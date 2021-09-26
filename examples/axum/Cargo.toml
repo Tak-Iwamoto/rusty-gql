@@ -1,0 +1,12 @@
+[package]
+name = "example-axum"
+version = "0.1.0"
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+askama = "0.10.5"
+axum = "0.2.5"
+rusty-gql = { path = "../.." }
+tokio = { version = "1.12.0", features = ["full"] }
