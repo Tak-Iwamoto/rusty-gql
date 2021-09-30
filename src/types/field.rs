@@ -1,4 +1,4 @@
-pub struct GraphQLArgument {
+pub struct GraphQLField {
     name: String,
     description: Option<String>,
 }

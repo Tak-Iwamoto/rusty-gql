@@ -9,6 +9,7 @@ fn test() {
     parse_query(v.as_str());
 }
 
+//graphql-jsのbuildExecutionContextが参考になりそう
 fn parse_query(query_doc: &str) -> Result<()> {
     let parsed_query = graphql_parser::parse_query::<&str>(query_doc)?;
     for node in parsed_query.definitions {
@@ -18,7 +19,6 @@ fn parse_query(query_doc: &str) -> Result<()> {
                     parse_selection_set(selection)
                 }
                 graphql_parser::query::OperationDefinition::Query(query) => {
-                    println!("{:?}", query.name);
                     for item in query.selection_set.items {
                         match item {
                             graphql_parser::query::Selection::Field(field) => {

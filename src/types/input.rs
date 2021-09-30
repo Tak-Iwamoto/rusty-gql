@@ -1,4 +1,4 @@
-pub struct GraphQLScalar {
+pub struct GraphQLInput {
     name: String,
     description: String,
 }
