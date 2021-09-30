@@ -1,3 +1,3 @@
 pub struct GraphQLError {
-    nodes: Vec<String>
+    nodes: Vec<String>,
 }

@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 
-use crate::{GraphQLError, GraphQLSchema, resolver::Resolver, types::GraphQLFragment};
+use crate::{resolver::Resolver, types::GraphQLFragment, GraphQLError, GraphQLSchema};
 
 pub struct Executor {
     schema: GraphQLSchema,
@@ -9,16 +9,11 @@ pub struct Executor {
     variables: HashSet<String, String>,
     field_resolver: Box<dyn Resolver>,
     type_resolver: Box<dyn Resolver>,
-    errors: Vec<GraphQLError>
+    errors: Vec<GraphQLError>,
 }
 
 impl Executor {
-    pub fn execute(&self) {
+    pub fn execute(&self) {}
 
-    }
-
-
-    fn execute_operation(&self) {
-
-    }
+    fn execute_operation(&self) {}
 }

@@ -4,7 +4,5 @@ pub struct Request {
 }
 
 impl Request {
-    fn execute(&self) {
-
-    }
+    fn execute(&self) {}
 }

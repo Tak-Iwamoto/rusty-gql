@@ -1,8 +1,14 @@
-use std::{convert::Infallible, net::SocketAddr};
 use askama::Template;
 use rusty_gql::GraphiQLTemplate;
+use std::{convert::Infallible, net::SocketAddr};
 
-use axum:: {Router, body::{Bytes, Full}, handler::{get}, http::{Response, StatusCode}, response::{Html, IntoResponse}};
+use axum::{
+    body::{Bytes, Full},
+    handler::get,
+    http::{Response, StatusCode},
+    response::{Html, IntoResponse},
+    Router,
+};
 
 #[tokio::main]
 async fn main() {

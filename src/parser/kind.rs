@@ -1,11 +1,5 @@
-pub struct Query {
+pub struct Query {}
 
-}
+pub struct Mutation {}
 
-pub struct Mutation {
-
-}
-
-pub struct Subscription {
-
-}
+pub struct Subscription {}

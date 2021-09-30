@@ -1,4 +1,7 @@
-use super::{enum_type::GraphQLEnum, input::GraphQLInput, interface::GraphQLInterface, object::GraphQLObject, scalar::GraphQLScalar, union_type::GraphQLUnion};
+use super::{
+    enum_type::GraphQLEnum, input::GraphQLInput, interface::GraphQLInterface,
+    object::GraphQLObject, scalar::GraphQLScalar, union_type::GraphQLUnion,
+};
 
 pub enum GraphQLType {
     GraphQLScalar(GraphQLScalar),
