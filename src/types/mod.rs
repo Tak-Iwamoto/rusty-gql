@@ -1,1 +1,23 @@
+mod argument;
+mod directive;
+mod enum_type;
+mod error;
+mod field;
+mod fragment;
+mod gql_type;
+mod input;
+mod interface;
+mod object;
+mod operation;
+mod query;
+mod mutation;
+mod subscription;
+mod scalar;
 mod schema;
+mod union_type;
+
+pub use directive::GraphQLDirective;
+pub use error::GraphQLError;
+pub use fragment::GraphQLFragment;
+pub use operation::GraphqlOperation;
+pub use schema::GraphQLSchema;

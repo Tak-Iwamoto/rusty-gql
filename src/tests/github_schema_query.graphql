@@ -1,0 +1,491 @@
+type Query {
+  """
+  Look up a code of conduct by its key
+  """
+  codeOfConduct(
+    """
+    The code of conduct's key
+    """
+    key: String!
+  ): CodeOfConduct
+
+  """
+  Look up a code of conduct by its key
+  """
+  codesOfConduct: [CodeOfConduct]
+
+  """
+  Look up an enterprise by URL slug.
+  """
+  enterprise(
+    """
+    The enterprise invitation token.
+    """
+    invitationToken: String
+
+    """
+    The enterprise URL slug.
+    """
+    slug: String!
+  ): Enterprise
+
+  """
+  Look up a pending enterprise administrator invitation by invitee, enterprise and role.
+  """
+  enterpriseAdministratorInvitation(
+    """
+    The slug of the enterprise the user was invited to join.
+    """
+    enterpriseSlug: String!
+
+    """
+    The role for the business member invitation.
+    """
+    role: EnterpriseAdministratorRole!
+
+    """
+    The login of the user invited to join the business.
+    """
+    userLogin: String!
+  ): EnterpriseAdministratorInvitation
+
+  """
+  Look up a pending enterprise administrator invitation by invitation token.
+  """
+  enterpriseAdministratorInvitationByToken(
+    """
+    The invitation token sent with the invitation email.
+    """
+    invitationToken: String!
+  ): EnterpriseAdministratorInvitation
+
+  """
+  Look up an open source license by its key
+  """
+  license(
+    """
+    The license's downcased SPDX ID
+    """
+    key: String!
+  ): License
+
+  """
+  Return a list of known open source licenses
+  """
+  licenses: [License]!
+
+  """
+  Get alphabetically sorted list of Marketplace categories
+  """
+  marketplaceCategories(
+    """
+    Exclude categories with no listings.
+    """
+    excludeEmpty: Boolean
+
+    """
+    Returns top level categories only, excluding any subcategories.
+    """
+    excludeSubcategories: Boolean
+
+    """
+    Return only the specified categories.
+    """
+    includeCategories: [String!]
+  ): [MarketplaceCategory!]!
+
+  """
+  Look up a Marketplace category by its slug.
+  """
+  marketplaceCategory(
+    """
+    The URL slug of the category.
+    """
+    slug: String!
+
+    """
+    Also check topic aliases for the category slug
+    """
+    useTopicAliases: Boolean
+  ): MarketplaceCategory
+
+  """
+  Look up a single Marketplace listing
+  """
+  marketplaceListing(
+    """
+    Select the listing that matches this slug. It's the short name of the listing used in its URL.
+    """
+    slug: String!
+  ): MarketplaceListing
+
+  """
+  Look up Marketplace listings
+  """
+  marketplaceListings(
+    """
+    Select listings that can be administered by the specified user.
+    """
+    adminId: ID
+
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Select listings visible to the viewer even if they are not approved. If omitted or
+    false, only approved listings will be returned.
+    """
+    allStates: Boolean
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """
+    Select only listings with the given category.
+    """
+    categorySlug: String
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+
+    """
+    Select listings for products owned by the specified organization.
+    """
+    organizationId: ID
+
+    """
+    Select only listings where the primary category matches the given category slug.
+    """
+    primaryCategoryOnly: Boolean = false
+
+    """
+    Select the listings with these slugs, if they are visible to the viewer.
+    """
+    slugs: [String]
+
+    """
+    Also check topic aliases for the category slug
+    """
+    useTopicAliases: Boolean
+
+    """
+    Select listings to which user has admin access. If omitted, listings visible to the
+    viewer are returned.
+    """
+    viewerCanAdmin: Boolean
+
+    """
+    Select only listings that offer a free trial.
+    """
+    withFreeTrialsOnly: Boolean = false
+  ): MarketplaceListingConnection!
+
+  """
+  Return information about the GitHub instance
+  """
+  meta: GitHubMetadata!
+
+  """
+  Fetches an object given its ID.
+  """
+  node(
+    """
+    ID of the object.
+    """
+    id: ID!
+  ): Node
+
+  """
+  Lookup nodes by a list of IDs.
+  """
+  nodes(
+    """
+    The list of node IDs.
+    """
+    ids: [ID!]!
+  ): [Node]!
+
+  """
+  Lookup a organization by login.
+  """
+  organization(
+    """
+    The organization's login.
+    """
+    login: String!
+  ): Organization
+
+  """
+  The client's rate limit information.
+  """
+  rateLimit(
+    """
+    If true, calculate the cost for the query without evaluating it
+    """
+    dryRun: Boolean = false
+  ): RateLimit
+
+  """
+  Hack to workaround https://github.com/facebook/relay/issues/112 re-exposing the root query object
+  """
+  relay: Query!
+
+  """
+  Lookup a given repository by the owner and repository name.
+  """
+  repository(
+    """
+    The name of the repository
+    """
+    name: String!
+
+    """
+    The login field of a user or organization
+    """
+    owner: String!
+  ): Repository
+
+  """
+  Lookup a repository owner (ie. either a User or an Organization) by login.
+  """
+  repositoryOwner(
+    """
+    The username to lookup the owner by.
+    """
+    login: String!
+  ): RepositoryOwner
+
+  """
+  Lookup resource by a URL.
+  """
+  resource(
+    """
+    The URL.
+    """
+    url: URI!
+  ): UniformResourceLocatable
+
+  """
+  Perform a search across resources.
+  """
+  search(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+
+    """
+    The search string to look for.
+    """
+    query: String!
+
+    """
+    The types of search items to search within.
+    """
+    type: SearchType!
+  ): SearchResultItemConnection!
+
+  """
+  GitHub Security Advisories
+  """
+  securityAdvisories(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Filter advisories by identifier, e.g. GHSA or CVE.
+    """
+    identifier: SecurityAdvisoryIdentifierFilter
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+
+    """
+    Ordering options for the returned topics.
+    """
+    orderBy: SecurityAdvisoryOrder = {field: UPDATED_AT, direction: DESC}
+
+    """
+    Filter advisories to those published since a time in the past.
+    """
+    publishedSince: DateTime
+
+    """
+    Filter advisories to those updated since a time in the past.
+    """
+    updatedSince: DateTime
+  ): SecurityAdvisoryConnection!
+
+  """
+  Fetch a Security Advisory by its GHSA ID
+  """
+  securityAdvisory(
+    """
+    GitHub Security Advisory ID.
+    """
+    ghsaId: String!
+  ): SecurityAdvisory
+
+  """
+  Software Vulnerabilities documented by GitHub Security Advisories
+  """
+  securityVulnerabilities(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """
+    An ecosystem to filter vulnerabilities by.
+    """
+    ecosystem: SecurityAdvisoryEcosystem
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+
+    """
+    Ordering options for the returned topics.
+    """
+    orderBy: SecurityVulnerabilityOrder = {field: UPDATED_AT, direction: DESC}
+
+    """
+    A package name to filter vulnerabilities by.
+    """
+    package: String
+
+    """
+    A list of severities to filter vulnerabilities by.
+    """
+    severities: [SecurityAdvisorySeverity!]
+  ): SecurityVulnerabilityConnection!
+
+  """
+  Users and organizations who can be sponsored via GitHub Sponsors.
+  """
+  sponsorables(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """
+    Optional filter for which dependencies should be checked for sponsorable
+    owners. Only sponsorable owners of dependencies in this ecosystem will be
+    included. Used when onlyDependencies = true.
+    """
+    dependencyEcosystem: SecurityAdvisoryEcosystem
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+
+    """
+    Whether only sponsorables who own the viewer's dependencies will be
+    returned. Must be authenticated to use. Can check an organization instead
+    for their dependencies owned by sponsorables by passing
+    orgLoginForDependencies.
+    """
+    onlyDependencies: Boolean = false
+
+    """
+    Ordering options for users and organizations returned from the connection.
+    """
+    orderBy: SponsorableOrder = {field: LOGIN, direction: ASC}
+
+    """
+    Optional organization username for whose dependencies should be checked.
+    Used when onlyDependencies = true. Omit to check your own dependencies. If
+    you are not an administrator of the organization, only dependencies from its
+    public repositories will be considered.
+    """
+    orgLoginForDependencies: String
+  ): SponsorableItemConnection!
+
+  """
+  Look up a topic by name.
+  """
+  topic(
+    """
+    The topic's name.
+    """
+    name: String!
+  ): Topic
+
+  """
+  Lookup a user by login.
+  """
+  user(
+    """
+    The user's login.
+    """
+    login: String!
+  ): User
+
+  """
+  The currently authenticated user.
+  """
+  viewer: User!
+}

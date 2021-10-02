@@ -1,1 +1,1 @@
-mod schema;
+mod query;
