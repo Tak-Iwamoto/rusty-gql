@@ -3,7 +3,9 @@ use super::{
     object::GraphQLObject, scalar::GraphQLScalar, union_type::GraphQLUnion,
 };
 
+#[derive(Debug)]
 pub enum GraphQLType {
+    Null,
     GraphQLScalar(GraphQLScalar),
     GraphQLObject(GraphQLObject),
     GraphQLInterface(GraphQLInterface),

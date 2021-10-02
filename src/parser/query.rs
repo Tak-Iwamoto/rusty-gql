@@ -4,7 +4,7 @@ use anyhow::Result;
 use graphql_parser::{query::SelectionSet, schema::Text};
 
 fn test() {
-    let contents = fs::read_to_string("src/tests/github_query.graphql");
+    let contents = fs::read_to_string("src/tests/github.graphql");
     let v = contents.unwrap();
     parse_query(v.as_str());
 }

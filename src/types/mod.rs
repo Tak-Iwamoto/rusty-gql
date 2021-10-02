@@ -10,6 +10,8 @@ mod interface;
 mod object;
 mod operation;
 mod query;
+mod mutation;
+mod subscription;
 mod scalar;
 mod schema;
 mod union_type;

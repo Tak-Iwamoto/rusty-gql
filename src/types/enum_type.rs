@@ -1,3 +1,4 @@
+#[derive(Debug)]
 pub struct GraphQLEnum {
     name: String,
     description: Option<String>,
