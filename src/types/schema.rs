@@ -1,6 +1,9 @@
 use std::collections::HashMap;
 
-use crate::types::GraphQLOperationSchema;
+use crate::types::{
+    enum_type::GraphQLEnum, input::GraphQLInput, interface::GraphQLInterface,
+    scalar::GraphQLScalar, union_type::GraphQLUnion, GraphQLOperationSchema,
+};
 
 use super::{gql_type::GraphQLType, GraphQLDirective};
 use anyhow::Result;
@@ -24,13 +27,12 @@ fn build_schema(schema_doc: &str) -> Result<GraphQLSchema> {
 
     for node in parsed_schema.definitions {
         match node {
-            graphql_parser::schema::Definition::SchemaDefinition(schema) => {
-                println!("{:?}", "schema");
-                println!("{:?}", schema.query.unwrap());
-            }
+            graphql_parser::schema::Definition::SchemaDefinition(schema) => {}
             graphql_parser::schema::Definition::TypeDefinition(type_def) => match type_def {
                 graphql_parser::schema::TypeDefinition::Scalar(scalar) => {
-                    println!("{:?}", scalar.name);
+                    let name = scalar.name.to_string();
+                    let gql_scalar = GraphQLScalar::parse(scalar);
+                    type_map.insert(name, GraphQLType::GraphQLScalar(gql_scalar));
                 }
 
                 graphql_parser::schema::TypeDefinition::Object(obj) => match &*obj.name {
@@ -56,35 +58,34 @@ fn build_schema(schema_doc: &str) -> Result<GraphQLSchema> {
                         }
                     }
                     _ => {
-                        println!("{:?}", obj.name);
                         // for field in obj.fields {
 
                         // }
                     }
                 },
                 graphql_parser::schema::TypeDefinition::Interface(interface) => {
-                    println!("{:?}", "interface");
-                    println!("{:?}", interface.name);
+                    let name = interface.name.to_string();
+                    let gql_interface = GraphQLInterface::parse(interface);
+                    type_map.insert(name, GraphQLType::GraphQLInterface(gql_interface));
                 }
-                graphql_parser::schema::TypeDefinition::Union(union) => {
-                    println!("{:?}", union.name);
+                graphql_parser::schema::TypeDefinition::Union(uni) => {
+                    let name = uni.name.to_string();
+                    let gql_union = GraphQLUnion::parse(uni);
+                    type_map.insert(name, GraphQLType::GraphQLUnion(gql_union));
                 }
                 graphql_parser::schema::TypeDefinition::Enum(enu) => {
-                    println!("{:?}", enu.name);
+                    let name = enu.name.to_string();
+                    let gql_enum = GraphQLEnum::parse(enu);
+                    type_map.insert(name, GraphQLType::GraphQLEnum(gql_enum));
                 }
                 graphql_parser::schema::TypeDefinition::InputObject(input) => {
-                    println!("{:?}", "input");
-                    println!("{:?}", input.name);
+                    let name = input.name.to_string();
+                    let gql_input = GraphQLInput::parse(input);
+                    type_map.insert(name, GraphQLType::GraphQLInput(gql_input));
                 }
             },
-            graphql_parser::schema::Definition::TypeExtension(type_ext) => {
-                println!("{:?}", "type_ext");
-                println!("{:?}", type_ext);
-            }
-            graphql_parser::schema::Definition::DirectiveDefinition(directive) => {
-                println!("{:?}", "directive");
-                println!("{:?}", directive);
-            }
+            graphql_parser::schema::Definition::TypeExtension(type_ext) => {}
+            graphql_parser::schema::Definition::DirectiveDefinition(directive) => {}
         }
     }
     Ok(GraphQLSchema {
@@ -100,7 +101,6 @@ fn parse_selection_set<'a, T: Text<'a>>(selection_set: SelectionSet<'a, T>) {
     for item in selection_set.items {
         match item {
             graphql_parser::query::Selection::Field(field) => {
-                println!("{:?}", field.name);
                 parse_selection_set(field.selection_set);
             }
             graphql_parser::query::Selection::FragmentSpread(_) => todo!(),
@@ -120,5 +120,6 @@ mod tests {
         let contents = fs::read_to_string("src/tests/github.graphql");
         let v = contents.unwrap();
         let schema = build_schema(v.as_str());
+        println!("{:?}", schema.unwrap().type_map.get("Date"));
     }
 }

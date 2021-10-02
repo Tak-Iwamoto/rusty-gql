@@ -6,5 +6,4 @@ pub struct GraphQLObject {
     description: Option<String>,
     fields: Vec<GraphQLField>,
     directives: Vec<GraphQLDirective>,
-    interfaces: Vec<GraphQLInterface>,
 }

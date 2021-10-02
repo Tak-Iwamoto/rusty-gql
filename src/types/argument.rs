@@ -1,12 +1,14 @@
 use graphql_parser::schema::{InputValue, Text};
 
-use super::gql_type::{GraphQLGenericType, GraphQLType};
+use super::{directive, gql_type::GraphQLGenericType, GraphQLDirective};
 
 #[derive(Debug)]
 pub struct GraphQLArgument {
     pub name: String,
     pub description: Option<String>,
     pub arg_type: GraphQLGenericType,
+    // TODO: parse directive
+    // pub directives: Vec<GraphQLDirective>,
 }
 
 impl GraphQLArgument {

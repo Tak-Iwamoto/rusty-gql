@@ -16,12 +16,12 @@ impl GraphQLOperationSchema {
         let args: Vec<GraphQLArgument> = field
             .arguments
             .into_iter()
-            .map(|field| GraphQLArgument::parse(field))
+            .map(|arg| GraphQLArgument::parse(arg))
             .collect();
         let directives: Vec<GraphQLDirective> = field
             .directives
             .into_iter()
-            .map(|f| GraphQLDirective::parse(f))
+            .map(|dir| GraphQLDirective::parse(dir))
             .collect();
         let return_type = GraphQLGenericType::parse(field.field_type);
 
