@@ -1,0 +1,1747 @@
+type Query {
+  """
+  Look up a code of conduct by its key
+  """
+  codeOfConduct(
+    """
+    The code of conduct's key
+    """
+    key: String!
+  ): CodeOfConduct
+
+  """
+  Look up a code of conduct by its key
+  """
+  codesOfConduct: [CodeOfConduct]
+
+  """
+  Look up an enterprise by URL slug.
+  """
+  enterprise(
+    """
+    The enterprise invitation token.
+    """
+    invitationToken: String
+
+    """
+    The enterprise URL slug.
+    """
+    slug: String!
+  ): Enterprise
+
+  """
+  Look up a pending enterprise administrator invitation by invitee, enterprise and role.
+  """
+  enterpriseAdministratorInvitation(
+    """
+    The slug of the enterprise the user was invited to join.
+    """
+    enterpriseSlug: String!
+
+    """
+    The role for the business member invitation.
+    """
+    role: EnterpriseAdministratorRole!
+
+    """
+    The login of the user invited to join the business.
+    """
+    userLogin: String!
+  ): EnterpriseAdministratorInvitation
+
+  """
+  Look up a pending enterprise administrator invitation by invitation token.
+  """
+  enterpriseAdministratorInvitationByToken(
+    """
+    The invitation token sent with the invitation email.
+    """
+    invitationToken: String!
+  ): EnterpriseAdministratorInvitation
+
+  """
+  Look up an open source license by its key
+  """
+  license(
+    """
+    The license's downcased SPDX ID
+    """
+    key: String!
+  ): License
+
+  """
+  Return a list of known open source licenses
+  """
+  licenses: [License]!
+
+  """
+  Get alphabetically sorted list of Marketplace categories
+  """
+  marketplaceCategories(
+    """
+    Exclude categories with no listings.
+    """
+    excludeEmpty: Boolean
+
+    """
+    Returns top level categories only, excluding any subcategories.
+    """
+    excludeSubcategories: Boolean
+
+    """
+    Return only the specified categories.
+    """
+    includeCategories: [String!]
+  ): [MarketplaceCategory!]!
+
+  """
+  Look up a Marketplace category by its slug.
+  """
+  marketplaceCategory(
+    """
+    The URL slug of the category.
+    """
+    slug: String!
+
+    """
+    Also check topic aliases for the category slug
+    """
+    useTopicAliases: Boolean
+  ): MarketplaceCategory
+
+  """
+  Look up a single Marketplace listing
+  """
+  marketplaceListing(
+    """
+    Select the listing that matches this slug. It's the short name of the listing used in its URL.
+    """
+    slug: String!
+  ): MarketplaceListing
+
+  """
+  Look up Marketplace listings
+  """
+  marketplaceListings(
+    """
+    Select listings that can be administered by the specified user.
+    """
+    adminId: ID
+
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Select listings visible to the viewer even if they are not approved. If omitted or
+    false, only approved listings will be returned.
+    """
+    allStates: Boolean
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """
+    Select only listings with the given category.
+    """
+    categorySlug: String
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+
+    """
+    Select listings for products owned by the specified organization.
+    """
+    organizationId: ID
+
+    """
+    Select only listings where the primary category matches the given category slug.
+    """
+    primaryCategoryOnly: Boolean = false
+
+    """
+    Select the listings with these slugs, if they are visible to the viewer.
+    """
+    slugs: [String]
+
+    """
+    Also check topic aliases for the category slug
+    """
+    useTopicAliases: Boolean
+
+    """
+    Select listings to which user has admin access. If omitted, listings visible to the
+    viewer are returned.
+    """
+    viewerCanAdmin: Boolean
+
+    """
+    Select only listings that offer a free trial.
+    """
+    withFreeTrialsOnly: Boolean = false
+  ): MarketplaceListingConnection!
+
+  """
+  Return information about the GitHub instance
+  """
+  meta: GitHubMetadata!
+
+  """
+  Fetches an object given its ID.
+  """
+  node(
+    """
+    ID of the object.
+    """
+    id: ID!
+  ): Node
+
+  """
+  Lookup nodes by a list of IDs.
+  """
+  nodes(
+    """
+    The list of node IDs.
+    """
+    ids: [ID!]!
+  ): [Node]!
+
+  """
+  Lookup a organization by login.
+  """
+  organization(
+    """
+    The organization's login.
+    """
+    login: String!
+  ): Organization
+
+  """
+  The client's rate limit information.
+  """
+  rateLimit(
+    """
+    If true, calculate the cost for the query without evaluating it
+    """
+    dryRun: Boolean = false
+  ): RateLimit
+
+  """
+  Hack to workaround https://github.com/facebook/relay/issues/112 re-exposing the root query object
+  """
+  relay: Query!
+
+  """
+  Lookup a given repository by the owner and repository name.
+  """
+  repository(
+    """
+    The name of the repository
+    """
+    name: String!
+
+    """
+    The login field of a user or organization
+    """
+    owner: String!
+  ): Repository
+
+  """
+  Lookup a repository owner (ie. either a User or an Organization) by login.
+  """
+  repositoryOwner(
+    """
+    The username to lookup the owner by.
+    """
+    login: String!
+  ): RepositoryOwner
+
+  """
+  Lookup resource by a URL.
+  """
+  resource(
+    """
+    The URL.
+    """
+    url: URI!
+  ): UniformResourceLocatable
+
+  """
+  Perform a search across resources.
+  """
+  search(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+
+    """
+    The search string to look for.
+    """
+    query: String!
+
+    """
+    The types of search items to search within.
+    """
+    type: SearchType!
+  ): SearchResultItemConnection!
+
+  """
+  GitHub Security Advisories
+  """
+  securityAdvisories(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Filter advisories by identifier, e.g. GHSA or CVE.
+    """
+    identifier: SecurityAdvisoryIdentifierFilter
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+
+    """
+    Ordering options for the returned topics.
+    """
+    orderBy: SecurityAdvisoryOrder = {field: UPDATED_AT, direction: DESC}
+
+    """
+    Filter advisories to those published since a time in the past.
+    """
+    publishedSince: DateTime
+
+    """
+    Filter advisories to those updated since a time in the past.
+    """
+    updatedSince: DateTime
+  ): SecurityAdvisoryConnection!
+
+  """
+  Fetch a Security Advisory by its GHSA ID
+  """
+  securityAdvisory(
+    """
+    GitHub Security Advisory ID.
+    """
+    ghsaId: String!
+  ): SecurityAdvisory
+
+  """
+  Software Vulnerabilities documented by GitHub Security Advisories
+  """
+  securityVulnerabilities(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """
+    An ecosystem to filter vulnerabilities by.
+    """
+    ecosystem: SecurityAdvisoryEcosystem
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+
+    """
+    Ordering options for the returned topics.
+    """
+    orderBy: SecurityVulnerabilityOrder = {field: UPDATED_AT, direction: DESC}
+
+    """
+    A package name to filter vulnerabilities by.
+    """
+    package: String
+
+    """
+    A list of severities to filter vulnerabilities by.
+    """
+    severities: [SecurityAdvisorySeverity!]
+  ): SecurityVulnerabilityConnection!
+
+  """
+  Users and organizations who can be sponsored via GitHub Sponsors.
+  """
+  sponsorables(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """
+    Optional filter for which dependencies should be checked for sponsorable
+    owners. Only sponsorable owners of dependencies in this ecosystem will be
+    included. Used when onlyDependencies = true.
+    """
+    dependencyEcosystem: SecurityAdvisoryEcosystem
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+
+    """
+    Whether only sponsorables who own the viewer's dependencies will be
+    returned. Must be authenticated to use. Can check an organization instead
+    for their dependencies owned by sponsorables by passing
+    orgLoginForDependencies.
+    """
+    onlyDependencies: Boolean = false
+
+    """
+    Ordering options for users and organizations returned from the connection.
+    """
+    orderBy: SponsorableOrder = {field: LOGIN, direction: ASC}
+
+    """
+    Optional organization username for whose dependencies should be checked.
+    Used when onlyDependencies = true. Omit to check your own dependencies. If
+    you are not an administrator of the organization, only dependencies from its
+    public repositories will be considered.
+    """
+    orgLoginForDependencies: String
+  ): SponsorableItemConnection!
+
+  """
+  Look up a topic by name.
+  """
+  topic(
+    """
+    The topic's name.
+    """
+    name: String!
+  ): Topic
+
+  """
+  Lookup a user by login.
+  """
+  user(
+    """
+    The user's login.
+    """
+    login: String!
+  ): User
+
+  """
+  The currently authenticated user.
+  """
+  viewer: User!
+}
+
+"""
+The root query for implementing GraphQL mutations.
+"""
+type Mutation {
+  """
+  Accepts a pending invitation for a user to become an administrator of an enterprise.
+  """
+  acceptEnterpriseAdministratorInvitation(
+    """
+    Parameters for AcceptEnterpriseAdministratorInvitation
+    """
+    input: AcceptEnterpriseAdministratorInvitationInput!
+  ): AcceptEnterpriseAdministratorInvitationPayload
+
+  """
+  Applies a suggested topic to the repository.
+  """
+  acceptTopicSuggestion(
+    """
+    Parameters for AcceptTopicSuggestion
+    """
+    input: AcceptTopicSuggestionInput!
+  ): AcceptTopicSuggestionPayload
+
+  """
+  Adds assignees to an assignable object.
+  """
+  addAssigneesToAssignable(
+    """
+    Parameters for AddAssigneesToAssignable
+    """
+    input: AddAssigneesToAssignableInput!
+  ): AddAssigneesToAssignablePayload
+
+  """
+  Adds a comment to an Issue or Pull Request.
+  """
+  addComment(
+    """
+    Parameters for AddComment
+    """
+    input: AddCommentInput!
+  ): AddCommentPayload
+
+  """
+  Adds a comment to a Discussion, possibly as a reply to another comment.
+  """
+  addDiscussionComment(
+    """
+    Parameters for AddDiscussionComment
+    """
+    input: AddDiscussionCommentInput!
+  ): AddDiscussionCommentPayload
+
+  """
+  Adds a support entitlement to an enterprise member.
+  """
+  addEnterpriseSupportEntitlement(
+    """
+    Parameters for AddEnterpriseSupportEntitlement
+    """
+    input: AddEnterpriseSupportEntitlementInput!
+  ): AddEnterpriseSupportEntitlementPayload
+
+  """
+  Adds labels to a labelable object.
+  """
+  addLabelsToLabelable(
+    """
+    Parameters for AddLabelsToLabelable
+    """
+    input: AddLabelsToLabelableInput!
+  ): AddLabelsToLabelablePayload
+
+  """
+  Adds a card to a ProjectColumn. Either `contentId` or `note` must be provided but **not** both.
+  """
+  addProjectCard(
+    """
+    Parameters for AddProjectCard
+    """
+    input: AddProjectCardInput!
+  ): AddProjectCardPayload
+
+  """
+  Adds a column to a Project.
+  """
+  addProjectColumn(
+    """
+    Parameters for AddProjectColumn
+    """
+    input: AddProjectColumnInput!
+  ): AddProjectColumnPayload
+
+  """
+  Adds a review to a Pull Request.
+  """
+  addPullRequestReview(
+    """
+    Parameters for AddPullRequestReview
+    """
+    input: AddPullRequestReviewInput!
+  ): AddPullRequestReviewPayload
+
+  """
+  Adds a comment to a review.
+  """
+  addPullRequestReviewComment(
+    """
+    Parameters for AddPullRequestReviewComment
+    """
+    input: AddPullRequestReviewCommentInput!
+  ): AddPullRequestReviewCommentPayload
+
+  """
+  Adds a new thread to a pending Pull Request Review.
+  """
+  addPullRequestReviewThread(
+    """
+    Parameters for AddPullRequestReviewThread
+    """
+    input: AddPullRequestReviewThreadInput!
+  ): AddPullRequestReviewThreadPayload
+
+  """
+  Adds a reaction to a subject.
+  """
+  addReaction(
+    """
+    Parameters for AddReaction
+    """
+    input: AddReactionInput!
+  ): AddReactionPayload
+
+  """
+  Adds a star to a Starrable.
+  """
+  addStar(
+    """
+    Parameters for AddStar
+    """
+    input: AddStarInput!
+  ): AddStarPayload
+
+  """
+  Add an upvote to a discussion or discussion comment.
+  """
+  addUpvote(
+    """
+    Parameters for AddUpvote
+    """
+    input: AddUpvoteInput!
+  ): AddUpvotePayload
+
+  """
+  Adds a verifiable domain to an owning account.
+  """
+  addVerifiableDomain(
+    """
+    Parameters for AddVerifiableDomain
+    """
+    input: AddVerifiableDomainInput!
+  ): AddVerifiableDomainPayload
+
+  """
+  Approve all pending deployments under one or more environments
+  """
+  approveDeployments(
+    """
+    Parameters for ApproveDeployments
+    """
+    input: ApproveDeploymentsInput!
+  ): ApproveDeploymentsPayload
+
+  """
+  Approve a verifiable domain for notification delivery.
+  """
+  approveVerifiableDomain(
+    """
+    Parameters for ApproveVerifiableDomain
+    """
+    input: ApproveVerifiableDomainInput!
+  ): ApproveVerifiableDomainPayload
+
+  """
+  Marks a repository as archived.
+  """
+  archiveRepository(
+    """
+    Parameters for ArchiveRepository
+    """
+    input: ArchiveRepositoryInput!
+  ): ArchiveRepositoryPayload
+
+  """
+  Cancels a pending invitation for an administrator to join an enterprise.
+  """
+  cancelEnterpriseAdminInvitation(
+    """
+    Parameters for CancelEnterpriseAdminInvitation
+    """
+    input: CancelEnterpriseAdminInvitationInput!
+  ): CancelEnterpriseAdminInvitationPayload
+
+  """
+  Cancel an active sponsorship.
+  """
+  cancelSponsorship(
+    """
+    Parameters for CancelSponsorship
+    """
+    input: CancelSponsorshipInput!
+  ): CancelSponsorshipPayload
+
+  """
+  Update your status on GitHub.
+  """
+  changeUserStatus(
+    """
+    Parameters for ChangeUserStatus
+    """
+    input: ChangeUserStatusInput!
+  ): ChangeUserStatusPayload
+
+  """
+  Clears all labels from a labelable object.
+  """
+  clearLabelsFromLabelable(
+    """
+    Parameters for ClearLabelsFromLabelable
+    """
+    input: ClearLabelsFromLabelableInput!
+  ): ClearLabelsFromLabelablePayload
+
+  """
+  Creates a new project by cloning configuration from an existing project.
+  """
+  cloneProject(
+    """
+    Parameters for CloneProject
+    """
+    input: CloneProjectInput!
+  ): CloneProjectPayload
+
+  """
+  Create a new repository with the same files and directory structure as a template repository.
+  """
+  cloneTemplateRepository(
+    """
+    Parameters for CloneTemplateRepository
+    """
+    input: CloneTemplateRepositoryInput!
+  ): CloneTemplateRepositoryPayload
+
+  """
+  Close an issue.
+  """
+  closeIssue(
+    """
+    Parameters for CloseIssue
+    """
+    input: CloseIssueInput!
+  ): CloseIssuePayload
+
+  """
+  Close a pull request.
+  """
+  closePullRequest(
+    """
+    Parameters for ClosePullRequest
+    """
+    input: ClosePullRequestInput!
+  ): ClosePullRequestPayload
+
+  """
+  Convert a project note card to one associated with a newly created issue.
+  """
+  convertProjectCardNoteToIssue(
+    """
+    Parameters for ConvertProjectCardNoteToIssue
+    """
+    input: ConvertProjectCardNoteToIssueInput!
+  ): ConvertProjectCardNoteToIssuePayload
+
+  """
+  Converts a pull request to draft
+  """
+  convertPullRequestToDraft(
+    """
+    Parameters for ConvertPullRequestToDraft
+    """
+    input: ConvertPullRequestToDraftInput!
+  ): ConvertPullRequestToDraftPayload
+
+  """
+  Create a new branch protection rule
+  """
+  createBranchProtectionRule(
+    """
+    Parameters for CreateBranchProtectionRule
+    """
+    input: CreateBranchProtectionRuleInput!
+  ): CreateBranchProtectionRulePayload
+
+  """
+  Create a check run.
+  """
+  createCheckRun(
+    """
+    Parameters for CreateCheckRun
+    """
+    input: CreateCheckRunInput!
+  ): CreateCheckRunPayload
+
+  """
+  Create a check suite
+  """
+  createCheckSuite(
+    """
+    Parameters for CreateCheckSuite
+    """
+    input: CreateCheckSuiteInput!
+  ): CreateCheckSuitePayload
+
+  """
+  Appends a commit to the given branch as the authenticated user.
+
+  This mutation creates a commit whose parent is the HEAD of the provided
+  branch and also updates that branch to point to the new commit.
+  It can be thought of as similar to `git commit`.
+
+  ### Locating a Branch
+
+  Commits are appended to a `branch` of type `Ref`.
+  This must refer to a git branch (i.e.  the fully qualified path must
+  begin with `refs/heads/`, although including this prefix is optional.
+
+  Callers may specify the `branch` to commit to either by its global node
+  ID or by passing both of `repositoryNameWithOwner` and `refName`.  For
+  more details see the documentation for `CommittableBranch`.
+
+  ### Describing Changes
+
+  `fileChanges` are specified as a `FilesChanges` object describing
+  `FileAdditions` and `FileDeletions`.
+
+  Please see the documentation for `FileChanges` for more information on
+  how to use this argument to describe any set of file changes.
+
+  ### Authorship
+
+  Similar to the web commit interface, this mutation does not support
+  specifying the author or committer of the commit and will not add
+  support for this in the future.
+
+  A commit created by a successful execution of this mutation will be
+  authored by the owner of the credential which authenticates the API
+  request.  The committer will be identical to that of commits authored
+  using the web interface.
+
+  If you need full control over author and committer information, please
+  use the Git Database REST API instead.
+
+  ### Commit Signing
+
+  Commits made using this mutation are automatically signed by GitHub if
+  supported and will be marked as verified in the user interface.
+  """
+  createCommitOnBranch(
+    """
+    Parameters for CreateCommitOnBranch
+    """
+    input: CreateCommitOnBranchInput!
+  ): CreateCommitOnBranchPayload
+
+  """
+  Create a content attachment.
+  """
+  createContentAttachment(
+    """
+    Parameters for CreateContentAttachment
+    """
+    input: CreateContentAttachmentInput!
+  ): CreateContentAttachmentPayload @preview(toggledBy: "corsair-preview")
+
+  """
+  Creates a new deployment event.
+  """
+  createDeployment(
+    """
+    Parameters for CreateDeployment
+    """
+    input: CreateDeploymentInput!
+  ): CreateDeploymentPayload @preview(toggledBy: "flash-preview")
+
+  """
+  Create a deployment status.
+  """
+  createDeploymentStatus(
+    """
+    Parameters for CreateDeploymentStatus
+    """
+    input: CreateDeploymentStatusInput!
+  ): CreateDeploymentStatusPayload @preview(toggledBy: "flash-preview")
+
+  """
+  Create a discussion.
+  """
+  createDiscussion(
+    """
+    Parameters for CreateDiscussion
+    """
+    input: CreateDiscussionInput!
+  ): CreateDiscussionPayload
+
+  """
+  Creates an organization as part of an enterprise account.
+  """
+  createEnterpriseOrganization(
+    """
+    Parameters for CreateEnterpriseOrganization
+    """
+    input: CreateEnterpriseOrganizationInput!
+  ): CreateEnterpriseOrganizationPayload
+
+  """
+  Creates an environment or simply returns it if already exists.
+  """
+  createEnvironment(
+    """
+    Parameters for CreateEnvironment
+    """
+    input: CreateEnvironmentInput!
+  ): CreateEnvironmentPayload
+
+  """
+  Creates a new IP allow list entry.
+  """
+  createIpAllowListEntry(
+    """
+    Parameters for CreateIpAllowListEntry
+    """
+    input: CreateIpAllowListEntryInput!
+  ): CreateIpAllowListEntryPayload
+
+  """
+  Creates a new issue.
+  """
+  createIssue(
+    """
+    Parameters for CreateIssue
+    """
+    input: CreateIssueInput!
+  ): CreateIssuePayload
+
+  """
+  Creates a new label.
+  """
+  createLabel(
+    """
+    Parameters for CreateLabel
+    """
+    input: CreateLabelInput!
+  ): CreateLabelPayload @preview(toggledBy: "bane-preview")
+
+  """
+  Creates a new project.
+  """
+  createProject(
+    """
+    Parameters for CreateProject
+    """
+    input: CreateProjectInput!
+  ): CreateProjectPayload
+
+  """
+  Create a new pull request
+  """
+  createPullRequest(
+    """
+    Parameters for CreatePullRequest
+    """
+    input: CreatePullRequestInput!
+  ): CreatePullRequestPayload
+
+  """
+  Create a new Git Ref.
+  """
+  createRef(
+    """
+    Parameters for CreateRef
+    """
+    input: CreateRefInput!
+  ): CreateRefPayload
+
+  """
+  Create a new repository.
+  """
+  createRepository(
+    """
+    Parameters for CreateRepository
+    """
+    input: CreateRepositoryInput!
+  ): CreateRepositoryPayload
+
+  """
+  Start a new sponsorship of a maintainer in GitHub Sponsors, or reactivate a past sponsorship.
+  """
+  createSponsorship(
+    """
+    Parameters for CreateSponsorship
+    """
+    input: CreateSponsorshipInput!
+  ): CreateSponsorshipPayload
+
+  """
+  Creates a new team discussion.
+  """
+  createTeamDiscussion(
+    """
+    Parameters for CreateTeamDiscussion
+    """
+    input: CreateTeamDiscussionInput!
+  ): CreateTeamDiscussionPayload
+
+  """
+  Creates a new team discussion comment.
+  """
+  createTeamDiscussionComment(
+    """
+    Parameters for CreateTeamDiscussionComment
+    """
+    input: CreateTeamDiscussionCommentInput!
+  ): CreateTeamDiscussionCommentPayload
+
+  """
+  Rejects a suggested topic for the repository.
+  """
+  declineTopicSuggestion(
+    """
+    Parameters for DeclineTopicSuggestion
+    """
+    input: DeclineTopicSuggestionInput!
+  ): DeclineTopicSuggestionPayload
+
+  """
+  Delete a branch protection rule
+  """
+  deleteBranchProtectionRule(
+    """
+    Parameters for DeleteBranchProtectionRule
+    """
+    input: DeleteBranchProtectionRuleInput!
+  ): DeleteBranchProtectionRulePayload
+
+  """
+  Deletes a deployment.
+  """
+  deleteDeployment(
+    """
+    Parameters for DeleteDeployment
+    """
+    input: DeleteDeploymentInput!
+  ): DeleteDeploymentPayload
+
+  """
+  Delete a discussion and all of its replies.
+  """
+  deleteDiscussion(
+    """
+    Parameters for DeleteDiscussion
+    """
+    input: DeleteDiscussionInput!
+  ): DeleteDiscussionPayload
+
+  """
+  Delete a discussion comment. If it has replies, wipe it instead.
+  """
+  deleteDiscussionComment(
+    """
+    Parameters for DeleteDiscussionComment
+    """
+    input: DeleteDiscussionCommentInput!
+  ): DeleteDiscussionCommentPayload
+
+  """
+  Deletes an environment
+  """
+  deleteEnvironment(
+    """
+    Parameters for DeleteEnvironment
+    """
+    input: DeleteEnvironmentInput!
+  ): DeleteEnvironmentPayload
+
+  """
+  Deletes an IP allow list entry.
+  """
+  deleteIpAllowListEntry(
+    """
+    Parameters for DeleteIpAllowListEntry
+    """
+    input: DeleteIpAllowListEntryInput!
+  ): DeleteIpAllowListEntryPayload
+
+  """
+  Deletes an Issue object.
+  """
+  deleteIssue(
+    """
+    Parameters for DeleteIssue
+    """
+    input: DeleteIssueInput!
+  ): DeleteIssuePayload
+
+  """
+  Deletes an IssueComment object.
+  """
+  deleteIssueComment(
+    """
+    Parameters for DeleteIssueComment
+    """
+    input: DeleteIssueCommentInput!
+  ): DeleteIssueCommentPayload
+
+  """
+  Deletes a label.
+  """
+  deleteLabel(
+    """
+    Parameters for DeleteLabel
+    """
+    input: DeleteLabelInput!
+  ): DeleteLabelPayload @preview(toggledBy: "bane-preview")
+
+  """
+  Delete a package version.
+  """
+  deletePackageVersion(
+    """
+    Parameters for DeletePackageVersion
+    """
+    input: DeletePackageVersionInput!
+  ): DeletePackageVersionPayload @preview(toggledBy: "package-deletes-preview")
+
+  """
+  Deletes a project.
+  """
+  deleteProject(
+    """
+    Parameters for DeleteProject
+    """
+    input: DeleteProjectInput!
+  ): DeleteProjectPayload
+
+  """
+  Deletes a project card.
+  """
+  deleteProjectCard(
+    """
+    Parameters for DeleteProjectCard
+    """
+    input: DeleteProjectCardInput!
+  ): DeleteProjectCardPayload
+
+  """
+  Deletes a project column.
+  """
+  deleteProjectColumn(
+    """
+    Parameters for DeleteProjectColumn
+    """
+    input: DeleteProjectColumnInput!
+  ): DeleteProjectColumnPayload
+
+  """
+  Deletes a pull request review.
+  """
+  deletePullRequestReview(
+    """
+    Parameters for DeletePullRequestReview
+    """
+    input: DeletePullRequestReviewInput!
+  ): DeletePullRequestReviewPayload
+
+  """
+  Deletes a pull request review comment.
+  """
+  deletePullRequestReviewComment(
+    """
+    Parameters for DeletePullRequestReviewComment
+    """
+    input: DeletePullRequestReviewCommentInput!
+  ): DeletePullRequestReviewCommentPayload
+
+  """
+  Delete a Git Ref.
+  """
+  deleteRef(
+    """
+    Parameters for DeleteRef
+    """
+    input: DeleteRefInput!
+  ): DeleteRefPayload
+
+  """
+  Deletes a team discussion.
+  """
+  deleteTeamDiscussion(
+    """
+    Parameters for DeleteTeamDiscussion
+    """
+    input: DeleteTeamDiscussionInput!
+  ): DeleteTeamDiscussionPayload
+
+  """
+  Deletes a team discussion comment.
+  """
+  deleteTeamDiscussionComment(
+    """
+    Parameters for DeleteTeamDiscussionComment
+    """
+    input: DeleteTeamDiscussionCommentInput!
+  ): DeleteTeamDiscussionCommentPayload
+
+  """
+  Deletes a verifiable domain.
+  """
+  deleteVerifiableDomain(
+    """
+    Parameters for DeleteVerifiableDomain
+    """
+    input: DeleteVerifiableDomainInput!
+  ): DeleteVerifiableDomainPayload
+
+  """
+  Disable auto merge on the given pull request
+  """
+  disablePullRequestAutoMerge(
+    """
+    Parameters for DisablePullRequestAutoMerge
+    """
+    input: DisablePullRequestAutoMergeInput!
+  ): DisablePullRequestAutoMergePayload
+
+  """
+  Dismisses an approved or rejected pull request review.
+  """
+  dismissPullRequestReview(
+    """
+    Parameters for DismissPullRequestReview
+    """
+    input: DismissPullRequestReviewInput!
+  ): DismissPullRequestReviewPayload
+
+  """
+  Enable the default auto-merge on a pull request.
+  """
+  enablePullRequestAutoMerge(
+    """
+    Parameters for EnablePullRequestAutoMerge
+    """
+    input: EnablePullRequestAutoMergeInput!
+  ): EnablePullRequestAutoMergePayload
+
+  """
+  Follow a user.
+  """
+  followUser(
+    """
+    Parameters for FollowUser
+    """
+    input: FollowUserInput!
+  ): FollowUserPayload
+
+  """
+  Creates a new project by importing columns and a list of issues/PRs.
+  """
+  importProject(
+    """
+    Parameters for ImportProject
+    """
+    input: ImportProjectInput!
+  ): ImportProjectPayload @preview(toggledBy: "slothette-preview")
+
+  """
+  Invite someone to become an administrator of the enterprise.
+  """
+  inviteEnterpriseAdmin(
+    """
+    Parameters for InviteEnterpriseAdmin
+    """
+    input: InviteEnterpriseAdminInput!
+  ): InviteEnterpriseAdminPayload
+
+  """
+  Creates a repository link for a project.
+  """
+  linkRepositoryToProject(
+    """
+    Parameters for LinkRepositoryToProject
+    """
+    input: LinkRepositoryToProjectInput!
+  ): LinkRepositoryToProjectPayload
+
+  """
+  Lock a lockable object
+  """
+  lockLockable(
+    """
+    Parameters for LockLockable
+    """
+    input: LockLockableInput!
+  ): LockLockablePayload
+
+  """
+  Mark a discussion comment as the chosen answer for discussions in an answerable category.
+  """
+  markDiscussionCommentAsAnswer(
+    """
+    Parameters for MarkDiscussionCommentAsAnswer
+    """
+    input: MarkDiscussionCommentAsAnswerInput!
+  ): MarkDiscussionCommentAsAnswerPayload
+
+  """
+  Mark a pull request file as viewed
+  """
+  markFileAsViewed(
+    """
+    Parameters for MarkFileAsViewed
+    """
+    input: MarkFileAsViewedInput!
+  ): MarkFileAsViewedPayload
+
+  """
+  Marks a pull request ready for review.
+  """
+  markPullRequestReadyForReview(
+    """
+    Parameters for MarkPullRequestReadyForReview
+    """
+    input: MarkPullRequestReadyForReviewInput!
+  ): MarkPullRequestReadyForReviewPayload
+
+  """
+  Merge a head into a branch.
+  """
+  mergeBranch(
+    """
+    Parameters for MergeBranch
+    """
+    input: MergeBranchInput!
+  ): MergeBranchPayload
+
+  """
+  Merge a pull request.
+  """
+  mergePullRequest(
+    """
+    Parameters for MergePullRequest
+    """
+    input: MergePullRequestInput!
+  ): MergePullRequestPayload
+
+  """
+  Minimizes a comment on an Issue, Commit, Pull Request, or Gist
+  """
+  minimizeComment(
+    """
+    Parameters for MinimizeComment
+    """
+    input: MinimizeCommentInput!
+  ): MinimizeCommentPayload
+
+  """
+  Moves a project card to another place.
+  """
+  moveProjectCard(
+    """
+    Parameters for MoveProjectCard
+    """
+    input: MoveProjectCardInput!
+  ): MoveProjectCardPayload
+
+  """
+  Moves a project column to another place.
+  """
+  moveProjectColumn(
+    """
+    Parameters for MoveProjectColumn
+    """
+    input: MoveProjectColumnInput!
+  ): MoveProjectColumnPayload
+
+  """
+  Pin an issue to a repository
+  """
+  pinIssue(
+    """
+    Parameters for PinIssue
+    """
+    input: PinIssueInput!
+  ): PinIssuePayload
+
+  """
+  Regenerates the identity provider recovery codes for an enterprise
+  """
+  regenerateEnterpriseIdentityProviderRecoveryCodes(
+    """
+    Parameters for RegenerateEnterpriseIdentityProviderRecoveryCodes
+    """
+    input: RegenerateEnterpriseIdentityProviderRecoveryCodesInput!
+  ): RegenerateEnterpriseIdentityProviderRecoveryCodesPayload
+
+  """
+  Regenerates a verifiable domain's verification token.
+  """
+  regenerateVerifiableDomainToken(
+    """
+    Parameters for RegenerateVerifiableDomainToken
+    """
+    input: RegenerateVerifiableDomainTokenInput!
+  ): RegenerateVerifiableDomainTokenPayload
+
+  """
+  Reject all pending deployments under one or more environments
+  """
+  rejectDeployments(
+    """
+    Parameters for RejectDeployments
+    """
+    input: RejectDeploymentsInput!
+  ): RejectDeploymentsPayload
+
+  """
+  Removes assignees from an assignable object.
+  """
+  removeAssigneesFromAssignable(
+    """
+    Parameters for RemoveAssigneesFromAssignable
+    """
+    input: RemoveAssigneesFromAssignableInput!
+  ): RemoveAssigneesFromAssignablePayload
+
+  """
+  Removes an administrator from the enterprise.
+  """
+  removeEnterpriseAdmin(
+    """
+    Parameters for RemoveEnterpriseAdmin
+    """
+    input: RemoveEnterpriseAdminInput!
+  ): RemoveEnterpriseAdminPayload
+
+  """
+  Removes the identity provider from an enterprise
+  """
+  removeEnterpriseIdentityProvider(
+    """
+    Parameters for RemoveEnterpriseIdentityProvider
+    """
+    input: RemoveEnterpriseIdentityProviderInput!
+  ): RemoveEnterpriseIdentityProviderPayload
+
+  """
+  Removes an organization from the enterprise
+  """
+  removeEnterpriseOrganization(
+    """
+    Parameters for RemoveEnterpriseOrganization
+    """
+    input: RemoveEnterpriseOrganizationInput!
+  ): RemoveEnterpriseOrganizationPayload
+
+  """
+  Removes a support entitlement from an enterprise member.
+  """
+  removeEnterpriseSupportEntitlement(
+    """
+    Parameters for RemoveEnterpriseSupportEntitlement
+    """
+    input: RemoveEnterpriseSupportEntitlementInput!
+  ): RemoveEnterpriseSupportEntitlementPayload
+
+  """
+  Removes labels from a Labelable object.
+  """
+  removeLabelsFromLabelable(
+    """
+    Parameters for RemoveLabelsFromLabelable
+    """
+    input: RemoveLabelsFromLabelableInput!
+  ): RemoveLabelsFromLabelablePayload
+
+  """
+  Removes outside collaborator from all repositories in an organization.
+  """
+  removeOutsideCollaborator(
+    """
+    Parameters for RemoveOutsideCollaborator
+    """
+    input: RemoveOutsideCollaboratorInput!
+  ): RemoveOutsideCollaboratorPayload
+
+  """
+  Removes a reaction from a subject.
+  """
+  removeReaction(
+    """
+    Parameters for RemoveReaction
+    """
+    input: RemoveReactionInput!
+  ): RemoveReactionPayload
+
+  """
+  Removes a star from a Starrable.
+  """
+  removeStar(
+    """
+    Parameters for RemoveStar
+    """
+    input: RemoveStarInput!
+  ): RemoveStarPayload
+
+  """
+  Remove an upvote to a discussion or discussion comment.
+  """
+  removeUpvote(
+    """
+    Parameters for RemoveUpvote
+    """
+    input: RemoveUpvoteInput!
+  ): RemoveUpvotePayload
+
+  """
+  Reopen a issue.
+  """
+  reopenIssue(
+    """
+    Parameters for ReopenIssue
+    """
+    input: ReopenIssueInput!
+  ): ReopenIssuePayload
+
+  """
+  Reopen a pull request.
+  """
+  reopenPullRequest(
+    """
+    Parameters for ReopenPullRequest
+    """
+    input: ReopenPullRequestInput!
+  ): ReopenPullRequestPayload
+
+  """
+  Set review requests on a pull request.
+  """
+  requestReviews(
+    """
+    Parameters for RequestReviews
+    """
+    input: RequestReviewsInput!
+  ): RequestReviewsPayload
+
+  """
+  Rerequests an existing check suite.
+  """
+  rerequestCheckSuite(
+    """
+    Parameters for RerequestCheckSuite
+    """
+    input: RerequestCheckSuiteInput!
+  ): RerequestCheckSuitePayload
+
+  """
+  Marks a review thread as resolved.
+  """
+  resolveReviewThread(
+    """
+    Parameters for ResolveReviewThread
+    """
+    input: ResolveReviewThreadInput!
+  ): ResolveReviewThreadPayload
+
+  """
+  Creates or updates the identity provider for an enterprise.
+  """
+  setEnterpriseIdentityProvider(
+    """
+    Parameters for SetEnterpriseIdentityProvider
+    """
+    input: SetEnterpriseIdentityProviderInput!
+  ): SetEnterpriseIdentityProviderPayload
+
+  """
+  Set an organization level interaction limit for an organization's public repositories.
+  """
+  setOrganizationInteractionLimit(
+    """
+    Parameters for SetOrganizationInteractionLimit
+    """
+    input: SetOrganizationInteractionLimitInput!
+  ): SetOrganizationInteractionLimitPayload
+
+  """
+  Sets an interaction limit setting for a repository.
+  """
+  setRepositoryInteractionLimit(
+    """
+    Parameters for SetRepositoryInteractionLimit
+    """
+    input: SetRepositoryInteractionLimitInput!
+  ): SetRepositoryInteractionLimitPayload
+
+  """
+  Set a user level interaction limit for an user's public repositories.
+  """
+  setUserInteractionLimit(
+    """
+    Parameters for SetUserInteractionLimit
+    """
+    input: SetUserInteractionLimitInput!
+  ): SetUserInteractionLimitPayload
+
+  """
+  Submits a pending pull request review.
+  """
+  submitPullRequestReview(
+    """
+    Parameters for SubmitPullRequestReview
+    """
+    input: SubmitPullRequestReviewInput!
+  ): SubmitPullRequestReviewPayload
+
+  """
+  Transfer an issue to a different repository
+  """
+  transferIssue(
+    """
+    Parameters for TransferIssue
+    """
+    input: TransferIssueInput!
+  ): TransferIssuePayload
+
+  """
+  Unarchives a repository.
+  """
+  unarchiveRepository(
+    """
+    Parameters for UnarchiveRepository
+    """
+    input: UnarchiveRepositoryInput!
+  ): UnarchiveRepositoryPayload
+
+  """
+  Unfollow a user.
+  """
+  unfollowUser(
+    """
+    Parameters for UnfollowUser
+    """
+    input: UnfollowUserInput!
+  ): UnfollowUserPayload
+
+  """
+  Deletes a repository link from a project.
+  """
+  unlinkRepositoryFromProject(
+    """
+    Parameters for UnlinkRepositoryFromProject
+    """
+    input: UnlinkRepositoryFromProjectInput!
+  ): UnlinkRepositoryFromProjectPayload
+
+  """
+  Unlock a lockable object
+  """
+  unlockLockable(
+    """
+    Parameters for UnlockLockable
+    """
+    input: UnlockLockableInput!
+  ): UnlockLockablePayload
+
+  """
+  Unmark a discussion comment as the chosen answer for discussions in an answerable category.
+  """
+  unmarkDiscussionCommentAsAnswer(
+    """
+    Parameters for UnmarkDiscussionCommentAsAnswer
+    """
+    input: UnmarkDiscussionCommentAsAnswerInput!
+  ): UnmarkDiscussionCommentAsAnswerPayload
+
+  """
+  Unmark a pull request file as viewed
+  """
+  unmarkFileAsViewed(
+    """
+    Parameters for UnmarkFileAsViewed
+    """
+    input: UnmarkFileAsViewedInput!
+  ): UnmarkFileAsViewedPayload
+
+  """
+  Unmark an issue as a duplicate of another issue.
+  """
+  unmarkIssueAsDuplicate(
+    """
+    Parameters for UnmarkIssueAsDuplicate
+    """
+    input: UnmarkIssueAsDuplicateInput!
+  ): UnmarkIssueAsDuplicatePayload
+
+  """
+  Unminimizes a comment on an Issue, Commit, Pull Request, or Gist
+  """
+  unminimizeComment(
+    """
+    Parameters for UnminimizeComment
+    """
+    input: UnminimizeCommentInput!
+  ): UnminimizeCommentPayload
+
+  """
+  Unpin a pinned issue from a repository
+  """
+  unpinIssue(
+    """
+    Parameters for UnpinIssue
+    """
+    input: UnpinIssueInput!
+  ): UnpinIssuePayload
+
+  """
+  Marks a review thread as unresolved.
+  """
+  unresolveReviewThread(
+    """
+    Parameters for UnresolveReviewThread
+    """
+    input: UnresolveReviewThreadInput!
+  ): UnresolveReviewThreadPayload
+
+  """
+  Create a new branch protection rule
+  """
+  updateBranchProtectionRule(
+    """
+    Parameters for UpdateBranchProtectionRule
+    """
+    input: UpdateBranchProtectionRuleInput!
+  ): UpdateBranchProtectionRulePayload
+}

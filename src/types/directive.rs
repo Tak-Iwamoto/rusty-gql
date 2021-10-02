@@ -5,17 +5,14 @@ use super::argument::GraphQLArgument;
 #[derive(Debug)]
 pub struct GraphQLDirective {
     pub name: String,
+    // TODO: directiveのargsを保存する
     // args: Vec<GraphQLArgument>,
 }
 
 impl GraphQLDirective {
-    pub fn parse<'a, T: Text<'a>>(input: Directive<'a, T>) -> GraphQLDirective {
-        for arg in input.arguments {
-
-        }
-
+    pub fn parse<'a>(input: Directive<'a, &'a str>) -> GraphQLDirective {
         GraphQLDirective {
-            name: format!("{:?}", input.name),
+            name: input.name.to_string(),
         }
     }
 }
