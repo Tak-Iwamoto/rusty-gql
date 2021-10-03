@@ -16,7 +16,7 @@ impl GraphQLOperationSchema {
         let args: Vec<GraphQLArgument> = field
             .arguments
             .into_iter()
-            .map(|arg| GraphQLArgument::parse(arg))
+            .map(|arg| -> GraphQLArgument { GraphQLArgument::parse(arg) })
             .collect();
         let directives: Vec<GraphQLDirective> = field
             .directives

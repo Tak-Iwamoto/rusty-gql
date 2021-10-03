@@ -2,7 +2,7 @@ use graphql_parser::schema::Type;
 
 use super::{
     enum_type::GraphQLEnum, input::GraphQLInput, interface::GraphQLInterface,
-    object::GraphQLObject, scalar::GraphQLScalar, union_type::GraphQLUnion,
+    object_type::GraphQLObjectType, scalar::GraphQLScalar, union_type::GraphQLUnion,
 };
 
 #[derive(Debug)]
@@ -26,7 +26,7 @@ impl GraphQLGenericType {
 pub enum GraphQLType {
     Null,
     GraphQLScalar(GraphQLScalar),
-    GraphQLObject(GraphQLObject),
+    GraphQLObject(GraphQLObjectType),
     GraphQLInterface(GraphQLInterface),
     GraphQLUnion(GraphQLUnion),
     GraphQLEnum(GraphQLEnum),

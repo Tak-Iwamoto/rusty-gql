@@ -1,20 +1,17 @@
 use std::collections::HashMap;
 
-use crate::types::{
-    enum_type::GraphQLEnum, input::GraphQLInput, interface::GraphQLInterface,
-    scalar::GraphQLScalar, union_type::GraphQLUnion, GraphQLOperationSchema,
+use super::{
+    directive::GraphQLDirectiveDefinition, GraphQLEnum, GraphQLInput, GraphQLInterface,
+    GraphQLObjectType, GraphQLOperationSchema, GraphQLScalar, GraphQLType, GraphQLUnion,
 };
-
-use super::{gql_type::GraphQLType, GraphQLDirective};
 use anyhow::Result;
-use graphql_parser::{query::SelectionSet, schema::Text};
 
 #[derive(Debug)]
 pub struct GraphQLSchema {
     pub queries: HashMap<String, GraphQLOperationSchema>,
     pub mutations: HashMap<String, GraphQLOperationSchema>,
     pub subscriptions: HashMap<String, GraphQLOperationSchema>,
-    pub directives: Vec<GraphQLDirective>,
+    pub directives: HashMap<String, GraphQLDirectiveDefinition>,
     pub type_map: HashMap<String, GraphQLType>,
 }
 
@@ -24,6 +21,7 @@ fn build_schema(schema_doc: &str) -> Result<GraphQLSchema> {
     let mut mutation_map = HashMap::new();
     let mut subscription_map = HashMap::new();
     let mut type_map = HashMap::new();
+    let mut directive_map = HashMap::new();
 
     for node in parsed_schema.definitions {
         match node {
@@ -58,9 +56,9 @@ fn build_schema(schema_doc: &str) -> Result<GraphQLSchema> {
                         }
                     }
                     _ => {
-                        // for field in obj.fields {
-
-                        // }
+                        let name = obj.name.to_string();
+                        let gql_object = GraphQLObjectType::parse(obj);
+                        type_map.insert(name, GraphQLType::GraphQLObject(gql_object));
                     }
                 },
                 graphql_parser::schema::TypeDefinition::Interface(interface) => {
@@ -85,28 +83,20 @@ fn build_schema(schema_doc: &str) -> Result<GraphQLSchema> {
                 }
             },
             graphql_parser::schema::Definition::TypeExtension(type_ext) => {}
-            graphql_parser::schema::Definition::DirectiveDefinition(directive) => {}
+            graphql_parser::schema::Definition::DirectiveDefinition(directive) => {
+                let name = directive.name.to_string();
+                let gql_directive = GraphQLDirectiveDefinition::parse(directive);
+                directive_map.insert(name, gql_directive);
+            }
         }
     }
     Ok(GraphQLSchema {
         queries: query_map,
         mutations: mutation_map,
         subscriptions: subscription_map,
-        directives: vec![],
+        directives: directive_map,
         type_map,
     })
-}
-
-fn parse_selection_set<'a, T: Text<'a>>(selection_set: SelectionSet<'a, T>) {
-    for item in selection_set.items {
-        match item {
-            graphql_parser::query::Selection::Field(field) => {
-                parse_selection_set(field.selection_set);
-            }
-            graphql_parser::query::Selection::FragmentSpread(_) => todo!(),
-            graphql_parser::query::Selection::InlineFragment(_) => todo!(),
-        }
-    }
 }
 
 #[cfg(test)]
@@ -120,6 +110,5 @@ mod tests {
         let contents = fs::read_to_string("src/tests/github.graphql");
         let v = contents.unwrap();
         let schema = build_schema(v.as_str());
-        println!("{:?}", schema.unwrap().type_map.get("Date"));
     }
 }

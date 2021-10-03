@@ -901,7 +901,7 @@ input ApproveDeploymentsInput {
   clientMutationId: String
 
   """
-  Optional comment for approving deployments
+  Optional comment for approving deploymentWorkflowRuns
   """
   comment: String = ""
 
