@@ -1,21 +1,21 @@
 use std::collections::HashMap;
 
 use super::{
-    directive::GraphQLDirectiveDefinition, GraphQLEnum, GraphQLInput, GraphQLInterface,
-    GraphQLObjectType, GraphQLOperationSchema, GraphQLScalar, GraphQLType, GraphQLUnion,
+    directive::GraphQLDirectiveDefinition, GraphQLEnum, GraphQLField, GraphQLInput,
+    GraphQLInterface, GraphQLObjectType, GraphQLScalar, GraphQLType, GraphQLUnion,
 };
 use anyhow::Result;
 
 #[derive(Debug)]
 pub struct GraphQLSchema {
-    pub queries: HashMap<String, GraphQLOperationSchema>,
-    pub mutations: HashMap<String, GraphQLOperationSchema>,
-    pub subscriptions: HashMap<String, GraphQLOperationSchema>,
+    pub queries: HashMap<String, GraphQLField>,
+    pub mutations: HashMap<String, GraphQLField>,
+    pub subscriptions: HashMap<String, GraphQLField>,
     pub directives: HashMap<String, GraphQLDirectiveDefinition>,
     pub type_map: HashMap<String, GraphQLType>,
 }
 
-fn build_schema(schema_doc: &str) -> Result<GraphQLSchema> {
+pub fn build_schema(schema_doc: &str) -> Result<GraphQLSchema> {
     let parsed_schema = graphql_parser::parse_schema::<&str>(schema_doc)?;
     let mut query_map = HashMap::new();
     let mut mutation_map = HashMap::new();
@@ -37,21 +37,21 @@ fn build_schema(schema_doc: &str) -> Result<GraphQLSchema> {
                     "Query" => {
                         for field in obj.fields {
                             let name = field.name.to_string();
-                            let query = GraphQLOperationSchema::parse(field);
+                            let query = GraphQLField::parse(field);
                             query_map.insert(name, query);
                         }
                     }
                     "Mutation" => {
                         for field in obj.fields {
                             let name = field.name.to_string();
-                            let query = GraphQLOperationSchema::parse(field);
+                            let query = GraphQLField::parse(field);
                             mutation_map.insert(name, query);
                         }
                     }
                     "Subscription" => {
                         for field in obj.fields {
                             let name = field.name.to_string();
-                            let query = GraphQLOperationSchema::parse(field);
+                            let query = GraphQLField::parse(field);
                             subscription_map.insert(name, query);
                         }
                     }
@@ -109,6 +109,20 @@ mod tests {
     fn it_works() {
         let contents = fs::read_to_string("src/tests/github.graphql");
         let v = contents.unwrap();
-        let schema = build_schema(v.as_str());
+        let schema = build_schema(v.as_str()).unwrap();
+        let query = schema.queries.get("codeOfConduct").unwrap();
+        for arg in &query.args {
+            match &arg.arg_type {
+                crate::types::GraphQLGenericType::NamedType(named_type) => {
+                    println!("{:?}", named_type);
+                }
+                crate::types::GraphQLGenericType::ListType(list) => {
+                    println!("{:?}", list);
+                }
+                crate::types::GraphQLGenericType::NonNullType(non_null) => {
+                    println!("{:?}", non_null);
+                }
+            }
+        }
     }
 }

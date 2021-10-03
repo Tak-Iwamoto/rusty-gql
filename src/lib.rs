@@ -1,5 +1,6 @@
 mod executor;
 mod graphql_value;
+mod operation;
 mod parser;
 mod request;
 mod resolver;

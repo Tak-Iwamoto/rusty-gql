@@ -1,12 +1,12 @@
 use graphql_parser::schema::ObjectType;
 
-use super::{GraphQLDirective, GraphQLOperationSchema};
+use super::{GraphQLDirective, GraphQLField};
 
 #[derive(Debug)]
 pub struct GraphQLObjectType {
     name: String,
     description: Option<String>,
-    fields: Vec<GraphQLOperationSchema>,
+    fields: Vec<GraphQLField>,
     directives: Vec<GraphQLDirective>,
     interfaces: Vec<String>,
 }
@@ -21,7 +21,7 @@ impl GraphQLObjectType {
         let fields = input
             .fields
             .into_iter()
-            .map(|field| GraphQLOperationSchema::parse(field))
+            .map(|field| GraphQLField::parse(field))
             .collect();
 
         let directives = input

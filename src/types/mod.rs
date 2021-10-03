@@ -22,7 +22,7 @@ pub use gql_type::GraphQLType;
 pub use input::GraphQLInput;
 pub use interface::GraphQLInterface;
 pub use object_type::GraphQLObjectType;
-pub use operation::GraphQLOperationSchema;
+pub use operation::GraphQLField;
 pub use scalar::GraphQLScalar;
 pub use schema::GraphQLSchema;
 pub use union_type::GraphQLUnion;

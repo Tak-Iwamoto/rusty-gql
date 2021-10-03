@@ -1,21 +1,21 @@
 use graphql_parser::schema::InterfaceType;
 
-use super::{GraphQLDirective, GraphQLOperationSchema};
+use super::{GraphQLDirective, GraphQLField};
 
 #[derive(Debug)]
 pub struct GraphQLInterface {
     name: String,
     description: Option<String>,
-    args: Vec<GraphQLOperationSchema>,
+    fields: Vec<GraphQLField>,
     directives: Vec<GraphQLDirective>,
 }
 
 impl GraphQLInterface {
     pub fn parse<'a>(input: InterfaceType<'a, &'a str>) -> Self {
-        let args = input
+        let fields = input
             .fields
             .into_iter()
-            .map(|f| GraphQLOperationSchema::parse(f))
+            .map(|f| GraphQLField::parse(f))
             .collect();
         let directives = input
             .directives
@@ -26,7 +26,7 @@ impl GraphQLInterface {
         GraphQLInterface {
             name: input.name.to_string(),
             description: input.description,
-            args,
+            fields,
             directives,
         }
     }
