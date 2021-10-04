@@ -1,10 +1,10 @@
 use std::collections::HashSet;
 
-use crate::{resolver::Resolver, types::GraphQLFragment, GraphQLError, GraphQLSchema};
+use crate::{resolver::Resolver, types::GraphQLFragmentDefinition, GraphQLError, GraphQLSchema};
 
 pub struct Executor {
     schema: GraphQLSchema,
-    fragments: HashSet<String, GraphQLFragment>,
+    fragments: HashSet<String, GraphQLFragmentDefinition>,
     // 一旦valueをstringにする
     variables: HashSet<String, String>,
     field_resolver: Box<dyn Resolver>,
