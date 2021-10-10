@@ -1,12 +1,9 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 use anyhow::Result;
-use graphql_parser::{
-    query::{Field, FragmentDefinition, Selection, SelectionSet},
-    schema::Text,
-};
+use graphql_parser::query::{Field, FragmentDefinition, Selection, SelectionSet};
 
-use crate::types::{GraphQLField, GraphQLFragmentDefinition};
+use crate::GraphQLSchema;
 
 enum GraphQLOperationType {
     Query,
@@ -66,9 +63,11 @@ fn build_operation(doc: &str) -> Result<()> {
 }
 
 fn collect_fields<'a>(
+    fragments: HashMap<String, FragmentDefinition<'a, &'a str>>,
     selection_set: SelectionSet<'a, &'a str>,
-) -> HashMap<String, Vec<Field<&str>>> {
+) -> HashMap<String, Vec<Field<'a, &'a str>>> {
     let mut fields_map: HashMap<String, Vec<Field<&str>>> = HashMap::new();
+    let mut visited_fragments = HashSet::new();
     for item in selection_set.items {
         match item {
             Selection::Field(field) => match fields_map.get(&field.name.to_string()) {
@@ -82,12 +81,46 @@ fn collect_fields<'a>(
                     fields_map.insert(field.name.to_string(), vec![field]);
                 }
             },
-            Selection::FragmentSpread(spread_frg) => {}
-            Selection::InlineFragment(inline_frg) => {}
+            Selection::FragmentSpread(spread_frg) => {
+                let fragment_name = spread_frg.fragment_name;
+                if visited_fragments.contains(fragment_name.to_string()) {
+                    continue;
+                }
+                visited_fragments.insert(fragment_name);
+                let fragment = fragments.get(fragment_name);
+                match fragment {
+                    Some(frg) => collect_fields(fragments, frg.selection_set),
+                    None => continue,
+                }
+            }
+            Selection::InlineFragment(inline_frg) => {
+                collect_fields(inline_frg.selection_set);
+            }
         }
     }
     fields_map
 }
+
+fn should_include_node() {}
+// function shouldIncludeNode(
+//     variableValues: { [variable: string]: unknown },
+//     node: FragmentSpreadNode | FieldNode | InlineFragmentNode,
+//   ): boolean {
+//     const skip = getDirectiveValues(GraphQLSkipDirective, node, variableValues);
+//     if (skip?.if === true) {
+//       return false;
+//     }
+
+//     const include = getDirectiveValues(
+//       GraphQLIncludeDirective,
+//       node,
+//       variableValues,
+//     );
+//     if (include?.if === false) {
+//       return false;
+//     }
+//     return true;
+//   }
 
 #[cfg(test)]
 mod tests {

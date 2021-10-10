@@ -1,6 +1,7 @@
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 
 use crate::{resolver::Resolver, types::GraphQLFragmentDefinition, GraphQLError, GraphQLSchema};
+use graphql_parser::query::{Field, FragmentDefinition, Selection, SelectionSet};
 
 pub struct Executor {
     schema: GraphQLSchema,

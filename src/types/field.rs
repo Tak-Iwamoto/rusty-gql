@@ -1,4 +1,3 @@
-use graphql_parser::query::Field as QueryField;
 use graphql_parser::schema::Field;
 
 use super::{argument::GraphQLArgument, gql_type::GraphQLGenericType, GraphQLDirective};
