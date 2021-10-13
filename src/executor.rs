@@ -1,7 +1,14 @@
-use std::collections::{HashMap, HashSet};
+use std::collections::HashSet;
 
-use crate::{resolver::Resolver, types::GraphQLFragmentDefinition, GraphQLError, GraphQLSchema};
-use graphql_parser::query::{Field, FragmentDefinition, Selection, SelectionSet};
+use crate::{
+    operation::GraphQLOperation, resolver::Resolver, types::GraphQLFragmentDefinition,
+    GraphQLError, GraphQLSchema,
+};
+
+pub struct ExecutorContext<'a> {
+    schema: GraphQLSchema,
+    operation: GraphQLOperation<'a>,
+}
 
 pub struct Executor {
     schema: GraphQLSchema,
@@ -11,10 +18,4 @@ pub struct Executor {
     field_resolver: Box<dyn Resolver>,
     type_resolver: Box<dyn Resolver>,
     errors: Vec<GraphQLError>,
-}
-
-impl Executor {
-    pub fn execute(&self) {}
-
-    fn execute_operation(&self) {}
 }

@@ -16,7 +16,7 @@ pub enum GraphQLValue {
     Object(BTreeMap<String, GraphQLValue>),
 }
 
-pub fn get_directive_values(directive: GraphQLDirective, node: Selection<&str>) {
+pub fn get_directive_values<'a>(directive: GraphQLDirective, node: Selection<'a, &'a str>) {
     let directveNode = match node {
         Selection::Field(field) => field
             .directives
@@ -33,6 +33,4 @@ pub fn get_directive_values(directive: GraphQLDirective, node: Selection<&str>) 
     };
 }
 
-pub fn get_argument_values(def: GraphQLField, node: Directive<&str>) {
-
-}
+pub fn get_argument_values<'a>(def: GraphQLField, node: Directive<'a, &'a str>) {}

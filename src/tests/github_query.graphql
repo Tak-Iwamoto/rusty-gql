@@ -1,24 +1,26 @@
-{
-  viewer {
-    repositories(first: 5) {
-      nodes {
-        name
-        pullRequests(last: 5) {
-          nodes {
-            number
-            url
-            state
-            reviews(last: 100) {
-              nodes {
-                author {
-                  login
-                }
-                state
+query {
+  repositories(first: 5) {
+    nodes {
+      name
+      pullRequests(last: 5) {
+        nodes {
+          number
+          url
+          state
+          reviews(last: 100) {
+            nodes {
+              author {
+                login
               }
+              state
             }
           }
         }
       }
     }
+  }
+  articles(limit: 2) {
+    id
+    title
   }
 }

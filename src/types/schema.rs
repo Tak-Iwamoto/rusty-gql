@@ -25,6 +25,7 @@ pub fn build_schema(schema_doc: &str) -> Result<GraphQLSchema> {
 
     for node in parsed_schema.definitions {
         match node {
+            // TODO:
             graphql_parser::schema::Definition::SchemaDefinition(schema) => {}
             graphql_parser::schema::Definition::TypeDefinition(type_def) => match type_def {
                 graphql_parser::schema::TypeDefinition::Scalar(scalar) => {
@@ -82,6 +83,7 @@ pub fn build_schema(schema_doc: &str) -> Result<GraphQLSchema> {
                     type_map.insert(name, GraphQLType::GraphQLInput(gql_input));
                 }
             },
+            // TODO:
             graphql_parser::schema::Definition::TypeExtension(type_ext) => {}
             graphql_parser::schema::Definition::DirectiveDefinition(directive) => {
                 let name = directive.name.to_string();
@@ -111,18 +113,5 @@ mod tests {
         let v = contents.unwrap();
         let schema = build_schema(v.as_str()).unwrap();
         let query = schema.queries.get("codeOfConduct").unwrap();
-        for arg in &query.args {
-            match &arg.arg_type {
-                crate::types::GraphQLGenericType::NamedType(named_type) => {
-                    println!("{:?}", named_type);
-                }
-                crate::types::GraphQLGenericType::ListType(list) => {
-                    println!("{:?}", list);
-                }
-                crate::types::GraphQLGenericType::NonNullType(non_null) => {
-                    println!("{:?}", non_null);
-                }
-            }
-        }
     }
 }
