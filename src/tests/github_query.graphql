@@ -1,4 +1,4 @@
-query {
+{
   repositories(first: 5) {
     nodes {
       name

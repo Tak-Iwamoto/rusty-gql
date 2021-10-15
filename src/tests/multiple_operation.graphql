@@ -16,3 +16,13 @@ query completedTasks {
     completed
   }
 }
+
+fragment postData on Post {
+  id
+  title
+  text
+  author {
+    username
+    displayName
+  }
+}

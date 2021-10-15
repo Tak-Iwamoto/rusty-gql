@@ -1,4 +1,4 @@
-use std::collections::HashSet;
+use std::{collections::HashSet};
 
 use crate::{
     operation::GraphQLOperation, resolver::Resolver, types::GraphQLFragmentDefinition,
@@ -9,6 +9,22 @@ pub struct ExecutorContext<'a> {
     schema: GraphQLSchema,
     operation: GraphQLOperation<'a>,
 }
+
+// impl<'a> ExecutorContext<'a> {
+//     pub fn collect_fields(&self) {
+//         for  def in self.operation.definitions {
+//             match def {
+//                 graphql_parser::query::Definition::Operation(operation_def) => {
+
+//                 },
+//                 graphql_parser::query::Definition::Fragment(_) => todo!(),
+//             }
+
+//         }
+
+//     }
+
+// }
 
 pub struct Executor {
     schema: GraphQLSchema,
