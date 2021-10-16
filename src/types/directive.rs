@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 
 use graphql_parser::schema::{Directive, DirectiveDefinition};
 
@@ -8,12 +8,12 @@ use super::argument::GraphQLArgument;
 pub struct GraphQLDirective {
     pub name: String,
     pub description: Option<String>,
-    pub args: HashMap<String, String>,
+    pub args: BTreeMap<String, String>,
 }
 
 impl GraphQLDirective {
     pub fn parse<'a>(input: Directive<'a, &'a str>) -> GraphQLDirective {
-        let mut args_map = HashMap::new();
+        let mut args_map = BTreeMap::new();
         for arg in input.arguments {
             args_map.insert(arg.0.to_string(), arg.1.to_string());
         }

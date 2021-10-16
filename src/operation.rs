@@ -1,8 +1,8 @@
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 
 use anyhow::{anyhow, Result};
 use graphql_parser::{
-    query::{Definition, FragmentDefinition, SelectionSet, VariableDefinition},
+    query::{FragmentDefinition, SelectionSet, VariableDefinition},
     schema::Directive,
 };
 
@@ -17,13 +17,14 @@ pub enum GraphQLOperationType {
 pub struct GraphQLOperation<'a> {
     pub operation_request: OperationRequest<'a>,
     pub operation_name: Option<String>,
-    pub fragments: HashMap<String, FragmentDefinition<'a, &'a str>>,
+    pub fragments: BTreeMap<String, FragmentDefinition<'a, &'a str>>,
     // pub variables:
     // pub errors
 }
 
 #[derive(Clone)]
-struct GQLOperationDefinition<'a> {
+pub struct GQLOperationDefinition<'a> {
+    pub name: Option<String>,
     pub operaton_type: GraphQLOperationType,
     pub directives: Vec<Directive<'a, &'a str>>,
     pub variable_definitions: Vec<VariableDefinition<'a, &'a str>>,
@@ -44,7 +45,7 @@ pub fn build_operation(
 ) -> Result<GraphQLOperation> {
     let parsed_query = graphql_parser::parse_query::<&str>(query_doc)?;
 
-    let mut fragments = HashMap::new();
+    let mut fragments = BTreeMap::new();
 
     let mut operations: Vec<GQLOperationDefinition> = Vec::new();
     for definition in parsed_query.definitions {
@@ -52,6 +53,7 @@ pub fn build_operation(
             graphql_parser::query::Definition::Operation(operation) => match operation {
                 graphql_parser::query::OperationDefinition::SelectionSet(selection_set) => {
                     operations.push(GQLOperationDefinition {
+                        name: None,
                         operaton_type: GraphQLOperationType::Query,
                         selection_set,
                         directives: vec![],
@@ -60,6 +62,7 @@ pub fn build_operation(
                 }
                 graphql_parser::query::OperationDefinition::Query(query) => {
                     operations.push(GQLOperationDefinition {
+                        name: query.name.map(|s| s.to_string()),
                         operaton_type: GraphQLOperationType::Query,
                         selection_set: query.selection_set,
                         directives: query.directives,
@@ -68,6 +71,7 @@ pub fn build_operation(
                 }
                 graphql_parser::query::OperationDefinition::Mutation(mutation) => {
                     operations.push(GQLOperationDefinition {
+                        name: mutation.name.map(|s| s.to_string()),
                         operaton_type: GraphQLOperationType::Query,
                         selection_set: mutation.selection_set,
                         directives: mutation.directives,
@@ -76,6 +80,7 @@ pub fn build_operation(
                 }
                 graphql_parser::query::OperationDefinition::Subscription(subscription) => {
                     operations.push(GQLOperationDefinition {
+                        name: subscription.name.map(|s| s.to_string()),
                         operaton_type: GraphQLOperationType::Query,
                         selection_set: subscription.selection_set,
                         directives: subscription.directives,
@@ -103,45 +108,14 @@ pub fn build_operation(
     })
 }
 
-pub fn test_parse(query_doc: &str) {
-    let parsed_query = graphql_parser::parse_query::<&str>(query_doc).unwrap();
-
-    let definitions = parsed_query.definitions;
-
-    for definition in &definitions {
-        match definition {
-            graphql_parser::query::Definition::Operation(operation) => match operation {
-                graphql_parser::query::OperationDefinition::SelectionSet(selection_set) => {
-                    println!("{:?}: {:?}", "selection_set", selection_set)
-                }
-                graphql_parser::query::OperationDefinition::Query(query) => {
-                    println!("{:?}: {:?}", "query", query)
-                }
-                graphql_parser::query::OperationDefinition::Mutation(mutation) => {
-                    println!("{:?}: {:?}", "mutation", mutation)
-                }
-                graphql_parser::query::OperationDefinition::Subscription(subscription) => {
-                    println!("{:?}: {:?}", "subscription", subscription)
-                }
-            },
-            graphql_parser::query::Definition::Fragment(fragment) => {
-                println!("{:?}: {:?}", "fragment", fragment)
-            }
-        }
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use std::fs;
-
-    use super::test_parse;
 
     #[test]
     fn it_works() {
         // let contents = fs::read_to_string("src/tests/multiple_operation.graphql");
         let contents = fs::read_to_string("src/tests/github_query.graphql");
         let v = contents.unwrap();
-        test_parse(v.as_str());
     }
 }

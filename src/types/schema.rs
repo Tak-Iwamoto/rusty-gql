@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 
 use super::{
     directive::GraphQLDirectiveDefinition, GraphQLEnum, GraphQLField, GraphQLInput,
@@ -8,20 +8,20 @@ use anyhow::Result;
 
 #[derive(Debug)]
 pub struct GraphQLSchema {
-    pub queries: HashMap<String, GraphQLField>,
-    pub mutations: HashMap<String, GraphQLField>,
-    pub subscriptions: HashMap<String, GraphQLField>,
-    pub directives: HashMap<String, GraphQLDirectiveDefinition>,
-    pub type_map: HashMap<String, GraphQLType>,
+    pub queries: BTreeMap<String, GraphQLField>,
+    pub mutations: BTreeMap<String, GraphQLField>,
+    pub subscriptions: BTreeMap<String, GraphQLField>,
+    pub directives: BTreeMap<String, GraphQLDirectiveDefinition>,
+    pub type_map: BTreeMap<String, GraphQLType>,
 }
 
 pub fn build_schema(schema_doc: &str) -> Result<GraphQLSchema> {
     let parsed_schema = graphql_parser::parse_schema::<&str>(schema_doc)?;
-    let mut query_map = HashMap::new();
-    let mut mutation_map = HashMap::new();
-    let mut subscription_map = HashMap::new();
-    let mut type_map = HashMap::new();
-    let mut directive_map = HashMap::new();
+    let mut query_map = BTreeMap::new();
+    let mut mutation_map = BTreeMap::new();
+    let mut subscription_map = BTreeMap::new();
+    let mut type_map = BTreeMap::new();
+    let mut directive_map = BTreeMap::new();
 
     for node in parsed_schema.definitions {
         match node {

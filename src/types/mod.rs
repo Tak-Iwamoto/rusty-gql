@@ -9,7 +9,7 @@ mod input;
 mod interface;
 mod object_type;
 mod scalar;
-mod schema;
+pub mod schema;
 mod type_extension;
 mod union_type;
 
