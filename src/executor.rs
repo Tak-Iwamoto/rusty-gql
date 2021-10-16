@@ -3,7 +3,7 @@ use std::collections::{BTreeMap, HashSet};
 use graphql_parser::query::{Field, Selection, SelectionSet};
 
 use crate::{
-    operation::{GQLOperationDefinition, GraphQLOperation, OperationRequest},
+    operation::{GraphQLOperation, OperationRequest},
     resolver::Resolver,
     types::GraphQLFragmentDefinition,
     GraphQLError, GraphQLSchema,
@@ -15,85 +15,73 @@ pub struct ExecutorContext<'a> {
 }
 
 impl<'a> ExecutorContext<'a> {
-    pub fn collect_fields(
-        &'a self,
-        selection_set: Option<&SelectionSet<'a, &'a str>>,
-    ) -> BTreeMap<String, Vec<Field<&str>>> {
+    pub fn collect_all_fields(&'a self) -> BTreeMap<String, Vec<Field<&str>>> {
         let mut fields: BTreeMap<String, Vec<Field<&str>>> = BTreeMap::new();
         let mut visited_fragments = HashSet::new();
 
-        // TODO: refactoring
         match &self.operation.operation_request {
             OperationRequest::Single(single_request) => {
-                for item in &single_request.selection_set.items {
-                    match item {
-                        Selection::Field(field) => match fields.get(&field.name.to_string()) {
-                            Some(_) => {
-                                fields
-                                    .get_mut(&field.name.to_string())
-                                    .unwrap()
-                                    .push(field.clone());
-                            }
-                            None => {
-                                fields.insert(field.name.to_string(), vec![field.clone()]);
-                            }
-                        },
-                        Selection::FragmentSpread(spread_frg) => {
-                            let fragment_name = spread_frg.fragment_name;
-                            if visited_fragments.contains(fragment_name) {
-                                continue;
-                            }
-                            visited_fragments.insert(fragment_name);
-                            let fragment = self.operation.fragments.get(fragment_name);
-                            match fragment {
-                                Some(frg) => return self.collect_fields(Some(&frg.selection_set)),
-                                None => continue,
-                            }
-                        }
-                        Selection::InlineFragment(inline_frg) => {
-                            self.collect_fields(Some(&inline_frg.selection_set));
-                        }
-                    }
-                }
+                self.collect_fields(
+                    &single_request.selection_set,
+                    &mut fields,
+                    &mut visited_fragments,
+                );
             }
             OperationRequest::Multi(requests) => {
                 for operation_def in requests {
-                    for item in &operation_def.selection_set.items {
-                        match item {
-                            Selection::Field(field) => match fields.get(&field.name.to_string()) {
-                                Some(_) => {
-                                    fields
-                                        .get_mut(&field.name.to_string())
-                                        .unwrap()
-                                        .push(field.clone());
-                                }
-                                None => {
-                                    fields.insert(field.name.to_string(), vec![field.clone()]);
-                                }
-                            },
-                            Selection::FragmentSpread(spread_frg) => {
-                                let fragment_name = spread_frg.fragment_name;
-                                if visited_fragments.contains(fragment_name) {
-                                    continue;
-                                }
-                                visited_fragments.insert(fragment_name);
-                                let fragment = self.operation.fragments.get(fragment_name);
-                                match fragment {
-                                    Some(frg) => {
-                                        return self.collect_fields(Some(&frg.selection_set))
-                                    }
-                                    None => continue,
-                                }
-                            }
-                            Selection::InlineFragment(inline_frg) => {
-                                self.collect_fields(Some(&inline_frg.selection_set));
-                            }
-                        }
-                    }
+                    self.collect_fields(
+                        &operation_def.selection_set,
+                        &mut fields,
+                        &mut visited_fragments,
+                    );
                 }
             }
         }
         fields
+    }
+
+    fn collect_fields(
+        &self,
+        selection_set: &SelectionSet<'a, &'a str>,
+        fields: &mut BTreeMap<String, Vec<Field<'a, &'a str>>>,
+        visited_fragments: &mut HashSet<&'a str>,
+    ) {
+        for item in &selection_set.items {
+            match item {
+                Selection::Field(field) => match fields.get(&field.name.to_string()) {
+                    Some(_) => {
+                        fields
+                            .get_mut(&field.name.to_string())
+                            .unwrap()
+                            .push(field.clone());
+                    }
+                    None => {
+                        fields.insert(field.name.to_string(), vec![field.clone()]);
+                    }
+                },
+                Selection::FragmentSpread(spread_frg) => {
+                    let fragment_name = spread_frg.fragment_name;
+                    if visited_fragments.contains(fragment_name) {
+                        continue;
+                    }
+                    visited_fragments.insert(fragment_name);
+                    let fragment = self.operation.fragments.get(fragment_name);
+                    match fragment {
+                        Some(frg) => {
+                            return self.collect_fields(
+                                &frg.selection_set,
+                                fields,
+                                visited_fragments,
+                            );
+                        }
+                        None => continue,
+                    }
+                }
+                Selection::InlineFragment(inline_frg) => {
+                    self.collect_fields(&inline_frg.selection_set, fields, visited_fragments);
+                }
+            }
+        }
     }
 }
 
@@ -127,7 +115,7 @@ mod tests {
             operation: query.unwrap(),
         };
 
-        let fields = context.collect_fields(None);
+        let fields = context.collect_all_fields();
 
         for field in fields {
             println!("{:?}", field);

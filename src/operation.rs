@@ -13,7 +13,6 @@ pub enum GraphQLOperationType {
     Subscription,
 }
 
-// single or multiのハンドリングをする
 pub struct GraphQLOperation<'a> {
     pub operation_request: OperationRequest<'a>,
     pub operation_name: Option<String>,
@@ -37,8 +36,6 @@ pub enum OperationRequest<'a> {
     Multi(Vec<GQLOperationDefinition<'a>>),
 }
 
-//graphql-jsのbuildExecutionContextが参考になりそう
-// fragmentとoperationと収集したfieldsを返すように実装する
 pub fn build_operation(
     query_doc: &str,
     operation_name: Option<String>,
@@ -106,16 +103,4 @@ pub fn build_operation(
         operation_name,
         fragments,
     })
-}
-
-#[cfg(test)]
-mod tests {
-    use std::fs;
-
-    #[test]
-    fn it_works() {
-        // let contents = fs::read_to_string("src/tests/multiple_operation.graphql");
-        let contents = fs::read_to_string("src/tests/github_query.graphql");
-        let v = contents.unwrap();
-    }
 }
