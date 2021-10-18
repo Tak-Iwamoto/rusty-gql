@@ -5,7 +5,6 @@ use graphql_parser::query::{Field, Selection, SelectionSet};
 use crate::{
     operation::{GraphQLOperation, OperationRequest},
     resolver::Resolver,
-    types::GraphQLFragmentDefinition,
     GraphQLError, GraphQLSchema,
 };
 
@@ -27,6 +26,7 @@ impl<'a> ExecutorContext<'a> {
                     &mut visited_fragments,
                 );
             }
+
             OperationRequest::Multi(requests) => {
                 for operation_def in requests {
                     self.collect_fields(
@@ -41,7 +41,7 @@ impl<'a> ExecutorContext<'a> {
     }
 
     fn collect_fields(
-        &self,
+        &'a self,
         selection_set: &SelectionSet<'a, &'a str>,
         fields: &mut BTreeMap<String, Vec<Field<'a, &'a str>>>,
         visited_fragments: &mut HashSet<&'a str>,
@@ -85,14 +85,15 @@ impl<'a> ExecutorContext<'a> {
     }
 }
 
-pub struct Executor {
-    schema: GraphQLSchema,
-    fragments: HashSet<String, GraphQLFragmentDefinition>,
-    // 一旦valueをstringにする
-    variables: HashSet<String, String>,
+pub struct Executor<'a> {
+    context: ExecutorContext<'a>,
     field_resolver: Box<dyn Resolver>,
     type_resolver: Box<dyn Resolver>,
     errors: Vec<GraphQLError>,
+}
+
+impl<'a> Executor<'a> {
+    pub fn execute_fields() {}
 }
 
 #[cfg(test)]
@@ -117,8 +118,12 @@ mod tests {
 
         let fields = context.collect_all_fields();
 
-        for field in fields {
-            println!("{:?}", field);
+        println!("{}", &fields.len());
+
+        for f in &fields["articles"] {
+            for item in &f.selection_set.items {
+                println!("{:?}", item);
+            }
         }
     }
 }

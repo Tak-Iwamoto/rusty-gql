@@ -1,10 +1,10 @@
 [package]
+edition = "2018"
 name = "rusty-gql"
 version = "0.1.0"
-edition = "2018"
 
 [workspace]
-members = ["examples/*"]
+members = ["examples/*", "derive"]
 
 [dependencies]
 anyhow = "1.0.44"
@@ -12,4 +12,5 @@ askama = "0.10.5"
 async-trait = "0.1.51"
 axum = "0.2.5"
 graphql-parser = "0.3.0"
+rusty-gql-derive = {path = "derive"}
 serde = "1.0.130"
