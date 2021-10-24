@@ -1,6 +1,6 @@
 [package]
 edition = "2018"
-name = "rusty-gql-derive"
+name = "rusty-gql-codegen"
 version = "0.1.0"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -11,4 +11,4 @@ proc-macro = true
 darling = "0.13.0"
 proc-macro2 = "1.0.29"
 quote = "1.0.10"
-syn = "1.0.80"
+syn = { version = "1.0.80", features = ["full", "extra-traits", "visit-mut", "visit"] }
