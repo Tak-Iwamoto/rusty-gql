@@ -32,5 +32,3 @@ pub struct GraphQLError {
     pub path: Vec<String>,
     pub extensions: Option<GraphQLTypedError>,
 }
-
-pub type ErrorResponse<T> = ::std::result::Result<T, GraphQLError>;

@@ -1,7 +1,6 @@
 mod argument;
 mod directive;
 mod enum_type;
-mod error;
 mod field;
 mod fragment;
 mod gql_type;
@@ -15,7 +14,6 @@ mod union_type;
 
 pub use directive::GraphQLDirective;
 pub use enum_type::GraphQLEnum;
-pub use error::GraphQLError;
 pub use field::GraphQLField;
 pub use fragment::GraphQLFragmentDefinition;
 pub use gql_type::GraphQLGenericType;
