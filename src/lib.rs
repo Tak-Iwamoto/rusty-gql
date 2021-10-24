@@ -5,11 +5,11 @@ mod request;
 mod resolver;
 mod server;
 mod template;
+mod error;
 mod types;
 
 pub use resolver::Resolver;
 pub use template::GraphiQLTemplate;
-pub use types::GraphQLError;
 pub use types::GraphQLSchema;
 
 #[cfg(test)]

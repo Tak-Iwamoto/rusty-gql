@@ -13,5 +13,3 @@ impl ProcMacroError {
         }
     }
 }
-
-pub type ProcMacroResult<T> = anyhow::Result<T, ProcMacroError>;
