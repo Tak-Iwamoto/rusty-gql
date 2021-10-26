@@ -19,8 +19,4 @@
       }
     }
   }
-  articles(limit: 2) {
-    id
-    title
-  }
 }

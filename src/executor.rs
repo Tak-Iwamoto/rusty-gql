@@ -2,11 +2,7 @@ use std::collections::{BTreeMap, HashSet};
 
 use graphql_parser::query::{Field, Selection, SelectionSet};
 
-use crate::{
-    operation::{GraphQLOperation, OperationRequest},
-    resolver::Resolver,
-    GraphQLError, GraphQLSchema,
-};
+use crate::{operation::GraphQLOperation, GraphQLSchema};
 
 pub struct ExecutorContext<'a> {
     pub schema: &'a GraphQLSchema,
@@ -33,27 +29,12 @@ fn collect_all_fields<'a>(
     let mut fields: BTreeMap<String, Vec<Field<&str>>> = BTreeMap::new();
     let mut visited_fragments = HashSet::new();
 
-    match &operation.operation_request {
-        OperationRequest::Single(single_request) => {
-            collect_fields(
-                operation,
-                &single_request.selection_set,
-                &mut fields,
-                &mut visited_fragments,
-            );
-        }
-
-        OperationRequest::Multi(requests) => {
-            for operation_def in requests {
-                collect_fields(
-                    operation,
-                    &operation_def.selection_set,
-                    &mut fields,
-                    &mut visited_fragments,
-                );
-            }
-        }
-    }
+    collect_fields(
+        operation,
+        &operation.definition.selection_set,
+        &mut fields,
+        &mut visited_fragments,
+    );
     fields
 }
 
@@ -107,19 +88,6 @@ fn collect_fields<'a>(
     }
 }
 
-impl<'a> ExecutorContext<'a> {}
-
-pub struct Executor<'a> {
-    context: ExecutorContext<'a>,
-    field_resolver: Box<dyn Resolver>,
-    type_resolver: Box<dyn Resolver>,
-    errors: Vec<GraphQLError>,
-}
-
-impl<'a> Executor<'a> {
-    pub fn execute_fields() {}
-}
-
 #[cfg(test)]
 mod tests {
     use crate::{
@@ -137,9 +105,7 @@ mod tests {
 
         let fields = collect_all_fields(&schema, &query);
 
-        println!("{}", &fields.len());
-
-        for f in &fields["articles"] {
+        for f in &fields["repositories"] {
             for item in &f.selection_set.items {
                 println!("{:?}", item);
             }
