@@ -1,8 +1,11 @@
 use std::collections::{BTreeMap, HashSet};
 
-use graphql_parser::query::{Field, Selection, SelectionSet};
+use graphql_parser::{
+    query::{Field, Selection, SelectionSet, VariableDefinition},
+    schema::Type,
+};
 
-use crate::{operation::GraphQLOperation, GraphQLSchema};
+use crate::{operation::GraphQLOperation, types::GraphQLType, GraphQLSchema};
 
 pub struct ExecutorContext<'a> {
     pub schema: &'a GraphQLSchema,
@@ -19,6 +22,37 @@ pub fn build_context<'a>(
         schema,
         operation,
         fields,
+    }
+}
+
+pub fn get_variables<'a>(schema: &'a GraphQLSchema, operation: &'a GraphQLOperation<'a>) {
+    let variable_definitions = &operation.definition.variable_definitions;
+    for var in variable_definitions {
+        let var_type = get_type(schema, &var.var_type);
+    }
+}
+
+pub fn get_type<'a>(
+    schema: &'a GraphQLSchema,
+    var_type: &'a Type<'a, &'a str>,
+) -> Option<GraphQLType> {
+    match var_type {
+        graphql_parser::schema::Type::NamedType(named_type) => {
+            return schema
+                .type_map
+                .get(&named_type.to_string())
+                .map(|var_ty| var_ty.clone())
+        }
+        graphql_parser::schema::Type::ListType(list) => {
+            let inner_type = get_type(schema, &list).unwrap();
+            let value = GraphQLType::List(Box::new(inner_type.clone()));
+            return Some(value);
+        }
+        graphql_parser::schema::Type::NonNullType(non_null) => {
+            let inner_type = get_type(schema, &non_null).unwrap();
+            let value = GraphQLType::NonNull(Box::new(inner_type.clone()));
+            return Some(value);
+        }
     }
 }
 

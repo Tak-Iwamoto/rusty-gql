@@ -2,7 +2,7 @@ use graphql_parser::schema::ObjectType;
 
 use super::{GraphQLDirective, GraphQLField};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct GraphQLObjectType {
     name: String,
     description: Option<String>,

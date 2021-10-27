@@ -4,7 +4,7 @@ use graphql_parser::schema::{Directive, DirectiveDefinition};
 
 use super::argument::GraphQLArgument;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct GraphQLDirective {
     pub name: String,
     pub description: Option<String>,

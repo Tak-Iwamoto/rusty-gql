@@ -2,7 +2,7 @@ use graphql_parser::schema::EnumType;
 
 use super::GraphQLDirective;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct GraphQLEnum {
     name: String,
     description: Option<String>,

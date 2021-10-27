@@ -2,7 +2,7 @@ use graphql_parser::schema::InterfaceType;
 
 use super::{GraphQLDirective, GraphQLField};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct GraphQLInterface {
     name: String,
     description: Option<String>,

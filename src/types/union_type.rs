@@ -2,7 +2,7 @@ use graphql_parser::schema::UnionType;
 
 use super::GraphQLDirective;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct GraphQLUnion {
     pub name: String,
     pub description: Option<String>,

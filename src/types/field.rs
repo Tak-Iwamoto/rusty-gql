@@ -2,7 +2,7 @@ use graphql_parser::schema::Field;
 
 use super::{argument::GraphQLArgument, gql_type::GraphQLGenericType, GraphQLDirective};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct GraphQLField {
     pub name: String,
     pub args: Vec<GraphQLArgument>,

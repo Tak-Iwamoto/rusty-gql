@@ -31,7 +31,7 @@ pub fn build_schema(schema_doc: &str) -> Result<GraphQLSchema> {
                 graphql_parser::schema::TypeDefinition::Scalar(scalar) => {
                     let name = scalar.name.to_string();
                     let gql_scalar = GraphQLScalar::parse(scalar);
-                    type_map.insert(name, GraphQLType::GraphQLScalar(gql_scalar));
+                    type_map.insert(name, GraphQLType::Scalar(gql_scalar));
                 }
 
                 graphql_parser::schema::TypeDefinition::Object(obj) => match &*obj.name {
@@ -59,28 +59,28 @@ pub fn build_schema(schema_doc: &str) -> Result<GraphQLSchema> {
                     _ => {
                         let name = obj.name.to_string();
                         let gql_object = GraphQLObjectType::parse(obj);
-                        type_map.insert(name, GraphQLType::GraphQLObject(gql_object));
+                        type_map.insert(name, GraphQLType::Object(gql_object));
                     }
                 },
                 graphql_parser::schema::TypeDefinition::Interface(interface) => {
                     let name = interface.name.to_string();
                     let gql_interface = GraphQLInterface::parse(interface);
-                    type_map.insert(name, GraphQLType::GraphQLInterface(gql_interface));
+                    type_map.insert(name, GraphQLType::Interface(gql_interface));
                 }
                 graphql_parser::schema::TypeDefinition::Union(uni) => {
                     let name = uni.name.to_string();
                     let gql_union = GraphQLUnion::parse(uni);
-                    type_map.insert(name, GraphQLType::GraphQLUnion(gql_union));
+                    type_map.insert(name, GraphQLType::Union(gql_union));
                 }
                 graphql_parser::schema::TypeDefinition::Enum(enu) => {
                     let name = enu.name.to_string();
                     let gql_enum = GraphQLEnum::parse(enu);
-                    type_map.insert(name, GraphQLType::GraphQLEnum(gql_enum));
+                    type_map.insert(name, GraphQLType::Enum(gql_enum));
                 }
                 graphql_parser::schema::TypeDefinition::InputObject(input) => {
                     let name = input.name.to_string();
                     let gql_input = GraphQLInput::parse(input);
-                    type_map.insert(name, GraphQLType::GraphQLInput(gql_input));
+                    type_map.insert(name, GraphQLType::Input(gql_input));
                 }
             },
             // TODO:

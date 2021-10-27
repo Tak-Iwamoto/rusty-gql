@@ -2,7 +2,7 @@ use graphql_parser::schema::InputObjectType;
 
 use super::{argument::GraphQLArgument, GraphQLDirective};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct GraphQLInput {
     name: String,
     description: Option<String>,

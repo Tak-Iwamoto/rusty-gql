@@ -2,7 +2,7 @@ use graphql_parser::schema::ScalarType;
 
 use super::GraphQLDirective;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct GraphQLScalar {
     pub name: String,
     pub description: Option<String>,

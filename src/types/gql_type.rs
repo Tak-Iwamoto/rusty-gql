@@ -5,7 +5,7 @@ use super::{
     object_type::GraphQLObjectType, scalar::GraphQLScalar, union_type::GraphQLUnion,
 };
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum GraphQLGenericType {
     NamedType(String),
     ListType(String),
@@ -22,14 +22,15 @@ impl GraphQLGenericType {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum GraphQLType {
     Null,
-    GraphQLScalar(GraphQLScalar),
-    GraphQLObject(GraphQLObjectType),
-    GraphQLInterface(GraphQLInterface),
-    GraphQLUnion(GraphQLUnion),
-    GraphQLEnum(GraphQLEnum),
-    GraphQLInput(GraphQLInput),
-    GraphQLList(Vec<GraphQLType>),
+    NonNull(Box<GraphQLType>),
+    Scalar(GraphQLScalar),
+    Object(GraphQLObjectType),
+    Interface(GraphQLInterface),
+    Union(GraphQLUnion),
+    Enum(GraphQLEnum),
+    Input(GraphQLInput),
+    List(Box<GraphQLType>),
 }
