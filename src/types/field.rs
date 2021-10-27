@@ -1,6 +1,6 @@
 use graphql_parser::schema::Field;
 
-use super::{argument::GraphQLArgument, gql_type::GraphQLGenericType, GraphQLDirective};
+use super::{argument::GraphQLArgument, gql_type::WrapType, GraphQLDirective};
 
 #[derive(Debug, Clone)]
 pub struct GraphQLField {
@@ -8,7 +8,7 @@ pub struct GraphQLField {
     pub args: Vec<GraphQLArgument>,
     pub description: Option<String>,
     pub directives: Vec<GraphQLDirective>,
-    pub return_type: GraphQLGenericType,
+    pub return_type: WrapType,
 }
 
 impl GraphQLField {
@@ -23,7 +23,7 @@ impl GraphQLField {
             .into_iter()
             .map(|dir| GraphQLDirective::parse(dir))
             .collect();
-        let return_type = GraphQLGenericType::parse(field.field_type);
+        let return_type = WrapType::parse(field.field_type);
 
         GraphQLField {
             name: field.name.to_string(),

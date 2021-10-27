@@ -6,18 +6,18 @@ use super::{
 };
 
 #[derive(Debug, Clone)]
-pub enum GraphQLGenericType {
+pub enum WrapType {
     NamedType(String),
     ListType(String),
     NonNullType(String),
 }
 
-impl GraphQLGenericType {
-    pub fn parse<'a>(input_type: Type<'a, &'a str>) -> GraphQLGenericType {
+impl WrapType {
+    pub fn parse<'a>(input_type: Type<'a, &'a str>) -> WrapType {
         match input_type {
-            Type::NamedType(named_type) => GraphQLGenericType::NamedType(named_type.into()),
-            Type::ListType(list_type) => GraphQLGenericType::ListType(list_type.to_string()),
-            Type::NonNullType(non_null) => GraphQLGenericType::NonNullType(non_null.to_string()),
+            Type::NamedType(named_type) => WrapType::NamedType(named_type.into()),
+            Type::ListType(list_type) => WrapType::ListType(list_type.to_string()),
+            Type::NonNullType(non_null) => WrapType::NonNullType(non_null.to_string()),
         }
     }
 }
