@@ -1,4 +1,7 @@
-use std::collections::{BTreeMap, HashMap, HashSet};
+use std::{
+    collections::{BTreeMap, HashMap, HashSet},
+    net::ToSocketAddrs,
+};
 
 use graphql_parser::{
     query::{Field, Selection, SelectionSet, VariableDefinition},
@@ -94,17 +97,16 @@ fn collect_fields<'a>(
 ) {
     for item in &selection_set.items {
         match item {
-            Selection::Field(field) => match fields.get(&field.name.to_string()) {
-                Some(_) => {
+            Selection::Field(field) => {
+                if fields.contains_key(&field.name.to_string()) {
                     fields
                         .get_mut(&field.name.to_string())
                         .unwrap()
                         .push(field.clone());
-                }
-                None => {
+                } else {
                     fields.insert(field.name.to_string(), vec![field.clone()]);
                 }
-            },
+            }
             Selection::FragmentSpread(spread_frg) => {
                 let fragment_name = spread_frg.fragment_name;
                 if visited_fragments.contains(fragment_name) {
