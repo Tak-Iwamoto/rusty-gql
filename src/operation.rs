@@ -40,7 +40,7 @@ pub fn build_operation<'a>(
     let mut operation_definitions: HashMap<&str, GraphQLOperationDefinition> = HashMap::new();
     let no_name_key = "no_name";
 
-    if operation_name == None && parsed_query.definitions.len() > 1 {
+    if operation_name.is_none() && parsed_query.definitions.len() > 1 {
         return Err(String::from(
             "Must provide operation name if multiple operation exist",
         ));
@@ -50,7 +50,7 @@ pub fn build_operation<'a>(
         match definition {
             graphql_parser::query::Definition::Operation(operation) => match operation {
                 graphql_parser::query::OperationDefinition::SelectionSet(selection_set) => {
-                    if operation_name == None {
+                    if operation_name.is_none() {
                         operation_definitions.insert(
                             no_name_key,
                             GraphQLOperationDefinition {

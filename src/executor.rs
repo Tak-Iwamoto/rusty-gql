@@ -1,8 +1,8 @@
-use std::collections::{BTreeMap, HashSet};
+use std::collections::{BTreeMap, HashMap, HashSet};
 
 use graphql_parser::{
     query::{Field, Selection, SelectionSet, VariableDefinition},
-    schema::Type,
+    schema::{Type, Value},
 };
 
 use crate::{operation::GraphQLOperation, types::GraphQLType, GraphQLSchema};
@@ -25,11 +25,25 @@ pub fn build_context<'a>(
     }
 }
 
-pub fn get_variables<'a>(schema: &'a GraphQLSchema, operation: &'a GraphQLOperation<'a>) {
+pub fn get_variables<'a>(
+    schema: &'a GraphQLSchema,
+    operation: &'a GraphQLOperation<'a>,
+) -> Result<HashMap<String, Value<'a, &'a str>>, String> {
     let variable_definitions = &operation.definition.variable_definitions;
+    let mut variables = HashMap::new();
     for var in variable_definitions {
         let var_type = get_type(schema, &var.var_type);
+        if var_type.is_none() {
+            continue;
+        }
+        let var_type = var_type.unwrap();
+
+        // TODO: error handling
+        if let Some(value) = &var.default_value {
+            variables.insert(var.name.to_string(), value.clone());
+        }
     }
+    Ok(variables)
 }
 
 pub fn get_type<'a>(
