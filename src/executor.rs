@@ -5,7 +5,12 @@ use graphql_parser::{
     schema::{Type, Value},
 };
 
-use crate::{operation::GraphQLOperation, types::GraphQLType, GraphQLSchema};
+use crate::{
+    graphql_value::{value_from_ast, GraphQLValue},
+    operation::GraphQLOperation,
+    types::GraphQLType,
+    GraphQLSchema,
+};
 
 pub struct ExecutorContext<'a> {
     pub schema: &'a GraphQLSchema,
@@ -28,26 +33,43 @@ pub fn build_context<'a>(
 pub fn get_variables<'a>(
     schema: &'a GraphQLSchema,
     operation: &'a GraphQLOperation<'a>,
-) -> Result<HashMap<String, Value<'a, &'a str>>, String> {
+    input_values: &BTreeMap<String, GraphQLValue>,
+) -> Result<HashMap<String, GraphQLValue>, String> {
     let variable_definitions = &operation.definition.variable_definitions;
     let mut variables = HashMap::new();
     for var in variable_definitions {
-        let var_type = get_type(schema, &var.var_type);
+        let var_type = get_type_from_schema(schema, &var.var_type);
         if var_type.is_none() {
             continue;
         }
         let var_type = var_type.unwrap();
 
-        // TODO: error handling
-        if let Some(value) = &var.default_value {
-            variables.insert(var.name.to_string(), value.clone());
+        let var_name = &var.name.to_string();
+        if !input_values.contains_key(var_name) {
+            if let Some(value) = &var.default_value {
+                variables.insert(
+                    var.name.to_string(),
+                    value_from_ast(value, &var_type, &None),
+                );
+            }
+        }
+
+        let value = input_values.get(var_name);
+
+        if let GraphQLType::NonNull(_) = var_type {
+            if value.is_none() {
+                return Err(format!("{} must not be null", var_name));
+            }
+        }
+
+        if let Some(var_value) = value {
+            variables.insert(var_name.to_string(), var_value.clone());
         }
     }
     Ok(variables)
 }
 
-
-pub fn get_type<'a>(
+pub fn get_type_from_schema<'a>(
     schema: &'a GraphQLSchema,
     var_type: &'a Type<'a, &'a str>,
 ) -> Option<GraphQLType> {
@@ -59,12 +81,12 @@ pub fn get_type<'a>(
                 .map(|var_ty| var_ty.clone())
         }
         graphql_parser::schema::Type::ListType(list) => {
-            let inner_type = get_type(schema, &list).unwrap();
+            let inner_type = get_type_from_schema(schema, &list).unwrap();
             let value = GraphQLType::List(Box::new(inner_type.clone()));
             return Some(value);
         }
         graphql_parser::schema::Type::NonNullType(non_null) => {
-            let inner_type = get_type(schema, &non_null).unwrap();
+            let inner_type = get_type_from_schema(schema, &non_null).unwrap();
             let value = GraphQLType::NonNull(Box::new(inner_type.clone()));
             return Some(value);
         }
