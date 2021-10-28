@@ -1,4 +1,4 @@
-use graphql_parser::schema::EnumType;
+use graphql_parser::schema::{EnumType};
 
 use super::GraphQLDirective;
 

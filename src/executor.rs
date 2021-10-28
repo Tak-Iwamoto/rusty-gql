@@ -1,7 +1,4 @@
-use std::{
-    collections::{BTreeMap, HashMap, HashSet},
-    net::ToSocketAddrs,
-};
+use std::collections::{BTreeMap, HashMap, HashSet};
 
 use graphql_parser::{
     query::{Field, Selection, SelectionSet, VariableDefinition},
@@ -48,6 +45,7 @@ pub fn get_variables<'a>(
     }
     Ok(variables)
 }
+
 
 pub fn get_type<'a>(
     schema: &'a GraphQLSchema,
