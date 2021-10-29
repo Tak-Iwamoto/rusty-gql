@@ -4,7 +4,6 @@ mod executor;
 mod graphql_object;
 mod graphql_value;
 mod operation;
-mod request;
 mod resolver;
 mod server;
 mod template;

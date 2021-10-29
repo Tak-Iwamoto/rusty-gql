@@ -1,23 +1,6 @@
 use graphql_parser::schema::{
-    EnumType, InputObjectType, InterfaceType, ObjectType, ScalarType, Type, UnionType,
+    EnumType, InputObjectType, InterfaceType, ObjectType, ScalarType, UnionType,
 };
-
-#[derive(Debug, Clone)]
-pub enum WrapType {
-    NamedType(String),
-    ListType(String),
-    NonNullType(String),
-}
-
-impl WrapType {
-    pub fn parse<'a>(input_type: Type<'a, &'a str>) -> WrapType {
-        match input_type {
-            Type::NamedType(named_type) => WrapType::NamedType(named_type.into()),
-            Type::ListType(list_type) => WrapType::ListType(list_type.to_string()),
-            Type::NonNullType(non_null) => WrapType::NonNullType(non_null.to_string()),
-        }
-    }
-}
 
 #[derive(Debug, Clone)]
 pub enum GraphQLType<'a> {
