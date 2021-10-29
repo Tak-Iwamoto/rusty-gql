@@ -1,8 +1,5 @@
-use graphql_parser::schema::Type;
-
-use super::{
-    enum_type::GraphQLEnum, input::GraphQLInput, interface::GraphQLInterface,
-    object_type::GraphQLObjectType, scalar::GraphQLScalar, union_type::GraphQLUnion,
+use graphql_parser::schema::{
+    EnumType, InputObjectType, InterfaceType, ObjectType, ScalarType, Type, UnionType,
 };
 
 #[derive(Debug, Clone)]
@@ -23,14 +20,14 @@ impl WrapType {
 }
 
 #[derive(Debug, Clone)]
-pub enum GraphQLType {
+pub enum GraphQLType<'a> {
     Null,
-    NonNull(Box<GraphQLType>),
-    Scalar(GraphQLScalar),
-    Object(GraphQLObjectType),
-    Interface(GraphQLInterface),
-    Union(GraphQLUnion),
-    Enum(GraphQLEnum),
-    Input(GraphQLInput),
-    List(Box<GraphQLType>),
+    NonNull(Box<GraphQLType<'a>>),
+    Scalar(ScalarType<'a, &'a str>),
+    Object(ObjectType<'a, &'a str>),
+    Interface(InterfaceType<'a, &'a str>),
+    Union(UnionType<'a, &'a str>),
+    Enum(EnumType<'a, &'a str>),
+    Input(InputObjectType<'a, &'a str>),
+    List(Box<GraphQLType<'a>>),
 }

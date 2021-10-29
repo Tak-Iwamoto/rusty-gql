@@ -1,8 +1,8 @@
 use std::collections::{BTreeMap, HashMap, HashSet};
 
 use graphql_parser::{
-    query::{Field, Selection, SelectionSet, VariableDefinition},
-    schema::{Type, Value},
+    query::{Field, Selection, SelectionSet},
+    schema::Type,
 };
 
 use crate::{
@@ -13,13 +13,13 @@ use crate::{
 };
 
 pub struct ExecutorContext<'a> {
-    pub schema: &'a GraphQLSchema,
+    pub schema: &'a GraphQLSchema<'a>,
     pub operation: &'a GraphQLOperation<'a>,
     pub fields: BTreeMap<String, Vec<Field<'a, &'a str>>>,
 }
 
 pub fn build_context<'a>(
-    schema: &'a GraphQLSchema,
+    schema: &'a GraphQLSchema<'a>,
     operation: &'a GraphQLOperation<'a>,
 ) -> ExecutorContext<'a> {
     let fields = collect_all_fields(schema, operation);
@@ -31,7 +31,7 @@ pub fn build_context<'a>(
 }
 
 pub fn get_variables<'a>(
-    schema: &'a GraphQLSchema,
+    schema: &'a GraphQLSchema<'a>,
     operation: &'a GraphQLOperation<'a>,
     input_values: &BTreeMap<String, GraphQLValue>,
 ) -> Result<HashMap<String, GraphQLValue>, String> {
@@ -69,10 +69,17 @@ pub fn get_variables<'a>(
     Ok(variables)
 }
 
+pub fn get_arguments<'a>(
+    field: Field<'a, &'a str>,
+    variable_values: HashMap<String, GraphQLValue>,
+) {
+    let arguments = field.arguments;
+}
+
 pub fn get_type_from_schema<'a>(
-    schema: &'a GraphQLSchema,
+    schema: &'a GraphQLSchema<'a>,
     var_type: &'a Type<'a, &'a str>,
-) -> Option<GraphQLType> {
+) -> Option<GraphQLType<'a>> {
     match var_type {
         graphql_parser::schema::Type::NamedType(named_type) => {
             return schema

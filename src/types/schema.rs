@@ -1,18 +1,16 @@
 use std::collections::BTreeMap;
 
-use super::{
-    directive::GraphQLDirectiveDefinition, GraphQLEnum, GraphQLField, GraphQLInput,
-    GraphQLInterface, GraphQLObjectType, GraphQLScalar, GraphQLType, GraphQLUnion,
-};
+use super::GraphQLType;
 use anyhow::Result;
+use graphql_parser::schema::{DirectiveDefinition, Field};
 
 #[derive(Debug)]
-pub struct GraphQLSchema {
-    pub queries: BTreeMap<String, GraphQLField>,
-    pub mutations: BTreeMap<String, GraphQLField>,
-    pub subscriptions: BTreeMap<String, GraphQLField>,
-    pub directives: BTreeMap<String, GraphQLDirectiveDefinition>,
-    pub type_map: BTreeMap<String, GraphQLType>,
+pub struct GraphQLSchema<'a> {
+    pub queries: BTreeMap<String, Field<'a, &'a str>>,
+    pub mutations: BTreeMap<String, Field<'a, &'a str>>,
+    pub subscriptions: BTreeMap<String, Field<'a, &'a str>>,
+    pub directives: BTreeMap<String, DirectiveDefinition<'a, &'a str>>,
+    pub type_map: BTreeMap<String, GraphQLType<'a>>,
 }
 
 pub fn build_schema(schema_doc: &str) -> Result<GraphQLSchema> {
@@ -30,65 +28,55 @@ pub fn build_schema(schema_doc: &str) -> Result<GraphQLSchema> {
             graphql_parser::schema::Definition::TypeDefinition(type_def) => match type_def {
                 graphql_parser::schema::TypeDefinition::Scalar(scalar) => {
                     let name = scalar.name.to_string();
-                    let gql_scalar = GraphQLScalar::parse(scalar);
-                    type_map.insert(name, GraphQLType::Scalar(gql_scalar));
+                    type_map.insert(name, GraphQLType::Scalar(scalar));
                 }
 
                 graphql_parser::schema::TypeDefinition::Object(obj) => match &*obj.name {
                     "Query" => {
                         for field in obj.fields {
                             let name = field.name.to_string();
-                            let query = GraphQLField::parse(field);
-                            query_map.insert(name, query);
+                            query_map.insert(name, field);
                         }
                     }
                     "Mutation" => {
                         for field in obj.fields {
                             let name = field.name.to_string();
-                            let query = GraphQLField::parse(field);
-                            mutation_map.insert(name, query);
+                            mutation_map.insert(name, field);
                         }
                     }
                     "Subscription" => {
                         for field in obj.fields {
                             let name = field.name.to_string();
-                            let query = GraphQLField::parse(field);
-                            subscription_map.insert(name, query);
+                            subscription_map.insert(name, field);
                         }
                     }
                     _ => {
                         let name = obj.name.to_string();
-                        let gql_object = GraphQLObjectType::parse(obj);
-                        type_map.insert(name, GraphQLType::Object(gql_object));
+                        type_map.insert(name, GraphQLType::Object(obj));
                     }
                 },
                 graphql_parser::schema::TypeDefinition::Interface(interface) => {
                     let name = interface.name.to_string();
-                    let gql_interface = GraphQLInterface::parse(interface);
-                    type_map.insert(name, GraphQLType::Interface(gql_interface));
+                    type_map.insert(name, GraphQLType::Interface(interface));
                 }
                 graphql_parser::schema::TypeDefinition::Union(uni) => {
                     let name = uni.name.to_string();
-                    let gql_union = GraphQLUnion::parse(uni);
-                    type_map.insert(name, GraphQLType::Union(gql_union));
+                    type_map.insert(name, GraphQLType::Union(uni));
                 }
                 graphql_parser::schema::TypeDefinition::Enum(enu) => {
                     let name = enu.name.to_string();
-                    let gql_enum = GraphQLEnum::parse(enu);
-                    type_map.insert(name, GraphQLType::Enum(gql_enum));
+                    type_map.insert(name, GraphQLType::Enum(enu));
                 }
                 graphql_parser::schema::TypeDefinition::InputObject(input) => {
                     let name = input.name.to_string();
-                    let gql_input = GraphQLInput::parse(input);
-                    type_map.insert(name, GraphQLType::Input(gql_input));
+                    type_map.insert(name, GraphQLType::Input(input));
                 }
             },
             // TODO:
             graphql_parser::schema::Definition::TypeExtension(type_ext) => {}
             graphql_parser::schema::Definition::DirectiveDefinition(directive) => {
                 let name = directive.name.to_string();
-                let gql_directive = GraphQLDirectiveDefinition::parse(directive);
-                directive_map.insert(name, gql_directive);
+                directive_map.insert(name, directive);
             }
         }
     }
