@@ -4,7 +4,7 @@ use futures::future::BoxFuture;
 use crate::{executor::ExecutorContext, graphql_value::GraphQLValue, GraphQLResponse};
 
 // この型のvecを作成してfuture::joinに渡すことで並列に処理することができる。
-type GraphQLFuture<'a> = BoxFuture<'a, GraphQLResponse<GraphQLValue>>;
+pub type GraphQLFuture<'a> = BoxFuture<'a, GraphQLResponse<GraphQLValue>>;
 
 // fieldごとにこのtraitを実装する
 #[async_trait]

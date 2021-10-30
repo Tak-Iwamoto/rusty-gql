@@ -46125,6 +46125,10 @@ type WorkflowRun implements Node {
   workflow: Workflow!
 }
 
+extend interface Actor {
+  nickname: String
+}
+
 """
 A valid x509 certificate string
 """
