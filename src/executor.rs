@@ -6,6 +6,7 @@ use graphql_parser::{
 };
 
 use crate::{
+    graphql_object::GraphQLObject,
     graphql_value::{value_from_ast, GraphQLValue},
     operation::GraphQLOperation,
     types::GraphQLType,
@@ -22,7 +23,7 @@ pub fn build_context<'a>(
     schema: &'a GraphQLSchema<'a>,
     operation: &'a GraphQLOperation<'a>,
 ) -> ExecutorContext<'a> {
-    let fields = collect_all_fields(schema, operation);
+    let fields = collect_all_fields(schema, operation, &operation.definition.selection_set);
     ExecutorContext {
         schema,
         operation,
@@ -100,16 +101,28 @@ pub fn get_type_from_schema<'a>(
     }
 }
 
+fn execute_fields<'a>(
+    ctx: &ExecutorContext,
+    parent_type: &GraphQLObject,
+    fields: Vec<Field<'a, &'a str>>,
+) {
+    // let field_def = get_field_def()
+}
+
+fn get_field_def<'a>(parent_type: &GraphQLObject, field: Field<'a, &'a str>) {}
+
+// TODO: schemaはfragmentの条件やskip directiveの処理で使用する
 fn collect_all_fields<'a>(
     schema: &'a GraphQLSchema,
     operation: &'a GraphQLOperation<'a>,
+    selection_set: &SelectionSet<'a, &'a str>,
 ) -> BTreeMap<String, Vec<Field<'a, &'a str>>> {
     let mut fields: BTreeMap<String, Vec<Field<&str>>> = BTreeMap::new();
     let mut visited_fragments = HashSet::new();
 
     collect_fields(
         operation,
-        &operation.definition.selection_set,
+        &selection_set,
         &mut fields,
         &mut visited_fragments,
     );
@@ -180,7 +193,7 @@ mod tests {
         let schema = build_schema(schema_doc.as_str()).unwrap();
         let query = build_operation(query_doc.as_str(), None).unwrap();
 
-        let fields = collect_all_fields(&schema, &query);
+        let fields = collect_all_fields(&schema, &query, &query.definition.selection_set);
 
         for f in &fields["repositories"] {
             for item in &f.selection_set.items {

@@ -1,7 +1,5 @@
 use std::collections::{BTreeMap, HashMap};
-
 use graphql_parser::schema::Value;
-
 use crate::types::GraphQLType;
 
 #[derive(Clone, Debug, PartialEq)]

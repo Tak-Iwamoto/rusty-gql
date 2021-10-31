@@ -259,11 +259,11 @@ mod tests {
 
     #[test]
     fn it_works() {
-        let contents = fs::read_to_string("src/tests/github.graphql");
+        let contents = fs::read_to_string("src/tests/pet_schema.graphql");
         let v = contents.unwrap();
         let schema = build_schema(v.as_str()).unwrap();
 
-        println!("{:?}", schema.type_map.get("Actor"));
-        let query = schema.queries.get("codeOfConduct").unwrap();
+        let query = schema.queries.get("pets").unwrap();
+        println!("{:?}", query);
     }
 }

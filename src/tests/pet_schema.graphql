@@ -1,5 +1,5 @@
 type Query {
-  pet: Pet
+  pets(first: Int): [Pet!]
 }
 
 interface Pet {
@@ -8,8 +8,10 @@ interface Pet {
 
 type Cat implements Pet {
   name: String
+  meows: Boolean
 }
 
 type Dog implements Pet {
   name: String
+  woofs: Boolean
 }
