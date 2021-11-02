@@ -1,5 +1,7 @@
 use proc_macro2::TokenStream;
 
+pub type ProcMacroResult<T> = std::result::Result<T, ProcMacroError>;
+
 pub enum ProcMacroError {
     Syn(syn::Error),
     Darling(darling::Error),
