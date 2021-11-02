@@ -1,4 +1,4 @@
-use std::{collections::HashMap, pin::Pin, process::Output, sync::Arc};
+use std::{collections::HashMap, pin::Pin};
 
 use futures::future::BoxFuture;
 
@@ -42,9 +42,9 @@ fn build_resolvers<'a>() -> HashMap<
 mod tests {
     use futures::join;
 
-    use crate::GraphQLResponse;
     use crate::container::build_resolvers;
     use crate::graphql_value::GraphQLValue;
+    use crate::GraphQLResponse;
 
     use super::test_async;
     use super::test_async1;

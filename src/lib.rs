@@ -8,6 +8,7 @@ mod resolver;
 mod server;
 mod template;
 mod types;
+mod test_async;
 
 use error::GraphQLError;
 pub use resolver::Resolver;
