@@ -264,6 +264,8 @@ mod tests {
         let schema = build_schema(v.as_str()).unwrap();
 
         let query = schema.queries.get("pets").unwrap();
-        println!("{:?}", query);
+        let cat = schema.type_map.get("Cat").unwrap();
+        println!("{:?}", query.field_type.to_string());
+        println!("{:?}", cat);
     }
 }

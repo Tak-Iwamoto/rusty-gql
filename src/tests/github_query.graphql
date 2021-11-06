@@ -1,26 +1,10 @@
 {
-  repositories(first: 5) {
-    nodes {
-      name
-      pullRequests(last: 5) {
-        nodes {
-          number
-          url
-          state
-          reviews(last: 100) {
-            nodes {
-              author {
-                login
-              }
-              state
-            }
-          }
-        }
-      }
+  repository(name: "react", owner: "facebook") {
+    name
+    owner {
+      id
+      login
     }
-  }
-  articles(limit: 2) {
-    id
-    title
+    url
   }
 }

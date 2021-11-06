@@ -1,7 +1,7 @@
 use async_trait::async_trait;
 use futures::future::BoxFuture;
 
-use crate::{executor::ExecutorContext, graphql_value::GraphQLValue, GraphQLResponse};
+use crate::{executor::ExecutionContext, graphql_value::GraphQLValue, GraphQLResponse};
 
 // この型のvecを作成してfuture::joinに渡すことで並列に処理することができる。
 pub type GraphQLFuture<'a> = BoxFuture<'a, GraphQLResponse<GraphQLValue>>;
@@ -9,12 +9,13 @@ pub type GraphQLFuture<'a> = BoxFuture<'a, GraphQLResponse<GraphQLValue>>;
 // fieldごとにこのtraitを実装する
 #[async_trait]
 pub trait Resolver: Send + Sync {
-    async fn resolve(&self, context: &ExecutorContext) -> GraphQLResponse<GraphQLValue>;
+    async fn resolve(&self, context: &ExecutionContext) -> GraphQLResponse<GraphQLValue>;
 }
 
 pub struct GraphQLPath {
-    prev: Box<GraphQLPath>,
-    typename: String,
+    pub prev: Option<Box<GraphQLPath>>,
+    pub key: String,
+    pub typename: String,
 }
 
 pub(crate) struct ResolverInfo {

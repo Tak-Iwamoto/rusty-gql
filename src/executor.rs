@@ -13,7 +13,7 @@ use crate::{
     GraphQLSchema,
 };
 
-pub struct ExecutorContext<'a> {
+pub struct ExecutionContext<'a> {
     pub schema: &'a GraphQLSchema<'a>,
     pub operation: &'a GraphQLOperation<'a>,
     pub fields: BTreeMap<String, Vec<Field<'a, &'a str>>>,
@@ -22,9 +22,9 @@ pub struct ExecutorContext<'a> {
 pub fn build_context<'a>(
     schema: &'a GraphQLSchema<'a>,
     operation: &'a GraphQLOperation<'a>,
-) -> ExecutorContext<'a> {
+) -> ExecutionContext<'a> {
     let fields = collect_all_fields(schema, operation, &operation.definition.selection_set);
-    ExecutorContext {
+    ExecutionContext {
         schema,
         operation,
         fields,
@@ -102,7 +102,7 @@ pub fn get_type_from_schema<'a>(
 }
 
 fn execute_fields<'a>(
-    ctx: &ExecutorContext,
+    ctx: &ExecutionContext,
     parent_type: &GraphQLObject,
     fields: Vec<Field<'a, &'a str>>,
 ) {
@@ -112,7 +112,7 @@ fn execute_fields<'a>(
 fn get_field_def<'a>(parent_type: &GraphQLObject, field: Field<'a, &'a str>) {}
 
 // TODO: schemaはfragmentの条件やskip directiveの処理で使用する
-fn collect_all_fields<'a>(
+pub fn collect_all_fields<'a>(
     schema: &'a GraphQLSchema,
     operation: &'a GraphQLOperation<'a>,
     selection_set: &SelectionSet<'a, &'a str>,
