@@ -1,4 +1,4 @@
-{
+query getRepository {
   repository(name: "react", owner: "facebook") {
     name
     owner {

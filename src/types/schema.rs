@@ -7,7 +7,7 @@ use graphql_parser::schema::{
 };
 
 #[derive(Debug)]
-pub struct GraphQLSchema<'a> {
+pub struct Schema<'a> {
     pub queries: BTreeMap<String, Field<'a, &'a str>>,
     pub mutations: BTreeMap<String, Field<'a, &'a str>>,
     pub subscriptions: BTreeMap<String, Field<'a, &'a str>>,
@@ -15,7 +15,7 @@ pub struct GraphQLSchema<'a> {
     pub type_map: BTreeMap<String, GraphQLType<'a>>,
 }
 
-pub fn build_schema(schema_doc: &str) -> Result<GraphQLSchema, String> {
+pub fn build_schema(schema_doc: &str) -> Result<Schema, String> {
     let parsed_schema =
         graphql_parser::parse_schema::<&str>(schema_doc).expect("failed to parse graphql schema");
     let mut query_map = BTreeMap::new();
@@ -242,7 +242,7 @@ pub fn build_schema(schema_doc: &str) -> Result<GraphQLSchema, String> {
             }
         }
     }
-    Ok(GraphQLSchema {
+    Ok(Schema {
         queries: query_map,
         mutations: mutation_map,
         subscriptions: subscription_map,

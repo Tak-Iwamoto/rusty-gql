@@ -1,5 +1,5 @@
 mod test_container;
-mod container;
+mod object_resolver;
 mod error;
 mod executor;
 mod graphql_object;
@@ -18,7 +18,7 @@ mod test_resolvers;
 use error::GraphQLError;
 pub use resolver::Resolver;
 pub use template::GraphiQLTemplate;
-pub use types::GraphQLSchema;
+pub use types::Schema;
 
 pub type GraphQLResponse<T> = ::std::result::Result<T, GraphQLError>;
 

@@ -8,33 +8,43 @@ use graphql_parser::{
 use crate::{
     graphql_object::GraphQLObject,
     graphql_value::{value_from_ast, GraphQLValue},
-    operation::GraphQLOperation,
+    operation::Operation,
+    path::GraphQLPath,
     types::GraphQLType,
-    GraphQLSchema,
+    Schema,
 };
 
 pub struct ExecutionContext<'a> {
-    pub schema: &'a GraphQLSchema<'a>,
-    pub operation: &'a GraphQLOperation<'a>,
+    pub schema: &'a Schema<'a>,
+    pub operation: &'a Operation<'a>,
     pub fields: BTreeMap<String, Vec<Field<'a, &'a str>>>,
-    // pub current_path: GraphQLPath,
+    // このcurrent_fieldを元にresolverの処理を適応する
+    // resolverはproc_macroでif文で書かれていて、nameが一致しないとき以外はresolve処理が走らないようになっている
+    pub current_field: Field<'a, &'a str>,
+    pub current_path: GraphQLPath,
 }
 
 pub fn build_context<'a>(
-    schema: &'a GraphQLSchema<'a>,
-    operation: &'a GraphQLOperation<'a>,
+    schema: &'a Schema<'a>,
+    operation: &'a Operation<'a>,
 ) -> ExecutionContext<'a> {
     let fields = collect_all_fields(schema, operation, &operation.definition.selection_set);
+    let current_path = GraphQLPath::default()
+        .prev(None)
+        .key(operation.definition.root_field.name.to_string());
+
     ExecutionContext {
         schema,
         operation,
         fields,
+        current_field: operation.definition.root_field.clone(),
+        current_path,
     }
 }
 
 pub fn get_variables<'a>(
-    schema: &'a GraphQLSchema<'a>,
-    operation: &'a GraphQLOperation<'a>,
+    schema: &'a Schema<'a>,
+    operation: &'a Operation<'a>,
     input_values: &BTreeMap<String, GraphQLValue>,
 ) -> Result<HashMap<String, GraphQLValue>, String> {
     let variable_definitions = &operation.definition.variable_definitions;
@@ -79,7 +89,7 @@ pub fn get_arguments<'a>(
 }
 
 pub fn get_type_from_schema<'a>(
-    schema: &'a GraphQLSchema<'a>,
+    schema: &'a Schema<'a>,
     var_type: &'a Type<'a, &'a str>,
 ) -> Option<GraphQLType<'a>> {
     match var_type {
@@ -114,8 +124,8 @@ fn get_field_def<'a>(parent_type: &GraphQLObject, field: Field<'a, &'a str>) {}
 
 // TODO: schemaはfragmentの条件やskip directiveの処理で使用する
 pub fn collect_all_fields<'a>(
-    schema: &'a GraphQLSchema,
-    operation: &'a GraphQLOperation<'a>,
+    schema: &'a Schema,
+    operation: &'a Operation<'a>,
     selection_set: &SelectionSet<'a, &'a str>,
 ) -> BTreeMap<String, Vec<Field<'a, &'a str>>> {
     let mut fields: BTreeMap<String, Vec<Field<&str>>> = BTreeMap::new();
@@ -131,7 +141,7 @@ pub fn collect_all_fields<'a>(
 }
 
 fn collect_fields<'a>(
-    operation: &'a GraphQLOperation<'a>,
+    operation: &'a Operation<'a>,
     selection_set: &SelectionSet<'a, &'a str>,
     fields: &mut BTreeMap<String, Vec<Field<'a, &'a str>>>,
     visited_fragments: &mut HashSet<&'a str>,

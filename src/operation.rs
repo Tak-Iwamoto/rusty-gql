@@ -6,15 +6,15 @@ use graphql_parser::{
 };
 
 #[derive(Debug)]
-pub struct GraphQLOperation<'a> {
-    pub definition: GraphQLOperationDefinition<'a>,
+pub struct Operation<'a> {
+    pub definition: OperationDefinition<'a>,
     pub fragments: BTreeMap<String, FragmentDefinition<'a, &'a str>>,
     // pub variables:
     // pub errors
 }
 
 #[derive(Clone, Debug)]
-pub struct GraphQLOperationDefinition<'a> {
+pub struct OperationDefinition<'a> {
     pub directives: Vec<Directive<'a, &'a str>>,
     pub variable_definitions: Vec<VariableDefinition<'a, &'a str>>,
     pub selection_set: SelectionSet<'a, &'a str>,
@@ -25,12 +25,12 @@ pub struct GraphQLOperationDefinition<'a> {
 pub fn build_operation<'a>(
     query_doc: &'a str,
     operation_name: Option<&str>,
-) -> Result<GraphQLOperation<'a>, String> {
+) -> Result<Operation<'a>, String> {
     let parsed_query = graphql_parser::parse_query::<&str>(query_doc).unwrap();
 
     let mut fragments = BTreeMap::new();
 
-    let mut operation_definitions: HashMap<&str, GraphQLOperationDefinition> = HashMap::new();
+    let mut operation_definitions: HashMap<&str, OperationDefinition> = HashMap::new();
     let no_name_key = "no_name";
 
     if operation_name.is_none() && parsed_query.definitions.len() > 1 {
@@ -47,7 +47,7 @@ pub fn build_operation<'a>(
                         let root_field = get_root_field(&selection_set)?;
                         operation_definitions.insert(
                             no_name_key,
-                            GraphQLOperationDefinition {
+                            OperationDefinition {
                                 selection_set,
                                 root_field,
                                 directives: vec![],
@@ -61,7 +61,7 @@ pub fn build_operation<'a>(
                     let root_field = get_root_field(&query.selection_set)?;
                     operation_definitions.insert(
                         query_name,
-                        GraphQLOperationDefinition {
+                        OperationDefinition {
                             selection_set: query.selection_set,
                             root_field,
                             directives: query.directives,
@@ -74,7 +74,7 @@ pub fn build_operation<'a>(
                     let root_field = get_root_field(&mutation.selection_set)?;
                     operation_definitions.insert(
                         mutation_name,
-                        GraphQLOperationDefinition {
+                        OperationDefinition {
                             selection_set: mutation.selection_set,
                             root_field,
                             directives: mutation.directives,
@@ -87,7 +87,7 @@ pub fn build_operation<'a>(
                     let root_field = get_root_field(&subscription.selection_set)?;
                     operation_definitions.insert(
                         subscription_name,
-                        GraphQLOperationDefinition {
+                        OperationDefinition {
                             selection_set: subscription.selection_set,
                             root_field,
                             directives: subscription.directives,
@@ -107,19 +107,25 @@ pub fn build_operation<'a>(
         Some(name) => {
             let target_def = operation_definitions.get(name);
             match target_def {
-                Some(definition) => Ok(GraphQLOperation {
+                Some(definition) => Ok(Operation {
                     definition: definition.clone(),
                     fragments,
                 }),
-                None => Err(format!("{} is not query name", name)),
+                None => Err(format!("{} is not contained in query", name)),
             }
         }
         None => match operation_definitions.get(no_name_key) {
-            Some(definition) => Ok(GraphQLOperation {
+            Some(definition) => Ok(Operation {
                 definition: definition.clone(),
                 fragments,
             }),
-            None => Err(String::from("operation does not exist")),
+            None => match operation_definitions.values().next() {
+                Some(definition) => Ok(Operation {
+                    definition: definition.clone(),
+                    fragments,
+                }),
+                None => Err(String::from("operation does not exist")),
+            },
         },
     }
 }
@@ -142,14 +148,19 @@ fn get_root_field<'a>(
 mod tests {
     use std::fs;
 
+    use crate::types::schema::build_schema;
+
     use super::build_operation;
 
     #[test]
     fn it_works() {
+        let schema_doc = fs::read_to_string("src/tests/pet_schema.graphql").unwrap();
+        let schema = build_schema(schema_doc.as_str()).unwrap();
         let query_doc = fs::read_to_string("src/tests/github_query.graphql").unwrap();
 
         let query = build_operation(query_doc.as_str(), None).unwrap();
 
-        println!("{:?}", query.definition.root_field);
+        println!("{:?}", query);
+        // println!("{:?}", query.definition.root_field);
     }
 }
