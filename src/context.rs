@@ -1,10 +1,8 @@
 use std::collections::{BTreeMap, HashMap, HashSet};
-
 use graphql_parser::{
     query::{Field, Selection, SelectionSet},
     schema::Type,
 };
-
 use crate::{
     graphql_object::GraphQLObject,
     graphql_value::{value_from_ast, GraphQLValue},
@@ -18,8 +16,6 @@ pub struct ExecutionContext<'a> {
     pub schema: &'a Schema<'a>,
     pub operation: &'a Operation<'a>,
     pub fields: BTreeMap<String, Vec<Field<'a, &'a str>>>,
-    // このcurrent_fieldを元にresolverの処理を適応する
-    // resolverはproc_macroでif文で書かれていて、nameが一致しないとき以外はresolve処理が走らないようになっている
     pub current_field: Field<'a, &'a str>,
     pub current_path: GraphQLPath,
 }

@@ -1,4 +1,3 @@
-mod test_container;
 mod object_resolver;
 mod error;
 mod context;
@@ -6,12 +5,12 @@ mod graphql_object;
 mod graphql_value;
 mod operation;
 mod resolver;
+mod container;
 mod server;
 mod template;
 mod types;
 mod request;
 mod path;
-mod test_async;
 mod test_resolver;
 mod test_resolvers;
 
