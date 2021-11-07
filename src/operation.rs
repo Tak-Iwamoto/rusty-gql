@@ -5,13 +5,7 @@ use graphql_parser::{
     schema::Directive,
 };
 
-#[derive(Clone)]
-pub enum GraphQLOperationType {
-    Query,
-    Mutation,
-    Subscription,
-}
-
+#[derive(Debug)]
 pub struct GraphQLOperation<'a> {
     pub definition: GraphQLOperationDefinition<'a>,
     pub fragments: BTreeMap<String, FragmentDefinition<'a, &'a str>>,
@@ -19,10 +13,8 @@ pub struct GraphQLOperation<'a> {
     // pub errors
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct GraphQLOperationDefinition<'a> {
-    pub name: Option<String>,
-    pub operaton_type: GraphQLOperationType,
     pub directives: Vec<Directive<'a, &'a str>>,
     pub variable_definitions: Vec<VariableDefinition<'a, &'a str>>,
     pub selection_set: SelectionSet<'a, &'a str>,
@@ -54,8 +46,6 @@ pub fn build_operation<'a>(
                         operation_definitions.insert(
                             no_name_key,
                             GraphQLOperationDefinition {
-                                name: None,
-                                operaton_type: GraphQLOperationType::Query,
                                 selection_set,
                                 directives: vec![],
                                 variable_definitions: vec![],
@@ -68,8 +58,6 @@ pub fn build_operation<'a>(
                     operation_definitions.insert(
                         query_name,
                         GraphQLOperationDefinition {
-                            name: query.name.map(|s| s.to_string()),
-                            operaton_type: GraphQLOperationType::Query,
                             selection_set: query.selection_set,
                             directives: query.directives,
                             variable_definitions: query.variable_definitions,
@@ -81,8 +69,6 @@ pub fn build_operation<'a>(
                     operation_definitions.insert(
                         mutation_name,
                         GraphQLOperationDefinition {
-                            name: mutation.name.map(|s| s.to_string()),
-                            operaton_type: GraphQLOperationType::Mutation,
                             selection_set: mutation.selection_set,
                             directives: mutation.directives,
                             variable_definitions: mutation.variable_definitions,
@@ -94,8 +80,6 @@ pub fn build_operation<'a>(
                     operation_definitions.insert(
                         subscription_name,
                         GraphQLOperationDefinition {
-                            name: subscription.name.map(|s| s.to_string()),
-                            operaton_type: GraphQLOperationType::Subscription,
                             selection_set: subscription.selection_set,
                             directives: subscription.directives,
                             variable_definitions: subscription.variable_definitions,
@@ -128,5 +112,21 @@ pub fn build_operation<'a>(
             }),
             None => Err(String::from("operation does not exist")),
         },
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::fs;
+
+    use super::build_operation;
+
+    #[test]
+    fn it_works() {
+        let query_doc = fs::read_to_string("src/tests/github_query.graphql").unwrap();
+
+        let query = build_operation(query_doc.as_str(), None).unwrap();
+
+        println!("{:?}", query.definition);
     }
 }

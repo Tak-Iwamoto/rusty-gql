@@ -1,3 +1,4 @@
+mod test_container;
 mod container;
 mod error;
 mod executor;
@@ -8,6 +9,8 @@ mod resolver;
 mod server;
 mod template;
 mod types;
+mod request;
+mod path;
 mod test_async;
 mod test_resolver;
 mod test_resolvers;

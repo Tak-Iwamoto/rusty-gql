@@ -2,13 +2,7 @@ use std::fs;
 
 use graphql_parser::query::Field;
 
-use crate::{
-    executor::{collect_all_fields, ExecutionContext},
-    graphql_object::GraphQLObject,
-    operation::build_operation,
-    resolver::GraphQLPath,
-    types::schema::build_schema,
-};
+use crate::{executor::{collect_all_fields, ExecutionContext}, graphql_object::GraphQLObject, operation::build_operation, path::GraphQLPath, types::schema::build_schema};
 
 fn test_query() {
     let contents = fs::read_to_string("src/tests/github.graphql").unwrap();
