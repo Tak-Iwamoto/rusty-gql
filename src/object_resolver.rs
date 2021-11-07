@@ -1,4 +1,4 @@
-use crate::{executor::ExecutionContext, graphql_value::GraphQLValue, GraphQLResponse};
+use crate::{context::ExecutionContext, graphql_value::GraphQLValue, GraphQLResponse};
 use async_trait::async_trait;
 
 #[async_trait]

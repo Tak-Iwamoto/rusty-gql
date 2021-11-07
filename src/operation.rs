@@ -5,6 +5,8 @@ use graphql_parser::{
     schema::Directive,
 };
 
+use crate::Schema;
+
 #[derive(Debug)]
 pub struct Operation<'a> {
     pub definition: OperationDefinition<'a>,
@@ -15,15 +17,34 @@ pub struct Operation<'a> {
 
 #[derive(Clone, Debug)]
 pub struct OperationDefinition<'a> {
+    pub operation_type: OperationType,
     pub directives: Vec<Directive<'a, &'a str>>,
     pub variable_definitions: Vec<VariableDefinition<'a, &'a str>>,
     pub selection_set: SelectionSet<'a, &'a str>,
     pub root_field: Field<'a, &'a str>,
 }
 
+#[derive(Clone, Debug)]
+pub enum OperationType {
+    Query,
+    Mutation,
+    Subscription,
+}
+
+impl ToString for OperationType {
+    fn to_string(&self) -> String {
+        match self {
+            OperationType::Query => String::from("Query"),
+            OperationType::Mutation => String::from("Mutation"),
+            OperationType::Subscription => String::from("Subscription"),
+        }
+    }
+}
+
 // operation_nameがある場合はここでひとつだけ返すで良さそう
 pub fn build_operation<'a>(
     query_doc: &'a str,
+    schema: &'a Schema<'a>,
     operation_name: Option<&str>,
 ) -> Result<Operation<'a>, String> {
     let parsed_query = graphql_parser::parse_query::<&str>(query_doc).unwrap();
@@ -45,9 +66,11 @@ pub fn build_operation<'a>(
                 graphql_parser::query::OperationDefinition::SelectionSet(selection_set) => {
                     if operation_name.is_none() {
                         let root_field = get_root_field(&selection_set)?;
+                        let operation_type = get_operation_type(&schema, &root_field)?;
                         operation_definitions.insert(
                             no_name_key,
                             OperationDefinition {
+                                operation_type,
                                 selection_set,
                                 root_field,
                                 directives: vec![],
@@ -59,9 +82,11 @@ pub fn build_operation<'a>(
                 graphql_parser::query::OperationDefinition::Query(query) => {
                     let query_name = query.name.unwrap_or_else(|| no_name_key);
                     let root_field = get_root_field(&query.selection_set)?;
+                    let operation_type = get_operation_type(&schema, &root_field)?;
                     operation_definitions.insert(
                         query_name,
                         OperationDefinition {
+                            operation_type,
                             selection_set: query.selection_set,
                             root_field,
                             directives: query.directives,
@@ -72,9 +97,11 @@ pub fn build_operation<'a>(
                 graphql_parser::query::OperationDefinition::Mutation(mutation) => {
                     let mutation_name = mutation.name.unwrap_or_else(|| no_name_key);
                     let root_field = get_root_field(&mutation.selection_set)?;
+                    let operation_type = get_operation_type(&schema, &root_field)?;
                     operation_definitions.insert(
                         mutation_name,
                         OperationDefinition {
+                            operation_type,
                             selection_set: mutation.selection_set,
                             root_field,
                             directives: mutation.directives,
@@ -85,9 +112,11 @@ pub fn build_operation<'a>(
                 graphql_parser::query::OperationDefinition::Subscription(subscription) => {
                     let subscription_name = subscription.name.unwrap_or_else(|| no_name_key);
                     let root_field = get_root_field(&subscription.selection_set)?;
+                    let operation_type = get_operation_type(&schema, &root_field)?;
                     operation_definitions.insert(
                         subscription_name,
                         OperationDefinition {
+                            operation_type,
                             selection_set: subscription.selection_set,
                             root_field,
                             directives: subscription.directives,
@@ -143,6 +172,22 @@ fn get_root_field<'a>(
         None => Err(String::from("Must have selection item")),
     }
 }
+fn get_operation_type<'a>(
+    schema: &'a Schema<'a>,
+    root_field: &Field<'a, &'a str>,
+) -> Result<OperationType, String> {
+    let root_fieldname = root_field.name;
+
+    if schema.queries.contains_key(root_fieldname) {
+        return Ok(OperationType::Query);
+    } else if schema.mutations.contains_key(root_fieldname) {
+        return Ok(OperationType::Mutation);
+    } else if schema.subscriptions.contains_key(root_fieldname) {
+        return Ok(OperationType::Subscription);
+    } else {
+        Err(format!("{} is not contained in schema", root_fieldname))
+    }
+}
 
 #[cfg(test)]
 mod tests {
@@ -154,13 +199,20 @@ mod tests {
 
     #[test]
     fn it_works() {
-        let schema_doc = fs::read_to_string("src/tests/pet_schema.graphql").unwrap();
+        let schema_doc = fs::read_to_string("src/tests/github.graphql").unwrap();
         let schema = build_schema(schema_doc.as_str()).unwrap();
         let query_doc = fs::read_to_string("src/tests/github_query.graphql").unwrap();
 
-        let query = build_operation(query_doc.as_str(), None).unwrap();
+        let query = build_operation(query_doc.as_str(), &schema, None).unwrap();
 
-        println!("{:?}", query);
-        // println!("{:?}", query.definition.root_field);
+        println!("{:?}", query.definition.root_field);
+        println!(
+            "{:?}",
+            schema
+                .queries
+                .get(&query.definition.root_field.name.to_string())
+                .unwrap()
+        );
+        println!("{:?}", query.definition);
     }
 }

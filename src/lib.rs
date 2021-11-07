@@ -1,7 +1,7 @@
 mod test_container;
 mod object_resolver;
 mod error;
-mod executor;
+mod context;
 mod graphql_object;
 mod graphql_value;
 mod operation;

@@ -29,15 +29,17 @@ pub fn build_context<'a>(
     operation: &'a Operation<'a>,
 ) -> ExecutionContext<'a> {
     let fields = collect_all_fields(schema, operation, &operation.definition.selection_set);
+    let current_field = operation.definition.root_field.clone();
     let current_path = GraphQLPath::default()
         .prev(None)
-        .key(operation.definition.root_field.name.to_string());
+        .key(operation.definition.root_field.name.to_string())
+        .parent_name(operation.definition.operation_type.to_string());
 
     ExecutionContext {
         schema,
         operation,
         fields,
-        current_field: operation.definition.root_field.clone(),
+        current_field,
         current_path,
     }
 }
@@ -192,7 +194,7 @@ fn collect_fields<'a>(
 #[cfg(test)]
 mod tests {
     use crate::{
-        executor::collect_all_fields, operation::build_operation, types::schema::build_schema,
+        context::collect_all_fields, operation::build_operation, types::schema::build_schema,
     };
     use std::fs;
 
@@ -202,7 +204,7 @@ mod tests {
         let query_doc = fs::read_to_string("src/tests/github_query.graphql").unwrap();
 
         let schema = build_schema(schema_doc.as_str()).unwrap();
-        let query = build_operation(query_doc.as_str(), None).unwrap();
+        let query = build_operation(query_doc.as_str(), &schema, None).unwrap();
 
         let fields = collect_all_fields(&schema, &query, &query.definition.selection_set);
 

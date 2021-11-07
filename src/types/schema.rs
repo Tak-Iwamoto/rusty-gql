@@ -259,13 +259,11 @@ mod tests {
 
     #[test]
     fn it_works() {
-        let contents = fs::read_to_string("src/tests/pet_schema.graphql");
+        let contents = fs::read_to_string("src/tests/github.graphql");
         let v = contents.unwrap();
         let schema = build_schema(v.as_str()).unwrap();
 
-        let query = schema.queries.get("pets").unwrap();
-        let cat = schema.type_map.get("Cat").unwrap();
-        println!("{:?}", query.field_type.to_string());
-        println!("{:?}", cat);
+        let query = schema.queries.get("repository").unwrap();
+        println!("{:?}", query)
     }
 }

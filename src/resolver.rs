@@ -1,7 +1,7 @@
 use async_trait::async_trait;
 use futures::future::BoxFuture;
 
-use crate::{GraphQLResponse, executor::ExecutionContext, graphql_value::GraphQLValue, path::GraphQLPath};
+use crate::{GraphQLResponse, context::ExecutionContext, graphql_value::GraphQLValue, path::GraphQLPath};
 
 // この型のvecを作成してfuture::joinに渡すことで並列に処理することができる。
 pub type GraphQLFuture<'a> = BoxFuture<'a, GraphQLResponse<GraphQLValue>>;

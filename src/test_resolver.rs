@@ -3,7 +3,7 @@ use std::fs;
 use graphql_parser::query::Field;
 
 use crate::{
-    executor::{collect_all_fields, ExecutionContext},
+    context::{collect_all_fields, ExecutionContext},
     graphql_object::GraphQLObject,
     operation::build_operation,
     path::GraphQLPath,
@@ -14,7 +14,7 @@ fn test_query() {
     let contents = fs::read_to_string("src/tests/github.graphql").unwrap();
     let schema = build_schema(contents.as_str()).unwrap();
     let query_doc = fs::read_to_string("src/tests/pet_query.graphql").unwrap();
-    let query = build_operation(query_doc.as_str(), None).unwrap();
+    let query = build_operation(query_doc.as_str(), &schema, None).unwrap();
     let root_fields = collect_all_fields(&schema, &query, &query.definition.selection_set);
 
     for (response_name, fields) in &root_fields {
