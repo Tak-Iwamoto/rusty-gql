@@ -9,7 +9,6 @@ use crate::{
     graphql_object::GraphQLObject,
     graphql_value::{value_from_ast, GraphQLValue},
     operation::GraphQLOperation,
-    path::GraphQLPath,
     types::GraphQLType,
     GraphQLSchema,
 };
@@ -19,7 +18,6 @@ pub struct ExecutionContext<'a> {
     pub operation: &'a GraphQLOperation<'a>,
     pub fields: BTreeMap<String, Vec<Field<'a, &'a str>>>,
     // pub current_path: GraphQLPath,
-    // pub current_field: Field<'a, &'a str>,
 }
 
 pub fn build_context<'a>(
@@ -198,7 +196,7 @@ mod tests {
 
         let fields = collect_all_fields(&schema, &query, &query.definition.selection_set);
 
-        for f in &fields["repositories"] {
+        for f in &fields["repository"] {
             for item in &f.selection_set.items {
                 println!("{:?}", item);
             }
