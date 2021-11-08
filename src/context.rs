@@ -1,8 +1,3 @@
-use std::collections::{BTreeMap, HashMap, HashSet};
-use graphql_parser::{
-    query::{Field, Selection, SelectionSet},
-    schema::Type,
-};
 use crate::{
     graphql_object::GraphQLObject,
     graphql_value::{value_from_ast, GraphQLValue},
@@ -11,6 +6,11 @@ use crate::{
     types::GraphQLType,
     Schema,
 };
+use graphql_parser::{
+    query::{Field, Selection, SelectionSet},
+    schema::Type,
+};
+use std::collections::{BTreeMap, HashMap, HashSet};
 
 pub struct ExecutionContext<'a> {
     pub schema: &'a Schema<'a>,

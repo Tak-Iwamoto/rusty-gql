@@ -45,9 +45,12 @@ impl ToString for OperationType {
 pub fn build_operation<'a>(
     query_doc: &'a str,
     schema: &'a Schema<'a>,
-    operation_name: Option<&str>,
+    operation_name: Option<String>,
 ) -> Result<Operation<'a>, String> {
-    let parsed_query = graphql_parser::parse_query::<&str>(query_doc).unwrap();
+    let parsed_query = match graphql_parser::parse_query::<&str>(query_doc) {
+        Ok(parsed) => parsed,
+        Err(_) => return Err(String::from("failed to parse query")),
+    };
 
     let mut fragments = BTreeMap::new();
 
@@ -134,7 +137,7 @@ pub fn build_operation<'a>(
 
     match operation_name {
         Some(name) => {
-            let target_def = operation_definitions.get(name);
+            let target_def = operation_definitions.get(name.as_str());
             match target_def {
                 Some(definition) => Ok(Operation {
                     definition: definition.clone(),

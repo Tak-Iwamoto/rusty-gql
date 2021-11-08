@@ -1,16 +1,14 @@
 use serde::{Deserialize, Serialize};
 
+use crate::container::ContextData;
+
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Request {
     #[serde(default)]
-    query_doc: String,
+    pub query_doc: String,
     #[serde(default)]
-    operation_name: Option<String>,
+    pub operation_name: Option<String>,
     #[serde(skip)]
-    context_value: Option<String>,
-}
-
-pub struct RequestContextValue {
-
+    pub context_value: Option<ContextData>,
 }
