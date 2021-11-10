@@ -41,7 +41,6 @@ impl ToString for OperationType {
     }
 }
 
-// operation_nameがある場合はここでひとつだけ返すで良さそう
 pub fn build_operation<'a>(
     query_doc: &'a str,
     schema: &'a Schema<'a>,

@@ -62,12 +62,12 @@ where
         })
     }
 
-    async fn build_operation(
-        &'a self,
-        query_doc: &'a str,
-        operation_name: Option<String>,
-    ) -> Result<Operation<'a>, String> {
-        let operation = build_operation(query_doc, &self.schema, operation_name)?;
+    async fn build_operation(&'a self, request: &'a Request) -> Result<Operation<'a>, String> {
+        let query_doc = &request.query_doc;
+        let operation_name = request.operation_name.clone();
+        let operation = build_operation(query_doc.as_str(), &self.schema, operation_name)?;
         Ok(operation)
     }
+
+    pub async fn execute(&self) {}
 }
