@@ -6,11 +6,11 @@ use graphql_parser::schema::{
 pub enum GraphQLType<'a> {
     Null,
     NonNull(Box<GraphQLType<'a>>),
-    Scalar(ScalarType<'a, &'a str>),
-    Object(ObjectType<'a, &'a str>),
-    Interface(InterfaceType<'a, &'a str>),
-    Union(UnionType<'a, &'a str>),
-    Enum(EnumType<'a, &'a str>),
-    Input(InputObjectType<'a, &'a str>),
+    Scalar(ScalarType<'a, String>),
+    Object(ObjectType<'a, String>),
+    Interface(InterfaceType<'a, String>),
+    Union(UnionType<'a, String>),
+    Enum(EnumType<'a, String>),
+    Input(InputObjectType<'a, String>),
     List(Box<GraphQLType<'a>>),
 }

@@ -1,6 +1,6 @@
-use std::collections::{BTreeMap, HashMap};
-use graphql_parser::schema::Value;
 use crate::types::GraphQLType;
+use graphql_parser::schema::Value;
+use std::collections::{BTreeMap, HashMap};
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum GraphQLValue {
@@ -15,7 +15,7 @@ pub enum GraphQLValue {
 }
 
 pub fn value_from_ast<'a>(
-    value: &Value<'a, &'a str>,
+    value: &Value<'a, String>,
     gql_type: &GraphQLType,
     variables: &Option<HashMap<String, GraphQLValue>>,
 ) -> GraphQLValue {

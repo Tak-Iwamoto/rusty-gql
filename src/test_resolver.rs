@@ -29,39 +29,39 @@ fn test_query() {
     println!("{:?}", root_fields);
 }
 
-fn execute_field<'a>(
-    ctx: &ExecutionContext,
-    parent_type: &GraphQLObject,
-    fields: &Vec<Field<'a, &'a str>>,
-    path: &GraphQLPath,
-    is_root: bool,
-) {
-    let field_name = fields.first().unwrap().name;
-    let root_def = match parent_type.name.as_str() {
-        "Query" => ctx.schema.queries.get(&field_name.to_string()).unwrap(),
-        "Mutation" => ctx.schema.mutations.get(&field_name.to_string()).unwrap(),
-        "Subscription" => ctx
-            .schema
-            .subscriptions
-            .get(&field_name.to_string())
-            .unwrap(),
-        _ => unreachable!(),
-    };
+// fn execute_field<'a>(
+//     ctx: &ExecutionContext,
+//     parent_type: &GraphQLObject,
+//     fields: &Vec<Field<'a, String>>,
+//     path: &GraphQLPath,
+//     is_root: bool,
+// ) {
+//     let field_name = fields.first().unwrap().name;
+//     let root_def = match parent_type.name.as_str() {
+//         "Query" => ctx.schema.queries.get(&field_name.to_string()).unwrap(),
+//         "Mutation" => ctx.schema.mutations.get(&field_name.to_string()).unwrap(),
+//         "Subscription" => ctx
+//             .schema
+//             .subscriptions
+//             .get(&field_name.to_string())
+//             .unwrap(),
+//         _ => unreachable!(),
+//     };
 
-    let return_type = &root_def.field_type;
-    match return_type {
-        graphql_parser::schema::Type::NamedType(_) => todo!(),
-        graphql_parser::schema::Type::ListType(_) => todo!(),
-        graphql_parser::schema::Type::NonNullType(_) => todo!(),
-    }
-    let resolve_fn = todo!();
+//     let return_type = &root_def.field_type;
+//     match return_type {
+//         graphql_parser::schema::Type::NamedType(_) => todo!(),
+//         graphql_parser::schema::Type::ListType(_) => todo!(),
+//         graphql_parser::schema::Type::NonNullType(_) => todo!(),
+//     }
+//     let resolve_fn = todo!();
 
-    let args = todo!();
+//     let args = todo!();
 
-    // let resolver_info = build_resolver_info();
+//     // let resolver_info = build_resolver_info();
 
-    // let result = resolve_fn(&args, ctx.context_value, )
-}
+//     // let result = resolve_fn(&args, ctx.context_value, )
+// }
 
 #[cfg(test)]
 mod tests {

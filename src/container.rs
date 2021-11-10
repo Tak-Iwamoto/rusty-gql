@@ -5,6 +5,7 @@ use std::{
 };
 
 use crate::{
+    context::build_context,
     object_resolver::ObjectResolver,
     operation::{build_operation, Operation},
     request::Request,
@@ -62,12 +63,24 @@ where
         })
     }
 
-    async fn build_operation(&'a self, request: &'a Request) -> Result<Operation<'a>, String> {
+    async fn prepare_operation(&'a self, request: &'a Request) -> Result<Operation<'a>, String> {
         let query_doc = &request.query_doc;
         let operation_name = request.operation_name.clone();
         let operation = build_operation(query_doc.as_str(), &self.schema, operation_name)?;
         Ok(operation)
     }
 
-    pub async fn execute(&self) {}
+    // async fn execute_operation(&'a self, operation: &'a Operation<'a>) {
+    //     let context = build_context(&self.schema, &operation.clone());
+    // }
+
+    // pub async fn execute(&'a self, request: &'a Request) {
+    //     let request = request.clone();
+    //     match self.prepare_operation(&request).await {
+    //         Ok(operation) => {
+    //             self.execute_operation(&operation.clone());
+    //         }
+    //         Err(error) => todo!(),
+    //     }
+    // }
 }

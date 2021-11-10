@@ -6,18 +6,18 @@ use graphql_parser::schema::{
     UnionType,
 };
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Schema<'a> {
-    pub queries: BTreeMap<String, Field<'a, &'a str>>,
-    pub mutations: BTreeMap<String, Field<'a, &'a str>>,
-    pub subscriptions: BTreeMap<String, Field<'a, &'a str>>,
-    pub directives: BTreeMap<String, DirectiveDefinition<'a, &'a str>>,
+    pub queries: BTreeMap<String, Field<'a, String>>,
+    pub mutations: BTreeMap<String, Field<'a, String>>,
+    pub subscriptions: BTreeMap<String, Field<'a, String>>,
+    pub directives: BTreeMap<String, DirectiveDefinition<'a, String>>,
     pub type_map: BTreeMap<String, GraphQLType<'a>>,
 }
 
 pub fn build_schema(schema_doc: &str) -> Result<Schema, String> {
     let parsed_schema =
-        graphql_parser::parse_schema::<&str>(schema_doc).expect("failed to parse graphql schema");
+        graphql_parser::parse_schema::<String>(schema_doc).expect("failed to parse graphql schema");
     let mut query_map = BTreeMap::new();
     let mut mutation_map = BTreeMap::new();
     let mut subscription_map = BTreeMap::new();
@@ -72,7 +72,7 @@ pub fn build_schema(schema_doc: &str) -> Result<Schema, String> {
             graphql_parser::schema::Definition::TypeExtension(type_ext) => match type_ext {
                 graphql_parser::schema::TypeExtension::Scalar(scalar_ext) => {
                     let original_name = scalar_ext.name.clone();
-                    match type_map.get(original_name) {
+                    match type_map.get(&original_name) {
                         Some(original_scalar) => {
                             if let GraphQLType::Scalar(original) = original_scalar {
                                 let mut extended_directives = original.directives.clone();
@@ -81,13 +81,11 @@ pub fn build_schema(schema_doc: &str) -> Result<Schema, String> {
                                 let extended_scalar = ScalarType {
                                     position: original.position,
                                     description: original.description.clone(),
-                                    name: original_name,
+                                    name: original_name.clone(),
                                     directives: extended_directives,
                                 };
-                                type_map.insert(
-                                    original_name.to_string(),
-                                    GraphQLType::Scalar(extended_scalar),
-                                );
+                                type_map
+                                    .insert(original_name, GraphQLType::Scalar(extended_scalar));
                             }
                         }
                         None => return Err(String::from("The scalar to extend is not found")),
@@ -95,7 +93,7 @@ pub fn build_schema(schema_doc: &str) -> Result<Schema, String> {
                 }
                 graphql_parser::schema::TypeExtension::Object(obj_ext) => {
                     let original_name = obj_ext.name.clone();
-                    match type_map.get(original_name) {
+                    match type_map.get(&original_name) {
                         Some(original_obj) => {
                             if let GraphQLType::Object(original) = original_obj {
                                 let mut extended_directives = original.directives.clone();
@@ -112,7 +110,7 @@ pub fn build_schema(schema_doc: &str) -> Result<Schema, String> {
                                 let extended_obj = ObjectType {
                                     position: original.position,
                                     description: original.description.clone(),
-                                    name: original_name,
+                                    name: original_name.clone(),
                                     directives: extended_directives,
                                     fields: extended_fields,
                                     implements_interfaces: extended_impl_interfaces,
@@ -128,7 +126,7 @@ pub fn build_schema(schema_doc: &str) -> Result<Schema, String> {
                 }
                 graphql_parser::schema::TypeExtension::Interface(inter_ext) => {
                     let original_name = inter_ext.name.clone();
-                    match type_map.get(original_name) {
+                    match type_map.get(&original_name) {
                         Some(original_interface) => {
                             if let GraphQLType::Interface(original) = original_interface {
                                 let mut extended_directives = original.directives.clone();
@@ -140,7 +138,7 @@ pub fn build_schema(schema_doc: &str) -> Result<Schema, String> {
                                 let extended_interface = InterfaceType {
                                     position: original.position,
                                     description: original.description.clone(),
-                                    name: original.name,
+                                    name: original_name.clone(),
                                     directives: extended_directives,
                                     fields: extended_fields,
                                 };
@@ -155,7 +153,7 @@ pub fn build_schema(schema_doc: &str) -> Result<Schema, String> {
                 }
                 graphql_parser::schema::TypeExtension::Union(union_ext) => {
                     let original_name = union_ext.name.clone();
-                    match type_map.get(original_name) {
+                    match type_map.get(&original_name) {
                         Some(original_union) => {
                             if let GraphQLType::Union(original) = original_union {
                                 let mut extended_directives = original.directives.clone();
@@ -167,7 +165,7 @@ pub fn build_schema(schema_doc: &str) -> Result<Schema, String> {
                                 let extended_union = UnionType {
                                     position: original.position,
                                     description: original.description.clone(),
-                                    name: original.name,
+                                    name: original_name.clone(),
                                     directives: extended_directives,
                                     types: extended_types,
                                 };
@@ -182,7 +180,7 @@ pub fn build_schema(schema_doc: &str) -> Result<Schema, String> {
                 }
                 graphql_parser::schema::TypeExtension::Enum(enum_ext) => {
                     let original_name = enum_ext.name.clone();
-                    match type_map.get(original_name) {
+                    match type_map.get(&original_name) {
                         Some(original_enum) => {
                             if let GraphQLType::Enum(original) = original_enum {
                                 let mut extended_directives = original.directives.clone();
@@ -194,7 +192,7 @@ pub fn build_schema(schema_doc: &str) -> Result<Schema, String> {
                                 let extended_enum = EnumType {
                                     position: original.position,
                                     description: original.description.clone(),
-                                    name: original.name,
+                                    name: original_name.clone(),
                                     directives: extended_directives,
                                     values: extended_values,
                                 };
@@ -209,7 +207,7 @@ pub fn build_schema(schema_doc: &str) -> Result<Schema, String> {
                 }
                 graphql_parser::schema::TypeExtension::InputObject(input_ext) => {
                     let original_name = input_ext.name.clone();
-                    match type_map.get(original_name) {
+                    match type_map.get(&original_name) {
                         Some(original_input) => {
                             if let GraphQLType::Input(original) = original_input {
                                 let mut extended_directives = original.directives.clone();
@@ -221,7 +219,7 @@ pub fn build_schema(schema_doc: &str) -> Result<Schema, String> {
                                 let extended_input = InputObjectType {
                                     position: original.position,
                                     description: original.description.clone(),
-                                    name: original.name,
+                                    name: original_name.clone(),
                                     directives: extended_directives,
                                     fields: extended_fields,
                                 };

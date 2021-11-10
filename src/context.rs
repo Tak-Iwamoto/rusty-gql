@@ -13,10 +13,10 @@ use graphql_parser::{
 use std::collections::{BTreeMap, HashMap, HashSet};
 
 pub struct ExecutionContext<'a> {
-    pub schema: &'a Schema<'a>,
-    pub operation: &'a Operation<'a>,
-    pub fields: BTreeMap<String, Vec<Field<'a, &'a str>>>,
-    pub current_field: Field<'a, &'a str>,
+    pub schema: Schema<'a>,
+    pub operation: Operation<'a>,
+    pub fields: BTreeMap<String, Vec<Field<'a, String>>>,
+    pub current_field: Field<'a, String>,
     pub current_path: GraphQLPath,
 }
 
@@ -24,7 +24,7 @@ pub fn build_context<'a>(
     schema: &'a Schema<'a>,
     operation: &'a Operation<'a>,
 ) -> ExecutionContext<'a> {
-    let fields = collect_all_fields(schema, operation, &operation.definition.selection_set);
+    let fields = collect_all_fields(schema, &operation, &operation.definition.selection_set);
     let current_field = operation.definition.root_field.clone();
     let current_path = GraphQLPath::default()
         .prev(None)
@@ -32,8 +32,8 @@ pub fn build_context<'a>(
         .parent_name(operation.definition.operation_type.to_string());
 
     ExecutionContext {
-        schema,
-        operation,
+        schema: schema.clone(),
+        operation: operation.clone(),
         fields,
         current_field,
         current_path,
@@ -80,7 +80,7 @@ pub fn get_variables<'a>(
 }
 
 pub fn get_arguments<'a>(
-    field: Field<'a, &'a str>,
+    field: Field<'a, String>,
     variable_values: HashMap<String, GraphQLValue>,
 ) {
     let arguments = field.arguments;
@@ -88,7 +88,7 @@ pub fn get_arguments<'a>(
 
 pub fn get_type_from_schema<'a>(
     schema: &'a Schema<'a>,
-    var_type: &'a Type<'a, &'a str>,
+    var_type: &'a Type<'a, String>,
 ) -> Option<GraphQLType<'a>> {
     match var_type {
         graphql_parser::schema::Type::NamedType(named_type) => {
@@ -113,20 +113,20 @@ pub fn get_type_from_schema<'a>(
 fn execute_fields<'a>(
     ctx: &ExecutionContext,
     parent_type: &GraphQLObject,
-    fields: Vec<Field<'a, &'a str>>,
+    fields: Vec<Field<'a, String>>,
 ) {
     // let field_def = get_field_def()
 }
 
-fn get_field_def<'a>(parent_type: &GraphQLObject, field: Field<'a, &'a str>) {}
+fn get_field_def<'a>(parent_type: &GraphQLObject, field: Field<'a, String>) {}
 
 // TODO: schemaはfragmentの条件やskip directiveの処理で使用する
 pub fn collect_all_fields<'a>(
     schema: &'a Schema,
     operation: &'a Operation<'a>,
-    selection_set: &SelectionSet<'a, &'a str>,
-) -> BTreeMap<String, Vec<Field<'a, &'a str>>> {
-    let mut fields: BTreeMap<String, Vec<Field<&str>>> = BTreeMap::new();
+    selection_set: &SelectionSet<'a, String>,
+) -> BTreeMap<String, Vec<Field<'a, String>>> {
+    let mut fields: BTreeMap<String, Vec<Field<String>>> = BTreeMap::new();
     let mut visited_fragments = HashSet::new();
 
     collect_fields(
@@ -140,9 +140,9 @@ pub fn collect_all_fields<'a>(
 
 fn collect_fields<'a>(
     operation: &'a Operation<'a>,
-    selection_set: &SelectionSet<'a, &'a str>,
-    fields: &mut BTreeMap<String, Vec<Field<'a, &'a str>>>,
-    visited_fragments: &mut HashSet<&'a str>,
+    selection_set: &SelectionSet<'a, String>,
+    fields: &mut BTreeMap<String, Vec<Field<'a, String>>>,
+    visited_fragments: &mut HashSet<String>,
 ) {
     for item in &selection_set.items {
         match item {
@@ -157,11 +157,11 @@ fn collect_fields<'a>(
                 }
             }
             Selection::FragmentSpread(spread_frg) => {
-                let fragment_name = spread_frg.fragment_name;
+                let fragment_name = &spread_frg.fragment_name;
                 if visited_fragments.contains(fragment_name) {
                     continue;
                 }
-                visited_fragments.insert(fragment_name);
+                visited_fragments.insert(fragment_name.to_string());
                 let fragment = operation.fragments.get(fragment_name);
                 match fragment {
                     Some(frg) => {

@@ -7,10 +7,10 @@ use graphql_parser::{
 
 use crate::Schema;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Operation<'a> {
     pub definition: OperationDefinition<'a>,
-    pub fragments: BTreeMap<String, FragmentDefinition<'a, &'a str>>,
+    pub fragments: BTreeMap<String, FragmentDefinition<'a, String>>,
     // pub variables:
     // pub errors
 }
@@ -18,10 +18,10 @@ pub struct Operation<'a> {
 #[derive(Clone, Debug)]
 pub struct OperationDefinition<'a> {
     pub operation_type: OperationType,
-    pub directives: Vec<Directive<'a, &'a str>>,
-    pub variable_definitions: Vec<VariableDefinition<'a, &'a str>>,
-    pub selection_set: SelectionSet<'a, &'a str>,
-    pub root_field: Field<'a, &'a str>,
+    pub directives: Vec<Directive<'a, String>>,
+    pub variable_definitions: Vec<VariableDefinition<'a, String>>,
+    pub selection_set: SelectionSet<'a, String>,
+    pub root_field: Field<'a, String>,
 }
 
 #[derive(Clone, Debug)]
@@ -46,15 +46,15 @@ pub fn build_operation<'a>(
     schema: &'a Schema<'a>,
     operation_name: Option<String>,
 ) -> Result<Operation<'a>, String> {
-    let parsed_query = match graphql_parser::parse_query::<&str>(query_doc) {
+    let parsed_query = match graphql_parser::parse_query::<String>(query_doc) {
         Ok(parsed) => parsed,
         Err(_) => return Err(String::from("failed to parse query")),
     };
 
     let mut fragments = BTreeMap::new();
 
-    let mut operation_definitions: HashMap<&str, OperationDefinition> = HashMap::new();
-    let no_name_key = "no_name";
+    let mut operation_definitions: HashMap<String, OperationDefinition> = HashMap::new();
+    let no_name_key = "no_operation_name";
 
     if operation_name.is_none() && parsed_query.definitions.len() > 1 {
         return Err(String::from(
@@ -70,7 +70,7 @@ pub fn build_operation<'a>(
                         let root_field = get_root_field(&selection_set)?;
                         let operation_type = get_operation_type(&schema, &root_field)?;
                         operation_definitions.insert(
-                            no_name_key,
+                            no_name_key.to_string(),
                             OperationDefinition {
                                 operation_type,
                                 selection_set,
@@ -82,7 +82,7 @@ pub fn build_operation<'a>(
                     }
                 }
                 graphql_parser::query::OperationDefinition::Query(query) => {
-                    let query_name = query.name.unwrap_or_else(|| no_name_key);
+                    let query_name = query.name.unwrap_or_else(|| no_name_key.to_string());
                     let root_field = get_root_field(&query.selection_set)?;
                     let operation_type = get_operation_type(&schema, &root_field)?;
                     operation_definitions.insert(
@@ -97,7 +97,7 @@ pub fn build_operation<'a>(
                     );
                 }
                 graphql_parser::query::OperationDefinition::Mutation(mutation) => {
-                    let mutation_name = mutation.name.unwrap_or_else(|| no_name_key);
+                    let mutation_name = mutation.name.unwrap_or_else(|| no_name_key.to_string());
                     let root_field = get_root_field(&mutation.selection_set)?;
                     let operation_type = get_operation_type(&schema, &root_field)?;
                     operation_definitions.insert(
@@ -112,7 +112,8 @@ pub fn build_operation<'a>(
                     );
                 }
                 graphql_parser::query::OperationDefinition::Subscription(subscription) => {
-                    let subscription_name = subscription.name.unwrap_or_else(|| no_name_key);
+                    let subscription_name =
+                        subscription.name.unwrap_or_else(|| no_name_key.to_string());
                     let root_field = get_root_field(&subscription.selection_set)?;
                     let operation_type = get_operation_type(&schema, &root_field)?;
                     operation_definitions.insert(
@@ -145,7 +146,7 @@ pub fn build_operation<'a>(
                 None => Err(format!("{} is not contained in query", name)),
             }
         }
-        None => match operation_definitions.get(no_name_key) {
+        None => match operation_definitions.get(&no_name_key.to_string()) {
             Some(definition) => Ok(Operation {
                 definition: definition.clone(),
                 fragments,
@@ -162,8 +163,8 @@ pub fn build_operation<'a>(
 }
 
 fn get_root_field<'a>(
-    selection_set: &SelectionSet<'a, &'a str>,
-) -> Result<Field<'a, &'a str>, String> {
+    selection_set: &SelectionSet<'a, String>,
+) -> Result<Field<'a, String>, String> {
     let first_item = selection_set.items.first();
     match first_item {
         Some(item) => match item {
@@ -176,9 +177,9 @@ fn get_root_field<'a>(
 }
 fn get_operation_type<'a>(
     schema: &'a Schema<'a>,
-    root_field: &Field<'a, &'a str>,
+    root_field: &Field<'a, String>,
 ) -> Result<OperationType, String> {
-    let root_fieldname = root_field.name;
+    let root_fieldname = &root_field.name;
 
     if schema.queries.contains_key(root_fieldname) {
         return Ok(OperationType::Query);
