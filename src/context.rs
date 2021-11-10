@@ -13,8 +13,8 @@ use graphql_parser::{
 use std::collections::{BTreeMap, HashMap, HashSet};
 
 pub struct ExecutionContext<'a> {
-    pub schema: Schema<'a>,
-    pub operation: Operation<'a>,
+    pub schema: &'a Schema<'a>,
+    pub operation: &'a Operation<'a>,
     pub fields: BTreeMap<String, Vec<Field<'a, String>>>,
     pub current_field: Field<'a, String>,
     pub current_path: GraphQLPath,
@@ -24,16 +24,19 @@ pub fn build_context<'a>(
     schema: &'a Schema<'a>,
     operation: &'a Operation<'a>,
 ) -> ExecutionContext<'a> {
-    let fields = collect_all_fields(schema, &operation, &operation.definition.selection_set);
+    let operation_type = operation.definition.operation_type.to_string();
+    let root_fieldname = operation.definition.root_field.name.to_string();
+    let selection_set = &operation.definition.selection_set;
     let current_field = operation.definition.root_field.clone();
+    let fields = collect_all_fields(&schema, &operation, selection_set);
     let current_path = GraphQLPath::default()
         .prev(None)
-        .key(operation.definition.root_field.name.to_string())
-        .parent_name(operation.definition.operation_type.to_string());
+        .key(root_fieldname)
+        .parent_name(operation_type);
 
     ExecutionContext {
-        schema: schema.clone(),
-        operation: operation.clone(),
+        schema,
+        operation,
         fields,
         current_field,
         current_path,
@@ -79,10 +82,7 @@ pub fn get_variables<'a>(
     Ok(variables)
 }
 
-pub fn get_arguments<'a>(
-    field: Field<'a, String>,
-    variable_values: HashMap<String, GraphQLValue>,
-) {
+pub fn get_arguments<'a>(field: Field<'a, String>, variable_values: HashMap<String, GraphQLValue>) {
     let arguments = field.arguments;
 }
 
@@ -130,7 +130,7 @@ pub fn collect_all_fields<'a>(
     let mut visited_fragments = HashSet::new();
 
     collect_fields(
-        operation,
+        &operation,
         &selection_set,
         &mut fields,
         &mut visited_fragments,

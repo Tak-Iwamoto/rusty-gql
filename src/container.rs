@@ -5,9 +5,10 @@ use std::{
 };
 
 use crate::{
-    context::build_context,
+    context::{build_context, collect_all_fields, ExecutionContext},
     object_resolver::ObjectResolver,
     operation::{build_operation, Operation},
+    path::GraphQLPath,
     request::Request,
     types::schema::build_schema,
     Schema,
@@ -70,15 +71,17 @@ where
         Ok(operation)
     }
 
-    // async fn execute_operation(&'a self, operation: &'a Operation<'a>) {
-    //     let context = build_context(&self.schema, &operation.clone());
+    // async fn execute_operation(&'a self, operation: Operation<'a>) {
+    //     let ctx = build_context(&self.schema, &operation);
     // }
 
     // pub async fn execute(&'a self, request: &'a Request) {
     //     let request = request.clone();
     //     match self.prepare_operation(&request).await {
     //         Ok(operation) => {
-    //             self.execute_operation(&operation.clone());
+    //             async move {
+    //                 self.execute_operation(&operation);
+    //             };
     //         }
     //         Err(error) => todo!(),
     //     }
