@@ -1,4 +1,4 @@
-use std::collections::BTreeMap;
+use std::{collections::BTreeMap, ops::Deref, sync::Arc};
 
 use super::GraphQLType;
 use graphql_parser::schema::{
@@ -13,6 +13,22 @@ pub struct Schema<'a> {
     pub subscriptions: BTreeMap<String, Field<'a, String>>,
     pub directives: BTreeMap<String, DirectiveDefinition<'a, String>>,
     pub type_map: BTreeMap<String, GraphQLType<'a>>,
+}
+
+pub struct ArcSchema<'a>(Arc<Schema<'a>>);
+
+impl<'a> ArcSchema<'a> {
+    pub fn new(schema: Schema<'a>) -> Self {
+        ArcSchema(Arc::new(schema))
+    }
+}
+
+impl<'a> Deref for ArcSchema<'a> {
+    type Target = Schema<'a>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
 }
 
 pub fn build_schema(schema_doc: &str) -> Result<Schema, String> {

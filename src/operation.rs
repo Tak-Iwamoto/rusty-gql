@@ -1,11 +1,15 @@
-use std::collections::{BTreeMap, HashMap};
+use std::{
+    collections::{BTreeMap, HashMap},
+    ops::Deref,
+    sync::Arc,
+};
 
 use graphql_parser::{
     query::{Field, FragmentDefinition, SelectionSet, VariableDefinition},
     schema::Directive,
 };
 
-use crate::Schema;
+use crate::{types::schema::ArcSchema, Schema};
 
 #[derive(Debug, Clone)]
 pub struct Operation<'a> {
@@ -13,6 +17,22 @@ pub struct Operation<'a> {
     pub fragments: BTreeMap<String, FragmentDefinition<'a, String>>,
     // pub variables:
     // pub errors
+}
+
+pub struct ArcOperation<'a>(Arc<Operation<'a>>);
+
+impl<'a> ArcOperation<'a> {
+    pub fn new(operation: Operation<'a>) -> ArcOperation<'a> {
+        ArcOperation(Arc::new(operation))
+    }
+}
+
+impl<'a> Deref for ArcOperation<'a> {
+    type Target = Operation<'a>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
 }
 
 #[derive(Clone, Debug)]
@@ -43,7 +63,7 @@ impl ToString for OperationType {
 
 pub fn build_operation<'a>(
     query_doc: &'a str,
-    schema: &'a Schema<'a>,
+    schema: &'a ArcSchema<'a>,
     operation_name: Option<String>,
 ) -> Result<Operation<'a>, String> {
     let parsed_query = match graphql_parser::parse_query::<String>(query_doc) {
@@ -196,7 +216,7 @@ fn get_operation_type<'a>(
 mod tests {
     use std::fs;
 
-    use crate::types::schema::build_schema;
+    use crate::types::schema::{build_schema, ArcSchema};
 
     use super::build_operation;
 
@@ -206,7 +226,7 @@ mod tests {
         let schema = build_schema(schema_doc.as_str()).unwrap();
         let query_doc = fs::read_to_string("src/tests/github_query.graphql").unwrap();
 
-        let query = build_operation(query_doc.as_str(), &schema, None).unwrap();
+        let query = build_operation(query_doc.as_str(), &ArcSchema::new(schema), None).unwrap();
 
         println!("{:?}", query.definition.root_field);
         println!(

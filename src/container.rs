@@ -1,17 +1,17 @@
 use std::{
     any::{Any, TypeId},
     collections::HashMap,
+    ops::Deref,
     sync::Arc,
 };
 
 use crate::{
-    context::{build_context, collect_all_fields, ExecutionContext},
+    context::ExecutionContext,
     object_resolver::ObjectResolver,
-    operation::{build_operation, Operation},
+    operation::{build_operation, ArcOperation, Operation},
     path::GraphQLPath,
     request::Request,
-    types::schema::build_schema,
-    Schema,
+    types::schema::{build_schema, ArcSchema},
 };
 
 pub struct ContextData(HashMap<TypeId, Box<dyn Any + Sync + Send>>);
@@ -31,7 +31,7 @@ pub struct Container<
     query_resolvers: Query,
     mutation_resolvers: Mutation,
     subscription_resolvers: Subscription,
-    schema: Schema<'a>,
+    schema: ArcSchema<'a>,
     context_data: ContextData,
 }
 
@@ -42,7 +42,17 @@ pub struct ArcContainer<
     Subscription: ObjectResolver,
 >(Arc<Container<'a, Query, Mutation, Subscription>>);
 
-impl<'a, Query, Mutation, Subscription> Container<'a, Query, Mutation, Subscription>
+impl<'a, Query: ObjectResolver, Mutation: ObjectResolver, Subscription: ObjectResolver> Deref
+    for ArcContainer<'a, Query, Mutation, Subscription>
+{
+    type Target = Container<'a, Query, Mutation, Subscription>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl<'a, Query, Mutation, Subscription> ArcContainer<'a, Query, Mutation, Subscription>
 where
     Query: ObjectResolver,
     Mutation: ObjectResolver,
@@ -55,13 +65,13 @@ where
         subscription: Subscription,
     ) -> Result<Self, String> {
         let schema = build_schema(schema_doc)?;
-        Ok(Container {
+        Ok(ArcContainer(Arc::new(Container {
             query_resolvers: query,
             mutation_resolvers: mutation,
             subscription_resolvers: subscription,
-            schema,
+            schema: ArcSchema::new(schema),
             context_data: ContextData::default(),
-        })
+        })))
     }
 
     async fn prepare_operation(&'a self, request: &'a Request) -> Result<Operation<'a>, String> {
@@ -71,19 +81,32 @@ where
         Ok(operation)
     }
 
-    // async fn execute_operation(&'a self, operation: Operation<'a>) {
-    //     let ctx = build_context(&self.schema, &operation);
-    // }
+    async fn execute_operation(&'a self, operation: ArcOperation<'a>) {
+        let operation_type = operation.definition.operation_type.to_string();
+        let root_fieldname = operation.definition.root_field.name.to_string();
+        let selection_set = &operation.definition.selection_set;
+        let current_field = operation.definition.root_field.clone();
+        let current_path = GraphQLPath::default()
+            .prev(None)
+            .key(root_fieldname)
+            .parent_name(operation_type);
 
-    // pub async fn execute(&'a self, request: &'a Request) {
-    //     let request = request.clone();
-    //     match self.prepare_operation(&request).await {
-    //         Ok(operation) => {
-    //             async move {
-    //                 self.execute_operation(&operation);
-    //             };
-    //         }
-    //         Err(error) => todo!(),
-    //     }
-    // }
+        ExecutionContext {
+            schema: &self.schema,
+            operation: &operation,
+            current_field,
+            current_path,
+        };
+    }
+
+    pub async fn execute(&'a self, request: &'a Request) {
+        match self.prepare_operation(request).await {
+            Ok(operation) => {
+                async move {
+                    self.execute_operation(ArcOperation::new(operation));
+                };
+            }
+            Err(error) => todo!(),
+        }
+    }
 }

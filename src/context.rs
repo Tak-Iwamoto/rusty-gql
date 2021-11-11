@@ -1,9 +1,9 @@
 use crate::{
     graphql_object::GraphQLObject,
     graphql_value::{value_from_ast, GraphQLValue},
-    operation::Operation,
+    operation::{ArcOperation, Operation},
     path::GraphQLPath,
-    types::GraphQLType,
+    types::{schema::ArcSchema, GraphQLType},
     Schema,
 };
 use graphql_parser::{
@@ -13,22 +13,22 @@ use graphql_parser::{
 use std::collections::{BTreeMap, HashMap, HashSet};
 
 pub struct ExecutionContext<'a> {
-    pub schema: &'a Schema<'a>,
-    pub operation: &'a Operation<'a>,
-    pub fields: BTreeMap<String, Vec<Field<'a, String>>>,
+    pub schema: &'a ArcSchema<'a>,
+    pub operation: &'a ArcOperation<'a>,
+    // pub fields: BTreeMap<String, Vec<Field<'a, String>>>,
     pub current_field: Field<'a, String>,
     pub current_path: GraphQLPath,
 }
 
 pub fn build_context<'a>(
-    schema: &'a Schema<'a>,
-    operation: &'a Operation<'a>,
+    schema: &'a ArcSchema<'a>,
+    operation: &'a ArcOperation<'a>,
 ) -> ExecutionContext<'a> {
     let operation_type = operation.definition.operation_type.to_string();
     let root_fieldname = operation.definition.root_field.name.to_string();
     let selection_set = &operation.definition.selection_set;
     let current_field = operation.definition.root_field.clone();
-    let fields = collect_all_fields(&schema, &operation, selection_set);
+    // let fields = collect_all_fields(&schema, &operation, selection_set);
     let current_path = GraphQLPath::default()
         .prev(None)
         .key(root_fieldname)
@@ -37,7 +37,7 @@ pub fn build_context<'a>(
     ExecutionContext {
         schema,
         operation,
-        fields,
+        // fields,
         current_field,
         current_path,
     }
@@ -190,7 +190,9 @@ fn collect_fields<'a>(
 #[cfg(test)]
 mod tests {
     use crate::{
-        context::collect_all_fields, operation::build_operation, types::schema::build_schema,
+        context::collect_all_fields,
+        operation::build_operation,
+        types::schema::{build_schema, ArcSchema},
     };
     use std::fs;
 
@@ -200,7 +202,7 @@ mod tests {
         let query_doc = fs::read_to_string("src/tests/github_query.graphql").unwrap();
 
         let schema = build_schema(schema_doc.as_str()).unwrap();
-        let query = build_operation(query_doc.as_str(), &schema, None).unwrap();
+        let query = build_operation(query_doc.as_str(), &ArcSchema::new(schema), None).unwrap();
 
         let fields = collect_all_fields(&schema, &query, &query.definition.selection_set);
 
