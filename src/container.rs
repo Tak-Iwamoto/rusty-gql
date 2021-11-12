@@ -81,40 +81,40 @@ where
         Ok(operation)
     }
 
-    async fn execute_operation(&'a self, operation: ArcOperation<'a>) {
-        let operation_type = operation.definition.operation_type.to_string();
-        let root_fieldname = operation.definition.root_field.name.to_string();
-        let selection_set = &operation.definition.selection_set;
-        let current_field = operation.definition.root_field.clone();
-        let current_path = GraphQLPath::default()
-            .prev(None)
-            .key(root_fieldname)
-            .parent_name(operation_type);
+    // async fn execute_operation(&'a self, operation: ArcOperation<'a>) {
+    //     let operation_type = operation.definition.operation_type.to_string();
+    //     let root_fieldname = operation.definition.root_field.name.to_string();
+    //     let selection_set = &operation.definition.selection_set;
+    //     let current_field = operation.definition.root_field.clone();
+    //     let current_path = GraphQLPath::default()
+    //         .prev(None)
+    //         .key(root_fieldname)
+    //         .parent_name(operation_type);
 
-        let ctx = ExecutionContext {
-            schema: &self.schema,
-            operation: &operation.clone(),
-            current_field,
-            current_path,
-        };
+    //     let ctx = ExecutionContext {
+    //         schema: &self.schema,
+    //         operation: &operation.clone(),
+    //         current_field,
+    //         current_path,
+    //     };
 
-        match &ctx.operation.definition.operation_type {
-            crate::operation::OperationType::Query => {
+    //     match &ctx.operation.definition.operation_type {
+    //         crate::operation::OperationType::Query => {
 
-            },
-            crate::operation::OperationType::Mutation => todo!(),
-            crate::operation::OperationType::Subscription => todo!(),
-        }
-    }
+    //         },
+    //         crate::operation::OperationType::Mutation => todo!(),
+    //         crate::operation::OperationType::Subscription => todo!(),
+    //     }
+    // }
 
-    pub async fn execute(&'a self, request: &'a Request) {
-        match self.prepare_operation(request).await {
-            Ok(operation) => {
-                async move {
-                    self.execute_operation(ArcOperation::new(operation));
-                };
-            }
-            Err(error) => todo!(),
-        }
-    }
+    // pub async fn execute(&'a self, request: &'a Request) {
+    //     match self.prepare_operation(request).await {
+    //         Ok(operation) => {
+    //             async move {
+    //                 self.execute_operation(ArcOperation::new(operation));
+    //             };
+    //         }
+    //         Err(error) => todo!(),
+    //     }
+    // }
 }

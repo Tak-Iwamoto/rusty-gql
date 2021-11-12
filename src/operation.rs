@@ -223,10 +223,10 @@ mod tests {
     #[test]
     fn it_works() {
         let schema_doc = fs::read_to_string("src/tests/github.graphql").unwrap();
-        let schema = build_schema(schema_doc.as_str()).unwrap();
+        let schema = ArcSchema::new(build_schema(schema_doc.as_str()).unwrap());
         let query_doc = fs::read_to_string("src/tests/github_query.graphql").unwrap();
 
-        let query = build_operation(query_doc.as_str(), &ArcSchema::new(schema), None).unwrap();
+        let query = build_operation(query_doc.as_str(), &schema, None).unwrap();
 
         println!("{:?}", query.definition.root_field);
         println!(
