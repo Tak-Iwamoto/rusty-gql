@@ -1,0 +1,11 @@
+[package]
+edition = "2018"
+name = "rusty-gql-cli"
+version = "0.1.0"
+
+[dependencies]
+codegen = "0.1.3"
+graphql-parser = "0.3.0"
+rusty-gql = { path = "../", version = "0.1.0" }
+structopt = "0.3.25"
+tokio = "1.13.0"

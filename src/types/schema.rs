@@ -1,17 +1,21 @@
 use std::{collections::BTreeMap, ops::Deref, sync::Arc};
 
-use super::GraphQLType;
+use super::{
+    argument::GqlArgument,
+    directive::{GqlDirective, GqlDirectiveDefinition},
+    field::GqlField,
+    GraphQLType,
+};
 use graphql_parser::schema::{
-    DirectiveDefinition, EnumType, Field, InputObjectType, InterfaceType, ObjectType, ScalarType,
-    UnionType,
+    EnumType, InputObjectType, InterfaceType, ObjectType, ScalarType, UnionType,
 };
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct Schema<'a> {
-    pub queries: BTreeMap<String, Field<'a, String>>,
-    pub mutations: BTreeMap<String, Field<'a, String>>,
-    pub subscriptions: BTreeMap<String, Field<'a, String>>,
-    pub directives: BTreeMap<String, DirectiveDefinition<'a, String>>,
+    pub queries: BTreeMap<String, GqlField>,
+    pub mutations: BTreeMap<String, GqlField>,
+    pub subscriptions: BTreeMap<String, GqlField>,
+    pub directives: BTreeMap<String, GqlDirectiveDefinition>,
     pub type_map: BTreeMap<String, GraphQLType<'a>>,
 }
 
@@ -52,17 +56,17 @@ pub fn build_schema(schema_doc: &str) -> Result<Schema, String> {
                 graphql_parser::schema::TypeDefinition::Object(obj) => match &*obj.name {
                     "Query" => {
                         for f in obj.fields {
-                            query_map.insert(f.name.to_string(), f);
+                            query_map.insert(f.name.to_string(), GqlField::from(f));
                         }
                     }
                     "Mutation" => {
                         for f in obj.fields {
-                            mutation_map.insert(f.name.to_string(), f);
+                            mutation_map.insert(f.name.to_string(), GqlField::from(f));
                         }
                     }
                     "Subscription" => {
                         for f in obj.fields {
-                            subscription_map.insert(f.name.to_string(), f);
+                            subscription_map.insert(f.name.to_string(), GqlField::from(f));
                         }
                     }
                     _ => {
@@ -252,7 +256,18 @@ pub fn build_schema(schema_doc: &str) -> Result<Schema, String> {
                 }
             },
             graphql_parser::schema::Definition::DirectiveDefinition(directive) => {
-                directive_map.insert(directive.name.to_string(), directive);
+                let arguments = directive
+                    .arguments
+                    .into_iter()
+                    .map(|arg| GqlArgument::from(arg))
+                    .collect();
+                let result = GqlDirectiveDefinition {
+                    position: directive.position,
+                    name: directive.name,
+                    description: directive.description,
+                    arguments,
+                };
+                directive_map.insert(result.name.to_string(), result);
             }
         }
     }

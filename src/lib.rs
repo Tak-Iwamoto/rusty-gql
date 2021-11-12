@@ -1,22 +1,24 @@
-mod field_resolver;
-mod error;
+mod container;
 mod context;
+mod error;
+mod field_resolver;
 mod graphql_object;
 mod graphql_value;
 mod operation;
+mod path;
+mod request;
 mod resolver;
-mod container;
 mod server;
 mod template;
-mod types;
-mod request;
-mod path;
 mod test_resolver;
 mod test_resolvers;
+mod types;
 
 use error::GraphQLError;
 pub use resolver::Resolver;
 pub use template::GraphiQLTemplate;
+pub use types::schema::build_schema;
+pub use types::GraphQLType;
 pub use types::Schema;
 
 pub type GraphQLResponse<T> = ::std::result::Result<T, GraphQLError>;
