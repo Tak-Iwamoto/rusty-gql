@@ -2,6 +2,6 @@ use crate::{context::ExecutionContext, graphql_value::GraphQLValue, GraphQLRespo
 use async_trait::async_trait;
 
 #[async_trait]
-pub trait ObjectResolver {
+pub trait FieldResolver {
     async fn resolve_field(&self, ctx: &ExecutionContext) -> GraphQLResponse<GraphQLValue>;
 }

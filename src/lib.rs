@@ -1,4 +1,4 @@
-mod object_resolver;
+mod field_resolver;
 mod error;
 mod context;
 mod graphql_object;

@@ -7,7 +7,7 @@ use std::{
 
 use crate::{
     context::ExecutionContext,
-    object_resolver::ObjectResolver,
+    field_resolver::FieldResolver,
     operation::{build_operation, ArcOperation, Operation},
     path::GraphQLPath,
     request::Request,
@@ -24,9 +24,9 @@ impl Default for ContextData {
 
 pub struct Container<
     'a,
-    Query: ObjectResolver,
-    Mutation: ObjectResolver,
-    Subscription: ObjectResolver,
+    Query: FieldResolver,
+    Mutation: FieldResolver,
+    Subscription: FieldResolver,
 > {
     query_resolvers: Query,
     mutation_resolvers: Mutation,
@@ -37,12 +37,12 @@ pub struct Container<
 
 pub struct ArcContainer<
     'a,
-    Query: ObjectResolver,
-    Mutation: ObjectResolver,
-    Subscription: ObjectResolver,
+    Query: FieldResolver,
+    Mutation: FieldResolver,
+    Subscription: FieldResolver,
 >(Arc<Container<'a, Query, Mutation, Subscription>>);
 
-impl<'a, Query: ObjectResolver, Mutation: ObjectResolver, Subscription: ObjectResolver> Deref
+impl<'a, Query: FieldResolver, Mutation: FieldResolver, Subscription: FieldResolver> Deref
     for ArcContainer<'a, Query, Mutation, Subscription>
 {
     type Target = Container<'a, Query, Mutation, Subscription>;
@@ -54,9 +54,9 @@ impl<'a, Query: ObjectResolver, Mutation: ObjectResolver, Subscription: ObjectRe
 
 impl<'a, Query, Mutation, Subscription> ArcContainer<'a, Query, Mutation, Subscription>
 where
-    Query: ObjectResolver,
-    Mutation: ObjectResolver,
-    Subscription: ObjectResolver,
+    Query: FieldResolver,
+    Mutation: FieldResolver,
+    Subscription: FieldResolver,
 {
     pub fn new(
         schema_doc: &'a str,
@@ -91,12 +91,20 @@ where
             .key(root_fieldname)
             .parent_name(operation_type);
 
-        ExecutionContext {
+        let ctx = ExecutionContext {
             schema: &self.schema,
-            operation: &operation,
+            operation: &operation.clone(),
             current_field,
             current_path,
         };
+
+        match &ctx.operation.definition.operation_type {
+            crate::operation::OperationType::Query => {
+
+            },
+            crate::operation::OperationType::Mutation => todo!(),
+            crate::operation::OperationType::Subscription => todo!(),
+        }
     }
 
     pub async fn execute(&'a self, request: &'a Request) {
