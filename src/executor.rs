@@ -1,30 +1,30 @@
 use crate::{
+    container::ArcContainer,
     context::build_context,
+    field_resolver::FieldResolver,
     operation::{build_operation, ArcOperation},
     request::Request,
-    types::schema::ArcSchema,
+    resolver::{resolve_mutation, resolve_query},
     OperationType,
 };
 
-pub async fn execute(schema: &ArcSchema, request: Request) -> Result<(), String> {
-    let operation = build_operation(&request.query_doc, &schema, request.operation_name)?;
+pub async fn execute<Query: FieldResolver, Mutation: FieldResolver, Subscription: FieldResolver>(
+    container: &ArcContainer<Query, Mutation, Subscription>,
+    request: Request,
+) -> Result<(), String> {
+    let operation = build_operation(
+        &request.query_doc,
+        &container.schema,
+        request.operation_name,
+    )?;
     let operation = ArcOperation::new(operation);
-    let ctx = build_context(schema, &operation);
+    let ctx = build_context(&container.schema, &operation);
 
-    match operation.definition.operation_type {
-        OperationType::Query => {
-            println!("{:?}", "query");
-            println!("{:?}", ctx.operation);
-        }
-        OperationType::Mutation => {
-            println!("{:?}", "mutation");
-            println!("{:?}", ctx.operation);
-        }
-        OperationType::Subscription => {
-            println!("{:?}", "subscription");
-            println!("{:?}", ctx);
-        }
-    }
+    let result = match operation.definition.operation_type {
+        OperationType::Query => resolve_query(&ctx, &container.query_resolvers).await,
+        OperationType::Mutation => resolve_mutation(&ctx, &container.mutation_resolvers).await,
+        OperationType::Subscription => resolve_mutation(&ctx, &container.mutation_resolvers).await,
+    };
     Ok(())
 }
 
@@ -33,8 +33,6 @@ mod tests {
     use std::fs;
 
     use crate::{build_schema, request::Request, types::schema::ArcSchema};
-
-    use super::execute;
 
     #[tokio::test]
     async fn it_works() {
@@ -46,7 +44,5 @@ mod tests {
             query_doc,
             operation_name: None,
         };
-
-        execute(&schema, request).await;
     }
 }
