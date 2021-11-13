@@ -2,7 +2,6 @@ mod container;
 mod context;
 mod error;
 mod field_resolver;
-mod graphql_object;
 mod graphql_value;
 mod operation;
 mod path;

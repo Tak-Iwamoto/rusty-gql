@@ -1,5 +1,4 @@
 use crate::{
-    graphql_object::GraphQLObject,
     graphql_value::{value_from_ast, GraphQLValue},
     operation::{ArcOperation, Operation},
     path::GraphQLPath,
@@ -109,16 +108,6 @@ pub fn get_type_from_schema<'a>(
         }
     }
 }
-
-fn execute_fields<'a>(
-    ctx: &ExecutionContext,
-    parent_type: &GraphQLObject,
-    fields: Vec<Field<'a, String>>,
-) {
-    // let field_def = get_field_def()
-}
-
-fn get_field_def<'a>(parent_type: &GraphQLObject, field: Field<'a, String>) {}
 
 // TODO: schemaはfragmentの条件やskip directiveの処理で使用する
 pub fn collect_all_fields<'a>(
