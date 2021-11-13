@@ -1,6 +1,7 @@
-use crate::types::GraphQLType;
 use graphql_parser::schema::Value;
 use std::collections::{BTreeMap, HashMap};
+
+use crate::types::GqlType;
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum GraphQLValue {
@@ -16,14 +17,14 @@ pub enum GraphQLValue {
 
 pub fn value_from_ast<'a>(
     value: &Value<'a, String>,
-    gql_type: &GraphQLType,
+    gql_type: &GqlType,
     variables: &Option<HashMap<String, GraphQLValue>>,
 ) -> GraphQLValue {
     match value {
         Value::Variable(variable) => {
             if let Some(vars) = variables {
                 let variable_value = vars.get(&variable.to_string());
-                if let GraphQLType::NonNull(_) = gql_type {
+                if let GqlType::NonNull(_) = gql_type {
                     if variable_value.is_none() {
                         GraphQLValue::Null
                     } else {

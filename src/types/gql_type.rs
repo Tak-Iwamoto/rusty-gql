@@ -4,14 +4,14 @@ use super::{
 };
 
 #[derive(Debug, Clone)]
-pub enum GraphQLType {
+pub enum GqlType {
     Null,
-    NonNull(Box<GraphQLType>),
+    NonNull(Box<GqlType>),
     Scalar(GqlScalar),
     Object(GqlObject),
     Interface(GqlInterface),
     Union(GqlUnion),
     Enum(GqlEnum),
     Input(GqlInputObject),
-    List(Box<GraphQLType>),
+    List(Box<GqlType>),
 }

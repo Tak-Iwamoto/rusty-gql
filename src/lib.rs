@@ -18,7 +18,6 @@ use error::GraphQLError;
 pub use resolver::Resolver;
 pub use template::GraphiQLTemplate;
 pub use types::schema::build_schema;
-pub use types::GraphQLType;
 pub use types::Schema;
 
 pub type GraphQLResponse<T> = ::std::result::Result<T, GraphQLError>;

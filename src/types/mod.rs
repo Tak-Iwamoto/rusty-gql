@@ -1,16 +1,16 @@
-mod gql_type;
-mod field;
-mod input_object;
 mod argument;
 mod directive;
-mod value;
-mod meta_type;
+mod field;
 mod gql_enum;
+mod gql_type;
 mod gql_union;
-mod scalar;
+mod input_object;
 mod interface;
+mod meta_type;
 mod object;
+mod scalar;
+mod value;
 
 pub mod schema;
-pub use gql_type::GraphQLType;
+pub use gql_type::GqlType;
 pub use schema::Schema;

@@ -23,11 +23,11 @@ impl Default for ContextData {
 }
 
 pub struct Container<Query: FieldResolver, Mutation: FieldResolver, Subscription: FieldResolver> {
-    query_resolvers: Query,
-    mutation_resolvers: Mutation,
-    subscription_resolvers: Subscription,
-    schema: ArcSchema,
-    context_data: ContextData,
+    pub query_resolvers: Query,
+    pub mutation_resolvers: Mutation,
+    pub subscription_resolvers: Subscription,
+    pub schema: ArcSchema,
+    pub context_data: ContextData,
 }
 
 pub struct ArcContainer<Query: FieldResolver, Mutation: FieldResolver, Subscription: FieldResolver>(
@@ -76,7 +76,7 @@ where
         Ok(operation)
     }
 
-    // async fn execute_operation(&'a self, operation: ArcOperation<'a>) {
+    // async fn execute_operation<'a>(&'a self, operation: ArcOperation<'a>) {
     //     let operation_type = operation.definition.operation_type.to_string();
     //     let root_fieldname = operation.definition.root_field.name.to_string();
     //     let selection_set = &operation.definition.selection_set;
@@ -94,15 +94,13 @@ where
     //     };
 
     //     match &ctx.operation.definition.operation_type {
-    //         crate::operation::OperationType::Query => {
-
-    //         },
+    //         crate::operation::OperationType::Query => {}
     //         crate::operation::OperationType::Mutation => todo!(),
     //         crate::operation::OperationType::Subscription => todo!(),
     //     }
     // }
 
-    // pub async fn execute(&'a self, request: &'a Request) {
+    // pub async fn execute(&self, request: &Request) {
     //     match self.prepare_operation(request).await {
     //         Ok(operation) => {
     //             async move {

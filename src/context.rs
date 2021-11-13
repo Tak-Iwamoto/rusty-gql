@@ -3,7 +3,7 @@ use crate::{
     graphql_value::{value_from_ast, GraphQLValue},
     operation::{ArcOperation, Operation},
     path::GraphQLPath,
-    types::{schema::ArcSchema, GraphQLType},
+    types::{schema::ArcSchema, GqlType},
     Schema,
 };
 use graphql_parser::{
@@ -14,7 +14,7 @@ use std::collections::{BTreeMap, HashMap, HashSet};
 
 pub struct ExecutionContext<'a> {
     pub schema: &'a ArcSchema,
-    pub operation: &'a ArcOperation<'a>,
+    pub operation: &'a Operation<'a>,
     // pub fields: BTreeMap<String, Vec<Field<'a, String>>>,
     pub current_field: Field<'a, String>,
     pub current_path: GraphQLPath,
@@ -69,7 +69,7 @@ pub fn get_variables<'a>(
 
         let value = input_values.get(var_name);
 
-        if let GraphQLType::NonNull(_) = var_type {
+        if let GqlType::NonNull(_) = var_type {
             if value.is_none() {
                 return Err(format!("{} must not be null", var_name));
             }
@@ -89,7 +89,7 @@ pub fn get_arguments<'a>(field: Field<'a, String>, variable_values: HashMap<Stri
 pub fn get_type_from_schema<'a>(
     schema: &'a Schema,
     var_type: &'a Type<'a, String>,
-) -> Option<GraphQLType> {
+) -> Option<GqlType> {
     match var_type {
         graphql_parser::schema::Type::NamedType(named_type) => {
             return schema
@@ -99,12 +99,12 @@ pub fn get_type_from_schema<'a>(
         }
         graphql_parser::schema::Type::ListType(list) => {
             let inner_type = get_type_from_schema(schema, &list).unwrap();
-            let value = GraphQLType::List(Box::new(inner_type.clone()));
+            let value = GqlType::List(Box::new(inner_type.clone()));
             return Some(value);
         }
         graphql_parser::schema::Type::NonNullType(non_null) => {
             let inner_type = get_type_from_schema(schema, &non_null).unwrap();
-            let value = GraphQLType::NonNull(Box::new(inner_type.clone()));
+            let value = GqlType::NonNull(Box::new(inner_type.clone()));
             return Some(value);
         }
     }
