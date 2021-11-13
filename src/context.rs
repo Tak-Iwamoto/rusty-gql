@@ -1,9 +1,8 @@
 use crate::{
-    graphql_value::{value_from_ast, GraphQLValue},
     operation::{ArcOperation, Operation},
     path::GraphQLPath,
-    types::{schema::ArcSchema, GqlType},
-    Schema,
+    types::{schema::ArcSchema, value::value_from_ast, GqlType},
+    GqlValue, Schema,
 };
 use graphql_parser::{
     query::{Field, Selection, SelectionSet},
@@ -46,8 +45,8 @@ pub fn build_context<'a>(
 pub fn get_variables<'a>(
     schema: &'a Schema,
     operation: &'a Operation<'a>,
-    input_values: &BTreeMap<String, GraphQLValue>,
-) -> Result<HashMap<String, GraphQLValue>, String> {
+    input_values: &BTreeMap<String, GqlValue>,
+) -> Result<HashMap<String, GqlValue>, String> {
     let variable_definitions = &operation.definition.variable_definitions;
     let mut variables = HashMap::new();
     for var in variable_definitions {
@@ -82,7 +81,7 @@ pub fn get_variables<'a>(
     Ok(variables)
 }
 
-pub fn get_arguments<'a>(field: Field<'a, String>, variable_values: HashMap<String, GraphQLValue>) {
+pub fn get_arguments<'a>(field: Field<'a, String>, variable_values: HashMap<String, GqlValue>) {
     let arguments = field.arguments;
 }
 

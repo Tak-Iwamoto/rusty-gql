@@ -9,9 +9,10 @@ mod interface;
 mod meta_type;
 mod object;
 mod scalar;
-mod value;
+pub mod value;
 
 pub mod schema;
-pub use gql_type::GqlType;
 pub use field::GqlField;
+pub use gql_type::GqlType;
 pub use schema::Schema;
+pub use value::GqlValue;
