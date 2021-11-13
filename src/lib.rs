@@ -15,6 +15,7 @@ mod test_resolvers;
 mod types;
 
 use error::GraphQLError;
+pub use operation::OperationType;
 pub use resolver::Resolver;
 pub use template::GraphiQLTemplate;
 pub use types::schema::build_schema;
