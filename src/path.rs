@@ -1,6 +1,4 @@
-use crate::{operation::Operation, Schema};
-
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct GraphQLPath {
     pub prev: Option<Box<GraphQLPath>>,
     pub key: String,

@@ -22,6 +22,7 @@ pub struct Schema {
     pub type_map: BTreeMap<String, GqlType>,
 }
 
+#[derive(Debug)]
 pub struct ArcSchema(Arc<Schema>);
 
 impl ArcSchema {

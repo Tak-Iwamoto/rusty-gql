@@ -11,10 +11,11 @@ use graphql_parser::{
 };
 use std::collections::{BTreeMap, HashMap, HashSet};
 
+#[derive(Debug)]
 pub struct ExecutionContext<'a> {
     pub schema: &'a ArcSchema,
-    pub operation: &'a Operation<'a>,
-    // pub fields: BTreeMap<String, Vec<Field<'a, String>>>,
+    pub operation: &'a ArcOperation<'a>,
+    pub fields: BTreeMap<String, Vec<Field<'a, String>>>,
     pub current_field: Field<'a, String>,
     pub current_path: GraphQLPath,
 }
@@ -27,7 +28,7 @@ pub fn build_context<'a>(
     let root_fieldname = operation.definition.root_field.name.to_string();
     let selection_set = &operation.definition.selection_set;
     let current_field = operation.definition.root_field.clone();
-    // let fields = collect_all_fields(&schema, &operation, selection_set);
+    let fields = collect_all_fields(&schema, &operation, selection_set);
     let current_path = GraphQLPath::default()
         .prev(None)
         .key(root_fieldname)
@@ -36,7 +37,7 @@ pub fn build_context<'a>(
     ExecutionContext {
         schema,
         operation,
-        // fields,
+        fields,
         current_field,
         current_path,
     }

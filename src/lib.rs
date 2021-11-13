@@ -11,6 +11,7 @@ mod server;
 mod template;
 mod test_resolvers;
 mod types;
+mod executor;
 
 use error::GraphQLError;
 pub use operation::OperationType;

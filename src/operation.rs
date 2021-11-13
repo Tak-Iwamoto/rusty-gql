@@ -19,6 +19,7 @@ pub struct Operation<'a> {
     // pub errors
 }
 
+#[derive(Debug)]
 pub struct ArcOperation<'a>(Arc<Operation<'a>>);
 
 impl<'a> ArcOperation<'a> {
