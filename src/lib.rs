@@ -10,7 +10,6 @@ mod request;
 mod resolver;
 mod server;
 mod template;
-mod test_resolver;
 mod test_resolvers;
 mod types;
 
