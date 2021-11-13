@@ -4,11 +4,20 @@ use graphql_parser::{schema::Directive, Pos};
 
 use super::{argument::GqlArgument, value::GqlValue};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct GqlDirective {
     pub position: Pos,
     pub name: String,
     pub arguments: BTreeMap<String, GqlValue>,
+}
+
+impl GqlDirective {
+    pub fn from_vec_directive<'a>(directives: Vec<Directive<'a, String>>) -> Vec<GqlDirective> {
+        directives
+            .into_iter()
+            .map(|dir| GqlDirective::from(dir))
+            .collect()
+    }
 }
 
 impl<'a> From<Directive<'a, String>> for GqlDirective {
@@ -24,6 +33,13 @@ impl<'a> From<Directive<'a, String>> for GqlDirective {
             arguments,
         }
     }
+}
+
+pub fn convert_vec_directive<'a>(directives: Vec<Directive<'a, String>>) -> Vec<GqlDirective> {
+    directives
+        .into_iter()
+        .map(|dir| GqlDirective::from(dir))
+        .collect()
 }
 
 #[derive(Debug)]

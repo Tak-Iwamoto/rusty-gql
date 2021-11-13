@@ -1,6 +1,6 @@
 use graphql_parser::schema::Type;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum GqlMetaType {
     NamedType(String),
     ListType(Box<GqlMetaType>),

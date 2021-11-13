@@ -63,7 +63,7 @@ impl ToString for OperationType {
 
 pub fn build_operation<'a>(
     query_doc: &'a str,
-    schema: &'a ArcSchema<'a>,
+    schema: &'a ArcSchema,
     operation_name: Option<String>,
 ) -> Result<Operation<'a>, String> {
     let parsed_query = match graphql_parser::parse_query::<String>(query_doc) {
@@ -196,7 +196,7 @@ fn get_root_field<'a>(
     }
 }
 fn get_operation_type<'a>(
-    schema: &'a Schema<'a>,
+    schema: &'a Schema,
     root_field: &Field<'a, String>,
 ) -> Result<OperationType, String> {
     let root_fieldname = &root_field.name;

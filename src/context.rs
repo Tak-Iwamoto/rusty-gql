@@ -13,7 +13,7 @@ use graphql_parser::{
 use std::collections::{BTreeMap, HashMap, HashSet};
 
 pub struct ExecutionContext<'a> {
-    pub schema: &'a ArcSchema<'a>,
+    pub schema: &'a ArcSchema,
     pub operation: &'a ArcOperation<'a>,
     // pub fields: BTreeMap<String, Vec<Field<'a, String>>>,
     pub current_field: Field<'a, String>,
@@ -21,7 +21,7 @@ pub struct ExecutionContext<'a> {
 }
 
 pub fn build_context<'a>(
-    schema: &'a ArcSchema<'a>,
+    schema: &'a ArcSchema,
     operation: &'a ArcOperation<'a>,
 ) -> ExecutionContext<'a> {
     let operation_type = operation.definition.operation_type.to_string();
@@ -44,7 +44,7 @@ pub fn build_context<'a>(
 }
 
 pub fn get_variables<'a>(
-    schema: &'a Schema<'a>,
+    schema: &'a Schema,
     operation: &'a Operation<'a>,
     input_values: &BTreeMap<String, GraphQLValue>,
 ) -> Result<HashMap<String, GraphQLValue>, String> {
@@ -87,9 +87,9 @@ pub fn get_arguments<'a>(field: Field<'a, String>, variable_values: HashMap<Stri
 }
 
 pub fn get_type_from_schema<'a>(
-    schema: &'a Schema<'a>,
+    schema: &'a Schema,
     var_type: &'a Type<'a, String>,
-) -> Option<GraphQLType<'a>> {
+) -> Option<GraphQLType> {
     match var_type {
         graphql_parser::schema::Type::NamedType(named_type) => {
             return schema

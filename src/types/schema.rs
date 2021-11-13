@@ -4,31 +4,34 @@ use super::{
     argument::GqlArgument,
     directive::{GqlDirective, GqlDirectiveDefinition},
     field::GqlField,
+    gql_enum::{GqlEnum, GqlEnumValue},
+    gql_union::GqlUnion,
+    input_object::GqlInputObject,
+    interface::GqlInterface,
+    object::GqlObject,
+    scalar::GqlScalar,
     GraphQLType,
-};
-use graphql_parser::schema::{
-    EnumType, InputObjectType, InterfaceType, ObjectType, ScalarType, UnionType,
 };
 
 #[derive(Debug)]
-pub struct Schema<'a> {
+pub struct Schema {
     pub queries: BTreeMap<String, GqlField>,
     pub mutations: BTreeMap<String, GqlField>,
     pub subscriptions: BTreeMap<String, GqlField>,
     pub directives: BTreeMap<String, GqlDirectiveDefinition>,
-    pub type_map: BTreeMap<String, GraphQLType<'a>>,
+    pub type_map: BTreeMap<String, GraphQLType>,
 }
 
-pub struct ArcSchema<'a>(Arc<Schema<'a>>);
+pub struct ArcSchema(Arc<Schema>);
 
-impl<'a> ArcSchema<'a> {
-    pub fn new(schema: Schema<'a>) -> Self {
+impl ArcSchema {
+    pub fn new(schema: Schema) -> Self {
         ArcSchema(Arc::new(schema))
     }
 }
 
-impl<'a> Deref for ArcSchema<'a> {
-    type Target = Schema<'a>;
+impl Deref for ArcSchema {
+    type Target = Schema;
 
     fn deref(&self) -> &Self::Target {
         &self.0
@@ -50,7 +53,8 @@ pub fn build_schema(schema_doc: &str) -> Result<Schema, String> {
             graphql_parser::schema::Definition::SchemaDefinition(schema) => {}
             graphql_parser::schema::Definition::TypeDefinition(type_def) => match type_def {
                 graphql_parser::schema::TypeDefinition::Scalar(scalar) => {
-                    type_map.insert(scalar.name.to_string(), GraphQLType::Scalar(scalar));
+                    let gql_scalar = GqlScalar::from(scalar);
+                    type_map.insert(gql_scalar.name.to_string(), GraphQLType::Scalar(gql_scalar));
                 }
 
                 graphql_parser::schema::TypeDefinition::Object(obj) => match &*obj.name {
@@ -70,23 +74,32 @@ pub fn build_schema(schema_doc: &str) -> Result<Schema, String> {
                         }
                     }
                     _ => {
-                        type_map.insert(obj.name.to_string(), GraphQLType::Object(obj));
+                        let gql_object = GqlObject::from(obj);
+                        type_map
+                            .insert(gql_object.name.to_string(), GraphQLType::Object(gql_object));
                     }
                 },
                 graphql_parser::schema::TypeDefinition::Interface(interface) => {
+                    let gql_interface = GqlInterface::from(interface);
                     type_map.insert(
-                        interface.name.to_string(),
-                        GraphQLType::Interface(interface),
+                        gql_interface.name.to_string(),
+                        GraphQLType::Interface(gql_interface),
                     );
                 }
                 graphql_parser::schema::TypeDefinition::Union(uni) => {
-                    type_map.insert(uni.name.to_string(), GraphQLType::Union(uni));
+                    let gql_union = GqlUnion::from(uni);
+                    type_map.insert(gql_union.name.to_string(), GraphQLType::Union(gql_union));
                 }
-                graphql_parser::schema::TypeDefinition::Enum(enu) => {
-                    type_map.insert(enu.name.to_string(), GraphQLType::Enum(enu));
+                graphql_parser::schema::TypeDefinition::Enum(enum_type) => {
+                    let gql_enum = GqlEnum::from(enum_type);
+                    type_map.insert(gql_enum.name.to_string(), GraphQLType::Enum(gql_enum));
                 }
                 graphql_parser::schema::TypeDefinition::InputObject(input) => {
-                    type_map.insert(input.name.to_string(), GraphQLType::Input(input));
+                    let gql_input_obj = GqlInputObject::from(input);
+                    type_map.insert(
+                        gql_input_obj.name.to_string(),
+                        GraphQLType::Input(gql_input_obj),
+                    );
                 }
             },
             graphql_parser::schema::Definition::TypeExtension(type_ext) => match type_ext {
@@ -96,9 +109,11 @@ pub fn build_schema(schema_doc: &str) -> Result<Schema, String> {
                         Some(original_scalar) => {
                             if let GraphQLType::Scalar(original) = original_scalar {
                                 let mut extended_directives = original.directives.clone();
-                                extended_directives.append(&mut scalar_ext.directives.clone());
+                                let mut directives =
+                                    GqlDirective::from_vec_directive(scalar_ext.directives);
+                                extended_directives.append(&mut directives);
 
-                                let extended_scalar = ScalarType {
+                                let extended_scalar = GqlScalar {
                                     position: original.position,
                                     description: original.description.clone(),
                                     name: original_name.clone(),
@@ -117,17 +132,20 @@ pub fn build_schema(schema_doc: &str) -> Result<Schema, String> {
                         Some(original_obj) => {
                             if let GraphQLType::Object(original) = original_obj {
                                 let mut extended_directives = original.directives.clone();
-                                extended_directives.append(&mut obj_ext.directives.clone());
+                                let mut directives =
+                                    GqlDirective::from_vec_directive(obj_ext.directives);
+                                extended_directives.append(&mut directives);
 
                                 let mut extended_fields = original.fields.clone();
-                                extended_fields.append(&mut obj_ext.fields.clone());
+                                let mut fields = GqlField::from_vec_field(obj_ext.fields);
+                                extended_fields.append(&mut fields);
 
                                 let mut extended_impl_interfaces =
                                     original.implements_interfaces.clone();
                                 extended_impl_interfaces
                                     .append(&mut obj_ext.implements_interfaces.clone());
 
-                                let extended_obj = ObjectType {
+                                let extended_obj = GqlObject {
                                     position: original.position,
                                     description: original.description.clone(),
                                     name: original_name.clone(),
@@ -150,12 +168,15 @@ pub fn build_schema(schema_doc: &str) -> Result<Schema, String> {
                         Some(original_interface) => {
                             if let GraphQLType::Interface(original) = original_interface {
                                 let mut extended_directives = original.directives.clone();
-                                extended_directives.append(&mut inter_ext.directives.clone());
+                                let mut directives =
+                                    GqlDirective::from_vec_directive(inter_ext.directives);
+                                extended_directives.append(&mut directives);
 
                                 let mut extended_fields = original.fields.clone();
-                                extended_fields.append(&mut inter_ext.fields.clone());
+                                let mut fields = GqlField::from_vec_field(inter_ext.fields);
+                                extended_fields.append(&mut fields);
 
-                                let extended_interface = InterfaceType {
+                                let extended_interface = GqlInterface {
                                     position: original.position,
                                     description: original.description.clone(),
                                     name: original_name.clone(),
@@ -177,12 +198,14 @@ pub fn build_schema(schema_doc: &str) -> Result<Schema, String> {
                         Some(original_union) => {
                             if let GraphQLType::Union(original) = original_union {
                                 let mut extended_directives = original.directives.clone();
-                                extended_directives.append(&mut union_ext.directives.clone());
+                                let mut directives =
+                                    GqlDirective::from_vec_directive(union_ext.directives.clone());
+                                extended_directives.append(&mut directives);
 
                                 let mut extended_types = original.types.clone();
                                 extended_types.append(&mut union_ext.types.clone());
 
-                                let extended_union = UnionType {
+                                let extended_union = GqlUnion {
                                     position: original.position,
                                     description: original.description.clone(),
                                     name: original_name.clone(),
@@ -204,22 +227,28 @@ pub fn build_schema(schema_doc: &str) -> Result<Schema, String> {
                         Some(original_enum) => {
                             if let GraphQLType::Enum(original) = original_enum {
                                 let mut extended_directives = original.directives.clone();
-                                extended_directives.append(&mut enum_ext.directives.clone());
+                                let mut directives =
+                                    GqlDirective::from_vec_directive(enum_ext.directives.clone());
+                                extended_directives.append(&mut directives);
 
                                 let mut extended_values = original.values.clone();
-                                extended_values.append(&mut enum_ext.values.clone());
+                                let mut values = enum_ext
+                                    .values
+                                    .into_iter()
+                                    .map(|value| GqlEnumValue::from(value))
+                                    .collect();
+                                extended_values.append(&mut values);
 
-                                let extended_enum = EnumType {
+                                let extended_enum = GqlEnum {
                                     position: original.position,
                                     description: original.description.clone(),
                                     name: original_name.clone(),
                                     directives: extended_directives,
                                     values: extended_values,
                                 };
-                                type_map.insert(
-                                    original_name.to_string(),
-                                    GraphQLType::Enum(extended_enum),
-                                );
+                                let gql_enum = GqlEnum::from(extended_enum);
+                                type_map
+                                    .insert(original_name.to_string(), GraphQLType::Enum(gql_enum));
                             }
                         }
                         None => return Err(String::from("The enum to extend is not found")),
@@ -231,12 +260,16 @@ pub fn build_schema(schema_doc: &str) -> Result<Schema, String> {
                         Some(original_input) => {
                             if let GraphQLType::Input(original) = original_input {
                                 let mut extended_directives = original.directives.clone();
-                                extended_directives.append(&mut input_ext.directives.clone());
+                                let mut directives =
+                                    GqlDirective::from_vec_directive(input_ext.directives.clone());
+                                extended_directives.append(&mut directives);
 
                                 let mut extended_fields = original.fields.clone();
-                                extended_fields.append(&mut input_ext.fields.clone());
+                                let mut fields =
+                                    GqlArgument::from_vec_input_value(input_ext.fields);
+                                extended_fields.append(&mut fields);
 
-                                let extended_input = InputObjectType {
+                                let extended_input = GqlInputObject {
                                     position: original.position,
                                     description: original.description.clone(),
                                     name: original_name.clone(),
@@ -256,11 +289,7 @@ pub fn build_schema(schema_doc: &str) -> Result<Schema, String> {
                 }
             },
             graphql_parser::schema::Definition::DirectiveDefinition(directive) => {
-                let arguments = directive
-                    .arguments
-                    .into_iter()
-                    .map(|arg| GqlArgument::from(arg))
-                    .collect();
+                let arguments = GqlArgument::from_vec_input_value(directive.arguments);
                 let result = GqlDirectiveDefinition {
                     position: directive.position,
                     name: directive.name,

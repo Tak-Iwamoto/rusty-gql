@@ -1,16 +1,17 @@
-use graphql_parser::schema::{
-    EnumType, InputObjectType, InterfaceType, ObjectType, ScalarType, UnionType,
+use super::{
+    gql_enum::GqlEnum, gql_union::GqlUnion, input_object::GqlInputObject, interface::GqlInterface,
+    object::GqlObject, scalar::GqlScalar,
 };
 
 #[derive(Debug, Clone)]
-pub enum GraphQLType<'a> {
+pub enum GraphQLType {
     Null,
-    NonNull(Box<GraphQLType<'a>>),
-    Scalar(ScalarType<'a, String>),
-    Object(ObjectType<'a, String>),
-    Interface(InterfaceType<'a, String>),
-    Union(UnionType<'a, String>),
-    Enum(EnumType<'a, String>),
-    Input(InputObjectType<'a, String>),
-    List(Box<GraphQLType<'a>>),
+    NonNull(Box<GraphQLType>),
+    Scalar(GqlScalar),
+    Object(GqlObject),
+    Interface(GqlInterface),
+    Union(GqlUnion),
+    Enum(GqlEnum),
+    Input(GqlInputObject),
+    List(Box<GraphQLType>),
 }

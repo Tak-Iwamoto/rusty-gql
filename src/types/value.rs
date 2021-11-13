@@ -2,7 +2,7 @@ use std::collections::BTreeMap;
 
 use graphql_parser::schema::Value;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum GqlValue {
     Variable(String),
     Int(i64),

@@ -2,7 +2,7 @@ use graphql_parser::{schema::InputValue, Pos};
 
 use super::{directive::GqlDirective, meta_type::GqlMetaType, value::GqlValue};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct GqlArgument {
     pub name: String,
     pub description: Option<String>,
@@ -12,17 +12,24 @@ pub struct GqlArgument {
     pub directives: Vec<GqlDirective>,
 }
 
+impl GqlArgument {
+    pub fn from_vec_input_value<'a>(
+        input_objects: Vec<InputValue<'a, String>>,
+    ) -> Vec<GqlArgument> {
+        input_objects
+            .into_iter()
+            .map(|arg| GqlArgument::from(arg))
+            .collect()
+    }
+}
+
 impl<'a> From<InputValue<'a, String>> for GqlArgument {
     fn from(input_value: InputValue<'a, String>) -> Self {
         let meta_type = GqlMetaType::from(input_value.value_type);
         let default_value = input_value
             .default_value
             .map_or(None, |value| Some(GqlValue::from(value)));
-        let directives = input_value
-            .directives
-            .into_iter()
-            .map(|dir| GqlDirective::from(dir))
-            .collect();
+        let directives = GqlDirective::from_vec_directive(input_value.directives);
 
         GqlArgument {
             name: input_value.name,

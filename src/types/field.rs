@@ -5,7 +5,7 @@ use super::argument::GqlArgument;
 use super::directive::GqlDirective;
 use super::meta_type::GqlMetaType;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct GqlField {
     pub name: String,
     pub description: Option<String>,
@@ -15,20 +15,20 @@ pub struct GqlField {
     pub directives: Vec<GqlDirective>,
 }
 
+impl GqlField {
+    pub fn from_vec_field<'a>(fields: Vec<Field<'a, String>>) -> Vec<GqlField> {
+        fields
+            .into_iter()
+            .map(|field| GqlField::from(field))
+            .collect()
+    }
+}
+
 impl<'a> From<Field<'a, String>> for GqlField {
     fn from(field: Field<'a, String>) -> Self {
         let meta_type = GqlMetaType::from(field.field_type);
-        let directives = field
-            .directives
-            .into_iter()
-            .map(|dir| GqlDirective::from(dir))
-            .collect();
-
-        let arguments = field
-            .arguments
-            .into_iter()
-            .map(|arg| GqlArgument::from(arg))
-            .collect();
+        let directives = GqlDirective::from_vec_directive(field.directives);
+        let arguments = GqlArgument::from_vec_input_value(field.arguments);
 
         GqlField {
             name: field.name,

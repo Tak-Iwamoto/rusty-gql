@@ -2,6 +2,7 @@ use graphql_parser::{schema::InputObjectType, Pos};
 
 use super::{argument::GqlArgument, directive::GqlDirective};
 
+#[derive(Debug, Clone)]
 pub struct GqlInputObject {
     pub name: String,
     pub description: Option<String>,

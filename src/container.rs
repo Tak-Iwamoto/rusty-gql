@@ -22,44 +22,36 @@ impl Default for ContextData {
     }
 }
 
-pub struct Container<
-    'a,
-    Query: FieldResolver,
-    Mutation: FieldResolver,
-    Subscription: FieldResolver,
-> {
+pub struct Container<Query: FieldResolver, Mutation: FieldResolver, Subscription: FieldResolver> {
     query_resolvers: Query,
     mutation_resolvers: Mutation,
     subscription_resolvers: Subscription,
-    schema: ArcSchema<'a>,
+    schema: ArcSchema,
     context_data: ContextData,
 }
 
-pub struct ArcContainer<
-    'a,
-    Query: FieldResolver,
-    Mutation: FieldResolver,
-    Subscription: FieldResolver,
->(Arc<Container<'a, Query, Mutation, Subscription>>);
+pub struct ArcContainer<Query: FieldResolver, Mutation: FieldResolver, Subscription: FieldResolver>(
+    Arc<Container<Query, Mutation, Subscription>>,
+);
 
-impl<'a, Query: FieldResolver, Mutation: FieldResolver, Subscription: FieldResolver> Deref
-    for ArcContainer<'a, Query, Mutation, Subscription>
+impl<Query: FieldResolver, Mutation: FieldResolver, Subscription: FieldResolver> Deref
+    for ArcContainer<Query, Mutation, Subscription>
 {
-    type Target = Container<'a, Query, Mutation, Subscription>;
+    type Target = Container<Query, Mutation, Subscription>;
 
     fn deref(&self) -> &Self::Target {
         &self.0
     }
 }
 
-impl<'a, Query, Mutation, Subscription> ArcContainer<'a, Query, Mutation, Subscription>
+impl<Query, Mutation, Subscription> ArcContainer<Query, Mutation, Subscription>
 where
     Query: FieldResolver,
     Mutation: FieldResolver,
     Subscription: FieldResolver,
 {
     pub fn new(
-        schema_doc: &'a str,
+        schema_doc: &str,
         query: Query,
         mutation: Mutation,
         subscription: Subscription,
@@ -74,7 +66,10 @@ where
         })))
     }
 
-    async fn prepare_operation(&'a self, request: &'a Request) -> Result<Operation<'a>, String> {
+    async fn prepare_operation<'a>(
+        &'a self,
+        request: &'a Request,
+    ) -> Result<Operation<'a>, String> {
         let query_doc = &request.query_doc;
         let operation_name = request.operation_name.clone();
         let operation = build_operation(query_doc.as_str(), &self.schema, operation_name)?;
