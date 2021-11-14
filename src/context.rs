@@ -10,7 +10,7 @@ use graphql_parser::{
 };
 use std::collections::{BTreeMap, HashMap, HashSet};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ExecutionContext<'a> {
     pub schema: &'a ArcSchema,
     pub operation: &'a ArcOperation<'a>,
