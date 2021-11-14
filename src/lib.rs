@@ -12,17 +12,11 @@ mod template;
 mod test_resolvers;
 mod types;
 
-use error::GraphQLError;
+use error::GqlError;
 pub use operation::OperationType;
 pub use resolver::Resolver;
 pub use template::GraphiQLTemplate;
 pub use types::schema::build_schema;
 pub use types::{GqlField, GqlType, GqlValue, Schema};
 
-pub type Response<T> = ::std::result::Result<T, GraphQLError>;
-
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {}
-}
+pub type Response<T> = ::std::result::Result<T, GqlError>;

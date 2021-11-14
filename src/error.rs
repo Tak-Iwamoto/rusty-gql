@@ -5,7 +5,7 @@ pub struct Location {
 }
 
 #[derive(Debug, Clone)]
-pub enum GraphQLErrorType {
+pub enum GqlErrorType {
     BadRequest,
     FailedPreCondition,
     Internal,
@@ -18,7 +18,7 @@ pub enum GraphQLErrorType {
 
 #[derive(Debug, Clone)]
 pub struct GraphQLTypedError {
-    pub error_type: GraphQLErrorType,
+    pub error_type: GqlErrorType,
     pub error_detail: Option<String>,
     pub origin: String,
     pub debug_info: String,
@@ -26,7 +26,7 @@ pub struct GraphQLTypedError {
 }
 
 #[derive(Debug, Clone)]
-pub struct GraphQLError {
+pub struct GqlError {
     pub message: String,
     pub locations: Vec<Location>,
     pub path: Vec<String>,
