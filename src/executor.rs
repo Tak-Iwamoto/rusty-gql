@@ -20,7 +20,7 @@ pub async fn execute<Query: FieldResolver, Mutation: FieldResolver, Subscription
     let operation = ArcOperation::new(operation);
     let ctx = build_context(&container.schema, &operation);
 
-    let result = match operation.definition.operation_type {
+    let result = match operation.operation_type {
         OperationType::Query => resolve_query(&ctx, &container.query_resolvers).await,
         OperationType::Mutation => resolve_mutation(&ctx, &container.mutation_resolvers).await,
         OperationType::Subscription => resolve_mutation(&ctx, &container.mutation_resolvers).await,

@@ -14,7 +14,7 @@ use std::collections::{BTreeMap, HashMap, HashSet};
 pub struct ExecutionContext<'a> {
     pub schema: &'a ArcSchema,
     pub operation: &'a ArcOperation<'a>,
-    pub fields: BTreeMap<String, Vec<Field<'a, String>>>,
+    pub fields: HashMap<String, Vec<Field<'a, String>>>,
     pub current_field: Field<'a, String>,
     pub current_path: GraphQLPath,
 }
@@ -23,10 +23,10 @@ pub fn build_context<'a>(
     schema: &'a ArcSchema,
     operation: &'a ArcOperation<'a>,
 ) -> ExecutionContext<'a> {
-    let operation_type = operation.definition.operation_type.to_string();
-    let root_fieldname = operation.definition.root_field.name.to_string();
-    let selection_set = &operation.definition.selection_set;
-    let current_field = operation.definition.root_field.clone();
+    let operation_type = operation.operation_type.to_string();
+    let root_fieldname = operation.root_field.name.to_string();
+    let selection_set = &operation.selection_set;
+    let current_field = operation.root_field.clone();
 
     let fields = collect_query_fields(&schema, &operation, selection_set);
     let current_path = GraphQLPath::default()
@@ -48,7 +48,7 @@ pub fn get_variables<'a>(
     operation: &'a Operation<'a>,
     input_values: &BTreeMap<String, GqlValue>,
 ) -> Result<HashMap<String, GqlValue>, String> {
-    let variable_definitions = &operation.definition.variable_definitions;
+    let variable_definitions = &operation.variable_definitions;
     let mut variables = HashMap::new();
     for var in variable_definitions {
         let var_type = get_type_from_schema(schema, &var.var_type);
@@ -115,8 +115,8 @@ pub fn collect_query_fields<'a>(
     schema: &'a Schema,
     operation: &'a Operation<'a>,
     selection_set: &SelectionSet<'a, String>,
-) -> BTreeMap<String, Vec<Field<'a, String>>> {
-    let mut fields: BTreeMap<String, Vec<Field<String>>> = BTreeMap::new();
+) -> HashMap<String, Vec<Field<'a, String>>> {
+    let mut fields: HashMap<String, Vec<Field<String>>> = HashMap::new();
     let mut visited_fragments = HashSet::new();
 
     collect_fields(
@@ -131,7 +131,7 @@ pub fn collect_query_fields<'a>(
 fn collect_fields<'a>(
     operation: &'a Operation<'a>,
     selection_set: &SelectionSet<'a, String>,
-    fields: &mut BTreeMap<String, Vec<Field<'a, String>>>,
+    fields: &mut HashMap<String, Vec<Field<'a, String>>>,
     visited_fragments: &mut HashSet<String>,
 ) {
     for item in &selection_set.items {
@@ -194,7 +194,11 @@ mod tests {
         let schema = ArcSchema::new(build_schema(schema_doc.as_str()).unwrap());
         let query = build_operation(query_doc.as_str(), &schema, None).unwrap();
 
-        let fields = collect_query_fields(&schema, &query, &query.definition.selection_set);
+        let fields = collect_query_fields(&schema, &query, &query.selection_set);
+
+        for field in &fields {
+            println!("{:?}", field);
+        }
 
         for f in &fields["repository"] {
             for item in &f.selection_set.items {

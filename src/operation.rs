@@ -13,7 +13,11 @@ use crate::{types::schema::ArcSchema, Schema};
 
 #[derive(Debug, Clone)]
 pub struct Operation<'a> {
-    pub definition: OperationDefinition<'a>,
+    pub operation_type: OperationType,
+    pub directives: Vec<Directive<'a, String>>,
+    pub variable_definitions: Vec<VariableDefinition<'a, String>>,
+    pub selection_set: SelectionSet<'a, String>,
+    pub root_field: Field<'a, String>,
     pub fragments: BTreeMap<String, FragmentDefinition<'a, String>>,
     // pub variables:
     // pub errors
@@ -37,7 +41,7 @@ impl<'a> Deref for ArcOperation<'a> {
 }
 
 #[derive(Clone, Debug)]
-pub struct OperationDefinition<'a> {
+struct OperationDefinition<'a> {
     pub operation_type: OperationType,
     pub directives: Vec<Directive<'a, String>>,
     pub variable_definitions: Vec<VariableDefinition<'a, String>>,
@@ -160,23 +164,44 @@ pub fn build_operation<'a>(
         Some(name) => {
             let target_def = operation_definitions.get(name.as_str());
             match target_def {
-                Some(definition) => Ok(Operation {
-                    definition: definition.clone(),
-                    fragments,
-                }),
+                Some(definition) => {
+                    let definition = definition.clone();
+                    Ok(Operation {
+                        operation_type: definition.operation_type,
+                        fragments,
+                        directives: definition.directives,
+                        variable_definitions: definition.variable_definitions,
+                        selection_set: definition.selection_set,
+                        root_field: definition.root_field,
+                    })
+                }
                 None => Err(format!("{} is not contained in query", name)),
             }
         }
         None => match operation_definitions.get(&no_name_key.to_string()) {
-            Some(definition) => Ok(Operation {
-                definition: definition.clone(),
-                fragments,
-            }),
-            None => match operation_definitions.values().next() {
-                Some(definition) => Ok(Operation {
-                    definition: definition.clone(),
+            Some(definition) => {
+                let definition = definition.clone();
+                Ok(Operation {
+                    operation_type: definition.operation_type,
                     fragments,
-                }),
+                    directives: definition.directives,
+                    variable_definitions: definition.variable_definitions,
+                    selection_set: definition.selection_set,
+                    root_field: definition.root_field,
+                })
+            }
+            None => match operation_definitions.values().next() {
+                Some(definition) => {
+                    let definition = definition.clone();
+                    Ok(Operation {
+                        operation_type: definition.operation_type,
+                        fragments,
+                        directives: definition.directives,
+                        variable_definitions: definition.variable_definitions,
+                        selection_set: definition.selection_set,
+                        root_field: definition.root_field,
+                    })
+                }
                 None => Err(String::from("operation does not exist")),
             },
         },
@@ -229,14 +254,13 @@ mod tests {
 
         let query = build_operation(query_doc.as_str(), &schema, None).unwrap();
 
-        println!("{:?}", query.definition.root_field);
+        println!("{:?}", query.root_field);
         println!(
             "{:?}",
             schema
                 .queries
-                .get(&query.definition.root_field.name.to_string())
+                .get(&query.root_field.name.to_string())
                 .unwrap()
         );
-        println!("{:?}", query.definition);
     }
 }
