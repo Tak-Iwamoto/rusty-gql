@@ -1,7 +1,7 @@
 #[derive(Clone, Debug)]
 pub struct GraphQLPath {
     pub prev: Option<Box<GraphQLPath>>,
-    pub key: String,
+    pub current_key: String,
     pub parent_name: String,
 }
 
@@ -9,7 +9,7 @@ impl Default for GraphQLPath {
     fn default() -> Self {
         Self {
             prev: None,
-            key: String::from(""),
+            current_key: String::from(""),
             parent_name: String::from("Query"),
         }
     }
@@ -21,8 +21,8 @@ impl GraphQLPath {
         self
     }
 
-    pub fn key(mut self, key: String) -> Self {
-        self.key = key;
+    pub fn current_key(mut self, current_key: String) -> Self {
+        self.current_key = current_key;
         self
     }
 

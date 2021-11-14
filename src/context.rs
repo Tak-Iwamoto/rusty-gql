@@ -27,10 +27,11 @@ pub fn build_context<'a>(
     let root_fieldname = operation.definition.root_field.name.to_string();
     let selection_set = &operation.definition.selection_set;
     let current_field = operation.definition.root_field.clone();
-    let fields = collect_all_fields(&schema, &operation, selection_set);
+
+    let fields = collect_query_fields(&schema, &operation, selection_set);
     let current_path = GraphQLPath::default()
         .prev(None)
-        .key(root_fieldname)
+        .current_key(root_fieldname)
         .parent_name(operation_type);
 
     ExecutionContext {
@@ -110,7 +111,7 @@ pub fn get_type_from_schema<'a>(
 }
 
 // TODO: schemaはfragmentの条件やskip directiveの処理で使用する
-pub fn collect_all_fields<'a>(
+pub fn collect_query_fields<'a>(
     schema: &'a Schema,
     operation: &'a Operation<'a>,
     selection_set: &SelectionSet<'a, String>,
@@ -179,7 +180,7 @@ fn collect_fields<'a>(
 #[cfg(test)]
 mod tests {
     use crate::{
-        context::collect_all_fields,
+        context::collect_query_fields,
         operation::build_operation,
         types::schema::{build_schema, ArcSchema},
     };
@@ -193,7 +194,7 @@ mod tests {
         let schema = ArcSchema::new(build_schema(schema_doc.as_str()).unwrap());
         let query = build_operation(query_doc.as_str(), &schema, None).unwrap();
 
-        let fields = collect_all_fields(&schema, &query, &query.definition.selection_set);
+        let fields = collect_query_fields(&schema, &query, &query.definition.selection_set);
 
         for f in &fields["repository"] {
             for item in &f.selection_set.items {
