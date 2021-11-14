@@ -1,12 +1,16 @@
-use rusty_gql_codegen::GqlField;
+use rusty_gql_codegen::gql_object;
 
-#[GqlField(parent_type = "Query", field = "show")]
-pub fn test_func(value: &str) -> String {
-    value
+pub struct Query;
+
+#[gql_object]
+impl Query {
+    async fn test(&self) -> i32 {
+        12
+    }
 }
 
-#[test]
-fn it_works() {
-    let value = test_func("value");
-    println!("{:?}", value);
+#[tokio::test]
+async fn it_works() {
+    let query = Query{};
+    let value = query.test().await;
 }
