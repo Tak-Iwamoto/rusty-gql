@@ -1,4 +1,5 @@
 use crate::{
+    error::GqlError,
     operation::{ArcOperation, Operation},
     path::GraphQLPath,
     types::{schema::ArcSchema, value::value_from_ast, GqlType},
@@ -17,6 +18,7 @@ pub struct ExecutionContext<'a> {
     pub fields: HashMap<String, Vec<Field<'a, String>>>,
     pub current_field: Field<'a, String>,
     pub current_path: GraphQLPath,
+    pub errors: Vec<GqlError>,
 }
 
 pub fn build_context<'a>(
@@ -40,6 +42,7 @@ pub fn build_context<'a>(
         fields,
         current_field,
         current_path,
+        errors: vec![],
     }
 }
 

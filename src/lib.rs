@@ -15,6 +15,7 @@ mod types;
 use error::GqlError;
 pub use operation::OperationType;
 pub use resolver::Resolver;
+pub use field_resolver::FieldResolver;
 pub use template::GraphiQLTemplate;
 pub use types::schema::build_schema;
 pub use types::{GqlField, GqlType, GqlValue, Schema};
