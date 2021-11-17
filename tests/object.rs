@@ -1,4 +1,4 @@
-use rusty_gql_codegen::gql_object;
+use rusty_gql::gql_object;
 
 pub struct Query;
 
