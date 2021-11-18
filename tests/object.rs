@@ -1,21 +1,15 @@
-use rusty_gql::gql_object;
+use rusty_gql::GqlObject;
 
-pub struct Query;
-
-#[gql_object]
-impl Query {
-    async fn test(&self) -> i32 {
-        12
-    }
-
-    async fn result_test(&self) -> Result<i32, String> {
-        Ok(11)
-    }
+#[derive(Debug, GqlObject)]
+pub struct Show {
+    pub name: String,
+    pub description: String,
 }
 
 #[tokio::test]
 async fn it_works() {
-    let query = Query {};
-    let value = query.result_test().await;
-    println!("{}", &value.unwrap());
+    let show = Show {
+        name: String::from("test"),
+        description: String::from("test"),
+    };
 }
