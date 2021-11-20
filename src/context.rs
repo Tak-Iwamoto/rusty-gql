@@ -15,7 +15,6 @@ use std::collections::{BTreeMap, HashMap, HashSet};
 pub struct ExecutionContext<'a> {
     pub schema: &'a ArcSchema,
     pub operation: &'a ArcOperation<'a>,
-    pub fields: HashMap<String, Vec<Field<'a, String>>>,
     pub current_field: Field<'a, String>,
     pub current_path: GraphQLPath,
     pub errors: Vec<GqlError>,
@@ -27,10 +26,8 @@ pub fn build_context<'a>(
 ) -> ExecutionContext<'a> {
     let operation_type = operation.operation_type.to_string();
     let root_fieldname = operation.root_field.name.to_string();
-    let selection_set = &operation.selection_set;
     let current_field = operation.root_field.clone();
 
-    let fields = collect_query_fields(&schema, &operation, selection_set);
     let current_path = GraphQLPath::default()
         .prev(None)
         .current_key(root_fieldname)
@@ -39,7 +36,6 @@ pub fn build_context<'a>(
     ExecutionContext {
         schema,
         operation,
-        fields,
         current_field,
         current_path,
         errors: vec![],
@@ -115,24 +111,18 @@ pub fn get_type_from_schema<'a>(
 
 // TODO: schemaはfragmentの条件やskip directiveの処理で使用する
 pub fn collect_query_fields<'a>(
-    schema: &'a Schema,
-    operation: &'a Operation<'a>,
+    ctx: &'a ExecutionContext<'a>,
     selection_set: &SelectionSet<'a, String>,
 ) -> HashMap<String, Vec<Field<'a, String>>> {
     let mut fields: HashMap<String, Vec<Field<String>>> = HashMap::new();
     let mut visited_fragments = HashSet::new();
 
-    collect_fields(
-        &operation,
-        &selection_set,
-        &mut fields,
-        &mut visited_fragments,
-    );
+    collect_fields(&ctx, &selection_set, &mut fields, &mut visited_fragments);
     fields
 }
 
 fn collect_fields<'a>(
-    operation: &'a Operation<'a>,
+    ctx: &'a ExecutionContext<'a>,
     selection_set: &SelectionSet<'a, String>,
     fields: &mut HashMap<String, Vec<Field<'a, String>>>,
     visited_fragments: &mut HashSet<String>,
@@ -155,26 +145,16 @@ fn collect_fields<'a>(
                     continue;
                 }
                 visited_fragments.insert(fragment_name.to_string());
-                let fragment = operation.fragments.get(fragment_name);
+                let fragment = &ctx.operation.fragments.get(fragment_name);
                 match fragment {
                     Some(frg) => {
-                        return collect_fields(
-                            operation,
-                            &frg.selection_set,
-                            fields,
-                            visited_fragments,
-                        );
+                        return collect_fields(&ctx, &frg.selection_set, fields, visited_fragments);
                     }
                     None => continue,
                 }
             }
             Selection::InlineFragment(inline_frg) => {
-                collect_fields(
-                    operation,
-                    &inline_frg.selection_set,
-                    fields,
-                    visited_fragments,
-                );
+                collect_fields(&ctx, &inline_frg.selection_set, fields, visited_fragments);
             }
         }
     }
@@ -184,10 +164,12 @@ fn collect_fields<'a>(
 mod tests {
     use crate::{
         context::collect_query_fields,
-        operation::build_operation,
+        operation::{build_operation, ArcOperation},
         types::schema::{build_schema, ArcSchema},
     };
     use std::fs;
+
+    use super::build_context;
 
     #[test]
     fn it_works() {
@@ -197,7 +179,11 @@ mod tests {
         let schema = ArcSchema::new(build_schema(schema_doc.as_str()).unwrap());
         let query = build_operation(query_doc.as_str(), &schema, None).unwrap();
 
-        let fields = collect_query_fields(&schema, &query, &query.selection_set);
+        let operation = build_operation(&query_doc, &schema, None).unwrap();
+        let operation = ArcOperation::new(operation);
+        let context = build_context(&schema, &operation);
+
+        let fields = collect_query_fields(&context, &query.selection_set);
 
         for field in &fields {
             println!("{:?}", field);

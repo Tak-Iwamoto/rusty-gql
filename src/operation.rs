@@ -253,14 +253,23 @@ mod tests {
         let query_doc = fs::read_to_string("src/tests/github_query.graphql").unwrap();
 
         let query = build_operation(query_doc.as_str(), &schema, None).unwrap();
+        println!("{:?}", &query.selection_set.items.len());
+        for item in query.selection_set.items {
+            match item {
+                graphql_parser::query::Selection::Field(field) => {
+                    println!("parent: {:?}", field);
 
-        println!("{:?}", query.root_field);
-        println!(
-            "{:?}",
-            schema
-                .queries
-                .get(&query.root_field.name.to_string())
-                .unwrap()
-        );
+                    for it in field.selection_set.items {
+                        println!("child: {:?}", it);
+                    }
+                }
+                graphql_parser::query::Selection::FragmentSpread(fragment_sp) => {
+                    println!("{}", fragment_sp.position);
+                }
+                graphql_parser::query::Selection::InlineFragment(inline_frg) => {
+                    println!("{}", inline_frg.position);
+                }
+            }
+        }
     }
 }
