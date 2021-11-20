@@ -1,7 +1,8 @@
 use crate::{
     error::GqlError, operation::ArcOperation, path::GraphQLPath, types::schema::ArcSchema,
 };
-use graphql_parser::query::Field;
+use graphql_parser::{query::Field, schema::Directive};
+use serde_json::to_string;
 
 #[derive(Debug, Clone)]
 pub struct ExecutionContext<'a> {
@@ -16,6 +17,18 @@ impl<'a> ExecutionContext<'a> {
     pub fn current_field(&mut self, field: Field<'a, String>) -> &mut ExecutionContext<'a> {
         self.current_field = field;
         self
+    }
+
+    pub fn is_skip(&self, directives: &'a [Directive<'a, String>]) -> bool {
+        for dir in directives {
+            let skip = match dir.name.as_str() {
+                "skip" => true,
+                "include" => false,
+                _ => continue,
+            };
+            return skip;
+        }
+        false
     }
 }
 

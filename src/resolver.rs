@@ -1,7 +1,10 @@
-use std::collections::{BTreeMap, HashMap, HashSet};
+use std::{
+    collections::{BTreeMap, HashMap, HashSet},
+    pin::Pin,
+};
 
 use async_trait::async_trait;
-use futures::future::BoxFuture;
+use futures::{future::BoxFuture, Future};
 use graphql_parser::{
     query::{Field, Selection, SelectionSet},
     schema::Type,
@@ -13,7 +16,8 @@ use crate::{
 };
 
 // この型のvecを作成してfuture::joinに渡すことで並列に処理することができる。
-pub type ResolversFuture<'a> = BoxFuture<'a, Response<(String, GqlValue)>>;
+// pub type ResolversFuture<'a> = BoxFuture<'a, Response<(String, GqlValue)>>;
+pub type ResolversFuture = Pin<Box<dyn Future<Output = (String, GqlValue)> + Send + 'static>>;
 
 // fieldごとにこのtraitを実装する
 #[async_trait]
@@ -49,7 +53,7 @@ pub(crate) async fn resolve_mutation<'a, T: FieldResolver + ?Sized>(
 // TODO: schemaはfragmentの条件やskip directiveの処理で使用する
 pub(crate) fn collect_query_fields<'a>(
     ctx: &'a ExecutionContext<'a>,
-    selection_set: &SelectionSet<'a, String>,
+    selection_set: &'a SelectionSet<'a, String>,
 ) -> HashMap<String, Vec<Field<'a, String>>> {
     let mut fields: HashMap<String, Vec<Field<String>>> = HashMap::new();
     let mut visited_fragments = HashSet::new();
@@ -63,9 +67,13 @@ fn collect_resolvers<'a, T: Resolver + 'a>(ctx: &'a ExecutionContext<'a>, root_r
     for item in &ctx.operation.selection_set.items {
         match item {
             Selection::Field(field) => resolvers.push(Box::pin({
-                let ctx = ctx.clone();
+                if ctx.is_skip(&field.directives) {
+                    continue;
+                }
+
                 async move {
                     let name = &field.name;
+                    let ctx = ctx.clone();
                     (
                         name.clone(),
                         root_resolver
@@ -83,13 +91,17 @@ fn collect_resolvers<'a, T: Resolver + 'a>(ctx: &'a ExecutionContext<'a>, root_r
 
 fn collect_fields<'a>(
     ctx: &'a ExecutionContext<'a>,
-    selection_set: &SelectionSet<'a, String>,
+    selection_set: &'a SelectionSet<'a, String>,
     fields: &mut HashMap<String, Vec<Field<'a, String>>>,
     visited_fragments: &mut HashSet<String>,
 ) {
     for item in &selection_set.items {
         match item {
             Selection::Field(field) => {
+                if ctx.is_skip(&field.directives) {
+                    continue;
+                }
+
                 if fields.contains_key(&field.name.to_string()) {
                     fields
                         .get_mut(&field.name.to_string())
