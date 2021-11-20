@@ -17,6 +17,12 @@ pub enum GqlValue {
     Object(BTreeMap<String, Box<GqlValue>>),
 }
 
+impl Default for GqlValue {
+    fn default() -> Self {
+        GqlValue::Null
+    }
+}
+
 impl<'a> From<Value<'a, String>> for GqlValue {
     fn from(value: Value<'a, String>) -> Self {
         match value {

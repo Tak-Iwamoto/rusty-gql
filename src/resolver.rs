@@ -13,12 +13,16 @@ use crate::{
 };
 
 // この型のvecを作成してfuture::joinに渡すことで並列に処理することができる。
-pub type GraphQLFuture<'a> = BoxFuture<'a, Response<GqlValue>>;
+pub type ResolversFuture<'a> = BoxFuture<'a, Response<(String, GqlValue)>>;
 
 // fieldごとにこのtraitを実装する
 #[async_trait]
 pub trait Resolver: Send + Sync {
-    async fn resolve(&self, context: &ExecutionContext) -> Response<GqlValue>;
+    async fn resolve<'a>(
+        &self,
+        context: &ExecutionContext,
+        field: &Field<'a, String>,
+    ) -> Response<GqlValue>;
 }
 
 pub(crate) struct ResolverInfo {
@@ -28,14 +32,14 @@ pub(crate) struct ResolverInfo {
     path: GraphQLPath,
 }
 
-pub async fn resolve_query<'a, T: FieldResolver + ?Sized>(
+pub(crate) async fn resolve_query<'a, T: FieldResolver + ?Sized>(
     ctx: &ExecutionContext<'a>,
     root: &'a T,
 ) -> Response<GqlValue> {
     Ok(GqlValue::Null)
 }
 
-pub async fn resolve_mutation<'a, T: FieldResolver + ?Sized>(
+pub(crate) async fn resolve_mutation<'a, T: FieldResolver + ?Sized>(
     ctx: &ExecutionContext<'a>,
     root: &'a T,
 ) -> Response<GqlValue> {
@@ -43,7 +47,7 @@ pub async fn resolve_mutation<'a, T: FieldResolver + ?Sized>(
 }
 
 // TODO: schemaはfragmentの条件やskip directiveの処理で使用する
-pub fn collect_query_fields<'a>(
+pub(crate) fn collect_query_fields<'a>(
     ctx: &'a ExecutionContext<'a>,
     selection_set: &SelectionSet<'a, String>,
 ) -> HashMap<String, Vec<Field<'a, String>>> {
@@ -52,6 +56,29 @@ pub fn collect_query_fields<'a>(
 
     collect_fields(&ctx, &selection_set, &mut fields, &mut visited_fragments);
     fields
+}
+
+fn collect_resolvers<'a, T: Resolver + 'a>(ctx: &'a ExecutionContext<'a>, root_resolver: &'a T) {
+    let mut resolvers = Vec::new();
+    for item in &ctx.operation.selection_set.items {
+        match item {
+            Selection::Field(field) => resolvers.push(Box::pin({
+                let ctx = ctx.clone();
+                async move {
+                    let name = &field.name;
+                    (
+                        name.clone(),
+                        root_resolver
+                            .resolve(&ctx, &field)
+                            .await
+                            .unwrap_or_default(),
+                    )
+                }
+            })),
+            Selection::FragmentSpread(fragment_spread) => {}
+            Selection::InlineFragment(_) => todo!(),
+        }
+    }
 }
 
 fn collect_fields<'a>(

@@ -12,6 +12,13 @@ pub struct ExecutionContext<'a> {
     pub errors: Vec<GqlError>,
 }
 
+impl<'a> ExecutionContext<'a> {
+    pub fn current_field(&mut self, field: Field<'a, String>) -> &mut ExecutionContext<'a> {
+        self.current_field = field;
+        self
+    }
+}
+
 pub(crate) fn build_context<'a>(
     schema: &'a ArcSchema,
     operation: &'a ArcOperation<'a>,
