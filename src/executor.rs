@@ -3,7 +3,7 @@ use crate::{
     context::build_context,
     operation::{build_operation, ArcOperation},
     request::Request,
-    resolver::{resolve_mutation, resolve_query},
+    resolver::{resolve_mutation, resolve_query, resolve_subscription},
     OperationType, Resolver,
 };
 
@@ -22,7 +22,9 @@ pub async fn execute<Query: Resolver, Mutation: Resolver, Subscription: Resolver
     let result = match operation.operation_type {
         OperationType::Query => resolve_query(&ctx, &container.query_resolvers).await,
         OperationType::Mutation => resolve_mutation(&ctx, &container.mutation_resolvers).await,
-        OperationType::Subscription => resolve_mutation(&ctx, &container.mutation_resolvers).await,
+        OperationType::Subscription => {
+            resolve_subscription(&ctx, &container.subscription_resolvers).await
+        }
     };
     Ok(())
 }

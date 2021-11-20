@@ -49,6 +49,13 @@ pub(crate) async fn resolve_mutation<'a, T: Resolver + ?Sized>(
     Ok(GqlValue::Null)
 }
 
+pub(crate) async fn resolve_subscription<'a, T: Resolver + ?Sized>(
+    ctx: &ExecutionContext<'a>,
+    root: &'a T,
+) -> Response<GqlValue> {
+    Ok(GqlValue::Null)
+}
+
 // TODO: schemaはfragmentの条件やskip directiveの処理で使用する
 pub(crate) fn collect_query_fields<'a>(
     ctx: &'a ExecutionContext<'a>,
