@@ -1,9 +1,22 @@
-use rusty_gql::GqlObject;
+use rusty_gql::Object;
 
-#[derive(GqlObject)]
+struct Post {
+    title: String,
+    description: String,
+}
+#[derive(Object)]
 pub struct Show {
     pub name: String,
     pub description: String,
+}
+
+impl Show {
+    fn posts() -> Vec<Post> {
+        vec![Post {
+            title: "post 1".to_string(),
+            description: "description".to_string(),
+        }]
+    }
 }
 
 #[tokio::test]

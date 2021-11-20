@@ -1,5 +1,5 @@
 use rusty_gql::async_trait::async_trait;
-use rusty_gql::{GqlQuery, GqlValue, Resolver};
+use rusty_gql::{Query as GqlQuery, GqlValue, Resolver};
 
 pub struct Query;
 

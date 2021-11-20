@@ -26,5 +26,5 @@ pub use types::{GqlField, GqlType, GqlValue, Schema};
 
 pub type Response<T> = ::std::result::Result<T, GqlError>;
 
-pub use rusty_gql_codegen::GqlQuery;
-pub use rusty_gql_codegen::GqlObject;
+pub use rusty_gql_codegen::Object;
+pub use rusty_gql_codegen::Resolver;
