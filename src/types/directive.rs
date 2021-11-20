@@ -35,13 +35,6 @@ impl<'a> From<Directive<'a, String>> for GqlDirective {
     }
 }
 
-pub fn convert_vec_directive<'a>(directives: Vec<Directive<'a, String>>) -> Vec<GqlDirective> {
-    directives
-        .into_iter()
-        .map(|dir| GqlDirective::from(dir))
-        .collect()
-}
-
 #[derive(Debug)]
 pub struct GqlDirectiveDefinition {
     pub position: Pos,

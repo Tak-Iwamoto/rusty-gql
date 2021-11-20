@@ -20,6 +20,9 @@ pub struct Schema {
     pub subscriptions: BTreeMap<String, GqlField>,
     pub directives: BTreeMap<String, GqlDirectiveDefinition>,
     pub type_map: BTreeMap<String, GqlType>,
+    pub query_root_type: Option<String>,
+    pub mutation_root_type: Option<String>,
+    pub subscription_root_type: Option<String>,
 }
 
 #[derive(Debug)]
@@ -47,11 +50,17 @@ pub fn build_schema(schema_doc: &str) -> Result<Schema, String> {
     let mut subscription_map = BTreeMap::new();
     let mut type_map = BTreeMap::new();
     let mut directive_map = BTreeMap::new();
+    let mut query_root_type = None;
+    let mut mutation_root_type = None;
+    let mut subscription_root_type = None;
 
     for node in parsed_schema.definitions {
         match node {
-            // TODO:
-            graphql_parser::schema::Definition::SchemaDefinition(schema) => {}
+            graphql_parser::schema::Definition::SchemaDefinition(schema) => {
+                query_root_type = schema.query;
+                mutation_root_type = schema.mutation;
+                subscription_root_type = schema.subscription;
+            }
             graphql_parser::schema::Definition::TypeDefinition(type_def) => match type_def {
                 graphql_parser::schema::TypeDefinition::Scalar(scalar) => {
                     let gql_scalar = GqlScalar::from(scalar);
@@ -304,6 +313,9 @@ pub fn build_schema(schema_doc: &str) -> Result<Schema, String> {
         subscriptions: subscription_map,
         directives: directive_map,
         type_map,
+        query_root_type,
+        mutation_root_type,
+        subscription_root_type,
     })
 }
 
