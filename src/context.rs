@@ -2,7 +2,6 @@ use crate::{
     error::GqlError, operation::ArcOperation, path::GraphQLPath, types::schema::ArcSchema,
 };
 use graphql_parser::{query::Field, schema::Directive};
-use serde_json::to_string;
 
 #[derive(Debug, Clone)]
 pub struct ExecutionContext<'a> {

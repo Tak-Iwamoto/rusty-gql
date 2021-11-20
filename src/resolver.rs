@@ -19,36 +19,30 @@ use crate::{
 // pub type ResolversFuture<'a> = BoxFuture<'a, Response<(String, GqlValue)>>;
 pub type ResolversFuture = Pin<Box<dyn Future<Output = (String, GqlValue)> + Send + 'static>>;
 
-// fieldごとにこのtraitを実装する
 #[async_trait]
-pub trait Resolver: Send + Sync {
+pub trait Resolver {
     async fn resolve<'a>(
         &self,
-        context: &ExecutionContext,
+        ctx: &ExecutionContext,
         field: &Field<'a, String>,
-    ) -> Response<GqlValue>;
+    ) -> Response<Option<GqlValue>>;
 }
 
-#[async_trait]
-pub trait FieldResolver {
-    async fn resolve_field(&self, ctx: &ExecutionContext) -> Response<Option<GqlValue>>;
-}
+// pub(crate) struct ResolverInfo {
+//     field_name: String,
+//     return_type: GqlValue,
+//     parent_type: String,
+//     path: GraphQLPath,
+// }
 
-pub(crate) struct ResolverInfo {
-    field_name: String,
-    return_type: GqlValue,
-    parent_type: String,
-    path: GraphQLPath,
-}
-
-pub(crate) async fn resolve_query<'a, T: FieldResolver + ?Sized>(
+pub(crate) async fn resolve_query<'a, T: Resolver + ?Sized>(
     ctx: &ExecutionContext<'a>,
     root: &'a T,
 ) -> Response<GqlValue> {
     Ok(GqlValue::Null)
 }
 
-pub(crate) async fn resolve_mutation<'a, T: FieldResolver + ?Sized>(
+pub(crate) async fn resolve_mutation<'a, T: Resolver + ?Sized>(
     ctx: &ExecutionContext<'a>,
     root: &'a T,
 ) -> Response<GqlValue> {

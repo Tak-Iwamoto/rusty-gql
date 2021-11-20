@@ -2,7 +2,6 @@ mod container;
 mod context;
 mod error;
 mod executor;
-mod field_resolver;
 mod operation;
 mod path;
 mod request;
@@ -17,7 +16,6 @@ pub use async_trait;
 
 pub use context::ExecutionContext;
 use error::GqlError;
-pub use field_resolver::FieldResolver;
 pub use operation::OperationType;
 pub use resolver::Resolver;
 pub use template::GraphiQLTemplate;

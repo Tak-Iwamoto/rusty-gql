@@ -84,7 +84,7 @@ pub fn parse_query_item_impl(item_impl: &mut ItemImpl) -> Result<TokenStream, sy
         type #shadow_type<#generics_params> = #self_name;
 
         #[rusty_gql::async_trait::async_trait]
-        impl #generics rusty_gql::FieldResolver for #shadow_type<#generics_params> #where_clause {
+        impl #generics rusty_gql::Resolver for #shadow_type<#generics_params> #where_clause {
             async fn resolve_field(&self, ctx: &rusty_gql::ExecutionContext) -> rusty_gql::Response<::std::option::Option<rusty_gql::GqlValue>> {
                 #(#resolvers)*
                 ::std::result::Result::Ok(::std::option::Option::None)
