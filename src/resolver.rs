@@ -11,8 +11,8 @@ use graphql_parser::{
 };
 
 use crate::{
-    context::ExecutionContext, field_resolver::FieldResolver, operation::Operation,
-    path::GraphQLPath, types::value::value_from_ast, GqlType, GqlValue, Response, Schema,
+    context::ExecutionContext, operation::Operation, path::GraphQLPath,
+    types::value::value_from_ast, GqlType, GqlValue, Response, Schema,
 };
 
 // この型のvecを作成してfuture::joinに渡すことで並列に処理することができる。
@@ -27,6 +27,11 @@ pub trait Resolver: Send + Sync {
         context: &ExecutionContext,
         field: &Field<'a, String>,
     ) -> Response<GqlValue>;
+}
+
+#[async_trait]
+pub trait FieldResolver {
+    async fn resolve_field(&self, ctx: &ExecutionContext) -> Response<Option<GqlValue>>;
 }
 
 pub(crate) struct ResolverInfo {
