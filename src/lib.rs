@@ -17,12 +17,12 @@ pub use async_trait;
 pub use context::ExecutionContext;
 use error::GqlError;
 pub use operation::OperationType;
-pub use resolver::Resolver;
+pub use resolver::{FieldResolver, Resolver};
 pub use template::GraphiQLTemplate;
 pub use types::schema::build_schema;
 pub use types::{GqlField, GqlType, GqlValue, Schema};
 
 pub type Response<T> = ::std::result::Result<T, GqlError>;
 
-pub use rusty_gql_codegen::Object;
 pub use rusty_gql_codegen::GqlModel;
+pub use rusty_gql_codegen::Object;

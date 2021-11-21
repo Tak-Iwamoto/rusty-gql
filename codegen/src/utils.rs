@@ -1,4 +1,4 @@
-use syn::{AttributeArgs, ReturnType, Type, TypeParamBound};
+use syn::{AttributeArgs, Ident, ImplItemMethod, Pat, PatIdent, ReturnType, Type, TypeParamBound};
 
 fn check_path_name(path: &syn::Path, value: &str) -> bool {
     path.segments.len() == 1 && path.segments[0].ident == value
@@ -40,6 +40,39 @@ pub fn get_type_name(ty: &Type) -> Result<String, syn::Error> {
             .unwrap()),
         _ => Err(syn::Error::new_spanned(ty, "invalid type")),
     }
+}
+
+pub fn get_method_args(method: &ImplItemMethod) -> Result<Vec<proc_macro2::Ident>, syn::Error> {
+    let mut args = Vec::new();
+    if method.sig.inputs.is_empty() {}
+
+    for (index, arg) in method.sig.inputs.iter().enumerate() {
+        match arg {
+            syn::FnArg::Receiver(receiver) => {
+                if index != 0 {
+                    return Err(syn::Error::new_spanned(
+                        receiver,
+                        "self must be the first argument.",
+                    ));
+                }
+            }
+            syn::FnArg::Typed(pat_type) => {
+                if index == 0 {
+                    return Err(syn::Error::new_spanned(
+                        pat_type,
+                        "self must be the first argument.",
+                    ));
+                }
+
+                if let Pat::Ident(ident) = &*pat_type.pat {
+                    args.push(ident.ident.clone());
+                } else {
+                    return Err(syn::Error::new_spanned(pat_type, "Invalid arg"));
+                }
+            }
+        }
+    }
+    Ok(args)
 }
 
 pub fn is_result_type(return_type: &Type) -> bool {

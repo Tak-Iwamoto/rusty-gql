@@ -1,15 +1,11 @@
 use proc_macro::{self, TokenStream};
-use proc_macro2::Span;
 use quote::quote;
-use syn::{Block, Ident, ImplItem, ItemImpl, ReturnType};
+use syn::{ext::IdentExt, Block, ImplItem, ItemImpl, ReturnType};
 
-use crate::utils::{get_type_name, is_result_type};
+use crate::utils::{get_method_args, is_result_type};
 
 pub fn parse_object_item_impl(item_impl: &mut ItemImpl) -> Result<TokenStream, syn::Error> {
     let self_name = &item_impl.self_ty;
-
-    let struct_name = get_type_name(&self_name)?;
-    let shadow_type = Ident::new(&format!("__shadow{}", struct_name), Span::call_site());
 
     let generics = &item_impl.generics;
     let generics_params = &generics.params;
@@ -34,9 +30,8 @@ pub fn parse_object_item_impl(item_impl: &mut ItemImpl) -> Result<TokenStream, s
                 syn::ReturnType::Type(_, ty) => ty,
             };
 
-            let block = &method.block;
-
             let is_result = is_result_type(return_type);
+            let block = &method.block;
 
             if !is_result {
                 let result_block = quote! {
@@ -55,41 +50,56 @@ pub fn parse_object_item_impl(item_impl: &mut ItemImpl) -> Result<TokenStream, s
                 .expect("ItemImpl return type is invalid.");
             }
 
-            let field_name = &method.sig.ident;
+            let method_name = &method.sig.ident;
+            let field_name = method_name.unraw().to_string();
+
+            let arg_idents = get_method_args(&method)?;
+            let mut args = Vec::new();
+
+            for arg in &arg_idents {
+                args.push(quote! { #arg })
+            }
 
             let resolve_obj = quote! {{
-                let res = self.#field_name(ctx).await;
+                self.#method_name(#(#args),*).await
             }};
-            dbg!(&resolve_obj);
 
             resolvers.push(quote! {
                 {
-                    if ctx.current_field.name == #field_name {
+                    if &ctx.current_field.name == #field_name {
                         let resolve_fn = async move {
                             #resolve_obj
                         };
 
                         // let obj = resolve_fn.await.map_err(|err| err)?;
-                        let obj = resolve_fn.await;
-                        return rusty_gql::Resolver::resolve(&obj, &ctx).await
+                        let obj = resolve_fn.await.map_err(|err| err).unwrap();
+                        return rusty_gql::Resolver::resolve(&obj, &ctx).await.map(::std::option::Option::Some);
                     }
                 }
-            })
+            });
         }
     }
+
     let expanded = quote! {
         #item_impl
 
         #[allow(non_snake_case)]
-        type #shadow_type<#generics_params> = #self_name;
 
         #[rusty_gql::async_trait::async_trait]
-        impl #generics rusty_gql::Resolver for #shadow_type<#generics_params> #where_clause {
-            async fn resolve(&self, ctx: &rusty_gql::ExecutionContext) -> rusty_gql::Response<::std::option::Option<rusty_gql::GqlValue>> {
+        impl #generics rusty_gql::FieldResolver for #self_name #generics_params #where_clause {
+            async fn resolve_field(&self, ctx: &rusty_gql::ExecutionContext) -> rusty_gql::Response<::std::option::Option<rusty_gql::GqlValue>> {
                 #(#resolvers)*
-                ::std::result::Result::Ok(::std::option::Option::None)
+                Ok(::std::option::Option::None)
+            }
+        }
+
+        #[rusty_gql::async_trait::async_trait]
+        impl #generics rusty_gql::Resolver for #self_name #generics_params #where_clause {
+            async fn resolve(&self, ctx: &rusty_gql::ExecutionContext) -> rusty_gql::Response<rusty_gql::GqlValue> {
+                Ok(GqlValue::Null)
             }
         }
     };
+
     Ok(expanded.into())
 }

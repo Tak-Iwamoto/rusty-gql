@@ -22,6 +22,11 @@ pub trait Resolver: Send + Sync {
     async fn resolve(&self, ctx: &ExecutionContext) -> Response<GqlValue>;
 }
 
+#[async_trait]
+pub trait FieldResolver: Send + Sync {
+    async fn resolve_field(&self, ctx: &ExecutionContext) -> Response<Option<GqlValue>>;
+}
+
 // pub(crate) struct ResolverInfo {
 //     field_name: String,
 //     return_type: GqlValue,
@@ -75,7 +80,8 @@ impl<'a> Resolvers<'a> {
                     }
                     self.0.push(Box::pin({
                         async move {
-                            let ctx = ctx.clone();
+                            let mut ctx = ctx.clone();
+                            ctx.current_field(field.clone());
                             let field_name = &field.name;
                             Ok((
                                 field_name.clone(),

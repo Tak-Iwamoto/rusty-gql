@@ -1,5 +1,5 @@
 use rusty_gql::async_trait::async_trait;
-use rusty_gql::{GqlValue, Object, Resolver};
+use rusty_gql::{ExecutionContext, GqlValue, Object, Resolver};
 
 pub struct Query;
 
@@ -22,7 +22,7 @@ impl Resolver for Show {
 
 #[Object]
 impl Query {
-    async fn test(&self) -> Show {
+    pub async fn get_shows(&self) -> Show {
         let show = Show {
             name: "test".to_string(),
             description: "test".to_string(),
@@ -30,7 +30,7 @@ impl Query {
         show
     }
 
-    async fn result_test(&self) -> Result<Show, String> {
+    pub async fn get_show2<'a>(&self, ctx: &ExecutionContext<'a>) -> Result<Show, String> {
         let show = Show {
             name: "test".to_string(),
             description: "test".to_string(),
@@ -42,5 +42,5 @@ impl Query {
 #[tokio::test]
 async fn it_works() {
     let query = Query {};
-    let value = query.result_test().await;
+    // let value = query.result_test().await;
 }
