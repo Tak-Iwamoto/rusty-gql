@@ -25,4 +25,4 @@ pub use types::{GqlField, GqlType, GqlValue, Schema};
 pub type Response<T> = ::std::result::Result<T, GqlError>;
 
 pub use rusty_gql_codegen::Object;
-pub use rusty_gql_codegen::Resolver;
+pub use rusty_gql_codegen::GqlModel;

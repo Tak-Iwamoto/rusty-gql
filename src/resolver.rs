@@ -19,7 +19,7 @@ type ResolverFuture<'a> = BoxFuture<'a, Response<(String, GqlValue)>>;
 // これを実装するのはqueryやgraphlqlのobject, Showなど
 #[async_trait]
 pub trait Resolver: Send + Sync {
-    async fn resolve<'a>(&self, ctx: &ExecutionContext) -> Response<GqlValue>;
+    async fn resolve(&self, ctx: &ExecutionContext) -> Response<GqlValue>;
 }
 
 // pub(crate) struct ResolverInfo {

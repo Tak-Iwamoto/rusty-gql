@@ -1,32 +1,46 @@
-use rusty_gql::Object;
+use rusty_gql::async_trait::async_trait;
+use rusty_gql::{GqlValue, Object, Resolver};
 
-struct Post {
-    title: String,
+pub struct Query;
+
+#[derive(Debug)]
+pub struct Show {
+    name: String,
     description: String,
 }
-#[derive(Object)]
-pub struct Show {
-    pub name: String,
-    pub description: String,
+
+#[async_trait]
+impl Resolver for Show {
+    async fn resolve(
+        &self,
+        context: &rusty_gql::ExecutionContext,
+    ) -> rusty_gql::Response<GqlValue> {
+        let value = GqlValue::Null;
+        Ok(value)
+    }
 }
 
-impl Show {
-    fn posts() -> Vec<Post> {
-        vec![Post {
-            title: "post 1".to_string(),
-            description: "description".to_string(),
-        }]
+#[Object]
+impl Query {
+    async fn test(&self) -> Show {
+        let show = Show {
+            name: "test".to_string(),
+            description: "test".to_string(),
+        };
+        show
+    }
+
+    async fn result_test(&self) -> Result<Show, String> {
+        let show = Show {
+            name: "test".to_string(),
+            description: "test".to_string(),
+        };
+        Ok(show)
     }
 }
 
 #[tokio::test]
 async fn it_works() {
-    let show = Show {
-        name: String::from("test"),
-        description: String::from("test description"),
-    };
-    let name = show.name().await.unwrap();
-    println!("{}", name);
-    let des = show.description().await.unwrap();
-    println!("{}", des);
+    let query = Query {};
+    let value = query.result_test().await;
 }
