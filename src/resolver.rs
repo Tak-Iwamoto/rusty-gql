@@ -1,31 +1,29 @@
-use std::{
-    collections::{BTreeMap, HashMap, HashSet},
-    pin::Pin,
-};
+use std::collections::{BTreeMap, HashMap, HashSet};
 
 use async_trait::async_trait;
-use futures::{future::BoxFuture, Future};
+use futures::future::BoxFuture;
 use graphql_parser::{
     query::{Field, Selection, SelectionSet},
     schema::Type,
 };
 
 use crate::{
-    context::ExecutionContext, operation::Operation, path::GraphQLPath,
-    types::value::value_from_ast, GqlType, GqlValue, Response, Schema,
+    context::ExecutionContext, operation::Operation, types::value::value_from_ast, GqlType,
+    GqlValue, Response, Schema,
 };
 
 // この型のvecを作成してfuture::joinに渡すことで並列に処理することができる。
-// pub type ResolversFuture<'a> = BoxFuture<'a, Response<(String, GqlValue)>>;
-pub type ResolversFuture = Pin<Box<dyn Future<Output = (String, GqlValue)> + Send + 'static>>;
+type ResolverFuture<'a> = BoxFuture<'a, Response<(String, GqlValue)>>;
+// pub type ResolverFuture<'a> = Pin<Box<dyn Future<Output = (String, Option<GqlValue>)> + Send + 'a>>;
 
+// これを実装するのはqueryやgraphlqlのobject, Showなど
 #[async_trait]
-pub trait Resolver {
+pub trait Resolver: Send + Sync {
     async fn resolve<'a>(
         &self,
         ctx: &ExecutionContext,
         field: &Field<'a, String>,
-    ) -> Response<Option<GqlValue>>;
+    ) -> Response<GqlValue>;
 }
 
 // pub(crate) struct ResolverInfo {
@@ -35,28 +33,30 @@ pub trait Resolver {
 //     path: GraphQLPath,
 // }
 
+// ここの第２引数はqueryの起点となるrootのresolver
+// それ以降はQueryで返されたstructのresolveを辿っていく
+// impl Query
 pub(crate) async fn resolve_query<'a, T: Resolver + ?Sized>(
     ctx: &ExecutionContext<'a>,
-    root: &'a T,
+    query_resolvers: &'a T,
 ) -> Response<GqlValue> {
     Ok(GqlValue::Null)
 }
 
 pub(crate) async fn resolve_mutation<'a, T: Resolver + ?Sized>(
     ctx: &ExecutionContext<'a>,
-    root: &'a T,
+    mutation_resolvers: &'a T,
 ) -> Response<GqlValue> {
     Ok(GqlValue::Null)
 }
 
 pub(crate) async fn resolve_subscription<'a, T: Resolver + ?Sized>(
     ctx: &ExecutionContext<'a>,
-    root: &'a T,
+    subscription_resolvers: &'a T,
 ) -> Response<GqlValue> {
     Ok(GqlValue::Null)
 }
 
-// TODO: schemaはfragmentの条件やskip directiveの処理で使用する
 pub(crate) fn collect_query_fields<'a>(
     ctx: &'a ExecutionContext<'a>,
     selection_set: &'a SelectionSet<'a, String>,
@@ -68,31 +68,33 @@ pub(crate) fn collect_query_fields<'a>(
     fields
 }
 
-fn collect_resolvers<'a, T: Resolver + 'a>(ctx: &'a ExecutionContext<'a>, root_resolver: &'a T) {
-    let mut resolvers = Vec::new();
+fn collect_resolvers<'a, T: Resolver + 'a>(
+    ctx: &'a ExecutionContext<'a>,
+    parent_type: &'a T,
+) -> Vec<ResolverFuture<'a>> {
+    let mut resolvers: Vec<ResolverFuture<'a>> = Vec::new();
     for item in &ctx.operation.selection_set.items {
         match item {
-            Selection::Field(field) => resolvers.push(Box::pin({
+            Selection::Field(field) => {
                 if ctx.is_skip(&field.directives) {
                     continue;
                 }
-
-                async move {
-                    let name = &field.name;
-                    let ctx = ctx.clone();
-                    (
-                        name.clone(),
-                        root_resolver
-                            .resolve(&ctx, &field)
-                            .await
-                            .unwrap_or_default(),
-                    )
-                }
-            })),
+                resolvers.push(Box::pin({
+                    async move {
+                        let ctx = ctx.clone();
+                        let field_name = &field.name;
+                        Ok((
+                            field_name.clone(),
+                            parent_type.resolve(&ctx, &field).await.unwrap_or_default(),
+                        ))
+                    }
+                }))
+            }
             Selection::FragmentSpread(fragment_spread) => {}
             Selection::InlineFragment(_) => todo!(),
         }
     }
+    resolvers
 }
 
 fn collect_fields<'a>(
