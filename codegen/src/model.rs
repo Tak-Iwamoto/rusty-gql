@@ -1,7 +1,7 @@
 use darling::{ast::Data, util::Ignored, FromDeriveInput, FromField};
 use proc_macro::TokenStream;
 use quote::quote;
-use syn::{Attribute, Generics, Ident, Type, Visibility};
+use syn::{ext::IdentExt, Attribute, Generics, Ident, Type, Visibility};
 
 use crate::error::CodegenResult;
 
@@ -48,10 +48,12 @@ pub fn parse_gql_model_input(input: &Model) -> CodegenResult<TokenStream> {
             None => unreachable!(),
         };
 
+        let field_name = field_ident.unraw().to_string();
+
         if field.resolver {
             resolvers.push(quote! {
             // 別途resolverが定義している時にここでさらに下のresolverに渡したい。
-                if ctx.current_field.name == #field_ident {
+                if ctx.current_field.name == #field_name {
                     let resolve_fn = async move {
                         self.#field_ident().await
                     };
