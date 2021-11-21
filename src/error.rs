@@ -1,7 +1,9 @@
+use graphql_parser::Pos;
+
 #[derive(Debug, Clone)]
 pub struct Location {
-    pub line: i32,
-    pub column: i32,
+    pub line: usize,
+    pub column: usize,
 }
 
 #[derive(Debug, Clone)]
@@ -31,4 +33,22 @@ pub struct GqlError {
     pub locations: Vec<Location>,
     pub path: Vec<String>,
     pub extensions: Option<GraphQLTypedError>,
+}
+
+impl GqlError {
+    pub fn new(message: impl Into<String>, pos: Option<Pos>) -> Self {
+        GqlError {
+            message: message.into(),
+            locations: pos
+                .map(|pos| {
+                    vec![Location {
+                        line: pos.line,
+                        column: pos.column,
+                    }]
+                })
+                .unwrap_or_default(),
+            path: Vec::new(),
+            extensions: None,
+        }
+    }
 }

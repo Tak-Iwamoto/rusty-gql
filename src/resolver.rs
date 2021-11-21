@@ -1,4 +1,4 @@
-use std::collections::{BTreeMap, HashMap, HashSet};
+use std::collections::{BTreeMap, HashMap};
 
 use async_trait::async_trait;
 use futures::future::BoxFuture;
@@ -8,8 +8,8 @@ use graphql_parser::{
 };
 
 use crate::{
-    context::ExecutionContext, operation::Operation, types::value::value_from_ast, GqlType,
-    GqlValue, Response, Schema,
+    context::ExecutionContext, error::GqlError, operation::Operation, types::value::value_from_ast,
+    GqlType, GqlValue, Response, Schema,
 };
 
 // この型のvecを作成してfuture::joinに渡すことで並列に処理することができる。
@@ -57,88 +57,71 @@ pub(crate) async fn resolve_subscription<'a, T: Resolver + ?Sized>(
     Ok(GqlValue::Null)
 }
 
-pub(crate) fn collect_query_fields<'a>(
-    ctx: &'a ExecutionContext<'a>,
-    selection_set: &'a SelectionSet<'a, String>,
-) -> HashMap<String, Vec<Field<'a, String>>> {
-    let mut fields: HashMap<String, Vec<Field<String>>> = HashMap::new();
-    let mut visited_fragments = HashSet::new();
+pub struct Resolvers<'a>(Vec<ResolverFuture<'a>>);
 
-    collect_fields(&ctx, &selection_set, &mut fields, &mut visited_fragments);
-    fields
-}
+impl<'a> Resolvers<'a> {
+    pub fn collect_field_resolvers<T: Resolver + 'a>(
+        &mut self,
+        ctx: &'a ExecutionContext<'a>,
+        parent_type: &'a T,
+        selection_set: Option<&'a SelectionSet<'a, String>>,
+    ) -> Response<()> {
+        let items = match selection_set {
+            Some(selection) => &selection.items,
+            None => &ctx.operation.selection_set.items,
+        };
 
-fn collect_resolvers<'a, T: Resolver + 'a>(
-    ctx: &'a ExecutionContext<'a>,
-    parent_type: &'a T,
-) -> Vec<ResolverFuture<'a>> {
-    let mut resolvers: Vec<ResolverFuture<'a>> = Vec::new();
-    for item in &ctx.operation.selection_set.items {
-        match item {
-            Selection::Field(field) => {
-                if ctx.is_skip(&field.directives) {
-                    continue;
-                }
-                resolvers.push(Box::pin({
-                    async move {
-                        let ctx = ctx.clone();
-                        let field_name = &field.name;
-                        Ok((
-                            field_name.clone(),
-                            parent_type.resolve(&ctx, &field).await.unwrap_or_default(),
-                        ))
+        for item in items {
+            match item {
+                Selection::Field(field) => {
+                    if ctx.is_skip(&field.directives) {
+                        continue;
                     }
-                }))
-            }
-            Selection::FragmentSpread(fragment_spread) => {}
-            Selection::InlineFragment(_) => todo!(),
-        }
-    }
-    resolvers
-}
-
-fn collect_fields<'a>(
-    ctx: &'a ExecutionContext<'a>,
-    selection_set: &'a SelectionSet<'a, String>,
-    fields: &mut HashMap<String, Vec<Field<'a, String>>>,
-    visited_fragments: &mut HashSet<String>,
-) {
-    for item in &selection_set.items {
-        match item {
-            Selection::Field(field) => {
-                if ctx.is_skip(&field.directives) {
-                    continue;
+                    self.0.push(Box::pin({
+                        async move {
+                            let ctx = ctx.clone();
+                            let field_name = &field.name;
+                            Ok((
+                                field_name.clone(),
+                                parent_type.resolve(&ctx, &field).await.unwrap_or_default(),
+                            ))
+                        }
+                    }))
                 }
-
-                if fields.contains_key(&field.name.to_string()) {
-                    fields
-                        .get_mut(&field.name.to_string())
-                        .unwrap()
-                        .push(field.clone());
-                } else {
-                    fields.insert(field.name.to_string(), vec![field.clone()]);
+                Selection::FragmentSpread(fragment_spread) => {
+                    let operation_fragment =
+                        ctx.operation.fragments.get(&fragment_spread.fragment_name);
+                    let fragment_def = match operation_fragment {
+                        Some(fragment) => fragment,
+                        None => {
+                            return Err(GqlError::new(
+                                format!("{:?} is not found in operation", fragment_spread),
+                                Some(fragment_spread.position),
+                            ))
+                        }
+                    };
+                    self.collect_field_resolvers(
+                        ctx,
+                        parent_type,
+                        Some(&fragment_def.selection_set),
+                    )?;
                 }
-            }
-            Selection::FragmentSpread(spread_frg) => {
-                let fragment_name = &spread_frg.fragment_name;
-                if visited_fragments.contains(fragment_name) {
-                    continue;
-                }
-                visited_fragments.insert(fragment_name.to_string());
-                let fragment = &ctx.operation.fragments.get(fragment_name);
-                match fragment {
-                    Some(frg) => {
-                        return collect_fields(&ctx, &frg.selection_set, fields, visited_fragments);
+                Selection::InlineFragment(inline_fragment) => {
+                    if ctx.is_skip(&inline_fragment.directives) {
+                        continue;
                     }
-                    None => continue,
+                    self.collect_field_resolvers(
+                        ctx,
+                        parent_type,
+                        Some(&inline_fragment.selection_set),
+                    )?;
                 }
-            }
-            Selection::InlineFragment(inline_frg) => {
-                collect_fields(&ctx, &inline_frg.selection_set, fields, visited_fragments);
             }
         }
+        Ok(())
     }
 }
+
 pub fn get_variables<'a>(
     schema: &'a Schema,
     operation: &'a Operation<'a>,
@@ -215,8 +198,6 @@ mod tests {
     };
     use std::fs;
 
-    use super::collect_query_fields;
-
     #[test]
     fn it_works() {
         let schema_doc = fs::read_to_string("src/tests/github.graphql").unwrap();
@@ -227,17 +208,5 @@ mod tests {
 
         let operation = ArcOperation::new(query);
         let context = build_context(&schema, &operation);
-
-        let fields = collect_query_fields(&context, &operation.selection_set);
-
-        for field in &fields {
-            println!("{:?}", field);
-        }
-
-        for f in &fields["repository"] {
-            for item in &f.selection_set.items {
-                println!("{:?}", item);
-            }
-        }
     }
 }
