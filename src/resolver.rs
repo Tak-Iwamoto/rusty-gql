@@ -1,4 +1,7 @@
-use std::collections::{BTreeMap, HashMap};
+use std::{
+    collections::{BTreeMap, HashMap},
+    future,
+};
 
 use async_trait::async_trait;
 use futures::future::BoxFuture;
@@ -58,21 +61,63 @@ pub(crate) async fn resolve_subscription<'a, T: Resolver + ?Sized>(
     Ok(GqlValue::Null)
 }
 
+fn build_gql_object(target_map: &mut BTreeMap<String, GqlValue>, gql_value: (String, GqlValue)) {
+    let (field_name, value) = gql_value;
+    if let Some(prev_value) = target_map.get_mut(&field_name) {
+        match prev_value {
+            GqlValue::List(target_list) => if let GqlValue::List(list) = value {},
+            GqlValue::Object(target_obj) => {
+                if let GqlValue::Object(obj) = value {
+                    for map in obj.into_iter() {
+                        build_gql_object(target_map, (map.0, *map.1))
+                    }
+                }
+            }
+            _ => return,
+        }
+    } else {
+        target_map.insert(field_name, value.clone());
+    }
+}
+
 pub struct Resolvers<'a>(Vec<ResolverFuture<'a>>);
+
+pub async fn resolve_object<'a, T: Resolver>(
+    ctx: &'a ExecutionContext<'a>,
+    parent_type: &'a T,
+    parallel: bool,
+) -> Response<GqlValue> {
+    let mut resolvers = Resolvers(Vec::new());
+
+    resolvers.collect_field_resolvers(ctx, parent_type, &ctx.operation.selection_set)?;
+
+    let res = if parallel {
+        futures::future::try_join_all(resolvers.0).await?
+    } else {
+        let mut results = Vec::new();
+        for resolver in resolvers.0 {
+            results.push(resolver.await?);
+        }
+        results
+    };
+
+    let mut target_map = BTreeMap::new();
+
+    for value in res {
+        build_gql_object(&target_map, res);
+    };
+
+    Ok(GqlValue::Null)
+}
 
 impl<'a> Resolvers<'a> {
     pub fn collect_field_resolvers<T: Resolver + 'a>(
         &mut self,
         ctx: &'a ExecutionContext<'a>,
         parent_type: &'a T,
-        selection_set: Option<&'a SelectionSet<'a, String>>,
+        selection_set: &'a SelectionSet<'a, String>,
     ) -> Response<()> {
-        let items = match selection_set {
-            Some(selection) => &selection.items,
-            None => &ctx.operation.selection_set.items,
-        };
-
-        for item in items {
+        for item in &selection_set.items {
             match item {
                 Selection::Field(field) => {
                     if ctx.is_skip(&field.directives) {
@@ -102,21 +147,13 @@ impl<'a> Resolvers<'a> {
                             ))
                         }
                     };
-                    self.collect_field_resolvers(
-                        ctx,
-                        parent_type,
-                        Some(&fragment_def.selection_set),
-                    )?;
+                    self.collect_field_resolvers(ctx, parent_type, &fragment_def.selection_set)?;
                 }
                 Selection::InlineFragment(inline_fragment) => {
                     if ctx.is_skip(&inline_fragment.directives) {
                         continue;
                     }
-                    self.collect_field_resolvers(
-                        ctx,
-                        parent_type,
-                        Some(&inline_fragment.selection_set),
-                    )?;
+                    self.collect_field_resolvers(ctx, parent_type, &inline_fragment.selection_set)?;
                 }
             }
         }
