@@ -16,12 +16,17 @@ type ResolverFuture<'a> = BoxFuture<'a, Response<(String, GqlValue)>>;
 
 #[async_trait]
 pub trait Resolver: Send + Sync {
-    async fn resolve(&self, ctx: &ExecutionContext) -> Response<Option<GqlValue>>;
+    async fn resolve(&self, ctx: &ExecutionContext<'_>) -> Response<Option<GqlValue>>;
 }
 
-// ここの第２引数はqueryの起点となるrootのresolver
-// それ以降はQueryで返されたstructのresolveを辿っていく
-// impl Query
+#[async_trait::async_trait]
+impl<T: Resolver> Resolver for &T {
+    #[allow(clippy::trivially_copy_pass_by_ref)]
+    async fn resolve(&self, ctx: &ExecutionContext<'_>) -> Response<Option<GqlValue>> {
+        T::resolve(*self, ctx).await
+    }
+}
+
 pub(crate) async fn resolve_query<'a, T: Resolver + ?Sized>(
     ctx: &'a ExecutionContext<'a>,
     query_resolver: &'a T,
@@ -83,12 +88,12 @@ pub struct Resolvers<'a>(Vec<ResolverFuture<'a>>);
 
 pub async fn resolve_object<'a, T: Resolver + ?Sized>(
     parent_type: &'a T,
-    ctx: &'a ExecutionContext<'a>,
+    ctx: &ExecutionContext<'a>,
     parallel: bool,
 ) -> Response<GqlValue> {
     let mut resolvers = Resolvers(Vec::new());
 
-    resolvers.collect_field_resolvers(ctx, parent_type, &ctx.operation.selection_set)?;
+    resolvers.collect_field_resolvers(parent_type, ctx, &ctx.operation.selection_set)?;
 
     let res = if parallel {
         futures::future::try_join_all(resolvers.0).await?
@@ -100,7 +105,6 @@ pub async fn resolve_object<'a, T: Resolver + ?Sized>(
         results
     };
 
-    // let mut target_map: BTreeMap<String, GqlValue> = BTreeMap::new();
     let mut gql_obj_map = BTreeMap::new();
 
     for value in res {
@@ -111,10 +115,10 @@ pub async fn resolve_object<'a, T: Resolver + ?Sized>(
 }
 
 impl<'a> Resolvers<'a> {
-    pub fn collect_field_resolvers<T: Resolver + 'a + ?Sized>(
+    pub fn collect_field_resolvers<T: Resolver + ?Sized>(
         &mut self,
-        ctx: &'a ExecutionContext<'a>,
         parent_type: &'a T,
+        ctx: &ExecutionContext<'a>,
         selection_set: &'a SelectionSet<'a, String>,
     ) -> Response<()> {
         for item in &selection_set.items {
@@ -124,8 +128,8 @@ impl<'a> Resolvers<'a> {
                         continue;
                     }
                     self.0.push(Box::pin({
+                        let ctx = ctx.clone();
                         async move {
-                            let mut ctx = ctx.clone();
                             ctx.current_field(field.clone());
                             let field_name = &field.name;
                             Ok((
@@ -147,13 +151,13 @@ impl<'a> Resolvers<'a> {
                             ))
                         }
                     };
-                    self.collect_field_resolvers(ctx, parent_type, &fragment_def.selection_set)?;
+                    self.collect_field_resolvers(parent_type, ctx, &fragment_def.selection_set)?;
                 }
                 Selection::InlineFragment(inline_fragment) => {
                     if ctx.is_skip(&inline_fragment.directives) {
                         continue;
                     }
-                    self.collect_field_resolvers(ctx, parent_type, &inline_fragment.selection_set)?;
+                    self.collect_field_resolvers(parent_type, ctx, &inline_fragment.selection_set)?;
                 }
             }
         }

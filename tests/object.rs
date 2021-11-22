@@ -1,5 +1,5 @@
 use rusty_gql::async_trait::async_trait;
-use rusty_gql::{ExecutionContext, Resolver, GqlValue, Object};
+use rusty_gql::{ExecutionContext, GqlValue, Object, Resolver};
 
 pub struct Query;
 
@@ -11,7 +11,7 @@ pub struct Show {
 
 #[async_trait]
 impl Resolver for Show {
-    async fn resolve(&self, ctx: &ExecutionContext) -> rusty_gql::Response<Option<GqlValue>> {
+    async fn resolve(&self, ctx: &ExecutionContext<'_>) -> rusty_gql::Response<Option<GqlValue>> {
         Ok(Some(GqlValue::Null))
     }
 }

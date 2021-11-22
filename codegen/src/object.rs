@@ -60,20 +60,22 @@ pub fn parse_object_item_impl(item_impl: &mut ItemImpl) -> Result<TokenStream, s
                 args.push(quote! { #arg })
             }
 
-            let resolve_obj = quote! {{
-                self.#method_name(#(#args),*).await
-            }};
+            let resolve_obj = quote! {
+                {
+                    self.#method_name(#(#args),*).await
+                }
+            };
 
             resolvers.push(quote! {
-                {
-                    if &ctx.current_field.name == #field_name {
-                        let resolve_fn = async move {
-                            #resolve_obj
-                        };
+                if ctx.current_field.name == #field_name {
+                    let resolve_fn = async move {
+                        #resolve_obj
+                    };
 
-                        let obj = resolve_fn.await.map_err(|err| err).unwrap();
-                        return rusty_gql::resolve_object(&obj, &ctx, true).await.map(::std::option::Option::Some);
-                    }
+                    let obj = resolve_fn.await.unwrap();
+                    let ctx_obj = ctx.current_selection_set(&ctx.selection_set);
+                    //ここのobjの寿命が短い
+                    return rusty_gql::resolve_object(&obj, &ctx_obj, true).await.map(::std::option::Option::Some);
                 }
             });
         }
@@ -82,16 +84,15 @@ pub fn parse_object_item_impl(item_impl: &mut ItemImpl) -> Result<TokenStream, s
     let expanded = quote! {
         #item_impl
 
-        #[allow(non_snake_case)]
-
         #[rusty_gql::async_trait::async_trait]
         impl #generics rusty_gql::Resolver for #self_name #generics_params #where_clause {
-            async fn resolve(&self, ctx: &rusty_gql::ExecutionContext) -> rusty_gql::Response<::std::option::Option<rusty_gql::GqlValue>> {
+            async fn resolve(&self, ctx: &rusty_gql::ExecutionContext<'_>) -> rusty_gql::Response<::std::option::Option<rusty_gql::GqlValue>> {
                 #(#resolvers)*
                 Ok(::std::option::Option::None)
             }
         }
     };
+    println!("{}", expanded.to_string());
 
     Ok(expanded.into())
 }
