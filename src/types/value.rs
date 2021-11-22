@@ -13,8 +13,8 @@ pub enum GqlValue {
     Boolean(bool),
     Null,
     Enum(String),
-    List(Vec<Box<GqlValue>>),
-    Object(BTreeMap<String, Box<GqlValue>>),
+    List(Vec<GqlValue>),
+    Object(BTreeMap<String, GqlValue>),
 }
 
 impl Default for GqlValue {
@@ -34,16 +34,13 @@ impl<'a> From<Value<'a, String>> for GqlValue {
             Value::Null => GqlValue::Null,
             Value::Enum(enum_value) => GqlValue::Enum(enum_value),
             Value::List(list) => {
-                let result = list
-                    .into_iter()
-                    .map(|ele| Box::new(Self::from(ele)))
-                    .collect();
+                let result = list.into_iter().map(|ele| Self::from(ele)).collect();
                 GqlValue::List(result)
             }
             Value::Object(obj) => {
                 let mut result = BTreeMap::new();
                 for (key, value) in obj {
-                    result.insert(key, Box::new(Self::from(value)));
+                    result.insert(key, Self::from(value));
                 }
                 GqlValue::Object(result)
             }
@@ -92,7 +89,7 @@ pub fn value_from_ast<'a>(
             let mut values = vec![];
             for item in list_value {
                 let value = value_from_ast(item, &gql_type, variables);
-                values.push(Box::new(value))
+                values.push(value);
             }
             GqlValue::List(values)
         }
@@ -100,7 +97,7 @@ pub fn value_from_ast<'a>(
             let mut obj_value = BTreeMap::new();
             for (k, v) in obj.iter() {
                 let value = value_from_ast(&v, &gql_type, variables);
-                obj_value.insert(k.to_string(), Box::new(value));
+                obj_value.insert(k.to_string(), value);
             }
             GqlValue::Object(obj_value)
         }

@@ -1,7 +1,4 @@
-use std::{
-    collections::{BTreeMap, HashMap},
-    future,
-};
+use std::collections::{BTreeMap, HashMap};
 
 use async_trait::async_trait;
 use futures::future::BoxFuture;
@@ -61,22 +58,39 @@ pub(crate) async fn resolve_subscription<'a, T: Resolver + ?Sized>(
     Ok(GqlValue::Null)
 }
 
-fn build_gql_object(target_map: &mut BTreeMap<String, GqlValue>, gql_value: (String, GqlValue)) {
+fn build_gql_object(target_obj: &mut BTreeMap<String, GqlValue>, gql_value: (String, GqlValue)) {
     let (field_name, value) = gql_value;
-    if let Some(prev_value) = target_map.get_mut(&field_name) {
+    if let Some(prev_value) = target_obj.get_mut(&field_name) {
         match prev_value {
-            GqlValue::List(target_list) => if let GqlValue::List(list) = value {},
-            GqlValue::Object(target_obj) => {
+            GqlValue::List(target_list) => {
+                if let GqlValue::List(list) = value {
+                    for (index, v) in list.into_iter().enumerate() {
+                        match target_list.get_mut(index) {
+                            Some(prev_value) => {
+                                if let GqlValue::Object(prev_obj) = prev_value {
+                                    if let GqlValue::Object(new_obj) = v {
+                                        for (key, value) in new_obj.into_iter() {
+                                            build_gql_object(prev_obj, (key, value))
+                                        }
+                                    }
+                                }
+                            }
+                            None => todo!(),
+                        }
+                    }
+                }
+            }
+            GqlValue::Object(prev_obj) => {
                 if let GqlValue::Object(obj) = value {
                     for map in obj.into_iter() {
-                        build_gql_object(target_map, (map.0, *map.1))
+                        build_gql_object(prev_obj, (map.0, map.1))
                     }
                 }
             }
             _ => return,
         }
     } else {
-        target_map.insert(field_name, value.clone());
+        target_obj.insert(field_name, value.clone());
     }
 }
 
@@ -101,13 +115,14 @@ pub async fn resolve_object<'a, T: Resolver>(
         results
     };
 
+    // let mut target_map: BTreeMap<String, GqlValue> = BTreeMap::new();
     let mut target_map = BTreeMap::new();
 
     for value in res {
-        build_gql_object(&target_map, res);
-    };
+        build_gql_object(&mut target_map, value);
+    }
 
-    Ok(GqlValue::Null)
+    Ok(GqlValue::Object(target_map))
 }
 
 impl<'a> Resolvers<'a> {
