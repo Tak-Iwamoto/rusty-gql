@@ -48,6 +48,42 @@ impl<'a> From<Value<'a, String>> for GqlValue {
     }
 }
 
+impl From<String> for GqlValue {
+    fn from(string_value: String) -> Self {
+        GqlValue::String(string_value)
+    }
+}
+
+impl From<i64> for GqlValue {
+    fn from(int_value: i64) -> Self {
+        GqlValue::Int(int_value)
+    }
+}
+
+impl From<f64> for GqlValue {
+    fn from(float_value: f64) -> Self {
+        GqlValue::Float(float_value)
+    }
+}
+
+impl From<bool> for GqlValue {
+    fn from(bool_value: bool) -> Self {
+        GqlValue::Boolean(bool_value)
+    }
+}
+
+impl<T: Into<GqlValue>> From<Vec<T>> for GqlValue {
+    fn from(list: Vec<T>) -> Self {
+        GqlValue::List(list.into_iter().map(Into::into).collect())
+    }
+}
+
+impl From<BTreeMap<String, GqlValue>> for GqlValue {
+    fn from(obj: BTreeMap<String, GqlValue>) -> Self {
+        GqlValue::Object(obj)
+    }
+}
+
 pub fn value_from_ast<'a>(
     value: &Value<'a, String>,
     gql_type: &GqlType,
