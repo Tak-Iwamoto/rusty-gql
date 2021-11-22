@@ -72,7 +72,7 @@ pub fn parse_object_item_impl(item_impl: &mut ItemImpl) -> Result<TokenStream, s
                         };
 
                         let obj = resolve_fn.await.map_err(|err| err).unwrap();
-                        return rusty_gql::Resolver::resolve(&obj, &ctx).await.map(::std::option::Option::Some);
+                        return rusty_gql::resolve_object(&obj, &ctx, true).await.map(::std::option::Option::Some);
                     }
                 }
             });
@@ -91,13 +91,6 @@ pub fn parse_object_item_impl(item_impl: &mut ItemImpl) -> Result<TokenStream, s
                 Ok(::std::option::Option::None)
             }
         }
-
-        // #[rusty_gql::async_trait::async_trait]
-        // impl #generics rusty_gql::Resolver for #self_name #generics_params #where_clause {
-        //     async fn resolve(&self, ctx: &rusty_gql::ExecutionContext) -> rusty_gql::Response<rusty_gql::GqlValue> {
-        //         rusty_gql::resolve_object(ctx, self, true).await
-        //     }
-        // }
     };
 
     Ok(expanded.into())

@@ -15,11 +15,6 @@ use crate::{
 type ResolverFuture<'a> = BoxFuture<'a, Response<(String, GqlValue)>>;
 
 #[async_trait]
-pub trait Resolver: Send + Sync {
-    async fn resolve(&self, ctx: &ExecutionContext) -> Response<GqlValue>;
-}
-
-#[async_trait]
 pub trait FieldResolver: Send + Sync {
     async fn resolve_field(&self, ctx: &ExecutionContext) -> Response<Option<GqlValue>>;
 }
@@ -31,21 +26,21 @@ pub(crate) async fn resolve_query<'a, T: FieldResolver + ?Sized>(
     ctx: &'a ExecutionContext<'a>,
     query_resolver: &'a T,
 ) -> Response<GqlValue> {
-    resolve_object(ctx, query_resolver, true).await
+    resolve_object(query_resolver, ctx, true).await
 }
 
 pub(crate) async fn resolve_mutation<'a, T: FieldResolver + ?Sized>(
     ctx: &'a ExecutionContext<'a>,
     mutation_resolver: &'a T,
 ) -> Response<GqlValue> {
-    resolve_object(ctx, mutation_resolver, false).await
+    resolve_object(mutation_resolver, ctx, false).await
 }
 
 pub(crate) async fn resolve_subscription<'a, T: FieldResolver + ?Sized>(
     ctx: &'a ExecutionContext<'a>,
     subscription_resolver: &'a T,
 ) -> Response<GqlValue> {
-    resolve_object(ctx, subscription_resolver, false).await
+    resolve_object(subscription_resolver, ctx, false).await
 }
 
 fn build_gql_object(target_obj: &mut BTreeMap<String, GqlValue>, gql_value: (String, GqlValue)) {
@@ -87,8 +82,8 @@ fn build_gql_object(target_obj: &mut BTreeMap<String, GqlValue>, gql_value: (Str
 pub struct Resolvers<'a>(Vec<ResolverFuture<'a>>);
 
 pub async fn resolve_object<'a, T: FieldResolver + ?Sized>(
-    ctx: &'a ExecutionContext<'a>,
     parent_type: &'a T,
+    ctx: &'a ExecutionContext<'a>,
     parallel: bool,
 ) -> Response<GqlValue> {
     let mut resolvers = Resolvers(Vec::new());

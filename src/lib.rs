@@ -17,7 +17,7 @@ pub use async_trait;
 pub use context::ExecutionContext;
 use error::GqlError;
 pub use operation::OperationType;
-pub use resolver::{resolve_object, FieldResolver, Resolver};
+pub use resolver::{resolve_object, FieldResolver};
 pub use template::GraphiQLTemplate;
 pub use types::schema::build_schema;
 pub use types::{GqlField, GqlType, GqlValue, Schema};

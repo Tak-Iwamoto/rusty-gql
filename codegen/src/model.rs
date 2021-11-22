@@ -58,7 +58,7 @@ pub fn parse_gql_model_input(input: &Model) -> CodegenResult<TokenStream> {
                         self.#field_ident().await
                     };
                     let obj = resolve_fn.await;
-                    return rusty_gql::Resolver::resolve(&obj, &ctx).await.map(::std::option::Option::Some);
+                    return rusty_gql::resolve_obj(&obj, &ctx).await.map(::std::option::Option::Some);
                 }
             })
         } else {
@@ -85,5 +85,6 @@ pub fn parse_gql_model_input(input: &Model) -> CodegenResult<TokenStream> {
             }
         }
     };
+    println!("{}", expanded.to_string());
     Ok(expanded.into())
 }
