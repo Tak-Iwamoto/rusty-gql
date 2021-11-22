@@ -78,8 +78,8 @@ pub fn parse_gql_model_input(input: &Model) -> CodegenResult<TokenStream> {
         }
 
         #[rusty_gql::async_trait::async_trait]
-        impl #impl_generics rusty_gql::FieldResolver for #struct_name #ty_generics #where_clause {
-            async fn resolve_field(&self, ctx: &rusty_gql::ExecutionContext) -> rusty_gql::Response<::std::option::Option<rusty_gql::GqlValue>> {
+        impl #impl_generics rusty_gql::Resolver for #struct_name #ty_generics #where_clause {
+            async fn resolve(&self, ctx: &rusty_gql::ExecutionContext) -> rusty_gql::Response<::std::option::Option<rusty_gql::GqlValue>> {
                 #(#resolvers)*
                 ::std::result::Result::Ok(::std::option::Option::None)
             }

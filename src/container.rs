@@ -2,21 +2,21 @@ use std::{ops::Deref, sync::Arc};
 
 use crate::{
     types::schema::{build_schema, ArcSchema},
-    FieldResolver,
+    Resolver,
 };
 
-pub struct Container<Query: FieldResolver, Mutation: FieldResolver, Subscription: FieldResolver> {
+pub struct Container<Query: Resolver, Mutation: Resolver, Subscription: Resolver> {
     pub query_resolvers: Query,
     pub mutation_resolvers: Mutation,
     pub subscription_resolvers: Subscription,
     pub schema: ArcSchema,
 }
 
-pub struct ArcContainer<Query: FieldResolver, Mutation: FieldResolver, Subscription: FieldResolver>(
+pub struct ArcContainer<Query: Resolver, Mutation: Resolver, Subscription: Resolver>(
     Arc<Container<Query, Mutation, Subscription>>,
 );
 
-impl<Query: FieldResolver, Mutation: FieldResolver, Subscription: FieldResolver> Deref
+impl<Query: Resolver, Mutation: Resolver, Subscription: Resolver> Deref
     for ArcContainer<Query, Mutation, Subscription>
 {
     type Target = Container<Query, Mutation, Subscription>;
@@ -28,9 +28,9 @@ impl<Query: FieldResolver, Mutation: FieldResolver, Subscription: FieldResolver>
 
 impl<Query, Mutation, Subscription> ArcContainer<Query, Mutation, Subscription>
 where
-    Query: FieldResolver,
-    Mutation: FieldResolver,
-    Subscription: FieldResolver,
+    Query: Resolver,
+    Mutation: Resolver,
+    Subscription: Resolver,
 {
     pub fn new(
         schema_doc: &str,

@@ -1,5 +1,5 @@
 use rusty_gql::async_trait::async_trait;
-use rusty_gql::{ExecutionContext, FieldResolver, GqlValue, Object};
+use rusty_gql::{ExecutionContext, Resolver, GqlValue, Object};
 
 pub struct Query;
 
@@ -10,8 +10,8 @@ pub struct Show {
 }
 
 #[async_trait]
-impl FieldResolver for Show {
-    async fn resolve_field(&self, ctx: &ExecutionContext) -> rusty_gql::Response<Option<GqlValue>> {
+impl Resolver for Show {
+    async fn resolve(&self, ctx: &ExecutionContext) -> rusty_gql::Response<Option<GqlValue>> {
         Ok(Some(GqlValue::Null))
     }
 }

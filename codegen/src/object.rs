@@ -85,8 +85,8 @@ pub fn parse_object_item_impl(item_impl: &mut ItemImpl) -> Result<TokenStream, s
         #[allow(non_snake_case)]
 
         #[rusty_gql::async_trait::async_trait]
-        impl #generics rusty_gql::FieldResolver for #self_name #generics_params #where_clause {
-            async fn resolve_field(&self, ctx: &rusty_gql::ExecutionContext) -> rusty_gql::Response<::std::option::Option<rusty_gql::GqlValue>> {
+        impl #generics rusty_gql::Resolver for #self_name #generics_params #where_clause {
+            async fn resolve(&self, ctx: &rusty_gql::ExecutionContext) -> rusty_gql::Response<::std::option::Option<rusty_gql::GqlValue>> {
                 #(#resolvers)*
                 Ok(::std::option::Option::None)
             }

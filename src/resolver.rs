@@ -15,28 +15,28 @@ use crate::{
 type ResolverFuture<'a> = BoxFuture<'a, Response<(String, GqlValue)>>;
 
 #[async_trait]
-pub trait FieldResolver: Send + Sync {
-    async fn resolve_field(&self, ctx: &ExecutionContext) -> Response<Option<GqlValue>>;
+pub trait Resolver: Send + Sync {
+    async fn resolve(&self, ctx: &ExecutionContext) -> Response<Option<GqlValue>>;
 }
 
 // ここの第２引数はqueryの起点となるrootのresolver
 // それ以降はQueryで返されたstructのresolveを辿っていく
 // impl Query
-pub(crate) async fn resolve_query<'a, T: FieldResolver + ?Sized>(
+pub(crate) async fn resolve_query<'a, T: Resolver + ?Sized>(
     ctx: &'a ExecutionContext<'a>,
     query_resolver: &'a T,
 ) -> Response<GqlValue> {
     resolve_object(query_resolver, ctx, true).await
 }
 
-pub(crate) async fn resolve_mutation<'a, T: FieldResolver + ?Sized>(
+pub(crate) async fn resolve_mutation<'a, T: Resolver + ?Sized>(
     ctx: &'a ExecutionContext<'a>,
     mutation_resolver: &'a T,
 ) -> Response<GqlValue> {
     resolve_object(mutation_resolver, ctx, false).await
 }
 
-pub(crate) async fn resolve_subscription<'a, T: FieldResolver + ?Sized>(
+pub(crate) async fn resolve_subscription<'a, T: Resolver + ?Sized>(
     ctx: &'a ExecutionContext<'a>,
     subscription_resolver: &'a T,
 ) -> Response<GqlValue> {
@@ -81,7 +81,7 @@ fn build_gql_object(target_obj: &mut BTreeMap<String, GqlValue>, gql_value: (Str
 
 pub struct Resolvers<'a>(Vec<ResolverFuture<'a>>);
 
-pub async fn resolve_object<'a, T: FieldResolver + ?Sized>(
+pub async fn resolve_object<'a, T: Resolver + ?Sized>(
     parent_type: &'a T,
     ctx: &'a ExecutionContext<'a>,
     parallel: bool,
@@ -111,7 +111,7 @@ pub async fn resolve_object<'a, T: FieldResolver + ?Sized>(
 }
 
 impl<'a> Resolvers<'a> {
-    pub fn collect_field_resolvers<T: FieldResolver + 'a + ?Sized>(
+    pub fn collect_field_resolvers<T: Resolver + 'a + ?Sized>(
         &mut self,
         ctx: &'a ExecutionContext<'a>,
         parent_type: &'a T,
@@ -130,7 +130,7 @@ impl<'a> Resolvers<'a> {
                             let field_name = &field.name;
                             Ok((
                                 field_name.clone(),
-                                parent_type.resolve_field(&ctx).await?.unwrap_or_default(),
+                                parent_type.resolve(&ctx).await?.unwrap_or_default(),
                             ))
                         }
                     }))
