@@ -16,13 +16,13 @@ type ResolverFuture<'a> = BoxFuture<'a, Response<(String, GqlValue)>>;
 
 #[async_trait]
 pub trait Resolver: Send + Sync {
-    async fn resolve(&self, ctx: &ExecutionContext<'_>) -> Response<Option<GqlValue>>;
+    async fn resolve(&self, ctx: &ExecutionContext) -> Response<Option<GqlValue>>;
 }
 
 #[async_trait::async_trait]
 impl<T: Resolver> Resolver for &T {
     #[allow(clippy::trivially_copy_pass_by_ref)]
-    async fn resolve(&self, ctx: &ExecutionContext<'_>) -> Response<Option<GqlValue>> {
+    async fn resolve(&self, ctx: &ExecutionContext) -> Response<Option<GqlValue>> {
         T::resolve(*self, ctx).await
     }
 }
@@ -130,7 +130,7 @@ impl<'a> Resolvers<'a> {
                     self.0.push(Box::pin({
                         let ctx = ctx.clone();
                         async move {
-                            ctx.current_field(field.clone());
+                            ctx.current_field(&field.clone());
                             let field_name = &field.name;
                             Ok((
                                 field_name.clone(),

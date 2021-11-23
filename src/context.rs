@@ -17,11 +17,11 @@ pub struct ExecutionContext<'a> {
 }
 
 impl<'a> ExecutionContext<'a> {
-    pub fn current_field(&self, field: Field<'a, String>) -> Self {
+    pub fn current_field(&self, field: &Field<'a, String>) -> Self {
         ExecutionContext {
             schema: self.schema,
             operation: self.operation,
-            current_field: field,
+            current_field: field.clone(),
             selection_set: self.selection_set.clone(),
             current_path: self.current_path.clone(),
             errors: self.errors.clone(),

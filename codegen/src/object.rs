@@ -73,8 +73,8 @@ pub fn parse_object_item_impl(item_impl: &mut ItemImpl) -> Result<TokenStream, s
                     };
 
                     let obj = resolve_fn.await.unwrap();
-                    let ctx_obj = ctx.current_selection_set(&ctx.selection_set);
-                    //ここのobjの寿命が短い
+                    let ctx_obj = ctx.current_field(&ctx.current_field);
+
                     return rusty_gql::resolve_object(&obj, &ctx_obj, true).await.map(::std::option::Option::Some);
                 }
             });
@@ -86,7 +86,7 @@ pub fn parse_object_item_impl(item_impl: &mut ItemImpl) -> Result<TokenStream, s
 
         #[rusty_gql::async_trait::async_trait]
         impl #generics rusty_gql::Resolver for #self_name #generics_params #where_clause {
-            async fn resolve(&self, ctx: &rusty_gql::ExecutionContext<'_>) -> rusty_gql::Response<::std::option::Option<rusty_gql::GqlValue>> {
+            async fn resolve(&self, ctx: &rusty_gql::ExecutionContext) -> rusty_gql::Response<::std::option::Option<rusty_gql::GqlValue>> {
                 #(#resolvers)*
                 Ok(::std::option::Option::None)
             }
