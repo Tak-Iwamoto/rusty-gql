@@ -4,11 +4,11 @@ use crate::{
     operation::{build_operation, ArcOperation},
     request::Request,
     resolver::{resolve_mutation, resolve_query, resolve_subscription},
-    Resolver, OperationType,
+    OperationType, Resolver,
 };
 
-pub async fn execute<Query: Resolver, Mutation: Resolver, Subscription: Resolver>(
-    container: &ArcContainer<Query, Mutation, Subscription>,
+pub async fn execute<T: Resolver>(
+    container: &ArcContainer<T>,
     request: Request,
 ) -> Result<(), String> {
     let operation = build_operation(
