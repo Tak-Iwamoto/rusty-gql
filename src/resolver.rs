@@ -16,13 +16,13 @@ type ResolverFuture<'a> = BoxFuture<'a, Response<(String, GqlValue)>>;
 
 #[async_trait]
 pub trait Resolver: Send + Sync {
-    async fn resolve(&self, ctx: &ExecutionContext) -> Response<Option<GqlValue>>;
+    async fn resolve(&self, ctx: &ExecutionContext<'_>) -> Response<Option<GqlValue>>;
 }
 
 #[async_trait::async_trait]
 impl<T: Resolver> Resolver for &T {
     #[allow(clippy::trivially_copy_pass_by_ref)]
-    async fn resolve(&self, ctx: &ExecutionContext) -> Response<Option<GqlValue>> {
+    async fn resolve(&self, ctx: &ExecutionContext<'_>) -> Response<Option<GqlValue>> {
         T::resolve(*self, ctx).await
     }
 }
@@ -130,11 +130,11 @@ impl<'a> Resolvers<'a> {
                     self.0.push(Box::pin({
                         let ctx = ctx.clone();
                         async move {
-                            ctx.current_field(&field.clone());
-                            let field_name = &field.name;
+                            let ctx_field = ctx.current_field(&field.clone());
+                            let field_name = field.name.clone();
                             Ok((
-                                field_name.clone(),
-                                parent_type.resolve(&ctx).await?.unwrap_or_default(),
+                                field_name,
+                                parent_type.resolve(&ctx_field).await?.unwrap_or_default(),
                             ))
                         }
                     }))
@@ -165,19 +165,19 @@ impl<'a> Resolvers<'a> {
     }
 }
 
-pub fn get_variables<'a>(
+pub fn get_variable_values<'a>(
     schema: &'a Schema,
     operation: &'a Operation<'a>,
     input_values: &BTreeMap<String, GqlValue>,
 ) -> Result<HashMap<String, GqlValue>, String> {
-    let variable_definitions = &operation.variable_definitions;
     let mut variables = HashMap::new();
-    for var in variable_definitions {
+    for var in &operation.variable_definitions {
         let var_type = get_type_from_schema(schema, &var.var_type);
-        if var_type.is_none() {
-            continue;
-        }
-        let var_type = var_type.unwrap();
+
+        let var_type = match var_type {
+            Some(ty) => ty,
+            None => continue,
+        };
 
         let var_name = &var.name.to_string();
         if !input_values.contains_key(var_name) {

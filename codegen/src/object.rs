@@ -86,13 +86,13 @@ pub fn parse_object_item_impl(item_impl: &mut ItemImpl) -> Result<TokenStream, s
 
         #[rusty_gql::async_trait::async_trait]
         impl #generics rusty_gql::Resolver for #self_name #generics_params #where_clause {
-            async fn resolve(&self, ctx: &rusty_gql::ExecutionContext) -> rusty_gql::Response<::std::option::Option<rusty_gql::GqlValue>> {
+            async fn resolve(&self, ctx: &rusty_gql::ExecutionContext<'_>) -> rusty_gql::Response<::std::option::Option<rusty_gql::GqlValue>> {
                 #(#resolvers)*
                 Ok(::std::option::Option::None)
             }
         }
     };
-    println!("{}", expanded.to_string());
+    // println!("{}", expanded.to_string());
 
     Ok(expanded.into())
 }
