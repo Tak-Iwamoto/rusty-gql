@@ -73,7 +73,8 @@ pub fn parse_object_item_impl(item_impl: &mut ItemImpl) -> Result<TokenStream, s
                     };
 
                     let obj = resolve_fn.await.unwrap();
-                    let ctx_obj = ctx.current_field(&ctx.current_field);
+                    let ctx = ctx.clone();
+                    let ctx_obj = &ctx.current_field(&ctx.current_field);
 
                     return rusty_gql::resolve_object(&obj, &ctx_obj, true).await.map(::std::option::Option::Some);
                 }

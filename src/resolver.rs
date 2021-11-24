@@ -122,16 +122,26 @@ impl<'a> Resolvers<'a> {
         selection_set: &'a SelectionSet<'a, String>,
     ) -> Response<()> {
         for item in &selection_set.items {
-            match item {
+            match &item {
                 Selection::Field(field) => {
                     if ctx.is_skip(&field.directives) {
+                        continue;
+                    }
+
+                    if field.name == "__typename" {
+                        let ctx_field = ctx.current_field(field);
+                        let field_name = ctx_field.current_field.name.clone();
+
+                        self.0.push(Box::pin(async move {
+                            Ok((field_name, GqlValue::String("typename".to_string())))
+                        }));
                         continue;
                     }
                     self.0.push(Box::pin({
                         let ctx = ctx.clone();
                         async move {
-                            let ctx_field = ctx.current_field(&field.clone());
-                            let field_name = field.name.clone();
+                            let ctx_field = ctx.current_field(field);
+                            let field_name = ctx.current_field.name.clone();
                             Ok((
                                 field_name,
                                 parent_type.resolve(&ctx_field).await?.unwrap_or_default(),

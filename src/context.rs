@@ -10,30 +10,17 @@ use graphql_parser::{
 pub struct ExecutionContext<'a> {
     pub schema: &'a ArcSchema,
     pub operation: &'a ArcOperation<'a>,
-    pub current_field: Field<'a, String>,
-    pub selection_set: SelectionSet<'a, String>,
+    pub current_field: &'a Field<'a, String>,
     pub current_path: GraphQLPath,
     pub errors: Vec<GqlError>,
 }
 
 impl<'a> ExecutionContext<'a> {
-    pub fn current_field(&self, field: &Field<'a, String>) -> Self {
+    pub fn current_field(&self, field: &'a Field<'a, String>) -> ExecutionContext<'a> {
         ExecutionContext {
             schema: self.schema,
             operation: self.operation,
-            current_field: field.clone(),
-            selection_set: self.selection_set.clone(),
-            current_path: self.current_path.clone(),
-            errors: self.errors.clone(),
-        }
-    }
-
-    pub fn current_selection_set(&self, selection_set: &SelectionSet<'a, String>) -> Self {
-        ExecutionContext {
-            schema: self.schema,
-            operation: self.operation,
-            current_field: self.current_field.clone(),
-            selection_set: selection_set.clone(),
+            current_field: field,
             current_path: self.current_path.clone(),
             errors: self.errors.clone(),
         }
@@ -58,8 +45,7 @@ pub(crate) fn build_context<'a>(
 ) -> ExecutionContext<'a> {
     let operation_type = operation.operation_type.to_string();
     let root_fieldname = operation.root_field.name.to_string();
-    let current_field = operation.root_field.clone();
-    let selection_set = current_field.selection_set.clone();
+    let current_field = &operation.root_field;
 
     let current_path = GraphQLPath::default()
         .prev(None)
@@ -70,7 +56,6 @@ pub(crate) fn build_context<'a>(
         schema,
         operation,
         current_field,
-        selection_set,
         current_path,
         errors: vec![],
     }
