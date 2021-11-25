@@ -14,10 +14,10 @@ mod types;
 #[doc(hidden)]
 pub use async_trait;
 
-pub use context::ExecutionContext;
+pub use context::{ExecutionContext, FieldContext, SelectionSetContext};
 use error::GqlError;
 pub use operation::OperationType;
-pub use resolver::{resolve_object, Resolver};
+pub use resolver::{resolve_selection_set, test_selection_set, Resolver};
 pub use template::GraphiQLTemplate;
 pub use types::schema::build_schema;
 pub use types::{GqlField, GqlType, GqlValue, Schema};

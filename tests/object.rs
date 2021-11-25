@@ -1,5 +1,6 @@
+use futures::future::Select;
 use rusty_gql::async_trait::async_trait;
-use rusty_gql::{ExecutionContext, GqlValue, Object, Resolver};
+use rusty_gql::{ExecutionContext, FieldContext, GqlValue, Object, Resolver, SelectionSetContext};
 
 pub struct Query;
 
@@ -11,7 +12,7 @@ pub struct Show {
 
 #[async_trait]
 impl Resolver for Show {
-    async fn resolve(&self, ctx: &ExecutionContext<'_>) -> rusty_gql::Response<Option<GqlValue>> {
+    async fn resolve_field(&self, ctx: &FieldContext<'_>) -> rusty_gql::Response<Option<GqlValue>> {
         // resolve_object(self, ctx, true).await.map(Some)
         Ok(Some(GqlValue::Null))
     }
@@ -19,7 +20,7 @@ impl Resolver for Show {
 
 #[Object]
 impl Query {
-    pub async fn get_shows(&self) -> Show {
+    pub async fn get_shows(&self, ctx: &FieldContext<'_>) -> Show {
         let show = Show {
             name: "test".to_string(),
             description: "test".to_string(),
@@ -27,12 +28,12 @@ impl Query {
         show
     }
 
-    pub async fn get_show2<'a>(&self, ctx: &ExecutionContext<'a>) -> Result<Show, String> {
+    pub async fn get_show2(&self, ctx: &FieldContext<'_>) -> Show {
         let show = Show {
             name: "test".to_string(),
             description: "test".to_string(),
         };
-        Ok(show)
+        show
     }
 }
 

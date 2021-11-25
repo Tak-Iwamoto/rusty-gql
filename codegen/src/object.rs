@@ -1,6 +1,6 @@
 use proc_macro::{self, TokenStream};
 use quote::quote;
-use syn::{ext::IdentExt, Block, ImplItem, ItemImpl, ReturnType};
+use syn::{ext::IdentExt, Block, FnArg, ImplItem, ItemImpl, ReturnType, Type, TypeReference};
 
 use crate::utils::{get_method_args, is_result_type};
 
@@ -49,7 +49,28 @@ pub fn parse_object_item_impl(item_impl: &mut ItemImpl) -> Result<TokenStream, s
                 )
                 .expect("ItemImpl return type is invalid.");
             }
+            // let should_create_context = &method
+            //     .sig
+            //     .inputs
+            //     .iter()
+            //     .nth(1)
+            //     .map(|x| {
+            //         if let FnArg::Typed(pat) = x {
+            //             if let Type::Reference(TypeReference { elem, .. }) = &*pat.ty {
+            //                 if let Type::Path(path) = elem.as_ref() {
+            //                     return path.path.segments.last().unwrap().ident != "FieldContext";
+            //                 }
+            //             }
+            //         };
+            //         true
+            //     })
+            //     .unwrap_or(true);
 
+            // if *should_create_context {
+            //     let arg_ctx = syn::parse2::<FnArg>(quote! { ctx: &rusty_gql::FieldContext<'_> })
+            //         .expect("invalid arg type");
+            //     method.sig.inputs.insert(1, arg_ctx);
+            // }
             let method_name = &method.sig.ident;
             let field_name = method_name.unraw().to_string();
 
@@ -61,22 +82,20 @@ pub fn parse_object_item_impl(item_impl: &mut ItemImpl) -> Result<TokenStream, s
             }
 
             let resolve_obj = quote! {
-                {
-                    self.#method_name(#(#args),*).await
-                }
+                // let res = self.#method_name(ctx, #(#args),*).await;
+                self.#method_name(ctx).await
             };
 
             resolvers.push(quote! {
-                if ctx.current_field.name == #field_name {
+                if ctx.item.name == #field_name {
                     let resolve_fn = async move {
                         #resolve_obj
                     };
 
                     let obj = resolve_fn.await.unwrap();
-                    let ctx = ctx.clone();
-                    let ctx_obj = &ctx.current_field(&ctx.current_field);
+                    let selection_set = ctx.with_selection_set(&ctx.item.selection_set);
 
-                    return rusty_gql::resolve_object(&obj, &ctx_obj, true).await.map(::std::option::Option::Some);
+                    rusty_gql::resolve_selection_set(&obj, &selection_set, true).await.map(::std::option::Option::Some);
                 }
             });
         }
@@ -87,7 +106,7 @@ pub fn parse_object_item_impl(item_impl: &mut ItemImpl) -> Result<TokenStream, s
 
         #[rusty_gql::async_trait::async_trait]
         impl #generics rusty_gql::Resolver for #self_name #generics_params #where_clause {
-            async fn resolve(&self, ctx: &rusty_gql::ExecutionContext<'_>) -> rusty_gql::Response<::std::option::Option<rusty_gql::GqlValue>> {
+            async fn resolve_field(&self, ctx: &rusty_gql::FieldContext<'_>) -> rusty_gql::Response<::std::option::Option<rusty_gql::GqlValue>> {
                 #(#resolvers)*
                 Ok(::std::option::Option::None)
             }

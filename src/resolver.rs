@@ -8,7 +8,10 @@ use graphql_parser::{
 };
 
 use crate::{
-    context::ExecutionContext, error::GqlError, operation::Operation, types::value::value_from_ast,
+    context::{FieldContext, SelectionSetContext},
+    error::GqlError,
+    operation::Operation,
+    types::value::value_from_ast,
     GqlType, GqlValue, Response, Schema,
 };
 
@@ -16,36 +19,37 @@ type ResolverFuture<'a> = BoxFuture<'a, Response<(String, GqlValue)>>;
 
 #[async_trait]
 pub trait Resolver: Send + Sync {
-    async fn resolve(&self, ctx: &ExecutionContext<'_>) -> Response<Option<GqlValue>>;
+    async fn resolve_field(&self, ctx: &FieldContext<'_>) -> Response<Option<GqlValue>>;
+}
+
+#[async_trait]
+pub trait FieldResolver: Send + Sync {
+    async fn resolve_field<'a>(
+        &'a self,
+        field: &'a Field<'a, String>,
+    ) -> Response<Option<GqlValue>>;
 }
 
 #[async_trait::async_trait]
 impl<T: Resolver> Resolver for &T {
     #[allow(clippy::trivially_copy_pass_by_ref)]
-    async fn resolve(&self, ctx: &ExecutionContext<'_>) -> Response<Option<GqlValue>> {
-        T::resolve(*self, ctx).await
+    async fn resolve_field(&self, ctx: &FieldContext<'_>) -> Response<Option<GqlValue>> {
+        T::resolve_field(*self, ctx).await
     }
 }
 
 pub(crate) async fn resolve_query<'a, T: Resolver + ?Sized>(
-    ctx: &'a ExecutionContext<'a>,
+    ctx: &'a SelectionSetContext<'a>,
     query_resolver: &'a T,
 ) -> Response<GqlValue> {
-    resolve_object(query_resolver, ctx, true).await
+    resolve_selection_set(query_resolver, ctx, true).await
 }
 
 pub(crate) async fn resolve_mutation<'a, T: Resolver + ?Sized>(
-    ctx: &'a ExecutionContext<'a>,
+    ctx: &'a SelectionSetContext<'a>,
     mutation_resolver: &'a T,
 ) -> Response<GqlValue> {
-    resolve_object(mutation_resolver, ctx, false).await
-}
-
-pub(crate) async fn resolve_subscription<'a, T: Resolver + ?Sized>(
-    ctx: &'a ExecutionContext<'a>,
-    subscription_resolver: &'a T,
-) -> Response<GqlValue> {
-    resolve_object(subscription_resolver, ctx, false).await
+    resolve_selection_set(mutation_resolver, ctx, false).await
 }
 
 fn build_gql_object(target_obj: &mut BTreeMap<String, GqlValue>, gql_value: (String, GqlValue)) {
@@ -86,14 +90,20 @@ fn build_gql_object(target_obj: &mut BTreeMap<String, GqlValue>, gql_value: (Str
 
 pub struct Resolvers<'a>(Vec<ResolverFuture<'a>>);
 
-pub async fn resolve_object<'a, T: Resolver + ?Sized>(
+pub async fn test_selection_set<'a, T: Resolver + ?Sized>(
+    parent_type: &T,
+    selection_set: &SelectionSet<'a, String>,
+) {
+}
+
+pub async fn resolve_selection_set<'a, T: Resolver + ?Sized>(
     parent_type: &'a T,
-    ctx: &ExecutionContext<'a>,
+    ctx: &SelectionSetContext<'a>,
     parallel: bool,
 ) -> Response<GqlValue> {
     let mut resolvers = Resolvers(Vec::new());
 
-    resolvers.collect_field_resolvers(parent_type, ctx, &ctx.operation.selection_set)?;
+    resolvers.collect_fields(parent_type, ctx)?;
 
     let res = if parallel {
         futures::future::try_join_all(resolvers.0).await?
@@ -115,13 +125,12 @@ pub async fn resolve_object<'a, T: Resolver + ?Sized>(
 }
 
 impl<'a> Resolvers<'a> {
-    pub fn collect_field_resolvers<T: Resolver + ?Sized>(
+    pub fn collect_fields<T: Resolver + ?Sized>(
         &mut self,
         parent_type: &'a T,
-        ctx: &ExecutionContext<'a>,
-        selection_set: &'a SelectionSet<'a, String>,
+        ctx: &SelectionSetContext<'a>,
     ) -> Response<()> {
-        for item in &selection_set.items {
+        for item in &ctx.item.items {
             match &item {
                 Selection::Field(field) => {
                     if ctx.is_skip(&field.directives) {
@@ -129,8 +138,8 @@ impl<'a> Resolvers<'a> {
                     }
 
                     if field.name == "__typename" {
-                        let ctx_field = ctx.current_field(field);
-                        let field_name = ctx_field.current_field.name.clone();
+                        let ctx_field = ctx.with_field(field);
+                        let field_name = ctx_field.item.name.clone();
 
                         self.0.push(Box::pin(async move {
                             Ok((field_name, GqlValue::String("typename".to_string())))
@@ -140,11 +149,14 @@ impl<'a> Resolvers<'a> {
                     self.0.push(Box::pin({
                         let ctx = ctx.clone();
                         async move {
-                            let ctx_field = ctx.current_field(field);
-                            let field_name = ctx.current_field.name.clone();
+                            let ctx_field = &ctx.with_field(field);
+                            let field_name = ctx_field.item.name.clone();
                             Ok((
                                 field_name,
-                                parent_type.resolve(&ctx_field).await?.unwrap_or_default(),
+                                parent_type
+                                    .resolve_field(&ctx_field)
+                                    .await?
+                                    .unwrap_or_default(),
                             ))
                         }
                     }))
@@ -161,13 +173,15 @@ impl<'a> Resolvers<'a> {
                             ))
                         }
                     };
-                    self.collect_field_resolvers(parent_type, ctx, &fragment_def.selection_set)?;
+                    let ctx_selection_set = ctx.with_selection_set(&fragment_def.selection_set);
+                    self.collect_fields(parent_type, &ctx_selection_set)?;
                 }
                 Selection::InlineFragment(inline_fragment) => {
                     if ctx.is_skip(&inline_fragment.directives) {
                         continue;
                     }
-                    self.collect_field_resolvers(parent_type, ctx, &inline_fragment.selection_set)?;
+                    let ctx_selection_set = ctx.with_selection_set(&inline_fragment.selection_set);
+                    self.collect_fields(parent_type, &ctx_selection_set)?;
                 }
             }
         }
