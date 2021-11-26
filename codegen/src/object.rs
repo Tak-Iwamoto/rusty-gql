@@ -82,8 +82,10 @@ pub fn parse_object_item_impl(item_impl: &mut ItemImpl) -> Result<TokenStream, s
             }
 
             let resolve_obj = quote! {
-                // let res = self.#method_name(ctx, #(#args),*).await;
-                self.#method_name(ctx).await
+                {
+                    // let res = self.#method_name(ctx, #(#args),*).await;
+                    self.#method_name(ctx).await
+                }
             };
 
             resolvers.push(quote! {
@@ -92,10 +94,10 @@ pub fn parse_object_item_impl(item_impl: &mut ItemImpl) -> Result<TokenStream, s
                         #resolve_obj
                     };
 
-                    let obj = resolve_fn.await.unwrap();
                     let selection_set = ctx.with_selection_set(&ctx.item.selection_set);
+                    let obj = resolve_fn.await.unwrap();
 
-                    rusty_gql::resolve_selection_set(&obj, &selection_set, true).await.map(::std::option::Option::Some);
+                    return rusty_gql::resolve_selection_set(&obj, &selection_set, true).await.map(::std::option::Option::Some);
                 }
             });
         }

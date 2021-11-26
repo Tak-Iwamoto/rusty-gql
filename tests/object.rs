@@ -1,4 +1,3 @@
-use futures::future::Select;
 use rusty_gql::async_trait::async_trait;
 use rusty_gql::{ExecutionContext, FieldContext, GqlValue, Object, Resolver, SelectionSetContext};
 
@@ -17,6 +16,14 @@ impl Resolver for Show {
         Ok(Some(GqlValue::Null))
     }
 }
+// pub trait OutputValueType: Type {
+//     /// Resolve an output value to `serde_json::Value`.
+//     async fn resolve(
+//         &self,
+//         ctx: &ContextSelectionSet<'_>,
+//         field: &Positioned<Field>,
+//     ) -> Result<serde_json::Value>;
+// }
 
 #[Object]
 impl Query {

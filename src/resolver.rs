@@ -90,12 +90,6 @@ fn build_gql_object(target_obj: &mut BTreeMap<String, GqlValue>, gql_value: (Str
 
 pub struct Resolvers<'a>(Vec<ResolverFuture<'a>>);
 
-pub async fn test_selection_set<'a, T: Resolver + ?Sized>(
-    parent_type: &T,
-    selection_set: &SelectionSet<'a, String>,
-) {
-}
-
 pub async fn resolve_selection_set<'a, T: Resolver + ?Sized>(
     parent_type: &'a T,
     ctx: &SelectionSetContext<'a>,
