@@ -3,7 +3,7 @@ use std::collections::{BTreeMap, HashMap};
 use async_trait::async_trait;
 use futures::future::BoxFuture;
 use graphql_parser::{
-    query::{Field, Selection, SelectionSet},
+    query::{Field, Selection},
     schema::Type,
 };
 
@@ -18,16 +18,13 @@ use crate::{
 type ResolverFuture<'a> = BoxFuture<'a, Response<(String, GqlValue)>>;
 
 #[async_trait]
-pub trait Resolver: Send + Sync {
-    async fn resolve_field(&self, ctx: &FieldContext<'_>) -> Response<Option<GqlValue>>;
+pub trait SelectionSetResolver: Resolver {
+    async fn resolve_selection_set(&self, ctx: &SelectionSetContext<'_>) -> Response<GqlValue>;
 }
 
 #[async_trait]
-pub trait FieldResolver: Send + Sync {
-    async fn resolve_field<'a>(
-        &'a self,
-        field: &'a Field<'a, String>,
-    ) -> Response<Option<GqlValue>>;
+pub trait Resolver: Send + Sync {
+    async fn resolve_field(&self, ctx: &FieldContext<'_>) -> Response<Option<GqlValue>>;
 }
 
 #[async_trait::async_trait]
@@ -39,17 +36,17 @@ impl<T: Resolver> Resolver for &T {
 }
 
 pub(crate) async fn resolve_query<'a, T: Resolver + ?Sized>(
-    ctx: &'a SelectionSetContext<'a>,
+    ctx: &SelectionSetContext<'a>,
     query_resolver: &'a T,
 ) -> Response<GqlValue> {
-    resolve_selection_set(query_resolver, ctx, true).await
+    resolve_selection(query_resolver, ctx, true).await
 }
 
 pub(crate) async fn resolve_mutation<'a, T: Resolver + ?Sized>(
-    ctx: &'a SelectionSetContext<'a>,
+    ctx: &SelectionSetContext<'a>,
     mutation_resolver: &'a T,
 ) -> Response<GqlValue> {
-    resolve_selection_set(mutation_resolver, ctx, false).await
+    resolve_selection(mutation_resolver, ctx, false).await
 }
 
 fn build_gql_object(target_obj: &mut BTreeMap<String, GqlValue>, gql_value: (String, GqlValue)) {
@@ -90,7 +87,7 @@ fn build_gql_object(target_obj: &mut BTreeMap<String, GqlValue>, gql_value: (Str
 
 pub struct Resolvers<'a>(Vec<ResolverFuture<'a>>);
 
-pub async fn resolve_selection_set<'a, T: Resolver + ?Sized>(
+pub async fn resolve_selection<'a, T: Resolver + ?Sized>(
     parent_type: &'a T,
     ctx: &SelectionSetContext<'a>,
     parallel: bool,
