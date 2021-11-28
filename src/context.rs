@@ -99,7 +99,21 @@ fn build_gql_object(target_obj: &mut BTreeMap<String, GqlValue>, gql_value: (Str
 }
 
 impl<'a> SelectionSetContext<'a> {
-    pub async fn resolve_selection<'b, T: Resolver>(
+    pub async fn resolve_selection_parallelly<'b, T: Resolver>(
+        &'b self,
+        parent_type: &'b T,
+    ) -> Response<GqlValue> {
+        self.resolve_selection(parent_type, true).await
+    }
+
+    pub async fn resolve_selection_serially<'b, T: Resolver>(
+        &'b self,
+        parent_type: &'b T,
+    ) -> Response<GqlValue> {
+        self.resolve_selection(parent_type, false).await
+    }
+
+    async fn resolve_selection<'b, T: Resolver>(
         &'b self,
         parent_type: &'b T,
         parallel: bool,

@@ -52,13 +52,13 @@ pub fn parse_gql_model_input(input: &Model) -> CodegenResult<TokenStream> {
 
         if field.resolver {
             resolvers.push(quote! {
-            // 別途resolverが定義している時にここでさらに下のresolverに渡したい。
                 if ctx.current_field.name == #field_name {
                     let resolve_fn = async move {
                         self.#field_ident().await
                     };
                     let obj = resolve_fn.await;
-                    return rusty_gql::resolve_obj(&obj, &ctx).await.map(::std::option::Option::Some);
+                    let ctx_selection_set = ctx.with_selection_set(&ctx.item.selection_set);
+                    return ctx_selection_set.resolve_selection_parallelly(&obj).await.map(Some);
                 }
             })
         } else {
@@ -79,12 +79,18 @@ pub fn parse_gql_model_input(input: &Model) -> CodegenResult<TokenStream> {
 
         #[rusty_gql::async_trait::async_trait]
         impl #impl_generics rusty_gql::Resolver for #struct_name #ty_generics #where_clause {
-            async fn resolve(&self, ctx: &rusty_gql::ExecutionContext<'_>) -> rusty_gql::Response<::std::option::Option<rusty_gql::GqlValue>> {
+            async fn resolve_field(&self, ctx: &rusty_gql::FieldContext<'_>) -> rusty_gql::Response<::std::option::Option<rusty_gql::GqlValue>> {
                 #(#resolvers)*
-                ::std::result::Result::Ok(::std::option::Option::None)
+                Ok(::std::option::Option::None)
+            }
+        }
+
+        #[rusty_gql::async_trait::async_trait]
+        impl #impl_generics rusty_gql::SelectionSetResolver for #struct_name #ty_generics #where_clause {
+            async fn resolve_selection_set(&self, ctx: &rusty_gql::SelectionSetContext<'_>) -> rusty_gql::Response<rusty_gql::GqlValue> {
+                ctx.resolve_selection_parallelly(self).await
             }
         }
     };
-    println!("{}", expanded.to_string());
     Ok(expanded.into())
 }

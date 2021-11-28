@@ -23,12 +23,12 @@ pub async fn execute<T: Resolver>(
     let result = match operation.operation_type {
         OperationType::Query => {
             ctx_selection_set
-                .resolve_selection(&container.query_resolvers, true)
+                .resolve_selection_parallelly(&container.query_resolvers)
                 .await
         }
         OperationType::Mutation => {
             ctx_selection_set
-                .resolve_selection(&container.mutation_resolvers, false)
+                .resolve_selection_serially(&container.mutation_resolvers)
                 .await
         }
         OperationType::Subscription => {
