@@ -1,5 +1,7 @@
 use rusty_gql::async_trait::async_trait;
-use rusty_gql::{FieldContext, GqlValue, Resolver, SelectionSetContext, SelectionSetResolver};
+use rusty_gql::{
+    FieldContext, GqlValue, Object, Resolver, SelectionSetContext, SelectionSetResolver,
+};
 
 pub struct Query;
 
@@ -27,7 +29,7 @@ impl SelectionSetResolver for Show {
     }
 }
 
-// #[Object]
+#[Object]
 impl Query {
     pub async fn get_shows(&self, ctx: &FieldContext<'_>) -> Show {
         let show = Show {
@@ -43,30 +45,6 @@ impl Query {
             description: "test".to_string(),
         };
         show
-    }
-}
-
-#[async_trait]
-impl Resolver for Query {
-    async fn resolve_field(&self, ctx: &FieldContext<'_>) -> rusty_gql::Response<Option<GqlValue>> {
-        if ctx.item.name == "get_shows" {
-            let resolve_fn = async move { self.get_shows(ctx).await };
-
-            let obj = resolve_fn.await;
-            let selection_set = ctx.with_selection_set(&ctx.item.selection_set);
-            return selection_set.resolve_selection(&obj, true).await.map(Some);
-        }
-        Ok(None)
-    }
-}
-
-#[async_trait]
-impl SelectionSetResolver for Query {
-    async fn resolve_selection_set(
-        &self,
-        ctx: &SelectionSetContext<'_>,
-    ) -> rusty_gql::Response<GqlValue> {
-        ctx.resolve_selection(self, true).await
     }
 }
 

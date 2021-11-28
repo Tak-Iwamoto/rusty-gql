@@ -95,8 +95,7 @@ pub fn parse_object_item_impl(item_impl: &mut ItemImpl) -> Result<TokenStream, s
 
                     let selection_set = ctx.with_selection_set(&ctx.item.selection_set);
                     let obj = resolve_fn.await.unwrap();
-
-                    return rusty_gql::SelectionSetResolver::resolve_selection_set(&obj, &selection_set).await.map(::std::option::Option::Some);
+                    return selection_set.resolve_selection(&obj, true).await.map(Some);
                 }
             });
         }
@@ -116,11 +115,10 @@ pub fn parse_object_item_impl(item_impl: &mut ItemImpl) -> Result<TokenStream, s
         #[rusty_gql::async_trait::async_trait]
         impl #generics rusty_gql::SelectionSetResolver for #self_name #generics_params #where_clause {
             async fn resolve_selection_set(&self, ctx: &rusty_gql::SelectionSetContext<'_>) -> rusty_gql::Response<rusty_gql::GqlValue> {
-                rusty_gql::resolve_selection(self, ctx, true).await
+                ctx.resolve_selection(self, true).await
             }
         }
     };
-    // println!("{}", expanded.to_string());
 
     Ok(expanded.into())
 }
