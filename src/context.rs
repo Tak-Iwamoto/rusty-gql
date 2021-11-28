@@ -1,8 +1,11 @@
+use std::collections::BTreeMap;
+
 use crate::{
-    error::GqlError, operation::ArcOperation, path::GraphQLPath, types::schema::ArcSchema,
+    error::GqlError, operation::ArcOperation, path::GraphQLPath, resolver::ResolverFuture,
+    types::schema::ArcSchema, GqlValue, Resolver, Response,
 };
 use graphql_parser::{
-    query::{Field, SelectionSet},
+    query::{Field, Selection, SelectionSet},
     schema::Directive,
 };
 
@@ -56,6 +59,132 @@ impl<'a, T> ExecutionContext<'a, T> {
             return skip;
         }
         false
+    }
+}
+
+fn build_gql_object(target_obj: &mut BTreeMap<String, GqlValue>, gql_value: (String, GqlValue)) {
+    let (field_name, value) = gql_value;
+    if let Some(prev_value) = target_obj.get_mut(&field_name) {
+        match prev_value {
+            GqlValue::List(target_list) => {
+                if let GqlValue::List(list) = value {
+                    for (index, v) in list.into_iter().enumerate() {
+                        match target_list.get_mut(index) {
+                            Some(prev_value) => {
+                                if let GqlValue::Object(prev_obj) = prev_value {
+                                    if let GqlValue::Object(new_obj) = v {
+                                        for (key, value) in new_obj.into_iter() {
+                                            build_gql_object(prev_obj, (key, value))
+                                        }
+                                    }
+                                }
+                            }
+                            None => todo!(),
+                        }
+                    }
+                }
+            }
+            GqlValue::Object(prev_obj) => {
+                if let GqlValue::Object(obj) = value {
+                    for map in obj.into_iter() {
+                        build_gql_object(prev_obj, (map.0, map.1))
+                    }
+                }
+            }
+            _ => return,
+        }
+    } else {
+        target_obj.insert(field_name, value.clone());
+    }
+}
+
+impl<'a> SelectionSetContext<'a> {
+    pub async fn resolve_selection<'b, T: Resolver>(
+        &'b self,
+        parent_type: &'b T,
+        parallel: bool,
+    ) -> Response<GqlValue> {
+        let resolvers = self.collect_fields(parent_type)?;
+
+        let res = if parallel {
+            futures::future::try_join_all(resolvers).await?
+        } else {
+            let mut results = Vec::new();
+            for resolver in resolvers {
+                results.push(resolver.await?);
+            }
+            results
+        };
+
+        let mut gql_obj_map = BTreeMap::new();
+
+        for value in res {
+            build_gql_object(&mut gql_obj_map, value);
+        }
+
+        Ok(GqlValue::Object(gql_obj_map))
+    }
+
+    pub fn collect_fields<'b, T: Resolver>(
+        &'b self,
+        parent_type: &'b T,
+    ) -> Response<Vec<ResolverFuture<'b>>> {
+        let mut resolvers: Vec<ResolverFuture<'b>> = Vec::new();
+        for item in &self.item.items {
+            match &item {
+                Selection::Field(field) => {
+                    if self.is_skip(&field.directives) {
+                        continue;
+                    }
+                    if field.name == "__typename" {
+                        let field_name = field.name.clone();
+
+                        resolvers.push(Box::pin(async move {
+                            Ok((field_name, GqlValue::String("typename".to_string())))
+                        }));
+                        continue;
+                    }
+
+                    resolvers.push(Box::pin({
+                        let ctx = self.clone();
+                        async move {
+                            let ctx_field = &ctx.with_field(field);
+                            let field_name = ctx_field.item.name.clone();
+                            Ok((
+                                field_name,
+                                parent_type
+                                    .resolve_field(&ctx_field)
+                                    .await?
+                                    .unwrap_or_default(),
+                            ))
+                        }
+                    }))
+                }
+                Selection::FragmentSpread(fragment_spread) => {
+                    let operation_fragment =
+                        self.operation.fragments.get(&fragment_spread.fragment_name);
+                    let fragment_def = match operation_fragment {
+                        Some(fragment) => fragment,
+                        None => {
+                            return Err(GqlError::new(
+                                format!("{:?} is not found in operation", fragment_spread),
+                                Some(fragment_spread.position),
+                            ))
+                        }
+                    };
+                    self.with_selection_set(&fragment_def.selection_set)
+                        .collect_fields(parent_type)?;
+                }
+                Selection::InlineFragment(inline_fragment) => {
+                    if self.is_skip(&inline_fragment.directives) {
+                        continue;
+                    }
+                    self.with_selection_set(&inline_fragment.selection_set)
+                        .collect_fields(parent_type)?;
+                }
+            }
+        }
+        Ok(resolvers)
     }
 }
 

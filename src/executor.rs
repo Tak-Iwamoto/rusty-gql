@@ -3,7 +3,6 @@ use crate::{
     context::build_context,
     operation::{build_operation, ArcOperation},
     request::Request,
-    resolver::{resolve_mutation, resolve_query},
     OperationType, Resolver,
 };
 
@@ -22,9 +21,15 @@ pub async fn execute<T: Resolver>(
     let ctx_selection_set = &ctx.with_selection_set(&operation.selection_set);
 
     let result = match operation.operation_type {
-        OperationType::Query => resolve_query(ctx_selection_set, &container.query_resolvers).await,
+        OperationType::Query => {
+            ctx_selection_set
+                .resolve_selection(&container.query_resolvers, true)
+                .await
+        }
         OperationType::Mutation => {
-            resolve_mutation(ctx_selection_set, &container.mutation_resolvers).await
+            ctx_selection_set
+                .resolve_selection(&container.mutation_resolvers, false)
+                .await
         }
         OperationType::Subscription => {
             unreachable!()

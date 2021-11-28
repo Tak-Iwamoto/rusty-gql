@@ -1,8 +1,5 @@
 use rusty_gql::async_trait::async_trait;
-use rusty_gql::{
-    resolve_selection, ExecutionContext, FieldContext, GqlValue, Object, Resolver,
-    SelectionSetContext, SelectionSetResolver,
-};
+use rusty_gql::{FieldContext, GqlValue, Resolver, SelectionSetContext, SelectionSetResolver};
 
 pub struct Query;
 
@@ -57,10 +54,7 @@ impl Resolver for Query {
 
             let obj = resolve_fn.await;
             let selection_set = ctx.with_selection_set(&ctx.item.selection_set);
-
-            return SelectionSetResolver::resolve_selection_set(&obj, &selection_set)
-                .await
-                .map(Some);
+            return selection_set.resolve_selection(&obj, true).await.map(Some);
         }
         Ok(None)
     }
@@ -72,8 +66,7 @@ impl SelectionSetResolver for Query {
         &self,
         ctx: &SelectionSetContext<'_>,
     ) -> rusty_gql::Response<GqlValue> {
-        let ctx = ctx.clone();
-        resolve_selection(self, &ctx, true).await
+        ctx.resolve_selection(self, true).await
     }
 }
 

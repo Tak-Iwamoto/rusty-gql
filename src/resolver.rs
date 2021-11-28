@@ -2,20 +2,16 @@ use std::collections::{BTreeMap, HashMap};
 
 use async_trait::async_trait;
 use futures::future::BoxFuture;
-use graphql_parser::{
-    query::{Field, Selection},
-    schema::Type,
-};
+use graphql_parser::{query::Field, schema::Type};
 
 use crate::{
     context::{FieldContext, SelectionSetContext},
-    error::GqlError,
     operation::Operation,
     types::value::value_from_ast,
     GqlType, GqlValue, Response, Schema,
 };
 
-type ResolverFuture<'a> = BoxFuture<'a, Response<(String, GqlValue)>>;
+pub type ResolverFuture<'a> = BoxFuture<'a, Response<(String, GqlValue)>>;
 
 #[async_trait]
 pub trait SelectionSetResolver: Resolver {
@@ -32,151 +28,6 @@ impl<T: Resolver> Resolver for &T {
     #[allow(clippy::trivially_copy_pass_by_ref)]
     async fn resolve_field(&self, ctx: &FieldContext<'_>) -> Response<Option<GqlValue>> {
         T::resolve_field(*self, ctx).await
-    }
-}
-
-pub(crate) async fn resolve_query<'a, T: Resolver + ?Sized>(
-    ctx: &SelectionSetContext<'a>,
-    query_resolver: &'a T,
-) -> Response<GqlValue> {
-    resolve_selection(query_resolver, ctx, true).await
-}
-
-pub(crate) async fn resolve_mutation<'a, T: Resolver + ?Sized>(
-    ctx: &SelectionSetContext<'a>,
-    mutation_resolver: &'a T,
-) -> Response<GqlValue> {
-    resolve_selection(mutation_resolver, ctx, false).await
-}
-
-fn build_gql_object(target_obj: &mut BTreeMap<String, GqlValue>, gql_value: (String, GqlValue)) {
-    let (field_name, value) = gql_value;
-    if let Some(prev_value) = target_obj.get_mut(&field_name) {
-        match prev_value {
-            GqlValue::List(target_list) => {
-                if let GqlValue::List(list) = value {
-                    for (index, v) in list.into_iter().enumerate() {
-                        match target_list.get_mut(index) {
-                            Some(prev_value) => {
-                                if let GqlValue::Object(prev_obj) = prev_value {
-                                    if let GqlValue::Object(new_obj) = v {
-                                        for (key, value) in new_obj.into_iter() {
-                                            build_gql_object(prev_obj, (key, value))
-                                        }
-                                    }
-                                }
-                            }
-                            None => todo!(),
-                        }
-                    }
-                }
-            }
-            GqlValue::Object(prev_obj) => {
-                if let GqlValue::Object(obj) = value {
-                    for map in obj.into_iter() {
-                        build_gql_object(prev_obj, (map.0, map.1))
-                    }
-                }
-            }
-            _ => return,
-        }
-    } else {
-        target_obj.insert(field_name, value.clone());
-    }
-}
-
-pub struct Resolvers<'a>(Vec<ResolverFuture<'a>>);
-
-pub async fn resolve_selection<'a, T: Resolver + ?Sized>(
-    parent_type: &'a T,
-    ctx: &SelectionSetContext<'a>,
-    parallel: bool,
-) -> Response<GqlValue> {
-    let mut resolvers = Resolvers(Vec::new());
-
-    resolvers.collect_fields(parent_type, ctx)?;
-
-    let res = if parallel {
-        futures::future::try_join_all(resolvers.0).await?
-    } else {
-        let mut results = Vec::new();
-        for resolver in resolvers.0 {
-            results.push(resolver.await?);
-        }
-        results
-    };
-
-    let mut gql_obj_map = BTreeMap::new();
-
-    for value in res {
-        build_gql_object(&mut gql_obj_map, value);
-    }
-
-    Ok(GqlValue::Object(gql_obj_map))
-}
-
-impl<'a> Resolvers<'a> {
-    pub fn collect_fields<T: Resolver + ?Sized>(
-        &mut self,
-        parent_type: &'a T,
-        ctx: &SelectionSetContext<'a>,
-    ) -> Response<()> {
-        for item in &ctx.item.items {
-            match &item {
-                Selection::Field(field) => {
-                    if ctx.is_skip(&field.directives) {
-                        continue;
-                    }
-
-                    if field.name == "__typename" {
-                        let ctx_field = ctx.with_field(field);
-                        let field_name = ctx_field.item.name.clone();
-
-                        self.0.push(Box::pin(async move {
-                            Ok((field_name, GqlValue::String("typename".to_string())))
-                        }));
-                        continue;
-                    }
-                    self.0.push(Box::pin({
-                        let ctx = ctx.clone();
-                        async move {
-                            let ctx_field = &ctx.with_field(field);
-                            let field_name = ctx_field.item.name.clone();
-                            Ok((
-                                field_name,
-                                parent_type
-                                    .resolve_field(&ctx_field)
-                                    .await?
-                                    .unwrap_or_default(),
-                            ))
-                        }
-                    }))
-                }
-                Selection::FragmentSpread(fragment_spread) => {
-                    let operation_fragment =
-                        ctx.operation.fragments.get(&fragment_spread.fragment_name);
-                    let fragment_def = match operation_fragment {
-                        Some(fragment) => fragment,
-                        None => {
-                            return Err(GqlError::new(
-                                format!("{:?} is not found in operation", fragment_spread),
-                                Some(fragment_spread.position),
-                            ))
-                        }
-                    };
-                    let ctx_selection_set = ctx.with_selection_set(&fragment_def.selection_set);
-                    self.collect_fields(parent_type, &ctx_selection_set)?;
-                }
-                Selection::InlineFragment(inline_fragment) => {
-                    if ctx.is_skip(&inline_fragment.directives) {
-                        continue;
-                    }
-                    let ctx_selection_set = ctx.with_selection_set(&inline_fragment.selection_set);
-                    self.collect_fields(parent_type, &ctx_selection_set)?;
-                }
-            }
-        }
-        Ok(())
     }
 }
 
