@@ -1,2 +1,0 @@
-mod model;
-mod query;

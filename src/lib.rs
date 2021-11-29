@@ -8,8 +8,8 @@ mod request;
 mod resolver;
 mod server;
 mod template;
-mod test_resolvers;
 mod types;
+mod validation;
 
 #[doc(hidden)]
 pub use async_trait;
