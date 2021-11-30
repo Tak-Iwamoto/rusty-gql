@@ -91,7 +91,7 @@ pub trait Visitor<'a> {
     fn visit_inline_fragment(
         &mut self,
         _ctx: &mut ValidationContext,
-        _fragment_spread: &'a InlineFragment<'a, String>,
+        _inline_fragment: &'a InlineFragment<'a, String>,
     ) {
     }
 }
