@@ -37,7 +37,14 @@ impl<'a> ValidationContext<'a> {
 pub trait Visitor<'a> {
     fn visit_document(&mut self, _ctx: &mut ValidationContext<'a>, _doc: &'a Document<'a, String>) {
     }
+    fn exit_document(&mut self, _ctx: &mut ValidationContext<'a>, _doc: &'a Document<'a, String>) {}
     fn visit_operation_definition(
+        &mut self,
+        _ctx: &mut ValidationContext<'a>,
+        _operation_definition: &'a OperationDefinition<'a, String>,
+    ) {
+    }
+    fn exit_operation_definition(
         &mut self,
         _ctx: &mut ValidationContext<'a>,
         _operation_definition: &'a OperationDefinition<'a, String>,
@@ -50,8 +57,20 @@ pub trait Visitor<'a> {
         _fragment_definition: &'a FragmentDefinition<'a, String>,
     ) {
     }
+    fn exit_fragment_definition(
+        &mut self,
+        _ctx: &mut ValidationContext,
+        _fragment_definition: &'a FragmentDefinition<'a, String>,
+    ) {
+    }
 
     fn visit_selection_set(
+        &mut self,
+        _ctx: &mut ValidationContext,
+        _selection_set: &'a SelectionSet<'a, String>,
+    ) {
+    }
+    fn exit_selection_set(
         &mut self,
         _ctx: &mut ValidationContext,
         _selection_set: &'a SelectionSet<'a, String>,
@@ -65,7 +84,19 @@ pub trait Visitor<'a> {
     ) {
     }
 
+    fn exit_selection(
+        &mut self,
+        _ctx: &mut ValidationContext,
+        _selection_set: &'a Selection<'a, String>,
+    ) {
+    }
     fn visit_directive(
+        &mut self,
+        _ctx: &mut ValidationContext,
+        _directive: &'a Directive<'a, String>,
+    ) {
+    }
+    fn exit_directive(
         &mut self,
         _ctx: &mut ValidationContext,
         _directive: &'a Directive<'a, String>,
@@ -73,8 +104,16 @@ pub trait Visitor<'a> {
     }
 
     fn visit_field(&mut self, _ctx: &mut ValidationContext, _field: &'a Field<'a, String>) {}
+    fn exit_field(&mut self, _ctx: &mut ValidationContext, _field: &'a Field<'a, String>) {}
 
     fn visit_variable_definition(
+        &mut self,
+        _ctx: &mut ValidationContext,
+        _variable_definition: &'a VariableDefinition<'a, String>,
+    ) {
+    }
+
+    fn exit_variable_definition(
         &mut self,
         _ctx: &mut ValidationContext,
         _variable_definition: &'a VariableDefinition<'a, String>,
@@ -88,7 +127,21 @@ pub trait Visitor<'a> {
     ) {
     }
 
+    fn exit_fragment_spread(
+        &mut self,
+        _ctx: &mut ValidationContext,
+        _fragment_spread: &'a FragmentSpread<'a, String>,
+    ) {
+    }
+
     fn visit_inline_fragment(
+        &mut self,
+        _ctx: &mut ValidationContext,
+        _inline_fragment: &'a InlineFragment<'a, String>,
+    ) {
+    }
+
+    fn exit_inline_fragment(
         &mut self,
         _ctx: &mut ValidationContext,
         _inline_fragment: &'a InlineFragment<'a, String>,
