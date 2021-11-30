@@ -42,11 +42,11 @@ impl<'a> Deref for ArcOperation<'a> {
 
 #[derive(Clone, Debug)]
 struct OperationDefinition<'a> {
-    pub operation_type: OperationType,
-    pub directives: Vec<Directive<'a, String>>,
-    pub variable_definitions: Vec<VariableDefinition<'a, String>>,
-    pub selection_set: SelectionSet<'a, String>,
-    pub root_field: Field<'a, String>,
+    operation_type: OperationType,
+    directives: Vec<Directive<'a, String>>,
+    variable_definitions: Vec<VariableDefinition<'a, String>>,
+    selection_set: SelectionSet<'a, String>,
+    root_field: Field<'a, String>,
 }
 
 #[derive(Clone, Debug)]
