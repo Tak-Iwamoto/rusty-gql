@@ -6,7 +6,7 @@ use graphql_parser::{
 };
 
 use crate::validation::{
-    scope::Scope,
+    utils::Scope,
     visitor::{ValidationContext, Visitor},
 };
 
