@@ -9,7 +9,7 @@ use graphql_parser::{
     schema::Directive,
 };
 
-use crate::{types::schema::ArcSchema, Schema};
+use crate::{error::GqlError, types::schema::ArcSchema, Schema};
 
 #[derive(Debug, Clone)]
 pub struct Operation<'a> {
@@ -18,8 +18,7 @@ pub struct Operation<'a> {
     pub variable_definitions: Vec<VariableDefinition<'a, String>>,
     pub selection_set: SelectionSet<'a, String>,
     pub root_field: Field<'a, String>,
-    pub fragments: BTreeMap<String, FragmentDefinition<'a, String>>,
-    // pub variables:
+    pub fragment_definitions: BTreeMap<String, FragmentDefinition<'a, String>>,
     // pub errors
 }
 
@@ -70,20 +69,21 @@ pub fn build_operation<'a>(
     query_doc: &'a str,
     schema: &'a ArcSchema,
     operation_name: Option<String>,
-) -> Result<Operation<'a>, String> {
+) -> Result<Operation<'a>, GqlError> {
     let parsed_query = match graphql_parser::parse_query::<String>(query_doc) {
         Ok(parsed) => parsed,
-        Err(_) => return Err(String::from("failed to parse query")),
+        Err(_) => return Err(GqlError::new("failed to parse query", None)),
     };
 
-    let mut fragments = BTreeMap::new();
+    let mut fragment_definitions = BTreeMap::new();
 
     let mut operation_definitions: HashMap<String, OperationDefinition> = HashMap::new();
     let no_name_key = "no_operation_name";
 
     if operation_name.is_none() && parsed_query.definitions.len() > 1 {
-        return Err(String::from(
+        return Err(GqlError::new(
             "Must provide operation name if multiple operation exist",
+            None,
         ));
     };
 
@@ -155,7 +155,7 @@ pub fn build_operation<'a>(
             },
             graphql_parser::query::Definition::Fragment(fragment) => {
                 let name = fragment.name.to_string();
-                fragments.insert(name, fragment.to_owned());
+                fragment_definitions.insert(name, fragment.to_owned());
             }
         }
     }
@@ -168,14 +168,17 @@ pub fn build_operation<'a>(
                     let definition = definition.clone();
                     Ok(Operation {
                         operation_type: definition.operation_type,
-                        fragments,
+                        fragment_definitions,
                         directives: definition.directives,
                         variable_definitions: definition.variable_definitions,
                         selection_set: definition.selection_set,
                         root_field: definition.root_field,
                     })
                 }
-                None => Err(format!("{} is not contained in query", name)),
+                None => Err(GqlError::new(
+                    format!("{} is not contained in query", name),
+                    None,
+                )),
             }
         }
         None => match operation_definitions.get(&no_name_key.to_string()) {
@@ -183,7 +186,7 @@ pub fn build_operation<'a>(
                 let definition = definition.clone();
                 Ok(Operation {
                     operation_type: definition.operation_type,
-                    fragments,
+                    fragment_definitions,
                     directives: definition.directives,
                     variable_definitions: definition.variable_definitions,
                     selection_set: definition.selection_set,
@@ -195,14 +198,14 @@ pub fn build_operation<'a>(
                     let definition = definition.clone();
                     Ok(Operation {
                         operation_type: definition.operation_type,
-                        fragments,
+                        fragment_definitions,
                         directives: definition.directives,
                         variable_definitions: definition.variable_definitions,
                         selection_set: definition.selection_set,
                         root_field: definition.root_field,
                     })
                 }
-                None => Err(String::from("operation does not exist")),
+                None => Err(GqlError::new("operation does not exist", None)),
             },
         },
     }
@@ -210,7 +213,7 @@ pub fn build_operation<'a>(
 
 fn get_root_field<'a>(
     selection_set: &SelectionSet<'a, String>,
-) -> Result<Field<'a, String>, String> {
+) -> Result<Field<'a, String>, GqlError> {
     let first_item = selection_set.items.first();
     match first_item {
         Some(item) => match item {
@@ -218,13 +221,13 @@ fn get_root_field<'a>(
             graphql_parser::query::Selection::FragmentSpread(_) => unreachable!(),
             graphql_parser::query::Selection::InlineFragment(_) => unreachable!(),
         },
-        None => Err(String::from("Must have selection item")),
+        None => Err(GqlError::new("Must have selection item", None)),
     }
 }
 fn get_operation_type<'a>(
     schema: &'a Schema,
     root_field: &Field<'a, String>,
-) -> Result<OperationType, String> {
+) -> Result<OperationType, GqlError> {
     let root_fieldname = &root_field.name;
 
     if schema.queries.contains_key(root_fieldname) {
@@ -234,7 +237,10 @@ fn get_operation_type<'a>(
     } else if schema.subscriptions.contains_key(root_fieldname) {
         return Ok(OperationType::Subscription);
     } else {
-        Err(format!("{} is not contained in schema", root_fieldname))
+        Err(GqlError::new(
+            format!("{} is not contained in schema", root_fieldname),
+            None,
+        ))
     }
 }
 

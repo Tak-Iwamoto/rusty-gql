@@ -3,7 +3,7 @@ use graphql_parser::{
         Document, Field, FragmentDefinition, FragmentSpread, InlineFragment, OperationDefinition,
         Selection, SelectionSet, VariableDefinition,
     },
-    schema::Directive,
+    schema::{Directive, Value},
     Pos,
 };
 
@@ -147,4 +147,9 @@ pub trait Visitor<'a> {
         _inline_fragment: &'a InlineFragment<'a, String>,
     ) {
     }
+
+    fn visit_argument(&mut self, _ctx: &mut ValidationContext, _arg: &'a Value<'a, String>) {
+
+    }
+    fn exit_argument(&mut self, _ctx: &mut ValidationContext, _arg: &'a Value<'a, String>) {}
 }

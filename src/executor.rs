@@ -1,6 +1,7 @@
 use crate::{
     container::ArcContainer,
     context::build_context,
+    error::GqlError,
     operation::{build_operation, ArcOperation},
     request::Request,
     OperationType, Resolver,
@@ -9,7 +10,7 @@ use crate::{
 pub async fn execute<T: Resolver>(
     container: &ArcContainer<T>,
     request: Request,
-) -> Result<(), String> {
+) -> Result<(), GqlError> {
     let operation = build_operation(
         &request.query_doc,
         &container.schema,

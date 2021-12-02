@@ -175,8 +175,10 @@ impl<'a> SelectionSetContext<'a> {
                     }))
                 }
                 Selection::FragmentSpread(fragment_spread) => {
-                    let operation_fragment =
-                        self.operation.fragments.get(&fragment_spread.fragment_name);
+                    let operation_fragment = self
+                        .operation
+                        .fragment_definitions
+                        .get(&fragment_spread.fragment_name);
                     let fragment_def = match operation_fragment {
                         Some(fragment) => fragment,
                         None => {

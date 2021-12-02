@@ -1,5 +1,7 @@
 use std::{collections::BTreeMap, ops::Deref, sync::Arc};
 
+use crate::error::GqlError;
+
 use super::{
     argument::GqlArgument,
     directive::{GqlDirective, GqlDirectiveDefinition},
@@ -42,7 +44,7 @@ impl Deref for ArcSchema {
     }
 }
 
-pub fn build_schema(schema_doc: &str) -> Result<Schema, String> {
+pub fn build_schema(schema_doc: &str) -> Result<Schema, GqlError> {
     let parsed_schema =
         graphql_parser::parse_schema::<String>(schema_doc).expect("failed to parse graphql schema");
     let mut query_map = BTreeMap::new();
@@ -131,7 +133,9 @@ pub fn build_schema(schema_doc: &str) -> Result<Schema, String> {
                                 type_map.insert(original_name, GqlType::Scalar(extended_scalar));
                             }
                         }
-                        None => return Err(String::from("The scalar to extend is not found")),
+                        None => {
+                            return Err(GqlError::new("The scalar to extend is not found", None))
+                        }
                     }
                 }
                 graphql_parser::schema::TypeExtension::Object(obj_ext) => {
@@ -167,7 +171,9 @@ pub fn build_schema(schema_doc: &str) -> Result<Schema, String> {
                                 );
                             }
                         }
-                        None => return Err(String::from("The interface to extend is not found")),
+                        None => {
+                            return Err(GqlError::new("The interface to extend is not found", None))
+                        }
                     }
                 }
                 graphql_parser::schema::TypeExtension::Interface(inter_ext) => {
@@ -197,7 +203,9 @@ pub fn build_schema(schema_doc: &str) -> Result<Schema, String> {
                                 );
                             }
                         }
-                        None => return Err(String::from("The interface to extend is not found")),
+                        None => {
+                            return Err(GqlError::new("The interface to extend is not found", None))
+                        }
                     }
                 }
                 graphql_parser::schema::TypeExtension::Union(union_ext) => {
@@ -226,7 +234,9 @@ pub fn build_schema(schema_doc: &str) -> Result<Schema, String> {
                                 );
                             }
                         }
-                        None => return Err(String::from("The union to extend is not found")),
+                        None => {
+                            return Err(GqlError::new("The union to extend is not found", None))
+                        }
                     }
                 }
                 graphql_parser::schema::TypeExtension::Enum(enum_ext) => {
@@ -258,7 +268,7 @@ pub fn build_schema(schema_doc: &str) -> Result<Schema, String> {
                                 type_map.insert(original_name.to_string(), GqlType::Enum(gql_enum));
                             }
                         }
-                        None => return Err(String::from("The enum to extend is not found")),
+                        None => return Err(GqlError::new("The enum to extend is not found", None)),
                     }
                 }
                 graphql_parser::schema::TypeExtension::InputObject(input_ext) => {
@@ -290,7 +300,10 @@ pub fn build_schema(schema_doc: &str) -> Result<Schema, String> {
                             }
                         }
                         None => {
-                            return Err(String::from("The input object to extend is not found"))
+                            return Err(GqlError::new(
+                                "The input object to extend is not found",
+                                None,
+                            ))
                         }
                     }
                 }

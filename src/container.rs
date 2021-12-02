@@ -1,6 +1,7 @@
 use std::{ops::Deref, sync::Arc};
 
 use crate::{
+    error::GqlError,
     types::schema::{build_schema, ArcSchema},
     Resolver,
 };
@@ -29,7 +30,7 @@ impl<T> ArcContainer<T>
 where
     T: Resolver,
 {
-    pub fn new(schema_doc: &str, query: T, mutation: T, subscription: T) -> Result<Self, String> {
+    pub fn new(schema_doc: &str, query: T, mutation: T, subscription: T) -> Result<Self, GqlError> {
         let schema = build_schema(schema_doc)?;
         Ok(ArcContainer(Arc::new(Container {
             query_resolvers: query,

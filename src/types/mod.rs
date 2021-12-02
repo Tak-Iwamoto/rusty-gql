@@ -12,6 +12,7 @@ mod scalar;
 pub mod value;
 
 pub mod schema;
+pub use argument::GqlArgument;
 pub use field::GqlField;
 pub use gql_type::GqlType;
 pub use schema::Schema;
