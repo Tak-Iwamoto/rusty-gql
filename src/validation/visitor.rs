@@ -181,9 +181,19 @@ fn visit_definition<'a, T: Visitor<'a>>(
     definition: &'a Definition<'a, String>,
 ) {
     match definition {
-        Definition::Operation(op) => visitor.enter_operation_definition(ctx, op),
+        Definition::Operation(op) => visit_operation_definition(visitor, ctx, op),
         Definition::Fragment(fragment_def) => visitor.enter_fragment_definition(ctx, fragment_def),
     }
+}
+
+fn visit_operation_definition<'a, T: Visitor<'a>>(
+    visitor: &mut T,
+    ctx: &mut ValidationContext<'a>,
+    operation_definition: &'a OperationDefinition<'a, String>,
+) {
+    visitor.enter_operation_definition(ctx, operation_definition);
+    visit_operation_definition(visitor, ctx, operation_definition);
+    visitor.exit_operation_definition(ctx, operation_definition);
 }
 
 fn exit_definition<'a, T: Visitor<'a>>(
@@ -195,4 +205,11 @@ fn exit_definition<'a, T: Visitor<'a>>(
         Definition::Operation(op) => visitor.exit_operation_definition(ctx, op),
         Definition::Fragment(fragment_def) => visitor.exit_fragment_definition(ctx, fragment_def),
     }
+}
+
+fn visit_variable_definitions<'a, T: Visitor<'a>>(
+    visitor: &mut T,
+    ctx: &mut ValidationContext<'a>,
+    variable_definitions: &'a Option<VariableDefinition<'a, String>>,
+) {
 }
