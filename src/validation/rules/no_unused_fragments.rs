@@ -60,7 +60,7 @@ impl<'a> Visitor<'a> for NoUnusedFragment<'a> {
         }
     }
 
-    fn visit_operation_definition(
+    fn enter_operation_definition(
         &mut self,
         _ctx: &mut ValidationContext<'a>,
         operation_definition: &'a OperationDefinition<'a, String>,
@@ -68,7 +68,7 @@ impl<'a> Visitor<'a> for NoUnusedFragment<'a> {
         // self.current_scope = Some(Scope::Operation(operation_definition.))
     }
 
-    fn visit_fragment_definition(
+    fn enter_fragment_definition(
         &mut self,
         _ctx: &mut ValidationContext,
         fragment_definition: &'a FragmentDefinition<'a, String>,
@@ -78,7 +78,7 @@ impl<'a> Visitor<'a> for NoUnusedFragment<'a> {
             .insert((&fragment_definition.name, fragment_definition.position));
     }
 
-    fn visit_fragment_spread(
+    fn enter_fragment_spread(
         &mut self,
         _ctx: &mut ValidationContext,
         fragment_spread: &'a FragmentSpread<'a, String>,
@@ -91,7 +91,7 @@ impl<'a> Visitor<'a> for NoUnusedFragment<'a> {
         }
     }
 
-    fn visit_inline_fragment(
+    fn enter_inline_fragment(
         &mut self,
         _ctx: &mut ValidationContext,
         _inline_fragment: &'a InlineFragment<'a, String>,

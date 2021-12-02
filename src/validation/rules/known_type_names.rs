@@ -5,7 +5,7 @@ use crate::validation::visitor::{ValidationContext, Visitor};
 pub struct KnownTypeNames {}
 
 impl<'a> Visitor<'a> for KnownTypeNames {
-    fn visit_fragment_definition(
+    fn enter_fragment_definition(
         &mut self,
         ctx: &mut ValidationContext,
         fragment_definition: &'a graphql_parser::query::FragmentDefinition<'a, String>,
@@ -13,7 +13,7 @@ impl<'a> Visitor<'a> for KnownTypeNames {
         validate(ctx, &fragment_definition.name, fragment_definition.position)
     }
 
-    fn visit_variable_definition(
+    fn enter_variable_definition(
         &mut self,
         ctx: &mut ValidationContext,
         variable_definition: &'a graphql_parser::query::VariableDefinition<'a, String>,
@@ -21,7 +21,7 @@ impl<'a> Visitor<'a> for KnownTypeNames {
         validate(ctx, &variable_definition.name, variable_definition.position)
     }
 
-    fn visit_inline_fragment(
+    fn enter_inline_fragment(
         &mut self,
         ctx: &mut ValidationContext,
         fragment_spread: &'a graphql_parser::query::InlineFragment<'a, String>,

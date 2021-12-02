@@ -7,7 +7,7 @@
 // }
 
 // impl<'a> Visitor<'a> for ArgumentsOfCorrectType<'a> {
-//     fn visit_directive(
+//     fn enter_directive(
 //         &mut self,
 //         _ctx: &mut ValidationContext,
 //         directive: &'a graphql_parser::schema::Directive<'a, String>,
@@ -23,7 +23,7 @@
 //         self.current_args = None;
 //     }
 
-//     fn visit_field(
+//     fn enter_field(
 //         &mut self,
 //         _ctx: &mut ValidationContext,
 //         field: &'a graphql_parser::query::Field<'a, String>,
@@ -39,7 +39,7 @@
 //         self.current_args = None;
 //     }
 
-//     fn visit_argument(
+//     fn enter_argument(
 //         &mut self,
 //         _ctx: &mut ValidationContext,
 //         arg: &'a (String, Value<'a, String>),

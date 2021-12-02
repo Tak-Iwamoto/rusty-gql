@@ -10,7 +10,7 @@ pub struct KnownDirectives {
 }
 
 impl<'a> Visitor<'a> for KnownDirectives {
-    fn visit_operation_definition(
+    fn enter_operation_definition(
         &mut self,
         _ctx: &mut ValidationContext<'a>,
         operation_definition: &'a OperationDefinition<'a, String>,
@@ -36,7 +36,7 @@ impl<'a> Visitor<'a> for KnownDirectives {
         );
     }
 
-    fn visit_fragment_definition(
+    fn enter_fragment_definition(
         &mut self,
         _ctx: &mut ValidationContext,
         _fragment_definition: &'a graphql_parser::query::FragmentDefinition<'a, String>,
@@ -54,14 +54,14 @@ impl<'a> Visitor<'a> for KnownDirectives {
         assert_eq!(top, Some(DirectiveLocation::FragmentDefinition));
     }
 
-    fn visit_directive(
+    fn enter_directive(
         &mut self,
         _ctx: &mut ValidationContext,
         directive: &'a graphql_parser::schema::Directive<'a, String>,
     ) {
     }
 
-    fn visit_field(
+    fn enter_field(
         &mut self,
         _ctx: &mut ValidationContext,
         _field: &'a graphql_parser::query::Field<'a, String>,
@@ -78,7 +78,7 @@ impl<'a> Visitor<'a> for KnownDirectives {
         assert_eq!(top, Some(DirectiveLocation::Field));
     }
 
-    fn visit_fragment_spread(
+    fn enter_fragment_spread(
         &mut self,
         _ctx: &mut ValidationContext,
         _fragment_spread: &'a graphql_parser::query::FragmentSpread<'a, String>,
@@ -95,7 +95,7 @@ impl<'a> Visitor<'a> for KnownDirectives {
         assert_eq!(top, Some(DirectiveLocation::FragmentSpread));
     }
 
-    fn visit_inline_fragment(
+    fn enter_inline_fragment(
         &mut self,
         _ctx: &mut ValidationContext,
         _inline_fragment: &'a graphql_parser::query::InlineFragment<'a, String>,

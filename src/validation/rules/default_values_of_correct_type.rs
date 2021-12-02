@@ -4,7 +4,7 @@ pub struct DefaultValueOfCorrectType;
 
 impl<'a> Visitor<'a> for DefaultValueOfCorrectType {
 
-    fn visit_variable_definition(
+    fn enter_variable_definition(
         &mut self,
         ctx: &mut crate::validation::visitor::ValidationContext,
         variable_definition: &'a graphql_parser::query::VariableDefinition<'a, String>,

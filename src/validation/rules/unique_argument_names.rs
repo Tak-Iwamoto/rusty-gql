@@ -9,7 +9,7 @@ pub struct UniqueArgumentNames<'a> {
 }
 
 impl<'a> Visitor<'a> for UniqueArgumentNames<'a> {
-    fn visit_directive(
+    fn enter_directive(
         &mut self,
         _ctx: &mut crate::validation::visitor::ValidationContext,
         _directive: &'a graphql_parser::schema::Directive<'a, String>,
@@ -17,7 +17,7 @@ impl<'a> Visitor<'a> for UniqueArgumentNames<'a> {
         self.names.clear();
     }
 
-    fn visit_field(
+    fn enter_field(
         &mut self,
         _ctx: &mut crate::validation::visitor::ValidationContext,
         _field: &'a graphql_parser::query::Field<'a, String>,
@@ -25,7 +25,7 @@ impl<'a> Visitor<'a> for UniqueArgumentNames<'a> {
         self.names.clear();
     }
 
-    fn visit_argument(&mut self, _ctx: &mut crate::validation::visitor::ValidationContext, arg: &'a Value<'a, String>) {
+    fn enter_argument(&mut self, _ctx: &mut crate::validation::visitor::ValidationContext, arg: &'a Value<'a, String>) {
 
     }
 }
