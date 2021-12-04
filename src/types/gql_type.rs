@@ -30,8 +30,16 @@ impl ToString for GqlMetaType {
 
 impl GqlMetaType {
     pub fn is_input_type(&self) -> bool {
-        matches!(self, &GqlMetaType::Scalar(_))
-            || matches!(self, &GqlMetaType::InputObject(_))
-            || matches!(self, &GqlMetaType::Enum(_))
+        matches!(
+            self,
+            &GqlMetaType::Scalar(_) | &GqlMetaType::InputObject(_) | &GqlMetaType::Enum(_)
+        )
+    }
+
+    pub fn is_composite_type(&self) -> bool {
+        matches!(
+            self,
+            &GqlMetaType::Object(_) | &GqlMetaType::Interface(_) | &GqlMetaType::Union(_)
+        )
     }
 }
