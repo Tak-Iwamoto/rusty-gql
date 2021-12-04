@@ -256,26 +256,33 @@ mod tests {
     fn it_works() {
         let schema_doc = fs::read_to_string("src/tests/github.graphql").unwrap();
         let schema = ArcSchema::new(build_schema(schema_doc.as_str()).unwrap());
-        let query_doc = fs::read_to_string("src/tests/github_query.graphql").unwrap();
+        // let query_doc = fs::read_to_string("src/tests/github_query.graphql").unwrap();
+        let query_doc = fs::read_to_string("src/tests/multiple_operation.graphql").unwrap();
+        let parsed_query = graphql_parser::parse_query::<String>(&query_doc).unwrap();
 
-        let query = build_operation(query_doc.as_str(), &schema, None).unwrap();
-        println!("{:?}", &query.selection_set.items.len());
-        for item in query.selection_set.items {
-            match item {
-                graphql_parser::query::Selection::Field(field) => {
-                    println!("parent: {:?}", field);
+        println!("{}", parsed_query.definitions.len());
 
-                    for it in field.selection_set.items {
-                        println!("child: {:?}", it);
-                    }
-                }
-                graphql_parser::query::Selection::FragmentSpread(fragment_sp) => {
-                    println!("{}", fragment_sp.position);
-                }
-                graphql_parser::query::Selection::InlineFragment(inline_frg) => {
-                    println!("{}", inline_frg.position);
-                }
-            }
+        for def in parsed_query.definitions {
+            println!("{:?}", def);
         }
+        // let query = build_operation(query_doc.as_str(), &schema, None).unwrap();
+        // println!("{:?}", &query.selection_set.items.len());
+        // for item in query.selection_set.items {
+        //     match item {
+        //         graphql_parser::query::Selection::Field(field) => {
+        //             println!("parent: {:?}", field);
+
+        //             for it in field.selection_set.items {
+        //                 println!("child: {:?}", it);
+        //             }
+        //         }
+        //         graphql_parser::query::Selection::FragmentSpread(fragment_sp) => {
+        //             println!("{}", fragment_sp.position);
+        //         }
+        //         graphql_parser::query::Selection::InlineFragment(inline_frg) => {
+        //             println!("{}", inline_frg.position);
+        //         }
+        //     }
+        // }
     }
 }

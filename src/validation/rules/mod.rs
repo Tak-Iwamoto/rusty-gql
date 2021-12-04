@@ -6,6 +6,7 @@ mod known_argument_names;
 mod known_directives;
 mod known_fragment_names;
 mod known_type_names;
+mod lone_anonymous_operation;
 mod no_fragment_cycles;
 mod no_undefined_variables;
 mod no_unused_fragments;

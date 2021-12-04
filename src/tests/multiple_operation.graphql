@@ -1,4 +1,4 @@
-query getTaskAndUser {
+{
   getTask(id: "0x3") {
     id
     title

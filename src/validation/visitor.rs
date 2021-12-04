@@ -161,7 +161,7 @@ pub trait Visitor<'a> {
     fn exit_argument(
         &mut self,
         _ctx: &mut ValidationContext,
-        _arg_name: &str,
+        _arg_name: &'a str,
         _arg_value: &'a Value<'a, String>,
     ) {
     }
@@ -184,9 +184,17 @@ fn visit_definitions<'a, T: Visitor<'a>>(
 ) {
     for def in definitions {
         match def {
-            Definition::Operation(operation) => {}
-            Definition::Fragment(_) => todo!(),
+            Definition::Operation(operation_definition) => {
+                visit_operation_definition(visitor, ctx, operation_definition);
+            }
+            Definition::Fragment(fragment_definition) => visit_fragment_definition(
+                visitor,
+                ctx,
+                &fragment_definition.name,
+                fragment_definition,
+            ),
         }
+        exit_definition(visitor, ctx, def);
     }
 }
 
@@ -209,6 +217,27 @@ fn visit_operation_definition<'a, T: Visitor<'a>>(
     operation_definition: &'a OperationDefinition<'a, String>,
 ) {
     visitor.enter_operation_definition(ctx, operation_definition);
+
+    match operation_definition {
+        OperationDefinition::SelectionSet(selection_set) => {
+            visit_selection_set(visitor, ctx, selection_set);
+        }
+        OperationDefinition::Query(query) => {
+            visit_variable_definitions(visitor, ctx, &query.variable_definitions);
+            visit_directives(visitor, ctx, &query.directives);
+            visit_selection_set(visitor, ctx, &query.selection_set);
+        }
+        OperationDefinition::Mutation(mutation) => {
+            visit_variable_definitions(visitor, ctx, &mutation.variable_definitions);
+            visit_directives(visitor, ctx, &mutation.directives);
+            visit_selection_set(visitor, ctx, &mutation.selection_set);
+        }
+        OperationDefinition::Subscription(subscription) => {
+            visit_variable_definitions(visitor, ctx, &subscription.variable_definitions);
+            visit_directives(visitor, ctx, &subscription.directives);
+            visit_selection_set(visitor, ctx, &subscription.selection_set);
+        }
+    }
     visitor.exit_operation_definition(ctx, operation_definition);
 }
 
@@ -219,7 +248,9 @@ fn visit_selection_set<'a, T: Visitor<'a>>(
 ) {
     if !selection_set.items.is_empty() {
         visitor.enter_selection_set(ctx, selection_set);
-        for selection in &selection_set.items {}
+        for selection in &selection_set.items {
+            visit_selection(visitor, ctx, selection);
+        }
         visitor.exit_selection_set(ctx, selection_set);
     }
 }
@@ -231,10 +262,17 @@ fn visit_selection<'a, T: Visitor<'a>>(
 ) {
     visitor.enter_selection(ctx, selection);
     match selection {
-        Selection::Field(field) => if field.name == "__typename" {},
-        Selection::FragmentSpread(fragment_spread) => {}
-        Selection::InlineFragment(inline_fragment) => {}
+        Selection::Field(field) => {
+            visit_field(visitor, ctx, field);
+        }
+        Selection::FragmentSpread(fragment_spread) => {
+            visit_fragment_spread(visitor, ctx, fragment_spread);
+        }
+        Selection::InlineFragment(inline_fragment) => {
+            visit_inline_fragment(visitor, ctx, inline_fragment);
+        }
     }
+    visitor.exit_selection(ctx, selection);
 }
 
 fn visit_field<'a, T: Visitor<'a>>(
@@ -316,6 +354,10 @@ fn exit_definition<'a, T: Visitor<'a>>(
 fn visit_variable_definitions<'a, T: Visitor<'a>>(
     visitor: &mut T,
     ctx: &mut ValidationContext<'a>,
-    variable_definitions: &'a Option<VariableDefinition<'a, String>>,
+    variable_definitions: &'a [VariableDefinition<'a, String>],
 ) {
+    for def in variable_definitions {
+        visitor.enter_variable_definition(ctx, def);
+        visitor.exit_variable_definition(ctx, def);
+    }
 }
