@@ -134,7 +134,10 @@ pub fn build_schema(schema_doc: &str) -> Result<Schema, GqlError> {
                             }
                         }
                         None => {
-                            return Err(GqlError::new("The scalar to extend is not found", None))
+                            return Err(GqlError::new(
+                                format!("The {} scalar to extend is not found", original_name),
+                                None,
+                            ))
                         }
                     }
                 }
@@ -172,7 +175,10 @@ pub fn build_schema(schema_doc: &str) -> Result<Schema, GqlError> {
                             }
                         }
                         None => {
-                            return Err(GqlError::new("The interface to extend is not found", None))
+                            return Err(GqlError::new(
+                                format!("The {} object to extend is not found", original_name),
+                                None,
+                            ))
                         }
                     }
                 }
@@ -204,7 +210,10 @@ pub fn build_schema(schema_doc: &str) -> Result<Schema, GqlError> {
                             }
                         }
                         None => {
-                            return Err(GqlError::new("The interface to extend is not found", None))
+                            return Err(GqlError::new(
+                                format!("The {} interface to extend is not found", original_name),
+                                None,
+                            ))
                         }
                     }
                 }
@@ -235,7 +244,10 @@ pub fn build_schema(schema_doc: &str) -> Result<Schema, GqlError> {
                             }
                         }
                         None => {
-                            return Err(GqlError::new("The union to extend is not found", None))
+                            return Err(GqlError::new(
+                                format!("The {} union to extend is not found", original_name),
+                                None,
+                            ))
                         }
                     }
                 }
@@ -268,7 +280,12 @@ pub fn build_schema(schema_doc: &str) -> Result<Schema, GqlError> {
                                 type_map.insert(original_name.to_string(), GqlType::Enum(gql_enum));
                             }
                         }
-                        None => return Err(GqlError::new("The enum to extend is not found", None)),
+                        None => {
+                            return Err(GqlError::new(
+                                format!("The {} enum to extend is not found", original_name),
+                                None,
+                            ))
+                        }
                     }
                 }
                 graphql_parser::schema::TypeExtension::InputObject(input_ext) => {
@@ -301,7 +318,10 @@ pub fn build_schema(schema_doc: &str) -> Result<Schema, GqlError> {
                         }
                         None => {
                             return Err(GqlError::new(
-                                "The input object to extend is not found",
+                                format!(
+                                    "The {} input object to extend is not found",
+                                    original_name
+                                ),
                                 None,
                             ))
                         }
