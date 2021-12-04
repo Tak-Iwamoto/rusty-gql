@@ -1,3 +1,5 @@
+use std::ops::RangeBounds;
+
 use super::directive::GqlDirective;
 use graphql_parser::{
     schema::{EnumType, EnumValue},
@@ -30,6 +32,13 @@ impl<'a> From<EnumType<'a, String>> for GqlEnum {
             directives,
             values,
         }
+    }
+}
+
+impl GqlEnum {
+    pub fn contains(&self, name: &str) -> bool {
+        let values: Vec<String> = self.values.iter().map(|v| v.name.clone()).collect();
+        values.contains(&name.to_string())
     }
 }
 
