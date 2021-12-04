@@ -5,7 +5,7 @@ use graphql_parser::{
         Definition, Document, Field, FragmentDefinition, FragmentSpread, InlineFragment,
         OperationDefinition, Selection, SelectionSet, VariableDefinition,
     },
-    schema::{Directive, Value},
+    schema::{Directive, Type, Value},
     Pos,
 };
 
@@ -21,6 +21,7 @@ pub struct ValidationContext<'a> {
     pub(crate) errors: Vec<ValidationError>,
     pub(crate) fragments: HashMap<String, FragmentDefinition<'a, String>>,
     pub(crate) variables: Option<HashMap<String, VariableDefinition<'a, String>>>,
+    pub parent_type_stack: Vec<Option<&'a Type<'a, String>>>,
 }
 
 impl<'a> ValidationContext<'a> {
@@ -46,6 +47,7 @@ impl<'a> ValidationContext<'a> {
             errors: vec![],
             fragments,
             variables,
+            parent_type_stack: vec![],
         }
     }
 
@@ -54,6 +56,9 @@ impl<'a> ValidationContext<'a> {
             positions,
             message: message.into(),
         })
+    }
+    pub fn parent_type(&self) -> Option<&'a Type<'a, String>> {
+        *self.parent_type_stack.last().unwrap_or(&None)
     }
 }
 

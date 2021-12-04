@@ -133,7 +133,7 @@ pub fn check_valid_input_value(
     }
 }
 
-fn get_type_name(ty: &Type<'_, String>) -> String {
+pub fn get_type_name(ty: &Type<'_, String>) -> String {
     match ty {
         Type::NamedType(named_type) => named_type.to_string(),
         Type::ListType(list) => get_type_name(list),
