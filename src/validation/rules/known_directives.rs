@@ -1,4 +1,4 @@
-use graphql_parser::query::{OperationDefinition, SelectionSet};
+use graphql_parser::query::OperationDefinition;
 
 use crate::validation::{
     utils::DirectiveLocation,
@@ -58,9 +58,17 @@ impl<'a> Visitor<'a> for KnownDirectives {
 
     fn enter_directive(
         &mut self,
-        _ctx: &mut ValidationContext,
+        ctx: &mut ValidationContext,
         directive: &'a graphql_parser::schema::Directive<'a, String>,
     ) {
+        if let Some(_) = ctx.schema.directives.get(&directive.name) {
+            // TODO:
+        } else {
+            ctx.add_error(
+                format!("Unknown directive {}", directive.name),
+                vec![directive.position],
+            );
+        }
     }
 
     fn enter_field(
