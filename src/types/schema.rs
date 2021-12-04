@@ -87,7 +87,8 @@ pub fn build_schema(schema_doc: &str) -> Result<Schema, GqlError> {
                     }
                     _ => {
                         let gql_object = GqlObject::from(obj);
-                        type_map.insert(gql_object.name.to_string(), GqlMetaType::Object(gql_object));
+                        type_map
+                            .insert(gql_object.name.to_string(), GqlMetaType::Object(gql_object));
                     }
                 },
                 graphql_parser::schema::TypeDefinition::Interface(interface) => {
@@ -109,7 +110,7 @@ pub fn build_schema(schema_doc: &str) -> Result<Schema, GqlError> {
                     let gql_input_obj = GqlInputObject::from(input);
                     type_map.insert(
                         gql_input_obj.name.to_string(),
-                        GqlMetaType::Input(gql_input_obj),
+                        GqlMetaType::InputObject(gql_input_obj),
                     );
                 }
             },
@@ -130,7 +131,8 @@ pub fn build_schema(schema_doc: &str) -> Result<Schema, GqlError> {
                                     name: original_name.clone(),
                                     directives: extended_directives,
                                 };
-                                type_map.insert(original_name, GqlMetaType::Scalar(extended_scalar));
+                                type_map
+                                    .insert(original_name, GqlMetaType::Scalar(extended_scalar));
                             }
                         }
                         None => {
@@ -277,7 +279,8 @@ pub fn build_schema(schema_doc: &str) -> Result<Schema, GqlError> {
                                     values: extended_values,
                                 };
                                 let gql_enum = GqlEnum::from(extended_enum);
-                                type_map.insert(original_name.to_string(), GqlMetaType::Enum(gql_enum));
+                                type_map
+                                    .insert(original_name.to_string(), GqlMetaType::Enum(gql_enum));
                             }
                         }
                         None => {
@@ -292,7 +295,7 @@ pub fn build_schema(schema_doc: &str) -> Result<Schema, GqlError> {
                     let original_name = input_ext.name.clone();
                     match type_map.get(&original_name) {
                         Some(original_input) => {
-                            if let GqlMetaType::Input(original) = original_input {
+                            if let GqlMetaType::InputObject(original) = original_input {
                                 let mut extended_directives = original.directives.clone();
                                 let mut directives =
                                     GqlDirective::from_vec_directive(input_ext.directives.clone());
@@ -312,7 +315,7 @@ pub fn build_schema(schema_doc: &str) -> Result<Schema, GqlError> {
                                 };
                                 type_map.insert(
                                     original_name.to_string(),
-                                    GqlMetaType::Input(extended_input),
+                                    GqlMetaType::InputObject(extended_input),
                                 );
                             }
                         }
