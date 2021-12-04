@@ -4,7 +4,7 @@ use graphql_parser::schema::{Type, Value};
 
 use crate::{
     types::{GqlMetaTypeName, GqlScalar},
-    GqlMetaType,
+    GqlMetaType, Schema,
 };
 
 use super::visitor::ValidationContext;
@@ -31,7 +31,7 @@ fn check_arg_uniqueness(ctx: &mut ValidationContext<'_>, args: &Vec<(String, Val
 }
 
 pub fn check_valid_input_value(
-    ctx: &mut ValidationContext<'_>,
+    schema: &Schema,
     ty: &Type<'_, String>,
     value: &Value<'_, String>,
 ) -> Option<String> {
@@ -40,7 +40,7 @@ pub fn check_valid_input_value(
             if let Value::Null = value {
                 return None;
             }
-            let type_def = ctx.schema.type_map.get(type_name);
+            let type_def = schema.type_map.get(type_name);
             match type_def {
                 Some(def) => match def {
                     GqlMetaType::Scalar(_) => {
@@ -59,7 +59,7 @@ pub fn check_valid_input_value(
                                 value_keys.remove(&field.name);
                                 if let Some(value) = object_value.get(&field.name) {
                                     return check_valid_input_value(
-                                        ctx,
+                                        schema,
                                         &field.meta_type.to_parser_type(),
                                         value,
                                     );
@@ -114,21 +114,21 @@ pub fn check_valid_input_value(
             Value::Null => None,
             Value::List(values) => {
                 for v in values {
-                    let error_msg = check_valid_input_value(ctx, &list_type, v);
+                    let error_msg = check_valid_input_value(schema, &list_type, v);
                     if let Some(msg) = error_msg {
                         return Some(msg);
                     }
                 }
                 None
             }
-            _ => check_valid_input_value(ctx, &list_type, value),
+            _ => check_valid_input_value(schema, &list_type, value),
         },
         Type::NonNullType(non_null_type) => match value {
             Value::Null => Some(format!(
                 "type {} is non null but not provided value",
                 get_type_name(ty)
             )),
-            _ => check_valid_input_value(ctx, &non_null_type, value),
+            _ => check_valid_input_value(schema, &non_null_type, value),
         },
     }
 }

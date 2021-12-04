@@ -1,54 +1,71 @@
-// use graphql_parser::schema::Value;
+use graphql_parser::schema::Value;
 
-// use crate::validation::visitor::{ValidationContext, Visitor};
+use crate::validation::{
+    utils::check_valid_input_value,
+    visitor::{ValidationContext, Visitor},
+};
 
-// pub struct ArgumentsOfCorrectType<'a> {
-//     pub current_args: Option<Vec<(String, Value<'a, String>)>>,
-// }
+pub struct ArgumentsOfCorrectType<'a> {
+    pub current_args: Option<Vec<(String, Value<'a, String>)>>,
+}
 
-// impl<'a> Visitor<'a> for ArgumentsOfCorrectType<'a> {
-//     fn enter_directive(
-//         &mut self,
-//         _ctx: &mut ValidationContext,
-//         directive: &'a graphql_parser::schema::Directive<'a, String>,
-//     ) {
-//         self.current_args = Some(directive.arguments.clone());
-//     }
+impl<'a> Visitor<'a> for ArgumentsOfCorrectType<'a> {
+    fn enter_directive(
+        &mut self,
+        _ctx: &mut ValidationContext,
+        directive: &'a graphql_parser::schema::Directive<'a, String>,
+    ) {
+        self.current_args = Some(directive.arguments.clone());
+    }
 
-//     fn exit_directive(
-//         &mut self,
-//         _ctx: &mut ValidationContext,
-//         _directive: &'a graphql_parser::schema::Directive<'a, String>,
-//     ) {
-//         self.current_args = None;
-//     }
+    fn exit_directive(
+        &mut self,
+        _ctx: &mut ValidationContext,
+        _directive: &'a graphql_parser::schema::Directive<'a, String>,
+    ) {
+        self.current_args = None;
+    }
 
-//     fn enter_field(
-//         &mut self,
-//         _ctx: &mut ValidationContext,
-//         field: &'a graphql_parser::query::Field<'a, String>,
-//     ) {
-//         self.current_args = Some(field.arguments.clone());
-//     }
+    fn enter_field(
+        &mut self,
+        _ctx: &mut ValidationContext,
+        field: &'a graphql_parser::query::Field<'a, String>,
+    ) {
+        self.current_args = Some(field.arguments.clone());
+    }
 
-//     fn exit_field(
-//         &mut self,
-//         _ctx: &mut ValidationContext,
-//         _field: &'a graphql_parser::query::Field<'a, String>,
-//     ) {
-//         self.current_args = None;
-//     }
+    fn exit_field(
+        &mut self,
+        _ctx: &mut ValidationContext,
+        _field: &'a graphql_parser::query::Field<'a, String>,
+    ) {
+        self.current_args = None;
+    }
 
-//     fn enter_argument(
-//         &mut self,
-//         _ctx: &mut ValidationContext,
-//         arg: &'a (String, Value<'a, String>),
-//     ) {
-//         let (arg_name, arg_value) = &arg;
+    fn enter_argument(
+        &mut self,
+        ctx: &mut ValidationContext,
+        arg_name: &'a str,
+        arg_value: &'a Value<'a, String>,
+    ) {
+        match &self.current_args {
+            Some(args) => {
+                let target_arg = args.iter().find(|arg| arg.0 == arg_name);
+                if target_arg.is_none() {
+                    return;
+                }
 
-//         if let Some(target_arg) = self
-//             .current_args
-//             .and_then(|args| args.iter().find(|a| a.0 == arg_name.clone()))
-//         {}
-//     }
-// }
+                if let Some(vars) = &ctx.variables {
+                    if let Some(def) = vars.get(arg_name) {
+                        if let Some(err_msg) =
+                            check_valid_input_value(&ctx.schema, &def.var_type, arg_value)
+                        {
+                            ctx.add_error(format!("Invalid value for argument {}", err_msg), vec![])
+                        }
+                    }
+                }
+            }
+            None => return,
+        }
+    }
+}

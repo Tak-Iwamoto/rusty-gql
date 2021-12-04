@@ -20,10 +20,15 @@ pub struct ValidationContext<'a> {
     pub(crate) schema: &'a Schema,
     pub(crate) errors: Vec<ValidationError>,
     pub(crate) fragments: HashMap<String, FragmentDefinition<'a, String>>,
+    pub(crate) variables: Option<HashMap<String, VariableDefinition<'a, String>>>,
 }
 
 impl<'a> ValidationContext<'a> {
-    pub fn new(schema: &'a Schema, doc: &'a Document<'a, String>) -> Self {
+    pub fn new(
+        schema: &'a Schema,
+        doc: &'a Document<'a, String>,
+        variables: Option<HashMap<String, VariableDefinition<'a, String>>>,
+    ) -> Self {
         let mut fragments = HashMap::new();
         for def in &doc.definitions {
             match def {
@@ -40,6 +45,7 @@ impl<'a> ValidationContext<'a> {
             schema,
             errors: vec![],
             fragments,
+            variables,
         }
     }
 
