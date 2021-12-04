@@ -38,7 +38,7 @@ impl<'a> Visitor<'a> for KnownTypeNames {
 }
 
 fn validate(ctx: &mut ValidationContext, name: &str, position: Pos) {
-    if ctx.schema.type_map.get(name).is_none() {
+    if ctx.schema.type_map.contains_key(name) {
         ctx.add_error(format!("Unknown type {}", name), vec![position])
     }
 }

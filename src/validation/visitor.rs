@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use graphql_parser::{
     query::{
         Definition, Document, Field, FragmentDefinition, FragmentSpread, InlineFragment,
@@ -17,13 +19,27 @@ pub struct ValidationError {
 pub struct ValidationContext<'a> {
     pub(crate) schema: &'a Schema,
     pub(crate) errors: Vec<ValidationError>,
+    pub(crate) fragments: HashMap<String, FragmentDefinition<'a, String>>,
 }
 
 impl<'a> ValidationContext<'a> {
-    pub fn new(schema: &'a Schema) -> Self {
+    pub fn new(schema: &'a Schema, doc: &'a Document<'a, String>) -> Self {
+        let mut fragments = HashMap::new();
+        for def in &doc.definitions {
+            match def {
+                Definition::Operation(_) => {
+                    continue;
+                }
+                Definition::Fragment(fragment) => {
+                    let name = fragment.name.clone();
+                    fragments.insert(name, fragment.clone());
+                }
+            }
+        }
         ValidationContext {
             schema,
             errors: vec![],
+            fragments,
         }
     }
 
