@@ -170,7 +170,7 @@ pub trait Visitor<'a> {
     fn enter_argument(
         &mut self,
         _ctx: &mut ValidationContext,
-        _arg_name: &str,
+        _arg_name: &'a str,
         _arg_value: &'a Value<'a, String>,
     ) {
     }

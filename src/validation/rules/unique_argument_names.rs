@@ -27,9 +27,12 @@ impl<'a> Visitor<'a> for UniqueArgumentNames<'a> {
 
     fn enter_argument(
         &mut self,
-        _ctx: &mut crate::validation::visitor::ValidationContext,
-        arg_name: &str,
-        arg_value: &'a Value<'a, String>,
+        ctx: &mut crate::validation::visitor::ValidationContext,
+        arg_name: &'a str,
+        _arg_value: &'a Value<'a, String>,
     ) {
+        if !self.names.insert(arg_name) {
+            ctx.add_error(format!("{} is already contained.", arg_name), vec![])
+        }
     }
 }
