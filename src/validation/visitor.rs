@@ -13,6 +13,7 @@ pub struct ValidationError {
     pub(crate) positions: Vec<Pos>,
     pub(crate) message: String,
 }
+
 pub struct ValidationContext<'a> {
     pub(crate) schema: &'a Schema,
     pub(crate) errors: Vec<ValidationError>,
@@ -54,12 +55,14 @@ pub trait Visitor<'a> {
     fn enter_fragment_definition(
         &mut self,
         _ctx: &mut ValidationContext,
+        _name: &'a str,
         _fragment_definition: &'a FragmentDefinition<'a, String>,
     ) {
     }
     fn exit_fragment_definition(
         &mut self,
         _ctx: &mut ValidationContext,
+        _name: &'a str,
         _fragment_definition: &'a FragmentDefinition<'a, String>,
     ) {
     }
@@ -80,14 +83,14 @@ pub trait Visitor<'a> {
     fn enter_selection(
         &mut self,
         _ctx: &mut ValidationContext,
-        _selection_set: &'a Selection<'a, String>,
+        _selection: &'a Selection<'a, String>,
     ) {
     }
 
     fn exit_selection(
         &mut self,
         _ctx: &mut ValidationContext,
-        _selection_set: &'a Selection<'a, String>,
+        _selection: &'a Selection<'a, String>,
     ) {
     }
     fn enter_directive(
@@ -148,8 +151,20 @@ pub trait Visitor<'a> {
     ) {
     }
 
-    fn enter_argument(&mut self, _ctx: &mut ValidationContext, _arg: &'a Value<'a, String>) {}
-    fn exit_argument(&mut self, _ctx: &mut ValidationContext, _arg: &'a Value<'a, String>) {}
+    fn enter_argument(
+        &mut self,
+        _ctx: &mut ValidationContext,
+        _arg_name: &str,
+        _arg_value: &'a Value<'a, String>,
+    ) {
+    }
+    fn exit_argument(
+        &mut self,
+        _ctx: &mut ValidationContext,
+        _arg_name: &str,
+        _arg_value: &'a Value<'a, String>,
+    ) {
+    }
 }
 
 pub fn visit<'a, T: Visitor<'a>>(
@@ -182,7 +197,9 @@ fn visit_definition<'a, T: Visitor<'a>>(
 ) {
     match definition {
         Definition::Operation(op) => visit_operation_definition(visitor, ctx, op),
-        Definition::Fragment(fragment_def) => visitor.enter_fragment_definition(ctx, fragment_def),
+        Definition::Fragment(fragment_def) => {
+            visitor.enter_fragment_definition(ctx, &fragment_def.name, fragment_def)
+        }
     }
 }
 
@@ -192,8 +209,95 @@ fn visit_operation_definition<'a, T: Visitor<'a>>(
     operation_definition: &'a OperationDefinition<'a, String>,
 ) {
     visitor.enter_operation_definition(ctx, operation_definition);
-    visit_operation_definition(visitor, ctx, operation_definition);
     visitor.exit_operation_definition(ctx, operation_definition);
+}
+
+fn visit_selection_set<'a, T: Visitor<'a>>(
+    visitor: &mut T,
+    ctx: &mut ValidationContext<'a>,
+    selection_set: &'a SelectionSet<'a, String>,
+) {
+    if !selection_set.items.is_empty() {
+        visitor.enter_selection_set(ctx, selection_set);
+        for selection in &selection_set.items {}
+        visitor.exit_selection_set(ctx, selection_set);
+    }
+}
+
+fn visit_selection<'a, T: Visitor<'a>>(
+    visitor: &mut T,
+    ctx: &mut ValidationContext<'a>,
+    selection: &'a Selection<'a, String>,
+) {
+    visitor.enter_selection(ctx, selection);
+    match selection {
+        Selection::Field(field) => if field.name == "__typename" {},
+        Selection::FragmentSpread(fragment_spread) => {}
+        Selection::InlineFragment(inline_fragment) => {}
+    }
+}
+
+fn visit_field<'a, T: Visitor<'a>>(
+    visitor: &mut T,
+    ctx: &mut ValidationContext<'a>,
+    field: &'a Field<'a, String>,
+) {
+    visitor.enter_field(ctx, field);
+
+    for (arg_name, arg_value) in &field.arguments {
+        visitor.enter_argument(ctx, arg_name, arg_value);
+        visitor.exit_argument(ctx, arg_name, arg_value);
+    }
+    visitor.exit_field(ctx, field);
+}
+
+fn visit_fragment_definition<'a, T: Visitor<'a>>(
+    visitor: &mut T,
+    ctx: &mut ValidationContext<'a>,
+    name: &'a str,
+    fragment_definition: &'a FragmentDefinition<'a, String>,
+) {
+    visitor.enter_fragment_definition(ctx, name, fragment_definition);
+    visit_directives(visitor, ctx, &fragment_definition.directives);
+    visit_selection_set(visitor, ctx, &fragment_definition.selection_set);
+    visitor.exit_fragment_definition(ctx, name, fragment_definition);
+}
+
+fn visit_fragment_spread<'a, T: Visitor<'a>>(
+    visitor: &mut T,
+    ctx: &mut ValidationContext<'a>,
+    fragment_spread: &'a FragmentSpread<'a, String>,
+) {
+    visitor.enter_fragment_spread(ctx, fragment_spread);
+    visit_directives(visitor, ctx, &fragment_spread.directives);
+    visitor.exit_fragment_spread(ctx, fragment_spread);
+}
+
+fn visit_inline_fragment<'a, T: Visitor<'a>>(
+    visitor: &mut T,
+    ctx: &mut ValidationContext<'a>,
+    inline_fragment: &'a InlineFragment<'a, String>,
+) {
+    visitor.enter_inline_fragment(ctx, inline_fragment);
+    visit_directives(visitor, ctx, &inline_fragment.directives);
+    visit_selection_set(visitor, ctx, &inline_fragment.selection_set);
+    visitor.exit_inline_fragment(ctx, inline_fragment);
+}
+
+fn visit_directives<'a, T: Visitor<'a>>(
+    visitor: &mut T,
+    ctx: &mut ValidationContext<'a>,
+    directives: &'a [Directive<'a, String>],
+) {
+    for directive in directives {
+        visitor.enter_directive(ctx, directive);
+
+        for (arg_name, arg_value) in &directive.arguments {
+            visitor.enter_argument(ctx, arg_name, arg_value);
+            visitor.exit_argument(ctx, arg_name, arg_value);
+        }
+        visitor.exit_directive(ctx, directive);
+    }
 }
 
 fn exit_definition<'a, T: Visitor<'a>>(
@@ -203,7 +307,9 @@ fn exit_definition<'a, T: Visitor<'a>>(
 ) {
     match definition {
         Definition::Operation(op) => visitor.exit_operation_definition(ctx, op),
-        Definition::Fragment(fragment_def) => visitor.exit_fragment_definition(ctx, fragment_def),
+        Definition::Fragment(fragment_def) => {
+            visitor.exit_fragment_definition(ctx, &fragment_def.name, fragment_def)
+        }
     }
 }
 

@@ -39,6 +39,7 @@ impl<'a> Visitor<'a> for KnownDirectives {
     fn enter_fragment_definition(
         &mut self,
         _ctx: &mut ValidationContext,
+        _name: &'a str,
         _fragment_definition: &'a graphql_parser::query::FragmentDefinition<'a, String>,
     ) {
         self.location_stack
@@ -48,6 +49,7 @@ impl<'a> Visitor<'a> for KnownDirectives {
     fn exit_fragment_definition(
         &mut self,
         _ctx: &mut ValidationContext,
+        _name: &'a str,
         _fragment_definition: &'a graphql_parser::query::FragmentDefinition<'a, String>,
     ) {
         let top = self.location_stack.pop();

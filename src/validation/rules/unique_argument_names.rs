@@ -25,7 +25,11 @@ impl<'a> Visitor<'a> for UniqueArgumentNames<'a> {
         self.names.clear();
     }
 
-    fn enter_argument(&mut self, _ctx: &mut crate::validation::visitor::ValidationContext, arg: &'a Value<'a, String>) {
-
+    fn enter_argument(
+        &mut self,
+        _ctx: &mut crate::validation::visitor::ValidationContext,
+        arg_name: &str,
+        arg_value: &'a Value<'a, String>,
+    ) {
     }
 }

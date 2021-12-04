@@ -8,9 +8,10 @@ impl<'a> Visitor<'a> for KnownTypeNames {
     fn enter_fragment_definition(
         &mut self,
         ctx: &mut ValidationContext,
+        name: &'a str,
         fragment_definition: &'a graphql_parser::query::FragmentDefinition<'a, String>,
     ) {
-        validate(ctx, &fragment_definition.name, fragment_definition.position)
+        validate(ctx, name, fragment_definition.position)
     }
 
     fn enter_variable_definition(

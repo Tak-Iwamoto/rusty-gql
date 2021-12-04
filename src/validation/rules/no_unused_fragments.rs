@@ -71,11 +71,12 @@ impl<'a> Visitor<'a> for NoUnusedFragment<'a> {
     fn enter_fragment_definition(
         &mut self,
         _ctx: &mut ValidationContext,
+        name: &'a str,
         fragment_definition: &'a FragmentDefinition<'a, String>,
     ) {
-        self.current_scope = Some(Scope::Fragment(&fragment_definition.name));
+        self.current_scope = Some(Scope::Fragment(name));
         self.fragment_definitions
-            .insert((&fragment_definition.name, fragment_definition.position));
+            .insert((name, fragment_definition.position));
     }
 
     fn enter_fragment_spread(
