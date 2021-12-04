@@ -7,8 +7,7 @@ use graphql_parser::{query::Field, schema::Type};
 use crate::{
     context::{FieldContext, SelectionSetContext},
     operation::Operation,
-    types::value::value_from_ast,
-    GqlType, GqlValue, Response, Schema,
+    GqlMetaType, GqlValue, Response, Schema,
 };
 
 pub type ResolverFuture<'a> = BoxFuture<'a, Response<(String, GqlValue)>>;
@@ -31,44 +30,44 @@ impl<T: Resolver> Resolver for &T {
     }
 }
 
-pub fn get_variable_values<'a>(
-    schema: &'a Schema,
-    operation: &'a Operation<'a>,
-    input_values: &BTreeMap<String, GqlValue>,
-) -> Result<HashMap<String, GqlValue>, String> {
-    let mut variables = HashMap::new();
-    for var in &operation.variable_definitions {
-        let var_type = get_type_from_schema(schema, &var.var_type);
+// pub fn get_variable_values<'a>(
+//     schema: &'a Schema,
+//     operation: &'a Operation<'a>,
+//     input_values: &BTreeMap<String, GqlValue>,
+// ) -> Result<HashMap<String, GqlValue>, String> {
+//     let mut variables = HashMap::new();
+//     for var in &operation.variable_definitions {
+//         let var_type = get_type_from_schema(schema, &var.var_type);
 
-        let var_type = match var_type {
-            Some(ty) => ty,
-            None => continue,
-        };
+//         let var_type = match var_type {
+//             Some(ty) => ty,
+//             None => continue,
+//         };
 
-        let var_name = &var.name.to_string();
-        if !input_values.contains_key(var_name) {
-            if let Some(value) = &var.default_value {
-                variables.insert(
-                    var.name.to_string(),
-                    value_from_ast(value, &var_type, &None),
-                );
-            }
-        }
+//         let var_name = &var.name.to_string();
+//         if !input_values.contains_key(var_name) {
+//             if let Some(value) = &var.default_value {
+//                 variables.insert(
+//                     var.name.to_string(),
+//                     value_from_ast(value, &var_type, &None),
+//                 );
+//             }
+//         }
 
-        let value = input_values.get(var_name);
+//         let value = input_values.get(var_name);
 
-        if let GqlType::NonNull(_) = var_type {
-            if value.is_none() {
-                return Err(format!("{} must not be null", var_name));
-            }
-        }
+//         if let GqlMetaType::NonNull(_) = var_type {
+//             if value.is_none() {
+//                 return Err(format!("{} must not be null", var_name));
+//             }
+//         }
 
-        if let Some(var_value) = value {
-            variables.insert(var_name.to_string(), var_value.clone());
-        }
-    }
-    Ok(variables)
-}
+//         if let Some(var_value) = value {
+//             variables.insert(var_name.to_string(), var_value.clone());
+//         }
+//     }
+//     Ok(variables)
+// }
 
 pub fn get_arguments<'a>(field: Field<'a, String>, variable_values: HashMap<String, GqlValue>) {
     let arguments = field.arguments;
@@ -77,7 +76,7 @@ pub fn get_arguments<'a>(field: Field<'a, String>, variable_values: HashMap<Stri
 pub fn get_type_from_schema<'a>(
     schema: &'a Schema,
     var_type: &'a Type<'a, String>,
-) -> Option<GqlType> {
+) -> Option<GqlMetaType> {
     match var_type {
         graphql_parser::schema::Type::NamedType(named_type) => {
             return schema
@@ -87,13 +86,14 @@ pub fn get_type_from_schema<'a>(
         }
         graphql_parser::schema::Type::ListType(list) => {
             let inner_type = get_type_from_schema(schema, &list).unwrap();
-            let value = GqlType::List(Box::new(inner_type.clone()));
+            let value = GqlMetaType::List(Box::new(inner_type.clone()));
             return Some(value);
         }
         graphql_parser::schema::Type::NonNullType(non_null) => {
-            let inner_type = get_type_from_schema(schema, &non_null).unwrap();
-            let value = GqlType::NonNull(Box::new(inner_type.clone()));
-            return Some(value);
+            // let inner_type = get_type_from_schema(schema, &non_null).unwrap();
+            // let value = GqlMetaType::NonNull(Box::new(inner_type.clone()));
+            // return Some(value);
+            None
         }
     }
 }

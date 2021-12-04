@@ -20,7 +20,7 @@ pub use operation::OperationType;
 pub use resolver::{Resolver, SelectionSetResolver};
 pub use template::GraphiQLTemplate;
 pub use types::schema::build_schema;
-pub use types::{GqlField, GqlType, GqlValue, Schema};
+pub use types::{GqlField, GqlMetaType, GqlValue, Schema};
 
 pub type Response<T> = ::std::result::Result<T, GqlError>;
 

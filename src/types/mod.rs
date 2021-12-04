@@ -14,6 +14,6 @@ pub mod value;
 pub mod schema;
 pub use argument::GqlArgument;
 pub use field::GqlField;
-pub use gql_type::GqlType;
+pub use gql_type::GqlMetaType;
 pub use schema::Schema;
 pub use value::GqlValue;

@@ -2,7 +2,7 @@ use std::{collections::BTreeMap, io::Error};
 
 use codegen::Scope;
 use futures::future::try_join_all;
-use rusty_gql::{self, build_schema, GqlField, GqlType, OperationType};
+use rusty_gql::{self, build_schema, GqlField, GqlMetaType, OperationType};
 use tokio::io::AsyncWriteExt;
 
 async fn generate_graphql_schema(schema_doc: &str) -> Result<(), Error> {
@@ -69,7 +69,7 @@ async fn generate_operation_file(
     Ok(())
 }
 
-fn generate_types(types_map: &BTreeMap<String, GqlType>) {
+fn generate_types(types_map: &BTreeMap<String, GqlMetaType>) {
     for (key, gql_type) in types_map.iter() {
         let mut scope = Scope::new();
     }

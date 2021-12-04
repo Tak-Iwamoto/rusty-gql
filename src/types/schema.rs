@@ -7,7 +7,7 @@ use super::{
     directive::{GqlDirective, GqlDirectiveDefinition},
     field::GqlField,
     gql_enum::{GqlEnum, GqlEnumValue},
-    gql_type::GqlType,
+    gql_type::GqlMetaType,
     gql_union::GqlUnion,
     input_object::GqlInputObject,
     interface::GqlInterface,
@@ -21,7 +21,7 @@ pub struct Schema {
     pub mutations: BTreeMap<String, GqlField>,
     pub subscriptions: BTreeMap<String, GqlField>,
     pub directives: BTreeMap<String, GqlDirectiveDefinition>,
-    pub type_map: BTreeMap<String, GqlType>,
+    pub type_map: BTreeMap<String, GqlMetaType>,
     pub query_root_type: Option<String>,
     pub mutation_root_type: Option<String>,
     pub subscription_root_type: Option<String>,
@@ -66,7 +66,7 @@ pub fn build_schema(schema_doc: &str) -> Result<Schema, GqlError> {
             graphql_parser::schema::Definition::TypeDefinition(type_def) => match type_def {
                 graphql_parser::schema::TypeDefinition::Scalar(scalar) => {
                     let gql_scalar = GqlScalar::from(scalar);
-                    type_map.insert(gql_scalar.name.to_string(), GqlType::Scalar(gql_scalar));
+                    type_map.insert(gql_scalar.name.to_string(), GqlMetaType::Scalar(gql_scalar));
                 }
 
                 graphql_parser::schema::TypeDefinition::Object(obj) => match &*obj.name {
@@ -87,29 +87,29 @@ pub fn build_schema(schema_doc: &str) -> Result<Schema, GqlError> {
                     }
                     _ => {
                         let gql_object = GqlObject::from(obj);
-                        type_map.insert(gql_object.name.to_string(), GqlType::Object(gql_object));
+                        type_map.insert(gql_object.name.to_string(), GqlMetaType::Object(gql_object));
                     }
                 },
                 graphql_parser::schema::TypeDefinition::Interface(interface) => {
                     let gql_interface = GqlInterface::from(interface);
                     type_map.insert(
                         gql_interface.name.to_string(),
-                        GqlType::Interface(gql_interface),
+                        GqlMetaType::Interface(gql_interface),
                     );
                 }
                 graphql_parser::schema::TypeDefinition::Union(uni) => {
                     let gql_union = GqlUnion::from(uni);
-                    type_map.insert(gql_union.name.to_string(), GqlType::Union(gql_union));
+                    type_map.insert(gql_union.name.to_string(), GqlMetaType::Union(gql_union));
                 }
                 graphql_parser::schema::TypeDefinition::Enum(enum_type) => {
                     let gql_enum = GqlEnum::from(enum_type);
-                    type_map.insert(gql_enum.name.to_string(), GqlType::Enum(gql_enum));
+                    type_map.insert(gql_enum.name.to_string(), GqlMetaType::Enum(gql_enum));
                 }
                 graphql_parser::schema::TypeDefinition::InputObject(input) => {
                     let gql_input_obj = GqlInputObject::from(input);
                     type_map.insert(
                         gql_input_obj.name.to_string(),
-                        GqlType::Input(gql_input_obj),
+                        GqlMetaType::Input(gql_input_obj),
                     );
                 }
             },
@@ -118,7 +118,7 @@ pub fn build_schema(schema_doc: &str) -> Result<Schema, GqlError> {
                     let original_name = scalar_ext.name.clone();
                     match type_map.get(&original_name) {
                         Some(original_scalar) => {
-                            if let GqlType::Scalar(original) = original_scalar {
+                            if let GqlMetaType::Scalar(original) = original_scalar {
                                 let mut extended_directives = original.directives.clone();
                                 let mut directives =
                                     GqlDirective::from_vec_directive(scalar_ext.directives);
@@ -130,7 +130,7 @@ pub fn build_schema(schema_doc: &str) -> Result<Schema, GqlError> {
                                     name: original_name.clone(),
                                     directives: extended_directives,
                                 };
-                                type_map.insert(original_name, GqlType::Scalar(extended_scalar));
+                                type_map.insert(original_name, GqlMetaType::Scalar(extended_scalar));
                             }
                         }
                         None => {
@@ -145,7 +145,7 @@ pub fn build_schema(schema_doc: &str) -> Result<Schema, GqlError> {
                     let original_name = obj_ext.name.clone();
                     match type_map.get(&original_name) {
                         Some(original_obj) => {
-                            if let GqlType::Object(original) = original_obj {
+                            if let GqlMetaType::Object(original) = original_obj {
                                 let mut extended_directives = original.directives.clone();
                                 let mut directives =
                                     GqlDirective::from_vec_directive(obj_ext.directives);
@@ -170,7 +170,7 @@ pub fn build_schema(schema_doc: &str) -> Result<Schema, GqlError> {
                                 };
                                 type_map.insert(
                                     original_name.to_string(),
-                                    GqlType::Object(extended_obj),
+                                    GqlMetaType::Object(extended_obj),
                                 );
                             }
                         }
@@ -186,7 +186,7 @@ pub fn build_schema(schema_doc: &str) -> Result<Schema, GqlError> {
                     let original_name = inter_ext.name.clone();
                     match type_map.get(&original_name) {
                         Some(original_interface) => {
-                            if let GqlType::Interface(original) = original_interface {
+                            if let GqlMetaType::Interface(original) = original_interface {
                                 let mut extended_directives = original.directives.clone();
                                 let mut directives =
                                     GqlDirective::from_vec_directive(inter_ext.directives);
@@ -205,7 +205,7 @@ pub fn build_schema(schema_doc: &str) -> Result<Schema, GqlError> {
                                 };
                                 type_map.insert(
                                     original_name.to_string(),
-                                    GqlType::Interface(extended_interface),
+                                    GqlMetaType::Interface(extended_interface),
                                 );
                             }
                         }
@@ -221,7 +221,7 @@ pub fn build_schema(schema_doc: &str) -> Result<Schema, GqlError> {
                     let original_name = union_ext.name.clone();
                     match type_map.get(&original_name) {
                         Some(original_union) => {
-                            if let GqlType::Union(original) = original_union {
+                            if let GqlMetaType::Union(original) = original_union {
                                 let mut extended_directives = original.directives.clone();
                                 let mut directives =
                                     GqlDirective::from_vec_directive(union_ext.directives.clone());
@@ -239,7 +239,7 @@ pub fn build_schema(schema_doc: &str) -> Result<Schema, GqlError> {
                                 };
                                 type_map.insert(
                                     original_name.to_string(),
-                                    GqlType::Union(extended_union),
+                                    GqlMetaType::Union(extended_union),
                                 );
                             }
                         }
@@ -255,7 +255,7 @@ pub fn build_schema(schema_doc: &str) -> Result<Schema, GqlError> {
                     let original_name = enum_ext.name.clone();
                     match type_map.get(&original_name) {
                         Some(original_enum) => {
-                            if let GqlType::Enum(original) = original_enum {
+                            if let GqlMetaType::Enum(original) = original_enum {
                                 let mut extended_directives = original.directives.clone();
                                 let mut directives =
                                     GqlDirective::from_vec_directive(enum_ext.directives.clone());
@@ -277,7 +277,7 @@ pub fn build_schema(schema_doc: &str) -> Result<Schema, GqlError> {
                                     values: extended_values,
                                 };
                                 let gql_enum = GqlEnum::from(extended_enum);
-                                type_map.insert(original_name.to_string(), GqlType::Enum(gql_enum));
+                                type_map.insert(original_name.to_string(), GqlMetaType::Enum(gql_enum));
                             }
                         }
                         None => {
@@ -292,7 +292,7 @@ pub fn build_schema(schema_doc: &str) -> Result<Schema, GqlError> {
                     let original_name = input_ext.name.clone();
                     match type_map.get(&original_name) {
                         Some(original_input) => {
-                            if let GqlType::Input(original) = original_input {
+                            if let GqlMetaType::Input(original) = original_input {
                                 let mut extended_directives = original.directives.clone();
                                 let mut directives =
                                     GqlDirective::from_vec_directive(input_ext.directives.clone());
@@ -312,7 +312,7 @@ pub fn build_schema(schema_doc: &str) -> Result<Schema, GqlError> {
                                 };
                                 type_map.insert(
                                     original_name.to_string(),
-                                    GqlType::Input(extended_input),
+                                    GqlMetaType::Input(extended_input),
                                 );
                             }
                         }
