@@ -11,15 +11,17 @@ use graphql_parser::{
 
 use crate::Schema;
 
+#[derive(Clone)]
 pub struct ValidationError {
     pub(crate) positions: Vec<Pos>,
     pub(crate) message: String,
 }
 
+#[derive(Clone)]
 pub struct ValidationContext<'a> {
     pub(crate) schema: &'a Schema,
     pub(crate) errors: Vec<ValidationError>,
-    pub(crate) fragments: HashMap<String, FragmentDefinition<'a, String>>,
+    pub(crate) fragments: &'a HashMap<String, FragmentDefinition<'a, String>>,
     pub(crate) variables: Option<HashMap<String, VariableDefinition<'a, String>>>,
     pub type_stack: Vec<Option<&'a Type<'a, String>>>,
     pub parent_type_stack: Vec<Option<&'a Type<'a, String>>>,
@@ -30,19 +32,8 @@ impl<'a> ValidationContext<'a> {
         schema: &'a Schema,
         doc: &'a Document<'a, String>,
         variables: Option<HashMap<String, VariableDefinition<'a, String>>>,
+        fragments: &'a HashMap<String, FragmentDefinition<'a, String>>,
     ) -> Self {
-        let mut fragments = HashMap::new();
-        for def in &doc.definitions {
-            match def {
-                Definition::Operation(_) => {
-                    continue;
-                }
-                Definition::Fragment(fragment) => {
-                    let name = fragment.name.clone();
-                    fragments.insert(name, fragment.clone());
-                }
-            }
-        }
         ValidationContext {
             schema,
             errors: vec![],
@@ -104,7 +95,7 @@ pub trait Visitor<'a> {
 
     fn enter_selection_set(
         &mut self,
-        _ctx: &mut ValidationContext,
+        _ctx: &mut ValidationContext<'a>,
         _selection_set: &'a SelectionSet<'a, String>,
     ) {
     }
