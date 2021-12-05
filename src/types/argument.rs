@@ -1,13 +1,13 @@
 use graphql_parser::{schema::InputValue, Pos};
 
-use super::{directive::GqlDirective, meta_type_name::GqlMetaTypeName, value::GqlValue};
+use super::{directive::GqlDirective, value_type::GqlValueType, value::GqlValue};
 
 #[derive(Debug, Clone)]
 pub struct GqlArgument {
     pub name: String,
     pub description: Option<String>,
     pub position: Pos,
-    pub meta_type: GqlMetaTypeName,
+    pub meta_type: GqlValueType,
     pub default_value: Option<GqlValue>,
     pub directives: Vec<GqlDirective>,
 }
@@ -25,7 +25,7 @@ impl GqlArgument {
 
 impl<'a> From<InputValue<'a, String>> for GqlArgument {
     fn from(input_value: InputValue<'a, String>) -> Self {
-        let meta_type = GqlMetaTypeName::from(input_value.value_type);
+        let meta_type = GqlValueType::from(input_value.value_type);
         let default_value = input_value
             .default_value
             .map_or(None, |value| Some(GqlValue::from(value)));

@@ -3,14 +3,14 @@ use graphql_parser::Pos;
 
 use super::argument::GqlArgument;
 use super::directive::GqlDirective;
-use super::meta_type_name::GqlMetaTypeName;
+use super::value_type::GqlValueType;
 
 #[derive(Debug, Clone)]
 pub struct GqlField {
     pub name: String,
     pub description: Option<String>,
     pub position: Pos,
-    pub meta_type: GqlMetaTypeName,
+    pub meta_type: GqlValueType,
     pub arguments: Vec<GqlArgument>,
     pub directives: Vec<GqlDirective>,
 }
@@ -26,7 +26,7 @@ impl GqlField {
 
 impl<'a> From<Field<'a, String>> for GqlField {
     fn from(field: Field<'a, String>) -> Self {
-        let meta_type = GqlMetaTypeName::from(field.field_type);
+        let meta_type = GqlValueType::from(field.field_type);
         let directives = GqlDirective::from_vec_directive(field.directives);
         let arguments = GqlArgument::from_vec_input_value(field.arguments);
 

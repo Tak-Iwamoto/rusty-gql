@@ -7,7 +7,7 @@ use graphql_parser::{
 };
 
 use crate::{
-    types::{GqlMetaTypeName, GqlScalar},
+    types::{GqlValueType, GqlScalar},
     GqlMetaType, Schema,
 };
 
@@ -68,7 +68,7 @@ pub fn check_valid_input_value(
                                         value,
                                     );
                                 } else if field.default_value.is_none()
-                                    && matches!(field.meta_type, GqlMetaTypeName::NonNullType(_))
+                                    && matches!(field.meta_type, GqlValueType::NonNullType(_))
                                 {
                                     return Some(format!(
                                         "field {} of type {} is non null type but not provided",
