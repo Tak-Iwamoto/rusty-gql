@@ -16,7 +16,7 @@ impl<'a> Visitor<'a> for FragmentsOnCompositeTypes {
     ) {
         if let Some(current_type) = ctx.current_type() {
             let type_name = get_type_name(current_type);
-            let target_type = ctx.schema.type_map.get(&type_name);
+            let target_type = ctx.schema.type_definitions.get(&type_name);
 
             if let Some(ty) = target_type {
                 if !ty.is_composite_type() {
@@ -36,7 +36,7 @@ impl<'a> Visitor<'a> for FragmentsOnCompositeTypes {
     ) {
         if let Some(current_type) = ctx.current_type() {
             let type_name = get_type_name(current_type);
-            let target_type = ctx.schema.type_map.get(&type_name);
+            let target_type = ctx.schema.type_definitions.get(&type_name);
 
             if let Some(ty) = target_type {
                 if !ty.is_composite_type() {

@@ -8,7 +8,7 @@ impl<'a> Visitor<'a> for VariablesAreInputTypes {
         ctx: &mut ValidationContext,
         variable_definition: &'a graphql_parser::query::VariableDefinition<'a, String>,
     ) {
-        let gql_type = ctx.schema.type_map.get(&variable_definition.name);
+        let gql_type = ctx.schema.type_definitions.get(&variable_definition.name);
 
         if let Some(variable_type) = gql_type {
             if !variable_type.is_input_type() {

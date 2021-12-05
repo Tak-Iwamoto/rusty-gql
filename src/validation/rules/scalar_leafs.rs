@@ -11,11 +11,11 @@ impl<'a> Visitor<'a> for ScalarLeafs {
     fn enter_field(&mut self, ctx: &mut ValidationContext, field: &'a Field<'a, String>) {
         if let Some(parent_type) = ctx.parent_type() {
             let type_name = get_type_name(parent_type);
-            let parent = ctx.schema.type_map.get(&type_name);
+            let parent = ctx.schema.type_definitions.get(&type_name);
 
             if let Some(parent_gql_type) = parent {
                 if let Some(target_field) = parent_gql_type.get_field_by_name(&field.name) {
-                    let target = ctx.schema.type_map.get(&target_field.name);
+                    let target = ctx.schema.type_definitions.get(&target_field.name);
 
                     if let Some(f) = target {
                         if f.is_leaf_type() && !field.selection_set.items.is_empty() {

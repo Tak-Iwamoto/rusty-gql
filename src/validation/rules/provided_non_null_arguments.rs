@@ -39,7 +39,7 @@ impl<'a> Visitor<'a> for ProvidedNonNullArguments {
     fn enter_field(&mut self, ctx: &mut ValidationContext, field: &'a Field<'a, String>) {
         if let Some(parent_type) = ctx.parent_type() {
             let type_name = get_type_name(parent_type);
-            if let Some(parent_gql_type) = ctx.schema.type_map.get(&type_name) {
+            if let Some(parent_gql_type) = ctx.schema.type_definitions.get(&type_name) {
                 if let Some(target_field) = parent_gql_type.get_field_by_name(&field.name) {
                     for arg in &target_field.arguments {
                         if arg.meta_type.is_non_null()

@@ -6,8 +6,7 @@ use graphql_parser::{query::Field, schema::Type};
 
 use crate::{
     context::{FieldContext, SelectionSetContext},
-    operation::Operation,
-    GqlMetaType, GqlValue, Response, Schema,
+    GqlTypeDefinition, GqlValue, Response, Schema,
 };
 
 pub type ResolverFuture<'a> = BoxFuture<'a, Response<(String, GqlValue)>>;
@@ -76,10 +75,10 @@ pub fn get_arguments<'a>(field: Field<'a, String>, variable_values: HashMap<Stri
 pub fn get_type_from_schema<'a>(
     schema: &'a Schema,
     var_type: &'a Type<'a, String>,
-) -> Option<GqlMetaType> {
+) -> Option<GqlTypeDefinition> {
     match var_type {
         graphql_parser::schema::Type::NamedType(named_type) => schema
-            .type_map
+            .type_definitions
             .get(&named_type.to_string())
             .map(|var_ty| var_ty.clone()),
         graphql_parser::schema::Type::ListType(list) => {
@@ -90,27 +89,5 @@ pub fn get_type_from_schema<'a>(
             let inner_type = get_type_from_schema(schema, &non_null).unwrap();
             Some(inner_type)
         }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use crate::{
-        context::build_context,
-        operation::{build_operation, ArcOperation},
-        types::schema::{build_schema, ArcSchema},
-    };
-    use std::fs;
-
-    #[test]
-    fn it_works() {
-        let schema_doc = fs::read_to_string("src/tests/github.graphql").unwrap();
-        let query_doc = fs::read_to_string("src/tests/github_query.graphql").unwrap();
-
-        let schema = ArcSchema::new(build_schema(schema_doc.as_str()).unwrap());
-        let query = build_operation(query_doc.as_str(), &schema, None).unwrap();
-
-        let operation = ArcOperation::new(query);
-        let context = build_context(&schema, &operation);
     }
 }

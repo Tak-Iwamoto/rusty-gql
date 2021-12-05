@@ -1,8 +1,6 @@
-use std::collections::{BTreeMap, HashMap};
+use std::collections::BTreeMap;
 
 use graphql_parser::schema::Value;
-
-use crate::GqlMetaType;
 
 #[derive(Debug, Clone)]
 pub enum GqlValue {

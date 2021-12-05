@@ -7,8 +7,8 @@ use graphql_parser::{
 };
 
 use crate::{
-    types::{GqlValueType, GqlScalar},
-    GqlMetaType, Schema,
+    types::{GqlScalar, GqlValueType},
+    GqlTypeDefinition, Schema,
 };
 
 use super::visitor::ValidationContext;
@@ -44,17 +44,17 @@ pub fn check_valid_input_value(
             if let Value::Null = value {
                 return None;
             }
-            let type_def = schema.type_map.get(type_name);
+            let type_def = schema.type_definitions.get(type_name);
             match type_def {
                 Some(def) => match def {
-                    GqlMetaType::Scalar(_) => {
+                    GqlTypeDefinition::Scalar(_) => {
                         if GqlScalar::is_valid_value(value) {
                             None
                         } else {
                             Some("Invalid type".to_string())
                         }
                     }
-                    GqlMetaType::InputObject(input_object) => match value {
+                    GqlTypeDefinition::InputObject(input_object) => match value {
                         Value::Object(object_value) => {
                             let mut value_keys: HashSet<String> =
                                 object_value.keys().cloned().collect::<HashSet<String>>();
@@ -86,7 +86,7 @@ pub fn check_valid_input_value(
                         }
                         _ => None,
                     },
-                    GqlMetaType::Enum(enum_value) => match value {
+                    GqlTypeDefinition::Enum(enum_value) => match value {
                         Value::String(name) => {
                             if enum_value.contains(&name) {
                                 Some(format!(
