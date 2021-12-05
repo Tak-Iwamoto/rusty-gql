@@ -63,10 +63,10 @@ impl<'a> Visitor<'a> for NoUnusedFragment<'a> {
     fn enter_operation_definition(
         &mut self,
         _ctx: &mut ValidationContext<'a>,
-        _name: Option<&'a str>,
-        operation_definition: &'a OperationDefinition<'a, String>,
+        name: Option<&'a str>,
+        _operation_definition: &'a OperationDefinition<'a, String>,
     ) {
-        // self.current_scope = Some(Scope::Operation(operation_definition.))
+        self.current_scope = Some(Scope::Operation(name));
     }
 
     fn enter_fragment_definition(
@@ -91,13 +91,6 @@ impl<'a> Visitor<'a> for NoUnusedFragment<'a> {
                 .or_insert_with(Vec::new)
                 .push(&fragment_spread.fragment_name)
         }
-    }
-
-    fn enter_inline_fragment(
-        &mut self,
-        _ctx: &mut ValidationContext,
-        _inline_fragment: &'a InlineFragment<'a, String>,
-    ) {
     }
 }
 

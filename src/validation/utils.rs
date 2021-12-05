@@ -157,3 +157,24 @@ pub fn get_type_name(ty: &Type<'_, String>) -> String {
         Type::NonNullType(non_null) => get_type_name(non_null),
     }
 }
+
+pub fn referenced_variables<'a>(value: &'a Value<'a, String>) -> Vec<&'a str> {
+    let mut vars = Vec::new();
+    referenced_variables_to_vec(value, &mut vars);
+    vars
+}
+
+fn referenced_variables_to_vec<'a>(value: &'a Value<'a, String>, vars: &mut Vec<&'a str>) {
+    match value {
+        Value::Variable(name) => {
+            vars.push(name);
+        }
+        Value::List(values) => values
+            .iter()
+            .for_each(|value| referenced_variables_to_vec(value, vars)),
+        Value::Object(obj) => obj
+            .values()
+            .for_each(|value| referenced_variables_to_vec(value, vars)),
+        _ => {}
+    }
+}
