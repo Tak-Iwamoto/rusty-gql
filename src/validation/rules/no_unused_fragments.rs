@@ -63,6 +63,7 @@ impl<'a> Visitor<'a> for NoUnusedFragment<'a> {
     fn enter_operation_definition(
         &mut self,
         _ctx: &mut ValidationContext<'a>,
+        _name: Option<&'a str>,
         operation_definition: &'a OperationDefinition<'a, String>,
     ) {
         // self.current_scope = Some(Scope::Operation(operation_definition.))

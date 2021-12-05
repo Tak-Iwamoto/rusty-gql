@@ -15,8 +15,6 @@ mod possible_fragment_spreads;
 mod provided_non_null_arguments;
 mod scalar_leafs;
 mod unique_argument_names;
-mod unique_input_field_names;
-mod unique_operation_names;
 mod unique_variable_names;
 mod variables_are_input_types;
 mod variables_in_allowed_position;

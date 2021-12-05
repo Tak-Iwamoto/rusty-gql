@@ -10,6 +10,7 @@ impl<'a> Visitor<'a> for UniqueVariableNames<'a> {
     fn enter_operation_definition(
         &mut self,
         _ctx: &mut ValidationContext<'a>,
+        _name: Option<&'a str>,
         _operation_definition: &'a graphql_parser::query::OperationDefinition<'a, String>,
     ) {
         self.names.clear();

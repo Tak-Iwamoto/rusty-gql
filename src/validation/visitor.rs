@@ -75,12 +75,14 @@ pub trait Visitor<'a> {
     fn enter_operation_definition(
         &mut self,
         _ctx: &mut ValidationContext<'a>,
+        _name: Option<&'a str>,
         _operation_definition: &'a OperationDefinition<'a, String>,
     ) {
     }
     fn exit_operation_definition(
         &mut self,
         _ctx: &mut ValidationContext<'a>,
+        _name: Option<&'a str>,
         _operation_definition: &'a OperationDefinition<'a, String>,
     ) {
     }
@@ -204,9 +206,10 @@ pub fn visit<'a, T: Visitor<'a>>(
     visitor: &mut T,
     ctx: &mut ValidationContext<'a>,
     doc: &'a Document<'a, String>,
+    operation_name: Option<&'a str>,
 ) {
     visitor.enter_document(ctx, doc);
-    visit_definitions(visitor, ctx, &doc.definitions);
+    visit_definitions(visitor, ctx, &doc.definitions, operation_name);
     visitor.exit_document(ctx, doc);
 }
 
@@ -214,11 +217,12 @@ fn visit_definitions<'a, T: Visitor<'a>>(
     visitor: &mut T,
     ctx: &mut ValidationContext<'a>,
     definitions: &'a [Definition<'a, String>],
+    operation_name: Option<&'a str>,
 ) {
     for def in definitions {
         match def {
             Definition::Operation(operation_definition) => {
-                visit_operation_definition(visitor, ctx, operation_definition);
+                visit_operation_definition(visitor, ctx, operation_name, operation_definition);
             }
             Definition::Fragment(fragment_definition) => visit_fragment_definition(
                 visitor,
@@ -227,7 +231,7 @@ fn visit_definitions<'a, T: Visitor<'a>>(
                 fragment_definition,
             ),
         }
-        exit_definition(visitor, ctx, def);
+        exit_definition(visitor, ctx, def, operation_name);
     }
 }
 
@@ -235,9 +239,12 @@ fn visit_definition<'a, T: Visitor<'a>>(
     visitor: &mut T,
     ctx: &mut ValidationContext<'a>,
     definition: &'a Definition<'a, String>,
+    operation_name: Option<&'a str>,
 ) {
     match definition {
-        Definition::Operation(op) => visit_operation_definition(visitor, ctx, op),
+        Definition::Operation(operation_definition) => {
+            visit_operation_definition(visitor, ctx, operation_name, operation_definition)
+        }
         Definition::Fragment(fragment_def) => {
             visitor.enter_fragment_definition(ctx, &fragment_def.name, fragment_def)
         }
@@ -247,9 +254,10 @@ fn visit_definition<'a, T: Visitor<'a>>(
 fn visit_operation_definition<'a, T: Visitor<'a>>(
     visitor: &mut T,
     ctx: &mut ValidationContext<'a>,
+    name: Option<&'a str>,
     operation_definition: &'a OperationDefinition<'a, String>,
 ) {
-    visitor.enter_operation_definition(ctx, operation_definition);
+    visitor.enter_operation_definition(ctx, name, operation_definition);
 
     match operation_definition {
         OperationDefinition::SelectionSet(selection_set) => {
@@ -271,7 +279,7 @@ fn visit_operation_definition<'a, T: Visitor<'a>>(
             visit_selection_set(visitor, ctx, &subscription.selection_set);
         }
     }
-    visitor.exit_operation_definition(ctx, operation_definition);
+    visitor.exit_operation_definition(ctx, name, operation_definition);
 }
 
 fn visit_selection_set<'a, T: Visitor<'a>>(
@@ -375,9 +383,10 @@ fn exit_definition<'a, T: Visitor<'a>>(
     visitor: &mut T,
     ctx: &mut ValidationContext<'a>,
     definition: &'a Definition<'a, String>,
+    operation_name: Option<&'a str>,
 ) {
     match definition {
-        Definition::Operation(op) => visitor.exit_operation_definition(ctx, op),
+        Definition::Operation(op) => visitor.exit_operation_definition(ctx, operation_name, op),
         Definition::Fragment(fragment_def) => {
             visitor.exit_fragment_definition(ctx, &fragment_def.name, fragment_def)
         }

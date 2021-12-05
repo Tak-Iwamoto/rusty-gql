@@ -13,6 +13,7 @@ impl<'a> Visitor<'a> for KnownDirectives {
     fn enter_operation_definition(
         &mut self,
         _ctx: &mut ValidationContext<'a>,
+        _name: Option<&'a str>,
         operation_definition: &'a OperationDefinition<'a, String>,
     ) {
         self.location_stack.push(match operation_definition {
@@ -26,6 +27,7 @@ impl<'a> Visitor<'a> for KnownDirectives {
     fn exit_operation_definition(
         &mut self,
         _ctx: &mut ValidationContext<'a>,
+        _name: Option<&'a str>,
         _operation_definition: &'a OperationDefinition<'a, String>,
     ) {
         let top = self.location_stack.pop();
