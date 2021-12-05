@@ -9,7 +9,7 @@ use crate::{
 
 use super::visitor::ValidationContext;
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
 pub enum Scope<'a> {
     Operation(Option<&'a str>),
     Fragment(&'a str),
@@ -130,6 +130,23 @@ pub fn check_valid_input_value(
             )),
             _ => check_valid_input_value(schema, &non_null_type, value),
         },
+    }
+}
+
+pub fn is_sub_type(base: &Type<'_, String>, sub: &Type<'_, String>) -> bool {
+    match (base, sub) {
+        (Type::NonNullType(base_type), Type::NonNullType(sub_type)) => {
+            is_sub_type(base_type, sub_type)
+        }
+        (Type::NamedType(base_type_name), Type::NonNullType(sub_type)) => {
+            let sub_type_name = get_type_name(&sub_type);
+            base_type_name.eq(&sub_type_name)
+        }
+        (Type::NamedType(base_type_name), Type::NamedType(sub_type_name)) => {
+            base_type_name.eq(sub_type_name)
+        }
+        (Type::ListType(base_type), Type::ListType(sub_type)) => is_sub_type(base_type, sub_type),
+        _ => false,
     }
 }
 

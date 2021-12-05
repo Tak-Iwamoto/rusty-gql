@@ -200,6 +200,24 @@ pub trait Visitor<'a> {
         _arg_value: &'a Value<'a, String>,
     ) {
     }
+
+    fn enter_input_value(
+        &mut self,
+        _ctx: &mut ValidationContext,
+        _expected_type: &Option<Type<'a, String>>,
+        _value: &'a Value<'a, String>,
+        _pos: Pos,
+    ) {
+    }
+
+    fn exit_input_value(
+        &mut self,
+        _ctx: &mut ValidationContext,
+        _expected_type: &Option<Type<'a, String>>,
+        _value: &'a Value<'a, String>,
+        _pos: Pos,
+    ) {
+    }
 }
 
 pub fn visit<'a, T: Visitor<'a>>(
