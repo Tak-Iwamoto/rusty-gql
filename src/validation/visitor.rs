@@ -50,6 +50,10 @@ impl<'a> ValidationContext<'a> {
             message: message.into(),
         })
     }
+    pub fn append_error(&mut self, errors: Vec<ValidationError>) {
+        self.errors.extend(errors);
+    }
+
     pub fn current_type(&self) -> Option<&'a Type<'a, String>> {
         self.type_stack.last().copied().flatten()
     }
