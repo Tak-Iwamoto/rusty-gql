@@ -1,6 +1,10 @@
 use std::collections::HashSet;
 
-use graphql_parser::schema::{Type, Value};
+use graphql_parser::{
+    query::OperationDefinition,
+    schema::{Type, Value},
+    Pos,
+};
 
 use crate::{
     types::{GqlMetaTypeName, GqlScalar},
@@ -176,5 +180,16 @@ fn referenced_variables_to_vec<'a>(value: &'a Value<'a, String>, vars: &mut Vec<
             .values()
             .for_each(|value| referenced_variables_to_vec(value, vars)),
         _ => {}
+    }
+}
+
+pub fn get_operation_def_position<'a>(
+    operation_definition: &OperationDefinition<'a, String>,
+) -> Pos {
+    match operation_definition {
+        OperationDefinition::SelectionSet(selection_set) => selection_set.span.0,
+        OperationDefinition::Query(query) => query.position,
+        OperationDefinition::Mutation(mutation) => mutation.position,
+        OperationDefinition::Subscription(subscription) => subscription.position,
     }
 }
