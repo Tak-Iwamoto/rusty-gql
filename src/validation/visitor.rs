@@ -23,7 +23,7 @@ pub struct ValidationContext<'a> {
     pub(crate) errors: Vec<ValidationError>,
     pub(crate) fragments: &'a HashMap<String, FragmentDefinition<'a, String>>,
     pub(crate) variables: Option<HashMap<String, VariableDefinition<'a, String>>>,
-    pub type_stack: Vec<Option<&'a Type<'a, String>>>,
+    pub type_stack: Vec<Option<&'a TypeDefinition<'a, String>>>,
     pub parent_type_stack: Vec<Option<&'a TypeDefinition<'a, String>>>,
 }
 
@@ -54,7 +54,7 @@ impl<'a> ValidationContext<'a> {
         self.errors.extend(errors);
     }
 
-    pub fn current_type(&self) -> Option<&'a Type<'a, String>> {
+    pub fn current_type(&self) -> Option<&'a TypeDefinition<'a, String>> {
         self.type_stack.last().copied().flatten()
     }
 

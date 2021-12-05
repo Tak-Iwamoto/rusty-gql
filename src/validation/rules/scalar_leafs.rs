@@ -1,10 +1,7 @@
 use graphql_parser::query::Field;
 
 use crate::{
-    validation::{
-        utils::get_type_name,
-        visitor::{ValidationContext, Visitor},
-    },
+    validation::visitor::{ValidationContext, Visitor},
     GqlTypeDefinition,
 };
 

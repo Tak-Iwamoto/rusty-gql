@@ -1,8 +1,11 @@
 use graphql_parser::query::{FragmentDefinition, InlineFragment};
 
-use crate::validation::{
-    utils::get_type_name,
-    visitor::{ValidationContext, Visitor},
+use crate::{
+    validation::{
+        utils::get_type_name,
+        visitor::{ValidationContext, Visitor},
+    },
+    GqlTypeDefinition,
 };
 
 pub struct FragmentsOnCompositeTypes;
@@ -15,7 +18,7 @@ impl<'a> Visitor<'a> for FragmentsOnCompositeTypes {
         fragment_definition: &'a FragmentDefinition<'a, String>,
     ) {
         if let Some(current_type) = ctx.current_type() {
-            let type_name = get_type_name(current_type);
+            let type_name = GqlTypeDefinition::type_name_from_def(current_type);
             let target_type = ctx.schema.type_definitions.get(&type_name);
 
             if let Some(ty) = target_type {
@@ -35,7 +38,7 @@ impl<'a> Visitor<'a> for FragmentsOnCompositeTypes {
         inline_fragment: &'a InlineFragment<'a, String>,
     ) {
         if let Some(current_type) = ctx.current_type() {
-            let type_name = get_type_name(current_type);
+            let type_name = GqlTypeDefinition::type_name_from_def(current_type);
             let target_type = ctx.schema.type_definitions.get(&type_name);
 
             if let Some(ty) = target_type {
