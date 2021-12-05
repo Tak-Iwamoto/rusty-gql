@@ -3,7 +3,7 @@ use graphql_parser::Pos;
 
 use super::argument::GqlArgument;
 use super::directive::GqlDirective;
-use super::meta_type::GqlMetaTypeName;
+use super::meta_type_name::GqlMetaTypeName;
 
 #[derive(Debug, Clone)]
 pub struct GqlField {

@@ -78,22 +78,17 @@ pub fn get_type_from_schema<'a>(
     var_type: &'a Type<'a, String>,
 ) -> Option<GqlMetaType> {
     match var_type {
-        graphql_parser::schema::Type::NamedType(named_type) => {
-            return schema
-                .type_map
-                .get(&named_type.to_string())
-                .map(|var_ty| var_ty.clone())
-        }
+        graphql_parser::schema::Type::NamedType(named_type) => schema
+            .type_map
+            .get(&named_type.to_string())
+            .map(|var_ty| var_ty.clone()),
         graphql_parser::schema::Type::ListType(list) => {
             let inner_type = get_type_from_schema(schema, &list).unwrap();
-            let value = GqlMetaType::List(Box::new(inner_type.clone()));
-            return Some(value);
+            Some(inner_type)
         }
         graphql_parser::schema::Type::NonNullType(non_null) => {
-            // let inner_type = get_type_from_schema(schema, &non_null).unwrap();
-            // let value = GqlMetaType::NonNull(Box::new(inner_type.clone()));
-            // return Some(value);
-            None
+            let inner_type = get_type_from_schema(schema, &non_null).unwrap();
+            Some(inner_type)
         }
     }
 }
