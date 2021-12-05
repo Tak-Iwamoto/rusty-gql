@@ -1,3 +1,5 @@
+use crate::GqlField;
+
 use super::{
     gql_enum::GqlEnum, gql_union::GqlUnion, input_object::GqlInputObject, interface::GqlInterface,
     object::GqlObject, scalar::GqlScalar,
@@ -41,5 +43,22 @@ impl GqlMetaType {
             self,
             &GqlMetaType::Object(_) | &GqlMetaType::Interface(_) | &GqlMetaType::Union(_)
         )
+    }
+
+    pub fn is_leaf_type(&self) -> bool {
+        matches!(self, &GqlMetaType::Enum(_) | &GqlMetaType::Scalar(_))
+    }
+
+    pub fn fields(&self) -> Option<&Vec<GqlField>> {
+        match self {
+            GqlMetaType::Object(obj) => Some(&obj.fields),
+            GqlMetaType::Interface(interface) => Some(&interface.fields),
+            _ => None,
+        }
+    }
+
+    pub fn get_field_by_name(&self, name: &str) -> Option<&GqlField> {
+        self.fields()
+            .and_then(|fields| fields.iter().find(|f| f.name == name))
     }
 }
