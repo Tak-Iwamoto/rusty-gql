@@ -1,8 +1,11 @@
 use graphql_parser::query::Field;
 
-use crate::validation::{
-    utils::get_type_name,
-    visitor::{ValidationContext, Visitor},
+use crate::{
+    validation::{
+        utils::get_type_name,
+        visitor::{ValidationContext, Visitor},
+    },
+    GqlTypeDefinition,
 };
 
 pub struct ScalarLeafs;
@@ -10,8 +13,10 @@ pub struct ScalarLeafs;
 impl<'a> Visitor<'a> for ScalarLeafs {
     fn enter_field(&mut self, ctx: &mut ValidationContext, field: &'a Field<'a, String>) {
         if let Some(parent_type) = ctx.parent_type() {
-            let type_name = get_type_name(parent_type);
-            let parent = ctx.schema.type_definitions.get(&type_name);
+            let parent = ctx
+                .schema
+                .type_definitions
+                .get(&GqlTypeDefinition::type_name_from_def(parent_type));
 
             if let Some(parent_gql_type) = parent {
                 if let Some(target_field) = parent_gql_type.get_field_by_name(&field.name) {

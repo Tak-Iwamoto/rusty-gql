@@ -1,3 +1,5 @@
+use graphql_parser::schema::TypeDefinition;
+
 use crate::GqlField;
 
 use super::{
@@ -31,22 +33,40 @@ impl ToString for GqlTypeDefinition {
 }
 
 impl GqlTypeDefinition {
+    pub fn type_name_from_def<'a>(type_definition: &TypeDefinition<'a, String>) -> String {
+        match type_definition {
+            TypeDefinition::Scalar(scalar) => scalar.name.clone(),
+            TypeDefinition::Object(obj) => obj.name.clone(),
+            TypeDefinition::Interface(interface) => interface.name.clone(),
+            TypeDefinition::Union(uni) => uni.name.clone(),
+            TypeDefinition::Enum(enu) => enu.name.clone(),
+            TypeDefinition::InputObject(input_obj) => input_obj.name.clone(),
+        }
+    }
+
     pub fn is_input_type(&self) -> bool {
         matches!(
             self,
-            &GqlTypeDefinition::Scalar(_) | &GqlTypeDefinition::InputObject(_) | &GqlTypeDefinition::Enum(_)
+            &GqlTypeDefinition::Scalar(_)
+                | &GqlTypeDefinition::InputObject(_)
+                | &GqlTypeDefinition::Enum(_)
         )
     }
 
     pub fn is_composite_type(&self) -> bool {
         matches!(
             self,
-            &GqlTypeDefinition::Object(_) | &GqlTypeDefinition::Interface(_) | &GqlTypeDefinition::Union(_)
+            &GqlTypeDefinition::Object(_)
+                | &GqlTypeDefinition::Interface(_)
+                | &GqlTypeDefinition::Union(_)
         )
     }
 
     pub fn is_leaf_type(&self) -> bool {
-        matches!(self, &GqlTypeDefinition::Enum(_) | &GqlTypeDefinition::Scalar(_))
+        matches!(
+            self,
+            &GqlTypeDefinition::Enum(_) | &GqlTypeDefinition::Scalar(_)
+        )
     }
 
     pub fn fields(&self) -> Option<&Vec<GqlField>> {

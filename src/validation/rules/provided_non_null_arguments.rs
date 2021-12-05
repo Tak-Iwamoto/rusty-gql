@@ -1,8 +1,11 @@
 use graphql_parser::{query::Field, schema::Directive};
 
-use crate::validation::{
-    utils::get_type_name,
-    visitor::{ValidationContext, Visitor},
+use crate::{
+    validation::{
+        utils::get_type_name,
+        visitor::{ValidationContext, Visitor},
+    },
+    GqlTypeDefinition,
 };
 
 pub struct ProvidedNonNullArguments;
@@ -38,8 +41,11 @@ impl<'a> Visitor<'a> for ProvidedNonNullArguments {
 
     fn enter_field(&mut self, ctx: &mut ValidationContext, field: &'a Field<'a, String>) {
         if let Some(parent_type) = ctx.parent_type() {
-            let type_name = get_type_name(parent_type);
-            if let Some(parent_gql_type) = ctx.schema.type_definitions.get(&type_name) {
+            if let Some(parent_gql_type) = ctx
+                .schema
+                .type_definitions
+                .get(&GqlTypeDefinition::type_name_from_def(parent_type))
+            {
                 if let Some(target_field) = parent_gql_type.get_field_by_name(&field.name) {
                     for arg in &target_field.arguments {
                         if arg.meta_type.is_non_null()
@@ -50,7 +56,7 @@ impl<'a> Visitor<'a> for ProvidedNonNullArguments {
                                     "Field {} argument {} of type {} is required but not provided",
                                     field.name,
                                     arg.name,
-                                    get_type_name(&parent_type)
+                                    GqlTypeDefinition::type_name_from_def(parent_type),
                                 ),
                                 vec![field.position],
                             )
