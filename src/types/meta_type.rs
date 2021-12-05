@@ -17,6 +17,10 @@ impl GqlMetaTypeName {
             }
         }
     }
+
+    pub fn is_non_null(&self) -> bool {
+        matches!(self, &GqlMetaTypeName::NonNullType(_))
+    }
 }
 
 impl<'a> From<Type<'a, String>> for GqlMetaTypeName {
