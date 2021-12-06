@@ -15,11 +15,11 @@ pub struct NoUnusedVariables<'a> {
 }
 
 impl<'a> NoUnusedVariables<'a> {
-    fn find_used_vars(
+    fn get_used_vars(
         &self,
         scope: &Scope<'a>,
-        defined: &HashSet<&'a str>,
-        used: &mut HashSet<&'a str>,
+        defined_vars: &HashSet<&'a str>,
+        used_vars: &mut HashSet<&'a str>,
         visited: &mut HashSet<Scope<'a>>,
     ) {
         if visited.contains(scope) {
@@ -27,17 +27,17 @@ impl<'a> NoUnusedVariables<'a> {
         }
         visited.insert(*scope);
 
-        if let Some(used_vars) = self.used_variables.get(scope) {
-            for var in used_vars {
-                if defined.contains(var) {
-                    used.insert(var);
+        if let Some(used_variables) = self.used_variables.get(scope) {
+            for var in used_variables {
+                if defined_vars.contains(var) {
+                    used_vars.insert(var);
                 }
             }
         }
 
         if let Some(fragment_spreads) = self.fragment_spreads.get(scope) {
             for sp in fragment_spreads {
-                self.find_used_vars(&Scope::Fragment(sp), defined, used, visited)
+                self.get_used_vars(&Scope::Fragment(sp), defined_vars, used_vars, visited)
             }
         }
     }
@@ -48,7 +48,7 @@ impl<'a> Visitor<'a> for NoUnusedVariables<'a> {
         for (name, vars) in &self.defined_variables {
             let mut used_vars = HashSet::new();
             let mut visited = HashSet::new();
-            self.find_used_vars(
+            self.get_used_vars(
                 &Scope::Operation(*name),
                 &vars.iter().map(|(name, _)| *name).collect(),
                 &mut used_vars,
