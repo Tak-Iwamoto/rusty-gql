@@ -8,21 +8,15 @@ use tokio::io::AsyncWriteExt;
 async fn gen_graphql_schema(schema_doc: &str) -> Result<(), Error> {
     let schema = build_schema(schema_doc).unwrap();
 
-    let type_definitions = schema.type_definitions;
-
-    let queries = schema.queries;
-    let mutations = schema.mutations;
-    let subscriptions = schema.subscriptions;
-
     create_dirs().await?;
 
-    let types_task = gen_type_definition_files(&type_definitions);
-    let query_task = gen_operation_files(&queries, "query");
-    let mutation_task = gen_operation_files(&mutations, "mutation");
-    let subscription_task = gen_operation_files(&subscriptions, "subscription");
+    let query_task = gen_operation_files(&schema.queries, "query");
+    let mutation_task = gen_operation_files(&schema.mutations, "mutation");
+    let subscription_task = gen_operation_files(&schema.subscriptions, "subscription");
 
     try_join_all(vec![query_task, mutation_task, subscription_task]).await?;
 
+    let types_task = gen_type_definition_files(&schema.type_definitions);
     types_task.await?;
     Ok(())
 }
@@ -41,10 +35,14 @@ async fn gen_operation_files(
 }
 
 async fn gen_operation_file(field: &GqlField, operation_str: &str) -> Result<(), Error> {
-    let mut file =
-        tokio::fs::File::create(format!("graphql/{}/{}.rs", operation_str, field.name)).await?;
-    file.write(gen_field_str(&field).as_bytes()).await?;
-    Ok(())
+    let path = format!("graphql/{}/{}.rs", operation_str, field.name);
+    if tokio::fs::File::open(&path).await.is_err() {
+        let mut file = tokio::fs::File::create(&path).await?;
+        file.write(gen_field_str(&field).as_bytes()).await?;
+        Ok(())
+    } else {
+        Ok(())
+    }
 }
 
 fn gen_field_str(field: &GqlField) -> String {
@@ -71,15 +69,19 @@ async fn gen_type_definition_files(
 }
 
 async fn gen_type_definition_file(type_def: &GqlTypeDefinition) -> Result<(), Error> {
-    let mut file = tokio::fs::File::create(format!(
+    let path = format!(
         "graphql/{}/{}.rs",
         type_def.to_string().to_lowercase(),
         type_def.name()
-    ))
-    .await?;
-    file.write(gen_type_definition_str(&type_def).as_bytes())
-        .await?;
-    Ok(())
+    );
+    if tokio::fs::File::open(&path).await.is_err() {
+        let mut file = tokio::fs::File::create(&path).await?;
+        file.write(gen_type_definition_str(&type_def).as_bytes())
+            .await?;
+        Ok(())
+    } else {
+        Ok(())
+    }
 }
 
 fn gen_type_definition_str(type_def: &GqlTypeDefinition) -> String {
@@ -102,7 +104,6 @@ async fn create_dirs() -> Result<Vec<()>, Error> {
     futures.push(tokio::fs::create_dir_all("./graphql/query"));
     futures.push(tokio::fs::create_dir_all("./graphql/mutation"));
     futures.push(tokio::fs::create_dir_all("./graphql/subscription"));
-    futures.push(tokio::fs::create_dir_all("./graphql/model"));
     futures.push(tokio::fs::create_dir_all("./graphql/inputobject"));
     futures.push(tokio::fs::create_dir_all("./graphql/object"));
     futures.push(tokio::fs::create_dir_all("./graphql/scalar"));
