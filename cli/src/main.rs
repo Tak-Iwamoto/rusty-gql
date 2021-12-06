@@ -4,11 +4,11 @@ use anyhow::Result;
 use app::build_app;
 use exit_codes::ExitCode;
 
-use crate::graphql::gen_graphql_schema;
+use crate::code_generate::gen_graphql_schema;
 
 mod app;
 mod exit_codes;
-mod graphql;
+mod code_generate;
 
 async fn run() -> Result<ExitCode> {
     let matches = build_app().get_matches();

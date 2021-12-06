@@ -47,7 +47,7 @@ async fn create_dirs() -> Result<Vec<()>, Error> {
 mod tests {
     use std::fs;
 
-    use crate::graphql::gen_graphql_schema;
+    use crate::code_generate::gen_graphql_schema;
 
     #[tokio::test]
     async fn it_works() {
