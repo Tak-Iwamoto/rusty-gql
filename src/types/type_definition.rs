@@ -62,6 +62,18 @@ impl GqlTypeDefinition {
             .and_then(|fields| fields.iter().find(|f| f.name == name).map(Clone::clone))
     }
 
+    pub fn name(&self) -> &str {
+        match self {
+            GqlTypeDefinition::Scalar(scalar) => &scalar.name,
+            GqlTypeDefinition::Object(obj) => &obj.name,
+            GqlTypeDefinition::Interface(interface) => &interface.name,
+            GqlTypeDefinition::Union(uni) => &uni.name,
+            GqlTypeDefinition::Enum(enu) => &enu.name,
+            GqlTypeDefinition::InputObject(input_object) => &input_object.name,
+            GqlTypeDefinition::List(list) => &list.name(),
+        }
+    }
+
     pub fn is_input_type(&self) -> bool {
         matches!(
             self,
