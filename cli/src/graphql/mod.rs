@@ -1,9 +1,12 @@
+mod utils;
+
 use std::{collections::BTreeMap, io::Error};
 
 use codegen::Scope;
 use futures::future::try_join_all;
 use rusty_gql::{self, build_schema, GqlField, GqlTypeDefinition};
-use tokio::io::AsyncWriteExt;
+
+use self::utils::{create_file, PathStr};
 
 pub async fn gen_graphql_schema(schema_doc: &str) -> Result<(), Error> {
     let schema = build_schema(schema_doc).unwrap();
@@ -32,32 +35,32 @@ async fn gen_operation_files(
         field_names.push(&field.name);
         futures.push(task);
     }
-    let mod_file_str = build_mod_file_str(&field_names);
-    let mod_file_path = format!("graphql/{}/mod.rs", operation_str);
+    let mod_file_str = build_mod_file_str(&operations);
+    let mod_file_path = PathStr::new(vec![operation_str, "mod"]).to_string();
     create_file(&&mod_file_path, &mod_file_str).await?;
 
     let res = try_join_all(futures).await;
     res
 }
 
-fn build_mod_file_str(names: &Vec<&String>) -> String {
+fn build_mod_file_str(operations: &BTreeMap<String, GqlField>) -> String {
     let mut result = String::from("");
 
-    for name in names {
-        result += format!("mod {};\n", name).as_str();
+    for (file_name, method) in operations.iter() {
+        // pub use field::GqlField;
+        result += format!(
+            "mod {file_name};\npub use {file_name}::{method};\n\n",
+            file_name = file_name,
+            method = method.name
+        )
+        .as_str();
     }
 
     result
 }
 
-async fn create_file(path: &str, content: &str) -> Result<(), Error> {
-    let mut file = tokio::fs::File::create(&path).await?;
-    file.write(content.as_bytes()).await?;
-    Ok(())
-}
-
 async fn gen_operation_file(field: &GqlField, operation_str: &str) -> Result<(), Error> {
-    let path = format!("graphql/{}/{}.rs", operation_str, field.name);
+    let path = PathStr::new(vec![operation_str, &field.name]).to_string();
     if tokio::fs::File::open(&path).await.is_err() {
         create_file(&path, &gen_field_str(&field)).await?;
         Ok(())
@@ -90,15 +93,10 @@ async fn gen_type_definition_files(
 }
 
 async fn gen_type_definition_file(type_def: &GqlTypeDefinition) -> Result<(), Error> {
-    let path = format!(
-        "graphql/{}/{}.rs",
-        type_def.to_string().to_lowercase(),
-        type_def.name()
-    );
+    let path =
+        PathStr::new(vec![&type_def.to_string().to_lowercase(), type_def.name()]).to_string();
     if tokio::fs::File::open(&path).await.is_err() {
-        let mut file = tokio::fs::File::create(&path).await?;
-        file.write(gen_type_definition_str(&type_def).as_bytes())
-            .await?;
+        create_file(&path, &gen_type_definition_str(&type_def)).await?;
         Ok(())
     } else {
         Ok(())
@@ -121,17 +119,17 @@ fn gen_type_definition_str(type_def: &GqlTypeDefinition) -> String {
 async fn create_dirs() -> Result<Vec<()>, Error> {
     let mut futures = Vec::new();
     // dirを作るときはcliのroot配下に作成される
-    futures.push(tokio::fs::create_dir_all("./graphql"));
-    futures.push(tokio::fs::create_dir_all("./graphql/query"));
-    futures.push(tokio::fs::create_dir_all("./graphql/mutation"));
-    futures.push(tokio::fs::create_dir_all("./graphql/subscription"));
-    futures.push(tokio::fs::create_dir_all("./graphql/inputobject"));
-    futures.push(tokio::fs::create_dir_all("./graphql/object"));
-    futures.push(tokio::fs::create_dir_all("./graphql/scalar"));
-    futures.push(tokio::fs::create_dir_all("./graphql/union"));
-    futures.push(tokio::fs::create_dir_all("./graphql/enum"));
-    futures.push(tokio::fs::create_dir_all("./graphql/interface"));
-    futures.push(tokio::fs::create_dir_all("./graphql/list"));
+    futures.push(tokio::fs::create_dir_all("graphql"));
+    futures.push(tokio::fs::create_dir_all("graphql/query"));
+    futures.push(tokio::fs::create_dir_all("graphql/mutation"));
+    futures.push(tokio::fs::create_dir_all("graphql/subscription"));
+    futures.push(tokio::fs::create_dir_all("graphql/inputobject"));
+    futures.push(tokio::fs::create_dir_all("graphql/object"));
+    futures.push(tokio::fs::create_dir_all("graphql/scalar"));
+    futures.push(tokio::fs::create_dir_all("graphql/union"));
+    futures.push(tokio::fs::create_dir_all("graphql/enum"));
+    futures.push(tokio::fs::create_dir_all("graphql/interface"));
+    futures.push(tokio::fs::create_dir_all("graphql/list"));
     let res = try_join_all(futures).await;
     res
 }
