@@ -3,18 +3,20 @@ use graphql_parser::{
     schema::{Directive, Value},
 };
 
-use crate::validation::visitor::{ValidationContext, Visitor};
+use crate::{
+    validation::visitor::{ValidationContext, Visitor},
+    GqlTypeDefinition,
+};
 
 pub struct KnownArgumentNames<'a> {
-    // pub current_args: Option<(String, Value<'a, String>), ArgsPosition<'a>>
-    current_args: Option<(&'a Vec<(String, Value<'a, String>)>, ArgsPosition<'a>)>,
+    current_args: Option<(Vec<String>, ArgsPosition<'a>)>,
 }
 
 enum ArgsPosition<'a> {
     Directive(&'a str),
     Field {
         field_name: &'a str,
-        type_name: &'a str,
+        type_name: String,
     },
 }
 
@@ -26,7 +28,12 @@ impl<'a> Visitor<'a> for KnownArgumentNames<'a> {
     ) {
         if ctx.schema.directives.get(&directive.name).is_some() {
             self.current_args = Some((
-                &directive.arguments,
+                directive
+                    .arguments
+                    .clone()
+                    .into_iter()
+                    .map(|arg| arg.0)
+                    .collect(),
                 ArgsPosition::Directive(&directive.name),
             ));
         }
@@ -40,19 +47,23 @@ impl<'a> Visitor<'a> for KnownArgumentNames<'a> {
     }
 
     fn enter_field(&mut self, ctx: &mut ValidationContext, field: &'a Field<'a, String>) {
-        // if let Some(parent_type) = ctx.parent_type() {
-        //     if let Some(schema_field) = ctx.schema.type_map.get(&get_type_name(&parent_type)) {
-        //         if schema_field.get_field_by_name(&field.name).is_some() {
-        //             self.current_args = Some((
-        //                 &field.arguments,
-        //                 ArgsPosition::Field {
-        //                     field_name: &field.name,
-        //                     type_name: &get_type_name(&parent_type).clone(),
-        //                 },
-        //             ))
-        //         }
-        //     }
-        // }
+        if let Some(parent_type) = ctx.parent_type() {
+            if let Some(target_field) =
+                GqlTypeDefinition::get_field_by_name(parent_type, &field.name)
+            {
+                self.current_args = Some((
+                    target_field
+                        .arguments
+                        .into_iter()
+                        .map(|arg| arg.name)
+                        .collect(),
+                    ArgsPosition::Field {
+                        field_name: &field.name,
+                        type_name: GqlTypeDefinition::type_name_from_def(parent_type),
+                    },
+                ))
+            }
+        }
     }
 
     fn exit_field(&mut self, _ctx: &mut ValidationContext, _field: &'a Field<'a, String>) {
@@ -66,7 +77,7 @@ impl<'a> Visitor<'a> for KnownArgumentNames<'a> {
         _arg_value: &'a Value<'a, String>,
     ) {
         if let Some((args, arg_position)) = &self.current_args {
-            if !args.iter().any(|arg| arg.0 == arg_name) {
+            if !args.iter().any(|arg| arg == arg_name) {
                 match arg_position {
                     ArgsPosition::Directive(directive_name) => ctx.add_error(
                         format!(
