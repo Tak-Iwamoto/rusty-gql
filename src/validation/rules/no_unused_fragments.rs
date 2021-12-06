@@ -1,7 +1,7 @@
 use std::collections::{HashMap, HashSet};
 
 use graphql_parser::{
-    query::{Definition, FragmentDefinition, FragmentSpread, InlineFragment, OperationDefinition},
+    query::{Definition, FragmentDefinition, FragmentSpread, OperationDefinition},
     Pos,
 };
 
@@ -43,9 +43,7 @@ impl<'a> Visitor<'a> for NoUnusedFragment<'a> {
         let mut reachable = HashSet::new();
 
         for definition in &doc.definitions {
-            if let Definition::Operation(operation) = definition {
-                // let name = operation_name(&operation);
-                // TODO: set operation name
+            if let Definition::Operation(_) = definition {
                 self.get_reachable_fragments(&Scope::Operation(None), &mut reachable)
             }
         }
@@ -91,17 +89,5 @@ impl<'a> Visitor<'a> for NoUnusedFragment<'a> {
                 .or_insert_with(Vec::new)
                 .push(&fragment_spread.fragment_name)
         }
-    }
-}
-
-fn operation_name<'a>(operation_definition: &'a OperationDefinition<'a, String>) -> Option<String> {
-    match operation_definition {
-        OperationDefinition::SelectionSet(_) => {
-            // TODO: error handling
-            unreachable!()
-        }
-        OperationDefinition::Query(query) => query.name.clone(),
-        OperationDefinition::Mutation(mutation) => mutation.name.clone(),
-        OperationDefinition::Subscription(subscription) => subscription.name.clone(),
     }
 }

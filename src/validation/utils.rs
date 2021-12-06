@@ -162,6 +162,15 @@ pub fn get_type_name(ty: &Type<'_, String>) -> String {
     }
 }
 
+pub fn get_operation_name<'a>(operation: &OperationDefinition<'a, String>) -> Option<String> {
+    match operation {
+        OperationDefinition::SelectionSet(_) => None,
+        OperationDefinition::Query(query) => query.name.clone(),
+        OperationDefinition::Mutation(mutation) => mutation.name.clone(),
+        OperationDefinition::Subscription(sub) => sub.name.clone(),
+    }
+}
+
 pub fn referenced_variables<'a>(value: &'a Value<'a, String>) -> Vec<&'a str> {
     let mut vars = Vec::new();
     referenced_variables_to_vec(value, &mut vars);

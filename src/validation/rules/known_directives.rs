@@ -63,9 +63,8 @@ impl<'a> Visitor<'a> for KnownDirectives {
         ctx: &mut ValidationContext,
         directive: &'a graphql_parser::schema::Directive<'a, String>,
     ) {
-        if let Some(_) = ctx.schema.directives.get(&directive.name) {
-            // TODO:
-        } else {
+        let is_exist = ctx.schema.directives.get(&directive.name).is_some();
+        if !is_exist {
             ctx.add_error(
                 format!("Unknown directive {}", directive.name),
                 vec![directive.position],
