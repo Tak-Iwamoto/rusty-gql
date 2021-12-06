@@ -1,4 +1,4 @@
-use graphql_parser::schema::TypeDefinition;
+use graphql_parser::schema::{Field, TypeDefinition};
 
 use crate::GqlField;
 
@@ -44,6 +44,24 @@ impl GqlTypeDefinition {
         }
     }
 
+    pub fn fields_from_def<'a>(
+        type_definition: &TypeDefinition<'a, String>,
+    ) -> Option<Vec<Field<'a, String>>> {
+        match type_definition {
+            TypeDefinition::Object(obj) => Some(obj.fields.clone()),
+            TypeDefinition::Interface(interface) => Some(interface.fields.clone()),
+            _ => None,
+        }
+    }
+
+    pub fn get_field_by_name<'a>(
+        type_definition: &TypeDefinition<'a, String>,
+        name: &str,
+    ) -> Option<Field<'a, String>> {
+        GqlTypeDefinition::fields_from_def(type_definition)
+            .and_then(|fields| fields.iter().find(|f| f.name == name).map(Clone::clone))
+    }
+
     pub fn is_input_type(&self) -> bool {
         matches!(
             self,
@@ -75,10 +93,5 @@ impl GqlTypeDefinition {
             GqlTypeDefinition::Interface(interface) => Some(&interface.fields),
             _ => None,
         }
-    }
-
-    pub fn get_field_by_name(&self, name: &str) -> Option<&GqlField> {
-        self.fields()
-            .and_then(|fields| fields.iter().find(|f| f.name == name))
     }
 }
