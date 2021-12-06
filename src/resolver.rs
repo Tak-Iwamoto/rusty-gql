@@ -1,4 +1,4 @@
-use std::collections::{BTreeMap, HashMap};
+use std::collections::HashMap;
 
 use async_trait::async_trait;
 use futures::future::BoxFuture;

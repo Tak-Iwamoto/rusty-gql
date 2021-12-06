@@ -2,7 +2,7 @@ use std::{collections::BTreeMap, io::Error};
 
 use codegen::Scope;
 use futures::future::try_join_all;
-use rusty_gql::{self, build_schema, GqlField, GqlTypeDefinition, OperationType};
+use rusty_gql::{self, build_schema, GqlField, GqlTypeDefinition};
 use tokio::io::AsyncWriteExt;
 
 async fn gen_graphql_schema(schema_doc: &str) -> Result<(), Error> {
@@ -21,7 +21,6 @@ async fn gen_graphql_schema(schema_doc: &str) -> Result<(), Error> {
     let mutation_task = gen_operation_files(&mutations, "mutation");
     let subscription_task = gen_operation_files(&subscriptions, "subscription");
 
-    // subscription_task.await?;
     try_join_all(vec![query_task, mutation_task, subscription_task]).await?;
 
     types_task.await?;
@@ -89,7 +88,7 @@ fn gen_type_definition_str(type_def: &GqlTypeDefinition) -> String {
 
     if let Some(fields) = type_def.fields() {
         for field in fields {
-            // struct_scope.field(&field.name, field.meta_type.name())
+            struct_scope.field(&field.name, field.meta_type.name());
         }
     }
 
@@ -109,6 +108,7 @@ async fn create_dirs() -> Result<Vec<()>, Error> {
     futures.push(tokio::fs::create_dir_all("./graphql/scalar"));
     futures.push(tokio::fs::create_dir_all("./graphql/union"));
     futures.push(tokio::fs::create_dir_all("./graphql/enum"));
+    futures.push(tokio::fs::create_dir_all("./graphql/interface"));
     futures.push(tokio::fs::create_dir_all("./graphql/list"));
     let res = try_join_all(futures).await;
     res
@@ -123,6 +123,9 @@ mod tests {
     #[tokio::test]
     async fn it_works() {
         let schema_doc = fs::read_to_string("../src/tests/github.graphql").unwrap();
-        gen_graphql_schema(&schema_doc).await;
+        match gen_graphql_schema(&schema_doc).await {
+            Ok(_) => println!("success"),
+            Err(err) => println!("{}", err.to_string()),
+        }
     }
 }
