@@ -62,7 +62,8 @@ fn build_mod_file_str(operations: &BTreeMap<String, GqlField>) -> String {
 async fn gen_operation_file(field: &GqlField, operation_str: &str) -> Result<(), Error> {
     let path = PathStr::new(vec![operation_str, &field.name]).to_string();
     if tokio::fs::File::open(&path).await.is_err() {
-        create_file(&path, &gen_field_str(&field)).await?;
+        let content = gen_field_str(&field);
+        create_file(&path, &content).await?;
         Ok(())
     } else {
         Ok(())
@@ -74,7 +75,7 @@ fn gen_field_str(field: &GqlField) -> String {
     let fn_scope = scope.new_fn(field.name.as_str());
 
     for arg in &field.arguments {
-        fn_scope.arg(arg.name.as_str(), arg.meta_type.name());
+        fn_scope.arg(arg.name.as_str(), arg.meta_type.to_rust_type());
     }
     fn_scope.vis("pub");
     scope.to_string()
@@ -96,7 +97,8 @@ async fn gen_type_definition_file(type_def: &GqlTypeDefinition) -> Result<(), Er
     let path =
         PathStr::new(vec![&type_def.to_string().to_lowercase(), type_def.name()]).to_string();
     if tokio::fs::File::open(&path).await.is_err() {
-        create_file(&path, &gen_type_definition_str(&type_def)).await?;
+        let content = gen_type_definition_str(&type_def);
+        create_file(&path, &content).await?;
         Ok(())
     } else {
         Ok(())
