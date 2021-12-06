@@ -5,7 +5,7 @@ use futures::future::try_join_all;
 use rusty_gql::{self, build_schema, GqlField, GqlTypeDefinition};
 use tokio::io::AsyncWriteExt;
 
-async fn gen_graphql_schema(schema_doc: &str) -> Result<(), Error> {
+pub async fn gen_graphql_schema(schema_doc: &str) -> Result<(), Error> {
     let schema = build_schema(schema_doc).unwrap();
 
     create_dirs().await?;
@@ -26,19 +26,40 @@ async fn gen_operation_files(
     operation_str: &str,
 ) -> Result<Vec<()>, Error> {
     let mut futures = Vec::new();
+    let mut field_names = Vec::new();
     for (_, field) in operations.iter() {
         let task = gen_operation_file(field, operation_str);
+        field_names.push(&field.name);
         futures.push(task);
     }
+    let mod_file_str = build_mod_file_str(&field_names);
+    let mod_file_path = format!("graphql/{}/mod.rs", operation_str);
+    create_file(&&mod_file_path, &mod_file_str).await?;
+
     let res = try_join_all(futures).await;
     res
+}
+
+fn build_mod_file_str(names: &Vec<&String>) -> String {
+    let mut result = String::from("");
+
+    for name in names {
+        result += format!("mod {};\n", name).as_str();
+    }
+
+    result
+}
+
+async fn create_file(path: &str, content: &str) -> Result<(), Error> {
+    let mut file = tokio::fs::File::create(&path).await?;
+    file.write(content.as_bytes()).await?;
+    Ok(())
 }
 
 async fn gen_operation_file(field: &GqlField, operation_str: &str) -> Result<(), Error> {
     let path = format!("graphql/{}/{}.rs", operation_str, field.name);
     if tokio::fs::File::open(&path).await.is_err() {
-        let mut file = tokio::fs::File::create(&path).await?;
-        file.write(gen_field_str(&field).as_bytes()).await?;
+        create_file(&path, &gen_field_str(&field)).await?;
         Ok(())
     } else {
         Ok(())

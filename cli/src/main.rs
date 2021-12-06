@@ -4,13 +4,17 @@ use anyhow::Result;
 use app::build_app;
 use exit_codes::ExitCode;
 
+use crate::graphql::gen_graphql_schema;
+
 mod app;
 mod exit_codes;
 mod graphql;
 
-fn run() -> Result<ExitCode> {
+async fn run() -> Result<ExitCode> {
     let matches = build_app().get_matches();
     if matches.subcommand_matches("gen").is_some() {
+        let schema_doc = std::fs::read_to_string("../src/tests/github.graphql").unwrap();
+        gen_graphql_schema(&schema_doc).await?;
         println!("generate command");
         return Ok(ExitCode::Success);
     }
@@ -29,8 +33,10 @@ fn run() -> Result<ExitCode> {
 
     Ok(ExitCode::Success)
 }
-fn main() {
-    let result = run();
+
+#[tokio::main]
+async fn main() {
+    let result = run().await;
     match result {
         Ok(code) => process::exit(code.into()),
         Err(err) => {
