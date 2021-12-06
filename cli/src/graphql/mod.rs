@@ -2,13 +2,13 @@ use std::{collections::BTreeMap, io::Error};
 
 use codegen::Scope;
 use futures::future::try_join_all;
-use rusty_gql::{self, build_schema, GqlField, GqlMetaType, OperationType};
+use rusty_gql::{self, build_schema, GqlField, GqlTypeDefinition, OperationType};
 use tokio::io::AsyncWriteExt;
 
 async fn generate_graphql_schema(schema_doc: &str) -> Result<(), Error> {
     let schema = build_schema(schema_doc).unwrap();
 
-    let types = schema.type_map;
+    let types = schema.type_definitions;
 
     let queries = schema.queries;
     let mutations = schema.mutations;
@@ -53,7 +53,7 @@ fn generate_field_str(field: &GqlField) -> String {
     let fn_scope = scope.new_fn(field.name.as_str());
 
     for arg in &field.arguments {
-        fn_scope.arg(arg.name.as_str(), "String");
+        fn_scope.arg(arg.name.as_str(), arg.meta_type.name());
     }
     scope.to_string()
 }
@@ -69,8 +69,8 @@ async fn generate_operation_file(
     Ok(())
 }
 
-fn generate_types(types_map: &BTreeMap<String, GqlMetaType>) {
-    for (key, gql_type) in types_map.iter() {
+fn generate_types(types_definitions: &BTreeMap<String, GqlTypeDefinition>) {
+    for (key, gql_type) in types_definitions.iter() {
         let mut scope = Scope::new();
     }
 }
