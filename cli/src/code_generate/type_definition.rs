@@ -21,8 +21,16 @@ pub async fn gen_type_definition_files(
 }
 
 async fn gen_type_definition_file(type_def: &GqlTypeDefinition) -> Result<(), Error> {
-    let path =
-        PathStr::new(vec![&type_def.to_string().to_lowercase(), type_def.name()]).to_string();
+    let base_path = match type_def {
+        GqlTypeDefinition::Scalar(_) => "scalar",
+        GqlTypeDefinition::Object(_) => "model",
+        GqlTypeDefinition::Interface(_) => "interface",
+        GqlTypeDefinition::Union(_) => "model",
+        GqlTypeDefinition::Enum(_) => "model",
+        GqlTypeDefinition::InputObject(_) => "input",
+        GqlTypeDefinition::List(_) => "model",
+    };
+    let path = PathStr::new(vec![base_path, type_def.name()]).to_string();
     if tokio::fs::File::open(&path).await.is_err() {
         let content = gen_type_definition_str(&type_def);
         create_file(&path, &content).await?;

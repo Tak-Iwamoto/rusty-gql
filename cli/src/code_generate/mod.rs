@@ -32,13 +32,10 @@ async fn create_dirs() -> Result<Vec<()>, Error> {
     futures.push(tokio::fs::create_dir_all("graphql/query"));
     futures.push(tokio::fs::create_dir_all("graphql/mutation"));
     futures.push(tokio::fs::create_dir_all("graphql/subscription"));
-    futures.push(tokio::fs::create_dir_all("graphql/inputobject"));
-    futures.push(tokio::fs::create_dir_all("graphql/object"));
+    futures.push(tokio::fs::create_dir_all("graphql/model"));
     futures.push(tokio::fs::create_dir_all("graphql/scalar"));
-    futures.push(tokio::fs::create_dir_all("graphql/union"));
-    futures.push(tokio::fs::create_dir_all("graphql/enum"));
     futures.push(tokio::fs::create_dir_all("graphql/interface"));
-    futures.push(tokio::fs::create_dir_all("graphql/list"));
+    futures.push(tokio::fs::create_dir_all("graphql/input"));
     let res = try_join_all(futures).await;
     res
 }
