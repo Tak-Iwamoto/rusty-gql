@@ -23,7 +23,7 @@ pub async fn gen_operation_files(
         field_names.push(&field.name);
         futures.push(task);
     }
-    let mod_file_str = build_mod_file_str(&operations);
+    let mod_file_str = build_mod_file_str(&operations, operation_type);
     let mod_file_path = PathStr::new(vec![operation_str, "mod"]).to_string();
     create_file(&mod_file_path, &mod_file_str).await?;
 
@@ -31,20 +31,52 @@ pub async fn gen_operation_files(
     res
 }
 
-fn build_mod_file_str(operations: &BTreeMap<String, GqlField>) -> String {
+fn build_mod_file_str(
+    operations: &BTreeMap<String, GqlField>,
+    operation_type: OperationType,
+) -> String {
     let mut result = String::from("");
 
-    for (file_name, method) in operations.iter() {
-        // pub use field::GqlField;
-        result += format!(
-            "mod {file_name};\npub use {file_name}::{method};\n\n",
-            file_name = file_name,
-            method = method.name
-        )
-        .as_str();
+    for (file_name, _) in operations.iter() {
+        result += format!("mod {file_name};\n", file_name = file_name,).as_str();
     }
 
+    result += "\n";
+    result += &build_query_str(operations, operation_type);
+
     result
+}
+
+fn build_query_str(
+    operations: &BTreeMap<String, GqlField>,
+    operation_type: OperationType,
+) -> String {
+    let mut scope = Scope::new();
+    let struct_name = match operation_type {
+        OperationType::Query => "Query",
+        OperationType::Mutation => "Mutation",
+        OperationType::Subscription => "Subscription",
+    };
+    scope.new_struct(struct_name).vis("pub");
+    let imp = scope.new_impl(struct_name);
+
+    for (operation_name, method) in operations.iter() {
+        let f = imp.new_fn(&operation_name);
+        let mut args_str = String::from("");
+        for arg in &method.arguments {
+            f.arg(arg.name.as_str(), arg.meta_type.to_rust_type());
+            args_str += format!("{},", &arg.name).as_str();
+        }
+
+        f.line(format!(
+            "{file_name}::{method}({args})",
+            file_name = operation_name,
+            method = method.name,
+            args = args_str
+        ));
+    }
+
+    scope.to_string()
 }
 
 async fn gen_operation_file(field: &GqlField, operation_str: &str) -> Result<(), Error> {
