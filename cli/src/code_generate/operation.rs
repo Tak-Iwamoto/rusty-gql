@@ -25,7 +25,7 @@ pub async fn gen_operation_files(
     }
     let mod_file_str = build_mod_file_str(&operations);
     let mod_file_path = PathStr::new(vec![operation_str, "mod"]).to_string();
-    create_file(&&mod_file_path, &mod_file_str).await?;
+    create_file(&mod_file_path, &mod_file_str).await?;
 
     let res = try_join_all(futures).await;
     res
