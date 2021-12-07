@@ -8,19 +8,19 @@ use rusty_gql::{
 
 use super::utils::{create_file, PathStr};
 
-pub async fn gen_type_definition_files(
+pub async fn build_type_definition_files(
     type_definitions: &BTreeMap<String, GqlTypeDefinition>,
 ) -> Result<Vec<()>, Error> {
     let mut futures = Vec::new();
     for (_, type_def) in type_definitions.iter() {
-        let task = gen_type_definition_file(type_def);
+        let task = build_type_definition_file(type_def);
         futures.push(task);
     }
     let res = try_join_all(futures).await;
     res
 }
 
-async fn gen_type_definition_file(type_def: &GqlTypeDefinition) -> Result<(), Error> {
+async fn build_type_definition_file(type_def: &GqlTypeDefinition) -> Result<(), Error> {
     let base_path = match type_def {
         GqlTypeDefinition::Scalar(_) => "scalar",
         GqlTypeDefinition::Object(_) => "model",
@@ -32,7 +32,7 @@ async fn gen_type_definition_file(type_def: &GqlTypeDefinition) -> Result<(), Er
     };
     let path = PathStr::new(vec![base_path, type_def.name()]).to_string();
     if tokio::fs::File::open(&path).await.is_err() {
-        let content = gen_type_definition_str(&type_def);
+        let content = build_type_definition_str(&type_def);
         create_file(&path, &content).await?;
         Ok(())
     } else {
@@ -40,26 +40,26 @@ async fn gen_type_definition_file(type_def: &GqlTypeDefinition) -> Result<(), Er
     }
 }
 
-fn gen_type_definition_str(type_def: &GqlTypeDefinition) -> String {
+fn build_type_definition_str(type_def: &GqlTypeDefinition) -> String {
     match type_def {
-        GqlTypeDefinition::Scalar(scalar) => gen_scalar_str(scalar),
-        GqlTypeDefinition::Object(obj) => gen_object_str(obj),
-        GqlTypeDefinition::Interface(interface) => gen_interface_str(interface),
-        GqlTypeDefinition::Union(uni) => gen_union_str(uni),
-        GqlTypeDefinition::Enum(enu) => gen_enum_str(enu),
-        GqlTypeDefinition::InputObject(input) => gen_input_object_str(input),
-        GqlTypeDefinition::List(list) => gen_list_str(list),
+        GqlTypeDefinition::Scalar(scalar) => build_scalar_str(scalar),
+        GqlTypeDefinition::Object(obj) => build_object_str(obj),
+        GqlTypeDefinition::Interface(interface) => build_interface_str(interface),
+        GqlTypeDefinition::Union(uni) => build_union_str(uni),
+        GqlTypeDefinition::Enum(enu) => build_enum_str(enu),
+        GqlTypeDefinition::InputObject(input) => build_input_object_str(input),
+        GqlTypeDefinition::List(list) => build_list_str(list),
     }
 }
 
-fn gen_scalar_str(gql_scalar: &GqlScalar) -> String {
+fn build_scalar_str(gql_scalar: &GqlScalar) -> String {
     let mut scope = Scope::new();
     scope.new_struct(gql_scalar.name.as_str()).vis("pub");
 
     scope.to_string()
 }
 
-fn gen_object_str(gql_obj: &GqlObject) -> String {
+fn build_object_str(gql_obj: &GqlObject) -> String {
     let mut scope = Scope::new();
     let struct_scope = scope.new_struct(gql_obj.name.as_str()).vis("pub");
 
@@ -70,7 +70,7 @@ fn gen_object_str(gql_obj: &GqlObject) -> String {
     scope.to_string()
 }
 
-fn gen_interface_str(gql_interface: &GqlInterface) -> String {
+fn build_interface_str(gql_interface: &GqlInterface) -> String {
     let mut scope = Scope::new();
     let trait_scope = scope.new_trait(gql_interface.name.as_str()).vis("pub");
 
@@ -82,7 +82,7 @@ fn gen_interface_str(gql_interface: &GqlInterface) -> String {
     scope.to_string()
 }
 
-fn gen_union_str(gql_union: &GqlUnion) -> String {
+fn build_union_str(gql_union: &GqlUnion) -> String {
     let mut scope = Scope::new();
     let enum_scope = scope.new_enum(gql_union.name.as_str()).vis("pub");
 
@@ -93,7 +93,7 @@ fn gen_union_str(gql_union: &GqlUnion) -> String {
     scope.to_string()
 }
 
-fn gen_input_object_str(gql_input: &GqlInputObject) -> String {
+fn build_input_object_str(gql_input: &GqlInputObject) -> String {
     let mut scope = Scope::new();
     let struct_scope = scope.new_struct(gql_input.name.as_str()).vis("pub");
 
@@ -104,14 +104,14 @@ fn gen_input_object_str(gql_input: &GqlInputObject) -> String {
     scope.to_string()
 }
 
-fn gen_list_str(gql_list: &GqlTypeDefinition) -> String {
+fn build_list_str(gql_list: &GqlTypeDefinition) -> String {
     let mut scope = Scope::new();
     println!("{}", gql_list.name());
 
     scope.to_string()
 }
 
-fn gen_enum_str(gql_enum: &GqlEnum) -> String {
+fn build_enum_str(gql_enum: &GqlEnum) -> String {
     let mut scope = Scope::new();
     let enum_scope = scope.new_enum(gql_enum.name.as_str()).vis("pub");
 

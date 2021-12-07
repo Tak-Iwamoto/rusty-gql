@@ -6,7 +6,7 @@ use rusty_gql::{self, GqlField, OperationType};
 
 use super::utils::{create_file, PathStr};
 
-pub async fn gen_operation_files(
+pub async fn build_operation_files(
     operations: &BTreeMap<String, GqlField>,
     operation_type: OperationType,
 ) -> Result<Vec<()>, Error> {
@@ -19,7 +19,7 @@ pub async fn gen_operation_files(
     };
 
     for (_, field) in operations.iter() {
-        let task = gen_operation_file(field, operation_str);
+        let task = build_operation_file(field, operation_str);
         field_names.push(&field.name);
         futures.push(task);
     }
@@ -79,10 +79,10 @@ fn build_query_str(
     scope.to_string()
 }
 
-async fn gen_operation_file(field: &GqlField, operation_str: &str) -> Result<(), Error> {
+async fn build_operation_file(field: &GqlField, operation_str: &str) -> Result<(), Error> {
     let path = PathStr::new(vec![operation_str, &field.name]).to_string();
     if tokio::fs::File::open(&path).await.is_err() {
-        let content = gen_field_str(&field);
+        let content = build_field_str(&field);
         create_file(&path, &content).await?;
         Ok(())
     } else {
@@ -90,7 +90,7 @@ async fn gen_operation_file(field: &GqlField, operation_str: &str) -> Result<(),
     }
 }
 
-fn gen_field_str(field: &GqlField) -> String {
+fn build_field_str(field: &GqlField) -> String {
     let mut scope = Scope::new();
     let fn_scope = scope.new_fn(field.name.as_str());
 

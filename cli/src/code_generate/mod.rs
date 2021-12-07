@@ -1,5 +1,6 @@
 mod operation;
 mod type_definition;
+mod directive;
 mod utils;
 
 use std::io::Error;
@@ -7,20 +8,20 @@ use std::io::Error;
 use futures::future::try_join_all;
 use rusty_gql::{build_schema, OperationType};
 
-use self::{operation::gen_operation_files, type_definition::gen_type_definition_files};
+use self::{operation::build_operation_files, type_definition::build_type_definition_files};
 
-pub async fn gen_graphql_schema(schema_doc: &str) -> Result<(), Error> {
+pub async fn build_graphql_schema(schema_doc: &str) -> Result<(), Error> {
     let schema = build_schema(schema_doc).unwrap();
 
     create_dirs().await?;
 
-    let query_task = gen_operation_files(&schema.queries, OperationType::Query);
-    let mutation_task = gen_operation_files(&schema.mutations, OperationType::Mutation);
-    let subscription_task = gen_operation_files(&schema.subscriptions, OperationType::Subscription);
+    let query_task = build_operation_files(&schema.queries, OperationType::Query);
+    let mutation_task = build_operation_files(&schema.mutations, OperationType::Mutation);
+    let subscription_task = build_operation_files(&schema.subscriptions, OperationType::Subscription);
 
     try_join_all(vec![query_task, mutation_task, subscription_task]).await?;
 
-    let types_task = gen_type_definition_files(&schema.type_definitions);
+    let types_task = build_type_definition_files(&schema.type_definitions);
     types_task.await?;
     Ok(())
 }
@@ -44,12 +45,12 @@ async fn create_dirs() -> Result<Vec<()>, Error> {
 mod tests {
     use std::fs;
 
-    use crate::code_generate::gen_graphql_schema;
+    use crate::code_generate::build_graphql_schema;
 
     #[tokio::test]
     async fn it_works() {
         let schema_doc = fs::read_to_string("../src/tests/github.graphql").unwrap();
-        match gen_graphql_schema(&schema_doc).await {
+        match build_graphql_schema(&schema_doc).await {
             Ok(_) => println!("success"),
             Err(err) => println!("{}", err.to_string()),
         }
