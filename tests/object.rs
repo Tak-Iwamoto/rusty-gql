@@ -13,7 +13,7 @@ pub struct Show {
 
 #[async_trait]
 impl Resolver for Show {
-    async fn resolve_field(&self, ctx: &FieldContext<'_>) -> rusty_gql::Response<Option<GqlValue>> {
+    async fn resolve_field(&self, ctx: &FieldContext<'_>) -> rusty_gql::ResolverResult<Option<GqlValue>> {
         // resolve_object(self, ctx, true).await.map(Some)
         Ok(Some(GqlValue::Null))
     }
@@ -24,7 +24,7 @@ impl SelectionSetResolver for Show {
     async fn resolve_selection_set(
         &self,
         ctx: &SelectionSetContext<'_>,
-    ) -> rusty_gql::Response<GqlValue> {
+    ) -> rusty_gql::ResolverResult<GqlValue> {
         Ok(GqlValue::Null)
     }
 }

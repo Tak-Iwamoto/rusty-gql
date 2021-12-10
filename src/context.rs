@@ -2,7 +2,7 @@ use std::collections::BTreeMap;
 
 use crate::{
     error::GqlError, operation::ArcOperation, path::GraphQLPath, resolver::ResolverFuture,
-    types::schema::ArcSchema, GqlValue, Resolver, Response,
+    types::schema::ArcSchema, GqlValue, Resolver, ResolverResult,
 };
 use graphql_parser::{
     query::{Field, Selection, SelectionSet},
@@ -102,14 +102,14 @@ impl<'a> SelectionSetContext<'a> {
     pub async fn resolve_selection_parallelly<'b, T: Resolver>(
         &'b self,
         parent_type: &'b T,
-    ) -> Response<GqlValue> {
+    ) -> ResolverResult<GqlValue> {
         self.resolve_selection(parent_type, true).await
     }
 
     pub async fn resolve_selection_serially<'b, T: Resolver>(
         &'b self,
         parent_type: &'b T,
-    ) -> Response<GqlValue> {
+    ) -> ResolverResult<GqlValue> {
         self.resolve_selection(parent_type, false).await
     }
 
@@ -117,7 +117,7 @@ impl<'a> SelectionSetContext<'a> {
         &'b self,
         parent_type: &'b T,
         parallel: bool,
-    ) -> Response<GqlValue> {
+    ) -> ResolverResult<GqlValue> {
         let resolvers = self.collect_fields(parent_type)?;
 
         let res = if parallel {
@@ -142,7 +142,7 @@ impl<'a> SelectionSetContext<'a> {
     pub fn collect_fields<'b, T: Resolver>(
         &'b self,
         parent_type: &'b T,
-    ) -> Response<Vec<ResolverFuture<'b>>> {
+    ) -> ResolverResult<Vec<ResolverFuture<'b>>> {
         let mut resolvers: Vec<ResolverFuture<'b>> = Vec::new();
         for item in &self.item.items {
             match &item {

@@ -6,6 +6,7 @@ mod operation;
 mod path;
 mod request;
 mod resolver;
+mod response;
 mod server;
 mod template;
 mod types;
@@ -25,7 +26,7 @@ pub use types::{
     GqlScalar, GqlTypeDefinition, GqlUnion, GqlValue, Schema,
 };
 
-pub type Response<T> = ::std::result::Result<T, GqlError>;
+pub type ResolverResult<T> = ::std::result::Result<T, GqlError>;
 
 pub use rusty_gql_codegen::GqlModel;
 pub use rusty_gql_codegen::Object;
