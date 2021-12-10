@@ -36,7 +36,8 @@ pub async fn execute<T: Resolver>(container: &ArcContainer<T>, request: Request)
                 .await
         }
         OperationType::Subscription => {
-            unreachable!()
+            let error = GqlError::new("subscription cannot execute from this path", None);
+            return Response::from_errors(vec![error]);
         }
     };
 
