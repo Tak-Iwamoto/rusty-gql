@@ -15,10 +15,14 @@ mod validation;
 #[doc(hidden)]
 pub use async_trait;
 
+pub use container::ArcContainer;
 pub use context::{ExecutionContext, FieldContext, SelectionSetContext};
 use error::GqlError;
+pub use executor::execute;
 pub use operation::OperationType;
+pub use request::Request;
 pub use resolver::{Resolver, SelectionSetResolver};
+pub use response::Response;
 pub use template::GraphiQLTemplate;
 pub use types::schema::build_schema;
 pub use types::{

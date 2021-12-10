@@ -1,5 +1,5 @@
 [package]
-name = "rocket"
+name = "rusty-gql-rocket"
 version = "0.1.0"
 edition = "2021"
 
