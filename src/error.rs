@@ -1,12 +1,13 @@
 use graphql_parser::Pos;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Location {
     pub line: usize,
     pub column: usize,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub enum GqlErrorType {
     BadRequest,
     FailedPreCondition,
@@ -18,7 +19,7 @@ pub enum GqlErrorType {
     Unknow,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct GraphQLTypedError {
     pub error_type: GqlErrorType,
     pub error_detail: Option<String>,
@@ -27,7 +28,7 @@ pub struct GraphQLTypedError {
     pub debug_uri: Option<String>,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct GqlError {
     pub message: String,
     pub locations: Vec<Location>,

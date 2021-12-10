@@ -1,8 +1,9 @@
 use std::collections::BTreeMap;
 
 use graphql_parser::schema::Value;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub enum GqlValue {
     Variable(String),
     Int(i64),

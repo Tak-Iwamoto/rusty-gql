@@ -10,10 +10,9 @@ members = ["examples/*", "codegen", "cli"]
 anyhow = "1.0.44"
 askama = "0.10.5"
 async-trait = "0.1.51"
-axum = "0.2.5"
 futures = "0.3.17"
 graphql-parser = "0.3.0"
-rocket = "0.4.10"
+http = "0.2.5"
 rusty-gql-codegen = {path = "codegen"}
 serde = {version = "1.0.130", features = ["derive"]}
 serde_json = "1.0.68"
