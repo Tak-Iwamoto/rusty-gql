@@ -21,6 +21,13 @@ impl Response {
         }
     }
 
+    pub fn from_errors(errors: Vec<GqlError>) -> Self {
+        Self {
+            errors,
+            ..Default::default()
+        }
+    }
+
     pub fn is_ok(&self) -> bool {
         self.errors.is_empty()
     }

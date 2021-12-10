@@ -4,19 +4,22 @@ use crate::{
     error::GqlError,
     operation::{build_operation, ArcOperation},
     request::Request,
+    response::Response,
     OperationType, Resolver,
 };
 
-pub async fn execute<T: Resolver>(
-    container: &ArcContainer<T>,
-    request: Request,
-) -> Result<(), GqlError> {
+pub async fn execute<T: Resolver>(container: &ArcContainer<T>, request: Request) -> Response {
     let operation = build_operation(
         &request.query_doc,
         &container.schema,
         request.operation_name,
-    )?;
-    let operation = ArcOperation::new(operation);
+    );
+
+    let operation = match operation {
+        Ok(op) => ArcOperation::new(op),
+        Err(error) => return Response::from_errors(vec![error]),
+    };
+
     let ctx = build_context(&container.schema, &operation);
 
     let ctx_selection_set = &ctx.with_selection_set(&operation.selection_set);
@@ -36,7 +39,15 @@ pub async fn execute<T: Resolver>(
             unreachable!()
         }
     };
-    Ok(())
+
+    match result {
+        Ok(value) => Response::new(value),
+        Err(error) => {
+            let mut errors = vec![error];
+            errors.extend(ctx_selection_set.errors.clone());
+            Response::from_errors(errors)
+        }
+    }
 }
 
 #[cfg(test)]
