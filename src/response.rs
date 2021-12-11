@@ -6,7 +6,7 @@ use crate::{error::GqlError, GqlValue};
 #[derive(Serialize, Deserialize, Default)]
 pub struct Response {
     #[serde(default)]
-    data: GqlValue,
+    pub data: GqlValue,
     #[serde(skip_serializing_if = "Vec::is_empty", default)]
     pub errors: Vec<GqlError>,
     #[serde(skip)]
