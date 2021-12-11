@@ -9,6 +9,9 @@ use crate::code_generate::build_graphql_schema;
 mod app;
 mod exit_codes;
 mod code_generate;
+mod integration;
+
+pub use integration::{ActixWebGqlResponse, AxumGqlResponse, RocketGqlResponse};
 
 async fn run() -> Result<ExitCode> {
     let matches = build_app().get_matches();
