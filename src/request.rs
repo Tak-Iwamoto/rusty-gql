@@ -1,5 +1,7 @@
 use serde::{Deserialize, Serialize};
 
+use crate::variables::Variables;
+
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Request {
@@ -7,4 +9,7 @@ pub struct Request {
     pub query_doc: String,
     #[serde(default)]
     pub operation_name: Option<String>,
+
+    #[serde(default)]
+    pub variables: Variables,
 }

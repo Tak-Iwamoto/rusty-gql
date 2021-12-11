@@ -1,9 +1,10 @@
 use std::collections::BTreeMap;
 
 use graphql_parser::schema::Value;
-use serde::{Deserialize, Serialize};
+use serde::ser::Error as SerError;
+use serde::{Deserialize, Serialize, Serializer};
 
-#[derive(Debug, Clone, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize)]
 pub enum GqlValue {
     Variable(String),
     Int(i64),
@@ -14,6 +15,22 @@ pub enum GqlValue {
     Enum(String),
     List(Vec<GqlValue>),
     Object(BTreeMap<String, GqlValue>),
+}
+
+impl Serialize for GqlValue {
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        match self {
+            GqlValue::Variable(_) => Err(S::Error::custom("cannot serialize variable")),
+            GqlValue::Int(v) => serializer.serialize_i64(*v),
+            GqlValue::Float(v) => serializer.serialize_f64(*v),
+            GqlValue::String(v) => serializer.serialize_str(v),
+            GqlValue::Boolean(v) => serializer.serialize_bool(*v),
+            GqlValue::Null => serializer.serialize_none(),
+            GqlValue::Enum(v) => serializer.serialize_str(v),
+            GqlValue::List(v) => v.serialize(serializer),
+            GqlValue::Object(v) => v.serialize(serializer),
+        }
+    }
 }
 
 impl Default for GqlValue {

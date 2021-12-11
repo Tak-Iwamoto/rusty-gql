@@ -1,4 +1,5 @@
 mod response;
+mod request;
 
 #[cfg(test)]
 mod tests {

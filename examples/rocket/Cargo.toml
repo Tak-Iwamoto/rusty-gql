@@ -8,3 +8,6 @@ edition = "2021"
 [dependencies]
 rocket = "0.4.10"
 rusty-gql = { path = "../.." }
+
+[toolchain]
+channel = "nightly"

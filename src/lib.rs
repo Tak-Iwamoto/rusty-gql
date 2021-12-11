@@ -11,6 +11,7 @@ mod server;
 mod template;
 mod types;
 mod validation;
+mod variables;
 
 #[doc(hidden)]
 pub use async_trait;

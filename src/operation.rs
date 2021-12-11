@@ -250,8 +250,6 @@ mod tests {
 
     use crate::types::schema::{build_schema, ArcSchema};
 
-    use super::build_operation;
-
     #[test]
     fn it_works() {
         let schema_doc = fs::read_to_string("src/tests/github.graphql").unwrap();

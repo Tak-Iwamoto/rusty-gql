@@ -55,17 +55,12 @@ pub async fn execute<T: Resolver>(container: &ArcContainer<T>, request: Request)
 mod tests {
     use std::fs;
 
-    use crate::{build_schema, request::Request, types::schema::ArcSchema};
+    use crate::{build_schema, types::schema::ArcSchema};
 
     #[tokio::test]
     async fn it_works() {
         let schema_doc = fs::read_to_string("src/tests/github.graphql").unwrap();
         let schema = ArcSchema::new(build_schema(schema_doc.as_str()).unwrap());
         let query_doc = fs::read_to_string("src/tests/github_query.graphql").unwrap();
-
-        let request = Request {
-            query_doc,
-            operation_name: None,
-        };
     }
 }
