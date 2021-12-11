@@ -2,9 +2,9 @@ use std::collections::BTreeMap;
 
 use graphql_parser::schema::Value;
 use serde::ser::Error as SerError;
-use serde::{Deserialize, Serialize, Serializer};
+use serde::{de::Visitor, Deserialize, Serialize, Serializer};
 
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone)]
 pub enum GqlValue {
     Variable(String),
     Int(i64),
@@ -30,6 +30,89 @@ impl Serialize for GqlValue {
             GqlValue::List(v) => v.serialize(serializer),
             GqlValue::Object(v) => v.serialize(serializer),
         }
+    }
+}
+
+struct GqlValueVisitor;
+
+impl<'de> Visitor<'de> for GqlValueVisitor {
+    type Value = GqlValue;
+
+    fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
+        formatter.write_str("GraphQL value")
+    }
+
+    fn visit_bool<E>(self, v: bool) -> Result<Self::Value, E>
+    where
+        E: serde::de::Error,
+    {
+        Ok(GqlValue::Boolean(v))
+    }
+
+    fn visit_i64<E>(self, v: i64) -> Result<Self::Value, E>
+    where
+        E: serde::de::Error,
+    {
+        Ok(GqlValue::Int(v))
+    }
+
+    fn visit_f64<E>(self, v: f64) -> Result<Self::Value, E>
+    where
+        E: serde::de::Error,
+    {
+        Ok(GqlValue::Float(v))
+    }
+
+    fn visit_str<E>(self, v: &str) -> Result<Self::Value, E>
+    where
+        E: serde::de::Error,
+    {
+        Ok(GqlValue::String(v.to_string()))
+    }
+
+    fn visit_string<E>(self, v: String) -> Result<Self::Value, E>
+    where
+        E: serde::de::Error,
+    {
+        Ok(GqlValue::String(v))
+    }
+
+    fn visit_none<E>(self) -> Result<Self::Value, E>
+    where
+        E: serde::de::Error,
+    {
+        Ok(GqlValue::Null)
+    }
+
+    fn visit_seq<A>(self, mut seq: A) -> Result<Self::Value, A::Error>
+    where
+        A: serde::de::SeqAccess<'de>,
+    {
+        let mut vec = Vec::new();
+        while let Some(elem) = seq.next_element()? {
+            vec.push(elem);
+        }
+        Ok(GqlValue::List(vec))
+    }
+
+    fn visit_map<A>(self, mut map: A) -> Result<Self::Value, A::Error>
+    where
+        A: serde::de::MapAccess<'de>,
+    {
+        let mut result = BTreeMap::new();
+        while let Some((name, value)) = map.next_entry()? {
+            result.insert(name, value);
+        }
+        Ok(GqlValue::Object(result))
+    }
+}
+
+impl<'de> Deserialize<'de> for GqlValue {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        deserializer.deserialize_any(GqlValueVisitor)
     }
 }
 
