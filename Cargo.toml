@@ -4,7 +4,7 @@ name = "rusty-gql"
 version = "0.1.0"
 
 [workspace]
-members = ["examples/*", "codegen", "cli"]
+members = ["examples/*", "codegen", "cli", "frameworks/axum", "frameworks/actix_web", "frameworks/rocket"]
 
 [dependencies]
 anyhow = "1.0.44"
