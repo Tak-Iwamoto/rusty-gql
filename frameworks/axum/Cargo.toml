@@ -1,12 +1,16 @@
 [package]
+edition = "2021"
 name = "rusty-gql-axum"
 version = "0.1.0"
-edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 async-trait = "0.1.52"
-axum = { version = "0.4.2", features = ["ws", "headers"] }
-rusty-gql = { path = "../..", version = "0.1.0" }
+axum = {version = "0.4.2", features = ["ws", "headers"]}
+bytes = "1.1.0"
+futures = "0.3.18"
+http-body = "0.4.4"
+rusty-gql = {path = "../..", version = "0.1.0"}
 serde_urlencoded = "0.7.0"
+tokio-util = {version = "0.6.9", default-features = false, features = ["io", "compat"]}

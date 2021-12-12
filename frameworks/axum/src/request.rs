@@ -1,8 +1,11 @@
-use axum::body::{self, Body, HttpBody};
-use axum::extract::FromRequest;
+use axum::extract::{BodyStream, FromRequest};
 use axum::http::{Method, StatusCode};
 use axum::response::{IntoResponse, Response};
-use rusty_gql::HttpRequestError;
+use axum::{body, BoxError};
+use bytes::Bytes;
+use futures::TryStreamExt;
+use rusty_gql::{receive_http_request, HttpRequestError};
+use tokio_util::compat::TokioAsyncReadCompatExt;
 
 pub struct GqlRequest(pub rusty_gql::Request);
 
@@ -27,31 +30,34 @@ impl From<HttpRequestError> for GqlRejection {
 #[async_trait::async_trait]
 impl<B> FromRequest<B> for GqlRequest
 where
-    B: HttpBody + Send + Sync + 'static,
+    B: http_body::Body + Unpin + Send + Sync + 'static,
+    B::Data: Into<Bytes>,
+    B::Error: Into<BoxError>,
 {
     type Rejection = GqlRejection;
-
     async fn from_request(
         req: &mut axum::extract::RequestParts<B>,
     ) -> Result<Self, Self::Rejection> {
-        if &Method::GET == req.method() {
-            let res =
-                serde_urlencoded::from_str(req.uri().query().unwrap_or_default()).map_err(|err| {
-                    HttpRequestError::Io(std::io::Error::new(
-                        std::io::ErrorKind::Other,
-                        format!("failed to parse graphql requst from query params: {}", err),
-                    ))
-                });
+        if let (&Method::GET, uri) = (req.method(), req.uri()) {
+            let res = serde_urlencoded::from_str(uri.query().unwrap_or_default()).map_err(|err| {
+                HttpRequestError::Io(std::io::Error::new(
+                    std::io::ErrorKind::Other,
+                    format!("failed to parse graphql requst from query params: {}", err),
+                ))
+            });
             Ok(Self(res?))
         } else {
-            let res =
-                serde_urlencoded::from_str(req.uri().query().unwrap_or_default()).map_err(|err| {
+            let body_stream = BodyStream::from_request(req)
+                .await
+                .map_err(|err| {
                     HttpRequestError::Io(std::io::Error::new(
                         std::io::ErrorKind::Other,
-                        format!("failed to parse graphql requst from query params: {}", err),
+                        err.to_string(),
                     ))
-                });
-            Ok(Self(res?))
+                })?
+                .map_err(|err| std::io::Error::new(std::io::ErrorKind::Other, err.to_string()));
+            let body_reader = tokio_util::io::StreamReader::new(body_stream).compat();
+            Ok(Self(receive_http_request(body_reader).await?))
         }
     }
 }
