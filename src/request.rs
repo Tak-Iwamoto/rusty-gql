@@ -6,7 +6,7 @@ use crate::variables::Variables;
 #[serde(rename_all = "camelCase")]
 pub struct Request {
     #[serde(default)]
-    pub query_doc: String,
+    pub query: String,
     #[serde(default)]
     pub operation_name: Option<String>,
 

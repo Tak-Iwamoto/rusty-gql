@@ -10,7 +10,7 @@ use crate::{
 
 pub async fn execute<T: Resolver>(container: &ArcContainer<T>, request: Request) -> Response {
     let operation = build_operation(
-        &request.query_doc,
+        &request.query,
         &container.schema,
         request.operation_name,
     );

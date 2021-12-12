@@ -7,8 +7,6 @@ mod path;
 mod request;
 mod resolver;
 mod response;
-mod server;
-mod template;
 mod types;
 mod validation;
 mod variables;
@@ -24,7 +22,6 @@ pub use operation::OperationType;
 pub use request::Request;
 pub use resolver::{Resolver, SelectionSetResolver};
 pub use response::Response;
-pub use template::GraphiQLTemplate;
 pub use types::schema::build_schema;
 pub use types::{
     GqlArgument, GqlDirective, GqlEnum, GqlField, GqlInputObject, GqlInterface, GqlObject,
