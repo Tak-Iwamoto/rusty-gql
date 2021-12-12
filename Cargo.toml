@@ -10,7 +10,7 @@ members = ["examples/*", "codegen", "cli", "frameworks/axum", "frameworks/actix_
 anyhow = "1.0.44"
 askama = "0.10.5"
 async-trait = "0.1.51"
-futures = "0.3.17"
+futures-util = { version = "0.3.18", default-features = false, features = ["io", "sink"] }
 graphql-parser = "0.3.0"
 http = "0.2.5"
 mime = "0.3.16"

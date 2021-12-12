@@ -1,3 +1,4 @@
+use futures_util::future::try_join_all;
 use std::collections::BTreeMap;
 
 use crate::{
@@ -121,7 +122,7 @@ impl<'a> SelectionSetContext<'a> {
         let resolvers = self.collect_fields(parent_type)?;
 
         let res = if parallel {
-            futures::future::try_join_all(resolvers).await?
+            try_join_all(resolvers).await?
         } else {
             let mut results = Vec::new();
             for resolver in resolvers {

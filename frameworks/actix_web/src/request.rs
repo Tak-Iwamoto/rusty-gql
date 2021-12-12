@@ -2,14 +2,14 @@ use std::pin::Pin;
 
 use actix_web::{
     http::{Error, Method},
-    FromRequest, Result,
+    Error, FromRequest, Result,
 };
 use futures::Future;
 
 pub struct GqlRequest(pub rusty_gql::Request);
 
 impl FromRequest for GqlRequest {
-    type Error;
+    type Error = Error;
 
     type Future;
 

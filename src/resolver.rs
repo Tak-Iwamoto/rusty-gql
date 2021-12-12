@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use async_trait::async_trait;
-use futures::future::BoxFuture;
+use futures_util::future::BoxFuture;
 use graphql_parser::{query::Field, schema::Type};
 
 use crate::{

@@ -2,7 +2,7 @@ use actix_web::{
     http::{Error, StatusCode},
     HttpResponse, Responder,
 };
-use futures::future::{ready, Ready};
+use futures_util::future::{ready, Ready};
 
 pub struct GqlResponse(pub rusty_gql::Response);
 

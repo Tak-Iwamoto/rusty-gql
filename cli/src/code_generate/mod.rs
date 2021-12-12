@@ -5,7 +5,7 @@ mod utils;
 
 use std::io::Error;
 
-use futures::future::try_join_all;
+use futures_util::future::try_join_all;
 use rusty_gql::{build_schema, OperationType};
 
 use self::{operation::build_operation_files, type_definition::build_type_definition_files};

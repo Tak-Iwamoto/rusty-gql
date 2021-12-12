@@ -1,7 +1,7 @@
 use std::{collections::BTreeMap, io::Error};
 
 use codegen::Scope;
-use futures::future::try_join_all;
+use futures_util::future::try_join_all;
 use rusty_gql::{
     GqlEnum, GqlInputObject, GqlInterface, GqlObject, GqlScalar, GqlTypeDefinition, GqlUnion,
 };

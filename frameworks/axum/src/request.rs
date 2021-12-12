@@ -3,9 +3,9 @@ use axum::http::{Method, StatusCode};
 use axum::response::{IntoResponse, Response};
 use axum::{body, BoxError};
 use bytes::Bytes;
+use futures_util::TryStreamExt;
 use rusty_gql::{receive_http_request, HttpRequestError};
 use tokio_util::compat::TokioAsyncReadCompatExt;
-use futures::TryStreamExt;
 
 pub struct GqlRequest(pub rusty_gql::Request);
 

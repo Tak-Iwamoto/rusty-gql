@@ -1,4 +1,4 @@
-use futures::{future, pin_mut, AsyncRead, AsyncReadExt};
+use futures_util::{pin_mut, AsyncRead, AsyncReadExt};
 use serde::{Deserialize, Serialize};
 
 use crate::variables::Variables;
