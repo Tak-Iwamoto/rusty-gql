@@ -19,7 +19,7 @@ pub use context::{ExecutionContext, FieldContext, SelectionSetContext};
 use error::GqlError;
 pub use executor::execute;
 pub use operation::OperationType;
-pub use request::Request;
+pub use request::{receive_http_request, HttpRequestError, Request};
 pub use resolver::{Resolver, SelectionSetResolver};
 pub use response::Response;
 pub use types::schema::build_schema;
