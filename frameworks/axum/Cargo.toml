@@ -7,5 +7,6 @@ edition = "2021"
 
 [dependencies]
 async-trait = "0.1.52"
-axum = "0.4.2"
+axum = { version = "0.4.2", features = ["ws", "headers"] }
 rusty-gql = { path = "../..", version = "0.1.0" }
+serde_urlencoded = "0.7.0"
