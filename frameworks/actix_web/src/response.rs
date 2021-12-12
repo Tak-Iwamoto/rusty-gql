@@ -4,15 +4,15 @@ use actix_web::{
 };
 use futures::future::{ready, Ready};
 
-pub struct ActixWebGqlResponse(pub rusty_gql::Response);
+pub struct GqlResponse(pub rusty_gql::Response);
 
-impl From<rusty_gql::Response> for ActixWebGqlResponse {
+impl From<rusty_gql::Response> for GqlResponse {
     fn from(response: rusty_gql::Response) -> Self {
-        ActixWebGqlResponse(response)
+        GqlResponse(response)
     }
 }
 
-impl Responder for ActixWebGqlResponse {
+impl Responder for GqlResponse {
     type Body = HttpResponse;
 
     fn respond_to(self, _: &actix_web::HttpRequest) -> HttpResponse {
