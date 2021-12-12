@@ -13,14 +13,12 @@ impl From<rusty_gql::Response> for ActixWebGqlResponse {
 }
 
 impl Responder for ActixWebGqlResponse {
-    type Error = Error;
+    type Body = HttpResponse;
 
-    type Future = Ready<Result<HttpResponse, Error>>;
-
-    fn respond_to(self, _: &actix_web::HttpRequest) -> Self::Future {
+    fn respond_to(self, _: &actix_web::HttpRequest) -> HttpResponse {
         let body = serde_json::to_string(&self.0).unwrap();
-        ready(Ok(HttpResponse::Ok()
+        HttpResponse::Ok()
             .content_type("application/json")
-            .body(body)))
+            .body(body)
     }
 }
