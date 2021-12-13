@@ -6,31 +6,43 @@ use crate::{
     Resolver,
 };
 
-pub struct Container<T: Resolver> {
-    pub query_resolvers: T,
-    pub mutation_resolvers: T,
-    pub subscription_resolvers: T,
+pub struct Container<Query: Resolver, Mutation: Resolver, Subscription: Resolver> {
+    pub query_resolvers: Query,
+    pub mutation_resolvers: Mutation,
+    pub subscription_resolvers: Subscription,
     pub schema: ArcSchema,
 }
 
-pub struct ArcContainer<T: Resolver>(Arc<Container<T>>);
+#[derive(Clone)]
+pub struct ArcContainer<Query: Resolver, Mutation: Resolver, Subscription: Resolver>(
+    Arc<Container<Query, Mutation, Subscription>>,
+);
 
-impl<T> Deref for ArcContainer<T>
+impl<Query, Mutation, Subscription> Deref for ArcContainer<Query, Mutation, Subscription>
 where
-    T: Resolver,
+    Query: Resolver,
+    Mutation: Resolver,
+    Subscription: Resolver,
 {
-    type Target = Container<T>;
+    type Target = Container<Query, Mutation, Subscription>;
 
     fn deref(&self) -> &Self::Target {
         &self.0
     }
 }
 
-impl<T> ArcContainer<T>
+impl<Query, Mutation, Subscription> ArcContainer<Query, Mutation, Subscription>
 where
-    T: Resolver,
+    Query: Resolver,
+    Mutation: Resolver,
+    Subscription: Resolver,
 {
-    pub fn new(schema_doc: &str, query: T, mutation: T, subscription: T) -> Result<Self, GqlError> {
+    pub fn new(
+        schema_doc: &str,
+        query: Query,
+        mutation: Mutation,
+        subscription: Subscription,
+    ) -> Result<Self, GqlError> {
         let schema = build_schema(schema_doc)?;
         Ok(ArcContainer(Arc::new(Container {
             query_resolvers: query,

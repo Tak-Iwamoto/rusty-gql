@@ -4,7 +4,7 @@ fn main() {
     println!("Hello, world!");
 }
 
-#[rocket::post("/graphql", data = "<request>", format = "application/json")]
-async fn execute_gql<T: Resolver>(container: &ArcContainer<T>, request: Request) -> Response {
-    execute(container, request).await
-}
+// #[rocket::post("/graphql", data = "<request>", format = "application/json")]
+// async fn execute_gql<T: Resolver>(container: &ArcContainer<T>, request: Request) -> Response {
+//     execute(container, request).await
+// }

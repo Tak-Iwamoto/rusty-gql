@@ -8,12 +8,11 @@ use crate::{
     OperationType, Resolver,
 };
 
-pub async fn execute<T: Resolver>(container: &ArcContainer<T>, request: Request) -> Response {
-    let operation = build_operation(
-        &request.query,
-        &container.schema,
-        request.operation_name,
-    );
+pub async fn execute<Query: Resolver, Mutation: Resolver, Subscription: Resolver>(
+    container: &ArcContainer<Query, Mutation, Subscription>,
+    request: Request,
+) -> Response {
+    let operation = build_operation(&request.query, &container.schema, request.operation_name);
 
     let operation = match operation {
         Ok(op) => ArcOperation::new(op),

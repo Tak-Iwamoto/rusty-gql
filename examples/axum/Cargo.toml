@@ -6,7 +6,8 @@ version = "0.1.0"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-askama = "0.10.5"
-axum = "0.2.5"
+axum = {version = "0.4.2", features = ["headers"]}
+hyper = "0.14.16"
 rusty-gql = {path = "../.."}
+rusty-gql-axum = {path = "../../frameworks/axum"}
 tokio = {version = "1.12.0", features = ["full"]}
