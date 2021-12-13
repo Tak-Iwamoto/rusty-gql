@@ -9,4 +9,5 @@ version = "0.1.0"
 askama = "0.10.5"
 axum = "0.2.5"
 rusty-gql = {path = "../.."}
+rusty-gql-axum = {path = "../../frameworks/axum"}
 tokio = {version = "1.12.0", features = ["full"]}
