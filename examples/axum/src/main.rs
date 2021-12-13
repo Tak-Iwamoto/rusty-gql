@@ -1,8 +1,8 @@
-use rusty_gql::{execute, ArcContainer, Object, Resolver};
+use rusty_gql::{execute, ArcContainer, Resolver};
 use rusty_gql_axum::{GqlRequest, GqlResponse};
 use std::net::SocketAddr;
 
-use axum::{extract::Extension, handler::post, AddExtensionLayer, Router};
+use axum::{extract::Extension, routing::post, AddExtensionLayer, Router};
 
 #[derive(Clone)]
 struct Query;
@@ -50,15 +50,17 @@ async fn graphql_handler(container: Extension<Container>, req: GqlRequest) -> Gq
     GqlResponse::from(result)
 }
 
+async fn test() -> &'static str {
+    "test"
+}
+
 #[tokio::main]
 async fn main() {
     let schema_doc = std::fs::read_to_string("./src/tests/starwars.graphql").unwrap();
-    let query = Query {};
-    let mutation = Mutation {};
-    let subscription = Subscription {};
-    let container = ArcContainer::new(schema_doc.as_str(), query, mutation, subscription);
+    let container = ArcContainer::new(schema_doc.as_str(), Query, Mutation, Subscription);
     let app = Router::new()
         .route("/graphql", post(graphql_handler))
+        // .route("/graphql", get(test))
         .layer(AddExtensionLayer::new(container));
     let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
     axum::Server::bind(&addr)
