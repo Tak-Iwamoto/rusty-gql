@@ -39,7 +39,7 @@ impl Response {
 
 #[cfg(test)]
 mod tests {
-    use std::collections::{BTreeMap, HashMap};
+    use std::collections::BTreeMap;
 
     use crate::{GqlValue, Response};
 

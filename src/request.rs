@@ -37,3 +37,16 @@ pub enum HttpRequestError {
     Io(std::io::Error),
     InvalidRequest(Box<dyn std::error::Error + Send + Sync>),
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::Request;
+
+    #[test]
+    fn test_deserialize() {
+        // r#"{"data":true}"#
+        let query_doc = r#"{"query": "test"}"#;
+        let req = serde_json::from_str::<Request>(query_doc);
+        println!("{:?}", req.unwrap().query);
+    }
+}
