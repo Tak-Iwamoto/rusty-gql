@@ -5,7 +5,7 @@ use std::net::SocketAddr;
 use axum::{
     extract::Extension,
     response::{self, IntoResponse},
-    routing::{get, post},
+    routing::get,
     AddExtensionLayer, Router,
 };
 
@@ -56,7 +56,7 @@ async fn graphql_handler(container: Extension<Container>, req: GqlRequest) -> Gq
 }
 
 async fn gql_playground() -> impl IntoResponse {
-    response::Html(playground_html("/"))
+    response::Html(playground_html("/graphql"))
 }
 
 #[tokio::main]
