@@ -36,3 +36,26 @@ impl Response {
         !self.is_ok()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use std::collections::{BTreeMap, HashMap};
+
+    use crate::{GqlValue, Response};
+
+    #[test]
+    fn test_json_serialize() {
+        let boolean = Response::new(GqlValue::Boolean(true));
+        assert_eq!(serde_json::to_string(&boolean).unwrap(), r#"{"data":true}"#);
+
+        let map = BTreeMap::from([
+            ("a".to_string(), GqlValue::Int(1)),
+            ("b".to_string(), GqlValue::Int(2)),
+        ]);
+        let obj = Response::new(GqlValue::Object(map));
+        assert_eq!(
+            serde_json::to_string(&obj).unwrap(),
+            r#"{"data":{"a":1,"b":2}}"#
+        );
+    }
+}
