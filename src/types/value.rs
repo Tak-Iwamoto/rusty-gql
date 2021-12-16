@@ -188,9 +188,23 @@ impl From<String> for GqlValue {
     }
 }
 
-impl From<i64> for GqlValue {
-    fn from(int_value: i64) -> Self {
-        GqlValue::Number(Number::from(int_value))
+macro_rules! from_integer {
+    ($($ty:ident),*) => {
+        $(
+            impl From<$ty> for GqlValue {
+                fn from(n: $ty) -> Self {
+                    GqlValue::Number(n.into())
+                }
+            }
+        )*
+    };
+}
+
+from_integer!(i8, i16, i32, i64, isize, u8, u16, u32, u64, usize);
+
+impl From<f32> for GqlValue {
+    fn from(v: f32) -> Self {
+        From::from(v as f64)
     }
 }
 
