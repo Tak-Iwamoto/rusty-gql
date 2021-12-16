@@ -41,6 +41,8 @@ impl Response {
 mod tests {
     use std::collections::BTreeMap;
 
+    use serde_json::Number;
+
     use crate::{GqlValue, Response};
 
     #[test]
@@ -49,8 +51,8 @@ mod tests {
         assert_eq!(serde_json::to_string(&boolean).unwrap(), r#"{"data":true}"#);
 
         let map = BTreeMap::from([
-            ("a".to_string(), GqlValue::Int(1)),
-            ("b".to_string(), GqlValue::Int(2)),
+            ("a".to_string(), GqlValue::Number(Number::from(1))),
+            ("b".to_string(), GqlValue::Number(Number::from(1))),
         ]);
         let obj = Response::new(GqlValue::Object(map));
         assert_eq!(

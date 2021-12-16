@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 use crate::GqlValue;
 
 #[derive(Serialize, Default)]
-pub struct Variables(BTreeMap<String, GqlValue>);
+pub struct Variables(pub BTreeMap<String, GqlValue>);
 
 impl<'de> Deserialize<'de> for Variables {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>

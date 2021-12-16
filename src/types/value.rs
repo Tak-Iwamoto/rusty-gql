@@ -3,12 +3,12 @@ use std::collections::BTreeMap;
 use graphql_parser::schema::Value;
 use serde::ser::Error as SerError;
 use serde::{de::Visitor, Deserialize, Serialize, Serializer};
+use serde_json::Number;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Eq)]
 pub enum GqlValue {
     Variable(String),
-    Int(i64),
-    Float(f64),
+    Number(Number),
     String(String),
     Boolean(bool),
     Null,
@@ -17,12 +17,31 @@ pub enum GqlValue {
     Object(BTreeMap<String, GqlValue>),
 }
 
+impl PartialEq for GqlValue {
+    fn eq(&self, other: &Self) -> bool {
+        match (self, other) {
+            (Self::Variable(l0), Self::Variable(r0)) => l0 == r0,
+            (Self::Number(l0), Self::Number(r0)) => l0 == r0,
+            (Self::String(l0), Self::String(r0)) => l0 == r0,
+            (Self::Boolean(l0), Self::Boolean(r0)) => l0 == r0,
+            (Self::Enum(l0), Self::Enum(r0)) => l0 == r0,
+            (Self::List(l0), Self::List(r0)) => {
+                if l0.len() != r0.len() {
+                    return false;
+                }
+                l0.iter().zip(r0.iter()).all(|(l, r)| l == r)
+            }
+            (Self::Object(l0), Self::Object(r0)) => l0 == r0,
+            _ => false,
+        }
+    }
+}
+
 impl Serialize for GqlValue {
     fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
         match self {
             GqlValue::Variable(_) => Err(S::Error::custom("cannot serialize variable")),
-            GqlValue::Int(v) => serializer.serialize_i64(*v),
-            GqlValue::Float(v) => serializer.serialize_f64(*v),
+            GqlValue::Number(v) => v.serialize(serializer),
             GqlValue::String(v) => serializer.serialize_str(v),
             GqlValue::Boolean(v) => serializer.serialize_bool(*v),
             GqlValue::Null => serializer.serialize_none(),
@@ -53,14 +72,24 @@ impl<'de> Visitor<'de> for GqlValueVisitor {
     where
         E: serde::de::Error,
     {
-        Ok(GqlValue::Int(v))
+        Ok(GqlValue::Number(v.into()))
+    }
+
+    fn visit_u64<E>(self, v: u64) -> Result<Self::Value, E>
+    where
+        E: serde::de::Error,
+    {
+        Ok(GqlValue::Number(v.into()))
     }
 
     fn visit_f64<E>(self, v: f64) -> Result<Self::Value, E>
     where
         E: serde::de::Error,
     {
-        Ok(GqlValue::Float(v))
+        match Number::from_f64(v) {
+            Some(v) => Ok(GqlValue::Number(v)),
+            None => Ok(GqlValue::Null),
+        }
     }
 
     fn visit_str<E>(self, v: &str) -> Result<Self::Value, E>
@@ -126,8 +155,14 @@ impl<'a> From<Value<'a, String>> for GqlValue {
     fn from(value: Value<'a, String>) -> Self {
         match value {
             Value::Variable(var) => GqlValue::Variable(var),
-            Value::Int(int) => GqlValue::Int(int.as_i64().unwrap()),
-            Value::Float(float) => GqlValue::Float(float),
+            Value::Int(int) => match int.as_i64() {
+                Some(v) => GqlValue::Number(Number::from(v)),
+                None => GqlValue::Null,
+            },
+            Value::Float(float) => match Number::from_f64(float) {
+                Some(v) => GqlValue::Number(v),
+                None => GqlValue::Null,
+            },
             Value::String(string) => GqlValue::String(string),
             Value::Boolean(boolean) => GqlValue::Boolean(boolean),
             Value::Null => GqlValue::Null,
@@ -155,13 +190,13 @@ impl From<String> for GqlValue {
 
 impl From<i64> for GqlValue {
     fn from(int_value: i64) -> Self {
-        GqlValue::Int(int_value)
+        GqlValue::Number(Number::from(int_value))
     }
 }
 
 impl From<f64> for GqlValue {
-    fn from(float_value: f64) -> Self {
-        GqlValue::Float(float_value)
+    fn from(v: f64) -> Self {
+        Number::from_f64(v).map_or(GqlValue::Null, GqlValue::Number)
     }
 }
 
@@ -182,59 +217,3 @@ impl From<BTreeMap<String, GqlValue>> for GqlValue {
         GqlValue::Object(obj)
     }
 }
-
-// pub fn value_from_ast<'a>(
-//     value: &Value<'a, String>,
-//     gql_type: &GqlType,
-//     variables: &Option<HashMap<String, GqlValue>>,
-// ) -> GqlValue {
-//     match value {
-//         Value::Variable(variable) => {
-//             if let Some(vars) = variables {
-//                 let variable_value = vars.get(&variable.to_string());
-//                 if let GqlType::NonNull(_) = gql_type {
-//                     if variable_value.is_none() {
-//                         GqlValue::Null
-//                     } else {
-//                         variable_value.unwrap().clone()
-//                     }
-//                 } else {
-//                     match variable_value {
-//                         Some(var) => var.clone(),
-//                         None => GqlValue::Null,
-//                     }
-//                 }
-//             } else {
-//                 GqlValue::Null
-//             }
-//         }
-//         Value::Int(int_value) => {
-//             if let Some(int) = int_value.as_i64() {
-//                 GqlValue::Int(int)
-//             } else {
-//                 GqlValue::Null
-//             }
-//         }
-//         Value::Float(float_value) => GqlValue::Float(*float_value),
-//         Value::String(str_value) => GqlValue::String(str_value.to_string()),
-//         Value::Boolean(bool_value) => GqlValue::Boolean(*bool_value),
-//         Value::Null => GqlValue::Null,
-//         Value::Enum(enum_literal) => GqlValue::Enum(enum_literal.to_string()),
-//         Value::List(list_value) => {
-//             let mut values = vec![];
-//             for item in list_value {
-//                 let value = value_from_ast(item, &gql_type, variables);
-//                 values.push(value);
-//             }
-//             GqlValue::List(values)
-//         }
-//         Value::Object(obj) => {
-//             let mut obj_value = BTreeMap::new();
-//             for (k, v) in obj.iter() {
-//                 let value = value_from_ast(&v, &gql_type, variables);
-//                 obj_value.insert(k.to_string(), value);
-//             }
-//             GqlValue::Object(obj_value)
-//         }
-//     }
-// }

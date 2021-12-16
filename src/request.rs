@@ -40,13 +40,52 @@ pub enum HttpRequestError {
 
 #[cfg(test)]
 mod tests {
-    use crate::Request;
+    use std::collections::HashMap;
+
+    use serde_json::Number;
+
+    use crate::{GqlValue, Request};
 
     #[test]
-    fn test_deserialize() {
-        // r#"{"data":true}"#
-        let query_doc = r#"{"query": "test"}"#;
-        let req = serde_json::from_str::<Request>(query_doc);
-        println!("{:?}", req.unwrap().query);
+    fn test_operation_name() {
+        let query_doc = r#"{"query": "{ hero droids jedi }", "operationName": "hero"}"#;
+        let req = serde_json::from_str::<Request>(query_doc).unwrap();
+        assert_eq!(req.query, "{ hero droids jedi }");
+        assert_eq!(req.operation_name, Some("hero".to_string()));
+        assert!(req.variables.0.is_empty());
+    }
+
+    #[test]
+    fn test_variables() {
+        let query_doc = r#"{"query": "{ hero droids jedi }", "variables": {"var1": 100, "var2": "value", "var3": [1,1,1]}}"#;
+        let req = serde_json::from_str::<Request>(query_doc).unwrap();
+        assert_eq!(req.query, "{ hero droids jedi }");
+        assert!(req.operation_name.is_none());
+
+        assert_eq!(
+            req.variables.0.get("var1"),
+            Some(&GqlValue::Number(Number::from(100 as i32)))
+        );
+        assert_eq!(
+            req.variables.0.get("var2"),
+            Some(&GqlValue::String(String::from("value")))
+        );
+        assert_eq!(
+            req.variables.0.get("var3"),
+            Some(&GqlValue::List(vec![
+                GqlValue::Number(Number::from(1 as i32)),
+                GqlValue::Number(Number::from(1 as i32)),
+                GqlValue::Number(Number::from(1 as i32))
+            ]))
+        );
+    }
+
+    #[test]
+    fn test_null_variables() {
+        let query_doc = r#"{"query": "{ hero droids jedi }", "variables": null}"#;
+        let req = serde_json::from_str::<Request>(query_doc).unwrap();
+        assert_eq!(req.query, "{ hero droids jedi }");
+        assert!(req.operation_name.is_none());
+        assert!(req.variables.0.is_empty());
     }
 }
