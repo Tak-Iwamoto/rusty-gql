@@ -28,7 +28,6 @@ pub async fn build_graphql_schema(schema_doc: &str) -> Result<(), Error> {
 
 async fn create_dirs() -> Result<Vec<()>, Error> {
     let mut futures = Vec::new();
-    // dirを作るときはcliのroot配下に作成される
     futures.push(tokio::fs::create_dir_all("graphql"));
     futures.push(tokio::fs::create_dir_all("graphql/query"));
     futures.push(tokio::fs::create_dir_all("graphql/mutation"));

@@ -19,7 +19,6 @@ pub struct Operation<'a> {
     pub selection_set: SelectionSet<'a, String>,
     pub root_field: Field<'a, String>,
     pub fragment_definitions: BTreeMap<String, FragmentDefinition<'a, String>>,
-    // pub errors
 }
 
 #[derive(Debug)]
