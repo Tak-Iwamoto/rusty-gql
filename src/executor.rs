@@ -44,7 +44,7 @@ pub async fn execute<Query: Resolver, Mutation: Resolver, Subscription: Resolver
         Ok(value) => Response::new(value),
         Err(error) => {
             let mut errors = vec![error];
-            errors.extend(ctx_selection_set.errors.clone());
+            errors.extend(ctx_selection_set.operation.errors.lock().unwrap().clone());
             Response::from_errors(errors)
         }
     }

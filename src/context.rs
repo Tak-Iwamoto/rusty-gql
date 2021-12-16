@@ -16,7 +16,6 @@ pub struct ExecutionContext<'a, T> {
     pub operation: &'a ArcOperation<'a>,
     pub item: T,
     pub current_path: GraphQLPath,
-    pub errors: Vec<GqlError>,
 }
 
 pub type FieldContext<'a> = ExecutionContext<'a, &'a Field<'a, String>>;
@@ -33,7 +32,6 @@ impl<'a, T> ExecutionContext<'a, T> {
             operation: self.operation,
             item: field,
             current_path: self.current_path.clone(),
-            errors: self.errors.clone(),
         }
     }
 
@@ -46,7 +44,6 @@ impl<'a, T> ExecutionContext<'a, T> {
             operation: self.operation,
             item: selection_set,
             current_path: self.current_path.clone(),
-            errors: self.errors.clone(),
         }
     }
 
@@ -60,6 +57,9 @@ impl<'a, T> ExecutionContext<'a, T> {
             return skip;
         }
         false
+    }
+    pub fn add_error(&self, error: &GqlError) {
+        self.operation.errors.lock().unwrap().push(error.clone());
     }
 }
 
@@ -223,6 +223,5 @@ pub(crate) fn build_context<'a>(
         operation,
         item: current_field,
         current_path,
-        errors: vec![],
     }
 }

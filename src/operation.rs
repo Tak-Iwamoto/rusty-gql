@@ -1,7 +1,7 @@
 use std::{
     collections::{BTreeMap, HashMap},
     ops::Deref,
-    sync::Arc,
+    sync::{Arc, Mutex},
 };
 
 use graphql_parser::{
@@ -11,7 +11,7 @@ use graphql_parser::{
 
 use crate::{error::GqlError, types::schema::ArcSchema, Schema};
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct Operation<'a> {
     pub operation_type: OperationType,
     pub directives: Vec<Directive<'a, String>>,
@@ -19,6 +19,7 @@ pub struct Operation<'a> {
     pub selection_set: SelectionSet<'a, String>,
     pub root_field: Field<'a, String>,
     pub fragment_definitions: BTreeMap<String, FragmentDefinition<'a, String>>,
+    pub errors: Mutex<Vec<GqlError>>,
 }
 
 #[derive(Debug)]
@@ -172,6 +173,7 @@ pub fn build_operation<'a>(
                         variable_definitions: definition.variable_definitions,
                         selection_set: definition.selection_set,
                         root_field: definition.root_field,
+                        errors: Default::default(),
                     })
                 }
                 None => Err(GqlError::new(
@@ -190,6 +192,7 @@ pub fn build_operation<'a>(
                     variable_definitions: definition.variable_definitions,
                     selection_set: definition.selection_set,
                     root_field: definition.root_field,
+                    errors: Default::default(),
                 })
             }
             None => match operation_definitions.values().next() {
@@ -202,6 +205,7 @@ pub fn build_operation<'a>(
                         variable_definitions: definition.variable_definitions,
                         selection_set: definition.selection_set,
                         root_field: definition.root_field,
+                        errors: Default::default(),
                     })
                 }
                 None => Err(GqlError::new("operation does not exist", None)),
