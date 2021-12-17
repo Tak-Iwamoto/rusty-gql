@@ -7,6 +7,6 @@ use crate::Schema;
 //   deprecationReason: String
 // }
 
-pub(crate) struct __EnumValue {
-    schema: &Schema,
+pub(crate) struct __EnumValue<'a> {
+    schema: &'a Schema,
 }

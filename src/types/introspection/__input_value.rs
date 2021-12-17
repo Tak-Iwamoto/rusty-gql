@@ -7,6 +7,6 @@ use crate::Schema;
 //   defaultValue: String
 // }
 
-pub(crate) struct __InputValue {
-    schema: &Schema,
+pub(crate) struct __InputValue<'a> {
+    schema: &'a Schema,
 }

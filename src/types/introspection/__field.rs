@@ -9,6 +9,6 @@ use crate::Schema;
 //   deprecationReason: String
 // }
 
-pub(crate) struct __Field {
-    schema: &Schema,
+pub(crate) struct __Field<'a> {
+    schema: &'a Schema,
 }

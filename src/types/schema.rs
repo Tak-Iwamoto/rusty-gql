@@ -350,6 +350,7 @@ pub fn build_schema(schema_doc: &str) -> Result<Schema, GqlError> {
                     name: directive.name,
                     description: directive.description,
                     arguments,
+                    locations: directive.locations,
                 };
                 directive_map.insert(result.name.to_string(), result);
             }

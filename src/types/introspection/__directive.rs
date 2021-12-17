@@ -1,7 +1,7 @@
 use crate::Schema;
 
-pub(crate) struct __Directive {
-    schema: &Schema,
+pub(crate) struct __Directive<'a> {
+    schema: &'a Schema,
 }
 
 #[allow(non_camel_case_types)]

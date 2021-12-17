@@ -40,8 +40,6 @@ pub enum HttpRequestError {
 
 #[cfg(test)]
 mod tests {
-    use std::collections::HashMap;
-
     use serde_json::Number;
 
     use crate::{GqlValue, Request};

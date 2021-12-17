@@ -1,6 +1,9 @@
 use std::collections::BTreeMap;
 
-use graphql_parser::{schema::Directive, Pos};
+use graphql_parser::{
+    schema::{Directive, DirectiveLocation},
+    Pos,
+};
 
 use super::{argument::GqlArgument, value::GqlValue};
 
@@ -41,4 +44,5 @@ pub struct GqlDirectiveDefinition {
     pub name: String,
     pub description: Option<String>,
     pub arguments: Vec<GqlArgument>,
+    pub locations: Vec<DirectiveLocation>,
 }

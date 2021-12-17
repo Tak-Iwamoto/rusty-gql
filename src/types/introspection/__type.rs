@@ -1,3 +1,5 @@
+use crate::Schema;
+
 // type __Type {
 //   kind: __TypeKind!
 //   name: String
@@ -18,8 +20,8 @@
 //   specifiedByURL: String
 // }
 
-pub(crate) struct __Type {
-    schema: &Schema,
+pub(crate) struct __Type<'a> {
+    schema: &'a Schema,
 }
 
 #[allow(non_camel_case_types)]
