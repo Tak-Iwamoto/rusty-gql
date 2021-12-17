@@ -5,6 +5,7 @@ mod executor;
 mod graphiql_html;
 mod operation;
 mod path;
+mod query_root;
 mod request;
 mod resolver;
 mod response;

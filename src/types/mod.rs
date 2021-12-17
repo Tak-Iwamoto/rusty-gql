@@ -5,6 +5,7 @@ mod gql_enum;
 mod gql_union;
 mod input_object;
 mod interface;
+mod introspection;
 mod object;
 mod scalar;
 mod type_definition;
