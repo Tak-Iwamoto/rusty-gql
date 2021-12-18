@@ -118,4 +118,27 @@ impl<'a> __Type<'a> {
             None
         }
     }
+
+    async fn interfaces(&self) -> Option<Vec<__Type<'a>>> {
+        if let TypeDetail::Named(def) = self.detail {
+            if let GqlTypeDefinition::Object(obj) = def {
+                let mut interfaces = Vec::new();
+
+                for interface_name in &obj.implements_interfaces {
+                    match self.schema.type_definitions.get(interface_name) {
+                        Some(def) => {
+                            let ty = __Type::from_type_definition(self.schema, def);
+                            interfaces.push(ty);
+                        }
+                        None => continue,
+                    }
+                }
+                Some(interfaces)
+            } else {
+                None
+            }
+        } else {
+            None
+        }
+    }
 }
