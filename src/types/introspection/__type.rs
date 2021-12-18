@@ -1,6 +1,6 @@
 use crate::{types::GqlValueType, GqlTypeDefinition, Schema};
 
-use super::__field::__Field;
+use super::{__enum_value::__EnumValue, __field::__Field};
 
 // type __Type {
 //   kind: __TypeKind!
@@ -165,6 +165,19 @@ impl<'a> __Type<'a> {
                 }
                 _ => None,
             }
+        } else {
+            None
+        }
+    }
+
+    async fn enum_values(&self) -> Option<Vec<__EnumValue<'a>>> {
+        if let TypeDetail::Named(GqlTypeDefinition::Enum(enu)) = &self.detail {
+            let mut values = Vec::new();
+            for v in &enu.values {
+                let value = __EnumValue::new(self.schema, &v);
+                values.push(value);
+            }
+            Some(values)
         } else {
             None
         }
