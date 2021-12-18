@@ -1,5 +1,7 @@
 use crate::{types::GqlValueType, GqlTypeDefinition, Schema};
 
+use super::__field::__Field;
+
 // type __Type {
 //   kind: __TypeKind!
 //   name: String
@@ -97,6 +99,23 @@ impl<'a> __Type<'a> {
             TypeDetail::Named(def) => def.description().as_ref(),
             TypeDetail::NonNull(_) => None,
             TypeDetail::List(_) => None,
+        }
+    }
+
+    async fn fields(&self) -> Option<Vec<__Field<'a>>> {
+        if let TypeDetail::Named(def) = self.detail {
+            match def.fields() {
+                Some(fields) => {
+                    let result = fields
+                        .into_iter()
+                        .map(|field| __Field::new(self.schema, field.clone()))
+                        .collect();
+                    Some(result)
+                }
+                None => None,
+            }
+        } else {
+            None
         }
     }
 }
