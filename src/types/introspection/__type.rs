@@ -91,4 +91,12 @@ impl<'a> __Type<'a> {
             TypeDetail::List(_) => None,
         }
     }
+
+    async fn description(&self) -> Option<&String> {
+        match self.detail {
+            TypeDetail::Named(def) => def.description().as_ref(),
+            TypeDetail::NonNull(_) => None,
+            TypeDetail::List(_) => None,
+        }
+    }
 }

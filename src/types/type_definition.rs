@@ -71,6 +71,17 @@ impl GqlTypeDefinition {
         }
     }
 
+    pub fn description(&self) -> &Option<String> {
+        match self {
+            GqlTypeDefinition::Scalar(scalar) => &scalar.description,
+            GqlTypeDefinition::Object(obj) => &obj.description,
+            GqlTypeDefinition::Interface(interface) => &interface.description,
+            GqlTypeDefinition::Union(uni) => &uni.description,
+            GqlTypeDefinition::Enum(enu) => &enu.description,
+            GqlTypeDefinition::InputObject(input_object) => &input_object.description,
+        }
+    }
+
     pub fn is_input_type(&self) -> bool {
         matches!(
             self,
