@@ -1,4 +1,4 @@
-use crate::{GqlTypeDefinition, Schema};
+use crate::{types::GqlValueType, GqlTypeDefinition, Schema};
 
 // type __Type {
 //   kind: __TypeKind!
@@ -20,9 +20,15 @@ use crate::{GqlTypeDefinition, Schema};
 //   specifiedByURL: String
 // }
 
+pub(crate) enum TypeDetail<'a> {
+    Named(&'a GqlTypeDefinition),
+    NonNull(&'a str),
+    List(&'a str),
+}
+
 pub(crate) struct __Type<'a> {
     schema: &'a Schema,
-    type_definition: &'a GqlTypeDefinition,
+    detail: TypeDetail<'a>,
 }
 
 #[allow(non_camel_case_types)]
@@ -38,10 +44,31 @@ pub(crate) enum __TypeKind {
 }
 
 impl<'a> __Type<'a> {
-    pub fn new(schema: &'a Schema, type_definition: &'a GqlTypeDefinition) -> Self {
+    pub fn from_type_definition(
+        schema: &'a Schema,
+        type_definition: &'a GqlTypeDefinition,
+    ) -> Self {
         __Type {
             schema,
-            type_definition,
+            detail: TypeDetail::Named(type_definition),
+        }
+    }
+
+    pub fn from_value_type(schema: &'a Schema, value_type: &'a GqlValueType) -> Self {
+        let detail = match value_type {
+            GqlValueType::NamedType(named) => {
+                let type_def = schema.type_definitions.get(named);
+                match type_def {
+                    Some(def) => TypeDetail::Named(def),
+                    None => panic!("Unknown type: '{}'", named),
+                }
+            }
+            GqlValueType::ListType(list) => TypeDetail::List(list.name()),
+            GqlValueType::NonNullType(non_null) => TypeDetail::NonNull(non_null.name()),
+        };
+        __Type {
+            schema,
+            detail,
         }
     }
 }

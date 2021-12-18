@@ -30,7 +30,6 @@ impl ToString for GqlTypeDefinition {
     }
 }
 
-// TODO: introspection用のメソッドを定義する
 impl GqlTypeDefinition {
     pub fn type_name_from_def<'a>(type_definition: &TypeDefinition<'a, String>) -> String {
         match type_definition {

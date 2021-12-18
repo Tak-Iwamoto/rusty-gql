@@ -377,10 +377,9 @@ mod tests {
     #[test]
     fn it_works() {
         let contents = fs::read_to_string("src/tests/github.graphql");
-        let v = contents.unwrap();
-        let schema = build_schema(v.as_str()).unwrap();
+        let schema = build_schema(contents.unwrap().as_str()).unwrap();
 
-        let query = schema.queries.get("repository").unwrap();
-        println!("{:?}", query)
+        assert!(schema.queries.get("repository").is_some());
+        assert!(schema.type_definitions.get("AddCommentInput").is_some());
     }
 }
