@@ -1,6 +1,6 @@
 use crate::{types::GqlValueType, GqlTypeDefinition, Schema};
 
-use super::{__enum_value::__EnumValue, __field::__Field, __input_value::__InputValue};
+use super::{enum_value::__EnumValue, field::__Field, input_value::__InputValue};
 
 // type __Type {
 //   kind: __TypeKind!
