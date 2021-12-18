@@ -28,7 +28,6 @@ async fn build_type_definition_file(type_def: &GqlTypeDefinition) -> Result<(), 
         GqlTypeDefinition::Union(_) => "model",
         GqlTypeDefinition::Enum(_) => "model",
         GqlTypeDefinition::InputObject(_) => "input",
-        GqlTypeDefinition::List(_) => "model",
     };
     let path = PathStr::new(vec![base_path, type_def.name()]).to_string();
     if tokio::fs::File::open(&path).await.is_err() {
@@ -48,7 +47,6 @@ fn build_type_definition_str(type_def: &GqlTypeDefinition) -> String {
         GqlTypeDefinition::Union(uni) => build_union_str(uni),
         GqlTypeDefinition::Enum(enu) => build_enum_str(enu),
         GqlTypeDefinition::InputObject(input) => build_input_object_str(input),
-        GqlTypeDefinition::List(list) => build_list_str(list),
     }
 }
 
@@ -100,13 +98,6 @@ fn build_input_object_str(gql_input: &GqlInputObject) -> String {
     for field in &gql_input.fields {
         struct_scope.field(&field.name, field.meta_type.to_rust_type());
     }
-
-    scope.to_string()
-}
-
-fn build_list_str(gql_list: &GqlTypeDefinition) -> String {
-    let mut scope = Scope::new();
-    println!("{}", gql_list.name());
 
     scope.to_string()
 }

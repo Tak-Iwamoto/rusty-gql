@@ -15,7 +15,6 @@ pub enum GqlTypeDefinition {
     Union(GqlUnion),
     Enum(GqlEnum),
     InputObject(GqlInputObject),
-    List(Box<GqlTypeDefinition>),
 }
 
 impl ToString for GqlTypeDefinition {
@@ -27,7 +26,6 @@ impl ToString for GqlTypeDefinition {
             GqlTypeDefinition::Union(_) => "Union".to_string(),
             GqlTypeDefinition::Enum(_) => "Enum".to_string(),
             GqlTypeDefinition::InputObject(_) => "InputObject".to_string(),
-            GqlTypeDefinition::List(_) => "List".to_string(),
         }
     }
 }
@@ -71,7 +69,6 @@ impl GqlTypeDefinition {
             GqlTypeDefinition::Union(uni) => &uni.name,
             GqlTypeDefinition::Enum(enu) => &enu.name,
             GqlTypeDefinition::InputObject(input_object) => &input_object.name,
-            GqlTypeDefinition::List(list) => &list.name(),
         }
     }
 

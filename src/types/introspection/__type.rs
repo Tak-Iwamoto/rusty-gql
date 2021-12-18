@@ -1,4 +1,4 @@
-use crate::Schema;
+use crate::{GqlTypeDefinition, Schema};
 
 // type __Type {
 //   kind: __TypeKind!
@@ -22,6 +22,7 @@ use crate::Schema;
 
 pub(crate) struct __Type<'a> {
     schema: &'a Schema,
+    type_definition: &'a GqlTypeDefinition,
 }
 
 #[allow(non_camel_case_types)]
@@ -34,4 +35,13 @@ pub(crate) enum __TypeKind {
     INPUT_OBJECT,
     LIST,
     NON_NULL,
+}
+
+impl<'a> __Type<'a> {
+    pub fn new(schema: &'a Schema, type_definition: &'a GqlTypeDefinition) -> Self {
+        __Type {
+            schema,
+            type_definition,
+        }
+    }
 }
