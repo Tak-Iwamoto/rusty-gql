@@ -33,14 +33,14 @@ pub(crate) struct __Type<'a> {
 
 #[allow(non_camel_case_types)]
 pub(crate) enum __TypeKind {
-    SCALAR,
-    OBJECT,
-    INTERFACE,
-    UNION,
-    ENUM,
-    INPUT_OBJECT,
-    LIST,
-    NON_NULL,
+    Scalar,
+    Object,
+    Interface,
+    Union,
+    Enum,
+    InputObject,
+    List,
+    NonNull,
 }
 
 impl<'a> __Type<'a> {
@@ -66,9 +66,21 @@ impl<'a> __Type<'a> {
             GqlValueType::ListType(list) => TypeDetail::List(list.name()),
             GqlValueType::NonNullType(non_null) => TypeDetail::NonNull(non_null.name()),
         };
-        __Type {
-            schema,
-            detail,
+        __Type { schema, detail }
+    }
+
+    async fn kind(&self) -> __TypeKind {
+        match self.detail {
+            TypeDetail::Named(def) => match def {
+                GqlTypeDefinition::Scalar(_) => __TypeKind::Scalar,
+                GqlTypeDefinition::Object(_) => __TypeKind::Object,
+                GqlTypeDefinition::Interface(_) => __TypeKind::Interface,
+                GqlTypeDefinition::Union(_) => __TypeKind::Union,
+                GqlTypeDefinition::Enum(_) => __TypeKind::Enum,
+                GqlTypeDefinition::InputObject(_) => __TypeKind::InputObject,
+            },
+            TypeDetail::NonNull(_) => __TypeKind::NonNull,
+            TypeDetail::List(_) => __TypeKind::List,
         }
     }
 }
