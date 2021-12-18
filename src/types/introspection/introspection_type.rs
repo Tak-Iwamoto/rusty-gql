@@ -2,26 +2,6 @@ use crate::{types::GqlValueType, GqlTypeDefinition, Schema};
 
 use super::{enum_value::__EnumValue, field::__Field, input_value::__InputValue};
 
-// type __Type {
-//   kind: __TypeKind!
-//   name: String
-//   description: String
-//   # must be non-null for OBJECT and INTERFACE, otherwise null.
-//   fields(includeDeprecated: Boolean = false): [__Field!]
-//   # must be non-null for OBJECT and INTERFACE, otherwise null.
-//   interfaces: [__Type!]
-//   # must be non-null for INTERFACE and UNION, otherwise null.
-//   possibleTypes: [__Type!]
-//   # must be non-null for ENUM, otherwise null.
-//   enumValues(includeDeprecated: Boolean = false): [__EnumValue!]
-//   # must be non-null for INPUT_OBJECT, otherwise null.
-//   inputFields: [__InputValue!]
-//   # must be non-null for NON_NULL and LIST, otherwise null.
-//   ofType: __Type
-//   # may be non-null for custom SCALAR, otherwise null.
-//   specifiedByURL: String
-// }
-
 pub(crate) enum TypeDetail<'a> {
     Named(&'a GqlTypeDefinition),
     NonNull(&'a str),
@@ -193,6 +173,26 @@ impl<'a> __Type<'a> {
             Some(values)
         } else {
             None
+        }
+    }
+
+    async fn of_type(&self) -> Option<__Type<'a>> {
+        match self.detail {
+            TypeDetail::Named(_) => None,
+            TypeDetail::NonNull(type_name) => {
+                let type_def = self.schema.type_definitions.get(type_name);
+                match type_def {
+                    Some(def) => Some(__Type::from_type_definition(self.schema, def)),
+                    None => panic!("Unknown type: '{}'", type_name),
+                }
+            }
+            TypeDetail::List(type_name) => {
+                let type_def = self.schema.type_definitions.get(type_name);
+                match type_def {
+                    Some(def) => Some(__Type::from_type_definition(self.schema, def)),
+                    None => panic!("Unknown type: '{}'", type_name),
+                }
+            }
         }
     }
 }
