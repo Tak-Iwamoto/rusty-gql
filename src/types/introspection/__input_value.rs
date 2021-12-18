@@ -1,4 +1,4 @@
-use crate::Schema;
+use crate::{GqlArgument, Schema};
 
 // type __InputValue {
 //   name: String!
@@ -9,4 +9,14 @@ use crate::Schema;
 
 pub(crate) struct __InputValue<'a> {
     schema: &'a Schema,
+    detail: GqlArgument,
+}
+
+impl<'a> __InputValue<'a> {
+    pub fn new(schema: &'a Schema, value: &'a GqlArgument) -> Self {
+        Self {
+            schema,
+            detail: value.clone(),
+        }
+    }
 }
