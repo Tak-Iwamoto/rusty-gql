@@ -83,4 +83,12 @@ impl<'a> __Type<'a> {
             TypeDetail::List(_) => __TypeKind::List,
         }
     }
+
+    async fn name(&self) -> Option<&str> {
+        match self.detail {
+            TypeDetail::Named(def) => Some(def.name()),
+            TypeDetail::NonNull(_) => None,
+            TypeDetail::List(_) => None,
+        }
+    }
 }
