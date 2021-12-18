@@ -141,4 +141,32 @@ impl<'a> __Type<'a> {
             None
         }
     }
+
+    async fn possible_types(&self) -> Option<Vec<__Type<'a>>> {
+        if let TypeDetail::Named(def) = self.detail {
+            match def {
+                GqlTypeDefinition::Interface(interface) => {
+                    let mut types = Vec::new();
+                    for field in &interface.fields {
+                        let ty = __Type::from_value_type(self.schema, &field.meta_type);
+                        types.push(ty);
+                    }
+                    Some(types)
+                }
+                GqlTypeDefinition::Union(uni) => {
+                    let mut types = Vec::new();
+                    for type_name in &uni.types {
+                        if let Some(def) = self.schema.type_definitions.get(type_name) {
+                            let ty = __Type::from_type_definition(self.schema, def);
+                            types.push(ty);
+                        }
+                    }
+                    Some(types)
+                }
+                _ => None,
+            }
+        } else {
+            None
+        }
+    }
 }
