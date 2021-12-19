@@ -16,8 +16,6 @@ use crate::{
 #[proc_macro_attribute]
 #[allow(non_snake_case)]
 pub fn Object(_args: TokenStream, input: TokenStream) -> TokenStream {
-    // let args = parse_macro_input!(args as AttributeArgs);
-
     let mut item_impl = parse_macro_input!(input as ItemImpl);
 
     let expanded = match parse_object_item_impl(&mut item_impl) {
@@ -28,7 +26,7 @@ pub fn Object(_args: TokenStream, input: TokenStream) -> TokenStream {
 }
 
 #[proc_macro_derive(GqlModel)]
-pub fn derive_object(input: TokenStream) -> TokenStream {
+pub fn derive_model(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
 
     let args = match Model::from_derive_input(&input) {

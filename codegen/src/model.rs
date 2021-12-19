@@ -12,9 +12,6 @@ pub struct ModelField {
     pub ty: Type,
     pub vis: Visibility,
     pub attrs: Vec<Attribute>,
-
-    #[darling(default)]
-    pub resolver: bool,
 }
 
 #[derive(FromDeriveInput)]
@@ -50,25 +47,23 @@ pub fn parse_gql_model_input(input: &Model) -> CodegenResult<TokenStream> {
 
         let field_name = field_ident.unraw().to_string();
 
-        if field.resolver {
-            resolvers.push(quote! {
-                if ctx.current_field.name == #field_name {
-                    let resolve_fn = async move {
-                        self.#field_ident().await
-                    };
-                    let obj = resolve_fn.await;
-                    let ctx_selection_set = ctx.with_selection_set(&ctx.item.selection_set);
-                    return ctx_selection_set.resolve_selection_parallelly(&obj).await.map(Some);
-                }
-            })
-        } else {
-            getters.push(quote! {
-                // convert to async method
-                #vis async fn #field_ident(&self) -> rusty_gql::Response<#return_type> {
-                    ::std::result::Result::Ok(::std::clone::Clone::clone(&self.#field_ident))
-                }
-            });
-        }
+        resolvers.push(quote! {
+            if ctx.current_field.name == #field_name {
+                let resolve_fn = async move {
+                    self.#field_ident().await
+                };
+                let obj = resolve_fn.await;
+                let ctx_selection_set = ctx.with_selection_set(&ctx.item.selection_set);
+                return ctx_selection_set.resolve_selection_parallelly(&obj).await.map(Some);
+            }
+        });
+
+        getters.push(quote! {
+            // convert to async method
+            #vis async fn #field_ident(&self) -> rusty_gql::Response<#return_type> {
+                ::std::result::Result::Ok(::std::clone::Clone::clone(&self.#field_ident))
+            }
+        });
     }
 
     let expanded = quote! {
