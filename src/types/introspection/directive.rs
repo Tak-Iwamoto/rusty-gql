@@ -1,28 +1,34 @@
-use crate::Schema;
+use graphql_parser::schema::DirectiveLocation;
+
+use crate::{types::GqlDirectiveDefinition, Schema};
+
+use super::input_value::__InputValue;
 
 pub(crate) struct __Directive<'a> {
-    schema: &'a Schema,
+    pub schema: &'a Schema,
+    pub detail: GqlDirectiveDefinition,
 }
 
-#[allow(non_camel_case_types)]
-pub(crate) enum __DirectiveLocation {
-    QUERY,
-    MUTATION,
-    SUBSCRIPTION,
-    FIELD,
-    FRAGMENT_DEFINITION,
-    FRAGMENT_SPREAD,
-    INLINE_FRAGMENT,
-    VARIABLE_DEFINITION,
-    SCHEMA,
-    SCALAR,
-    OBJECT,
-    FIELD_DEFINITION,
-    ARGUMENT_DEFINITION,
-    INTERFACE,
-    UNION,
-    ENUM,
-    ENUM_VALUE,
-    INPUT_OBJECT,
-    INPUT_FIELD_DEFINITION,
+impl<'a> __Directive<'a> {
+    async fn name(&self) -> &str {
+        self.detail.name.as_str()
+    }
+
+    async fn description(&self) -> Option<&String> {
+        self.detail.description.as_ref()
+    }
+
+    async fn locations(&self) -> &Vec<DirectiveLocation> {
+        &self.detail.locations
+    }
+
+    async fn args(&'a self) -> Vec<__InputValue<'a>> {
+        let mut result = Vec::new();
+
+        for arg in &self.detail.arguments {
+            let value = __InputValue::new(self.schema, arg);
+            result.push(value);
+        }
+        result
+    }
 }
