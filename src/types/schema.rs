@@ -74,19 +74,34 @@ pub fn build_schema(schema_doc: &str) -> Result<Schema, GqlError> {
 
                 graphql_parser::schema::TypeDefinition::Object(obj) => match &*obj.name {
                     "Query" => {
-                        for f in obj.fields {
-                            query_map.insert(f.name.to_string(), GqlField::from(f));
+                        for f in &obj.fields {
+                            query_map.insert(f.name.to_string(), GqlField::from(f.clone()));
                         }
+                        let gql_object = GqlObject::from(obj);
+                        type_definitions.insert(
+                            gql_object.name.to_string(),
+                            GqlTypeDefinition::Object(gql_object),
+                        );
                     }
                     "Mutation" => {
-                        for f in obj.fields {
-                            mutation_map.insert(f.name.to_string(), GqlField::from(f));
+                        for f in &obj.fields {
+                            mutation_map.insert(f.name.to_string(), GqlField::from(f.clone()));
                         }
+                        let gql_object = GqlObject::from(obj);
+                        type_definitions.insert(
+                            gql_object.name.to_string(),
+                            GqlTypeDefinition::Object(gql_object),
+                        );
                     }
                     "Subscription" => {
-                        for f in obj.fields {
-                            subscription_map.insert(f.name.to_string(), GqlField::from(f));
+                        for f in &obj.fields {
+                            subscription_map.insert(f.name.to_string(), GqlField::from(f.clone()));
                         }
+                        let gql_object = GqlObject::from(obj);
+                        type_definitions.insert(
+                            gql_object.name.to_string(),
+                            GqlTypeDefinition::Object(gql_object),
+                        );
                     }
                     _ => {
                         let gql_object = GqlObject::from(obj);

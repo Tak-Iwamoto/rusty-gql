@@ -6,10 +6,16 @@ use super::input_value::__InputValue;
 
 pub(crate) struct __Directive<'a> {
     pub schema: &'a Schema,
-    pub detail: GqlDirectiveDefinition,
+    pub detail: &'a GqlDirectiveDefinition,
 }
 
 impl<'a> __Directive<'a> {
+    pub fn new(schema: &'a Schema, directive: &'a GqlDirectiveDefinition) -> Self {
+        __Directive {
+            schema,
+            detail: directive,
+        }
+    }
     async fn name(&self) -> &str {
         self.detail.name.as_str()
     }
