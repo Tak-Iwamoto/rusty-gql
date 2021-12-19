@@ -17,6 +17,21 @@ pub enum GqlValue {
     Object(BTreeMap<String, GqlValue>),
 }
 
+impl ToString for GqlValue {
+    fn to_string(&self) -> String {
+        match self {
+            GqlValue::Variable(v) => v.clone(),
+            GqlValue::Number(v) => v.to_string(),
+            GqlValue::String(v) => v.clone(),
+            GqlValue::Boolean(v) => v.to_string(),
+            GqlValue::Null => "null".to_string(),
+            GqlValue::Enum(v) => v.clone(),
+            GqlValue::List(v) => format!("{:?}", v),
+            GqlValue::Object(v) => format!("{:?}", v),
+        }
+    }
+}
+
 impl PartialEq for GqlValue {
     fn eq(&self, other: &Self) -> bool {
         match (self, other) {
