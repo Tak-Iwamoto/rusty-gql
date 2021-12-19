@@ -64,3 +64,15 @@ impl<'a> From<EnumValue<'a, String>> for GqlEnumValue {
         }
     }
 }
+
+impl GqlEnumValue {
+    pub fn is_deprecated(&self) -> bool {
+        for dir in &self.directives {
+            if dir.name == "deprecated" {
+                return true;
+            }
+            continue;
+        }
+        false
+    }
+}

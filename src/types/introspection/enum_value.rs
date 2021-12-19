@@ -1,12 +1,5 @@
 use crate::{types::GqlEnumValue, Schema};
 
-// type __EnumValue {
-//   name: String!
-//   description: String
-//   isDeprecated: Boolean!
-//   deprecationReason: String
-// }
-
 pub(crate) struct __EnumValue<'a> {
     schema: &'a Schema,
     detail: GqlEnumValue,
@@ -18,5 +11,17 @@ impl<'a> __EnumValue<'a> {
             schema,
             detail: value.clone(),
         }
+    }
+
+    async fn name(&self) -> &str {
+        self.detail.name.as_str()
+    }
+
+    async fn description(&self) -> Option<&String> {
+        self.detail.description.as_ref()
+    }
+
+    async fn is_deprecated(&self) -> bool {
+        self.detail.is_deprecated()
     }
 }
