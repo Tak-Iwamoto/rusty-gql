@@ -74,7 +74,7 @@ pub fn parse_gql_model_input(input: &Model) -> CodegenResult<TokenStream> {
 
         #[rusty_gql::async_trait::async_trait]
         impl #impl_generics rusty_gql::Resolver for #struct_name #ty_generics #where_clause {
-            async fn resolve_field(&self, ctx: &rusty_gql::FieldContext<'_>) -> rusty_gql::Response<::std::option::Option<rusty_gql::GqlValue>> {
+            async fn resolve_field(&self, ctx: &rusty_gql::FieldContext<'_>) -> rusty_gql::ResolverResult<::std::option::Option<rusty_gql::GqlValue>> {
                 #(#resolvers)*
                 Ok(::std::option::Option::None)
             }
@@ -82,7 +82,7 @@ pub fn parse_gql_model_input(input: &Model) -> CodegenResult<TokenStream> {
 
         #[rusty_gql::async_trait::async_trait]
         impl #impl_generics rusty_gql::SelectionSetResolver for #struct_name #ty_generics #where_clause {
-            async fn resolve_selection_set(&self, ctx: &rusty_gql::SelectionSetContext<'_>) -> rusty_gql::Response<rusty_gql::GqlValue> {
+            async fn resolve_selection_set(&self, ctx: &rusty_gql::SelectionSetContext<'_>) -> rusty_gql::ResolverResult<rusty_gql::GqlValue> {
                 ctx.resolve_selection_parallelly(self).await
             }
         }

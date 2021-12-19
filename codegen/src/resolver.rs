@@ -1,10 +1,10 @@
 use proc_macro::{self, TokenStream};
 use quote::quote;
-use syn::{ext::IdentExt, Block, FnArg, ImplItem, ItemImpl, ReturnType, Type, TypeReference};
+use syn::{ext::IdentExt, Block, ImplItem, ItemImpl, ReturnType, Type, TypeReference};
 
 use crate::utils::{get_method_args, is_result_type};
 
-pub fn parse_object_item_impl(item_impl: &mut ItemImpl) -> Result<TokenStream, syn::Error> {
+pub fn parse_resolver_item_impl(item_impl: &mut ItemImpl) -> Result<TokenStream, syn::Error> {
     let self_name = &item_impl.self_ty;
 
     let generics = &item_impl.generics;
@@ -106,7 +106,7 @@ pub fn parse_object_item_impl(item_impl: &mut ItemImpl) -> Result<TokenStream, s
 
         #[rusty_gql::async_trait::async_trait]
         impl #generics rusty_gql::Resolver for #self_name #generics_params #where_clause {
-            async fn resolve_field(&self, ctx: &rusty_gql::FieldContext<'_>) -> rusty_gql::Response<::std::option::Option<rusty_gql::GqlValue>> {
+            async fn resolve_field(&self, ctx: &rusty_gql::FieldContext<'_>) -> rusty_gql::ResolverResult<::std::option::Option<rusty_gql::GqlValue>> {
                 #(#resolvers)*
                 Ok(::std::option::Option::None)
             }
@@ -114,7 +114,7 @@ pub fn parse_object_item_impl(item_impl: &mut ItemImpl) -> Result<TokenStream, s
 
         #[rusty_gql::async_trait::async_trait]
         impl #generics rusty_gql::SelectionSetResolver for #self_name #generics_params #where_clause {
-            async fn resolve_selection_set(&self, ctx: &rusty_gql::SelectionSetContext<'_>) -> rusty_gql::Response<rusty_gql::GqlValue> {
+            async fn resolve_selection_set(&self, ctx: &rusty_gql::SelectionSetContext<'_>) -> rusty_gql::ResolverResult<rusty_gql::GqlValue> {
                 ctx.resolve_selection_parallelly(self).await
             }
         }
