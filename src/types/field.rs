@@ -22,6 +22,16 @@ impl GqlField {
             .map(|field| GqlField::from(field))
             .collect()
     }
+
+    pub fn is_deprecated(&self) -> bool {
+        for dir in &self.directives {
+            if dir.name == "deprecated" {
+                return true;
+            }
+            continue;
+        }
+        false
+    }
 }
 
 impl<'a> From<Field<'a, String>> for GqlField {
