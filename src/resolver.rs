@@ -1,8 +1,9 @@
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
 
 use async_trait::async_trait;
 use futures_util::future::BoxFuture;
 use graphql_parser::{query::Field, schema::Type};
+use serde::Serialize;
 use serde_json::Number;
 
 use crate::{
@@ -116,3 +117,31 @@ impl Resolver for isize {
         Ok(Some(GqlValue::Number(Number::from(*self))))
     }
 }
+
+// #[async_trait::async_trait]
+// impl Resolver for f64 {
+//     async fn resolve_field(&self, _ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
+//         Ok(Some(GqlValue::Number(
+//             Number::from_f64(*self).unwrap_or_default(),
+//         )))
+//     }
+// }
+
+#[async_trait::async_trait]
+impl Resolver for bool {
+    async fn resolve_field(&self, _ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
+        Ok(Some(GqlValue::Boolean(*self)))
+    }
+}
+
+// #[async_trait::async_trait]
+// impl<V> Resolver for BTreeMap<String, V>
+// where
+//     V: Serialize + Send + Sync,
+// {
+//     async fn resolve_field(&self, _ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
+//         let mut value = BTreeMap::new();
+//         BTreeMap::clone_from(&mut value, self);
+//         Ok(Some(GqlValue::Object(value)))
+//     }
+// }

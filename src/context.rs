@@ -140,6 +140,25 @@ impl<'a> SelectionSetContext<'a> {
         Ok(GqlValue::Object(gql_obj_map))
     }
 
+    // async fn resolve_list<'b, T: Resolver>(
+    //     &'b self,
+    //     parent_type: &'b T,
+    //     iter: impl IntoIterator<Item = T>,
+    // ) -> ResolverResult<GqlValue> {
+    //     let mut futures = Vec::new();
+    //     for item in iter.into_iter() {
+    //         let ctx = self.clone();
+    //         let ctx_field = &ctx.with_field(field);
+    //         futures.push(async move {
+    //             item.resolve_field(ctx_field)
+    //                 .await
+    //                 .map(|v| v.unwrap_or_default())
+    //         })
+    //     }
+    //     let result = try_join_all(futures).await?;
+    //     Ok(GqlValue::List(result))
+    // }
+
     pub fn collect_fields<'b, T: Resolver>(
         &'b self,
         parent_type: &'b T,
