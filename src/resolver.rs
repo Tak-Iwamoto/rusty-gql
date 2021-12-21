@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use async_trait::async_trait;
 use futures_util::future::BoxFuture;
 use graphql_parser::{query::Field, schema::Type};
+use serde_json::Number;
 
 use crate::{
     context::{FieldContext, SelectionSetContext},
@@ -46,65 +47,72 @@ impl Resolver for String {
     }
 }
 
-// pub fn get_variable_values<'a>(
-//     schema: &'a Schema,
-//     operation: &'a Operation<'a>,
-//     input_values: &BTreeMap<String, GqlValue>,
-// ) -> Result<HashMap<String, GqlValue>, String> {
-//     let mut variables = HashMap::new();
-//     for var in &operation.variable_definitions {
-//         let var_type = get_type_from_schema(schema, &var.var_type);
-
-//         let var_type = match var_type {
-//             Some(ty) => ty,
-//             None => continue,
-//         };
-
-//         let var_name = &var.name.to_string();
-//         if !input_values.contains_key(var_name) {
-//             if let Some(value) = &var.default_value {
-//                 variables.insert(
-//                     var.name.to_string(),
-//                     value_from_ast(value, &var_type, &None),
-//                 );
-//             }
-//         }
-
-//         let value = input_values.get(var_name);
-
-//         if let GqlMetaType::NonNull(_) = var_type {
-//             if value.is_none() {
-//                 return Err(format!("{} must not be null", var_name));
-//             }
-//         }
-
-//         if let Some(var_value) = value {
-//             variables.insert(var_name.to_string(), var_value.clone());
-//         }
-//     }
-//     Ok(variables)
-// }
-
-pub fn get_arguments<'a>(field: Field<'a, String>, variable_values: HashMap<String, GqlValue>) {
-    let arguments = field.arguments;
+#[async_trait::async_trait]
+impl Resolver for i8 {
+    async fn resolve_field(&self, _ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
+        Ok(Some(GqlValue::Number(Number::from(*self))))
+    }
 }
 
-pub fn get_type_from_schema<'a>(
-    schema: &'a Schema,
-    var_type: &'a Type<'a, String>,
-) -> Option<GqlTypeDefinition> {
-    match var_type {
-        graphql_parser::schema::Type::NamedType(named_type) => schema
-            .type_definitions
-            .get(&named_type.to_string())
-            .map(|var_ty| var_ty.clone()),
-        graphql_parser::schema::Type::ListType(list) => {
-            let inner_type = get_type_from_schema(schema, &list).unwrap();
-            Some(inner_type)
-        }
-        graphql_parser::schema::Type::NonNullType(non_null) => {
-            let inner_type = get_type_from_schema(schema, &non_null).unwrap();
-            Some(inner_type)
-        }
+#[async_trait::async_trait]
+impl Resolver for i16 {
+    async fn resolve_field(&self, _ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
+        Ok(Some(GqlValue::Number(Number::from(*self))))
+    }
+}
+
+#[async_trait::async_trait]
+impl Resolver for i32 {
+    async fn resolve_field(&self, _ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
+        Ok(Some(GqlValue::Number(Number::from(*self))))
+    }
+}
+
+#[async_trait::async_trait]
+impl Resolver for i64 {
+    async fn resolve_field(&self, _ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
+        Ok(Some(GqlValue::Number(Number::from(*self))))
+    }
+}
+
+#[async_trait::async_trait]
+impl Resolver for u8 {
+    async fn resolve_field(&self, _ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
+        Ok(Some(GqlValue::Number(Number::from(*self))))
+    }
+}
+
+#[async_trait::async_trait]
+impl Resolver for u16 {
+    async fn resolve_field(&self, _ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
+        Ok(Some(GqlValue::Number(Number::from(*self))))
+    }
+}
+
+#[async_trait::async_trait]
+impl Resolver for u32 {
+    async fn resolve_field(&self, _ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
+        Ok(Some(GqlValue::Number(Number::from(*self))))
+    }
+}
+
+#[async_trait::async_trait]
+impl Resolver for u64 {
+    async fn resolve_field(&self, _ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
+        Ok(Some(GqlValue::Number(Number::from(*self))))
+    }
+}
+
+#[async_trait::async_trait]
+impl Resolver for usize {
+    async fn resolve_field(&self, _ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
+        Ok(Some(GqlValue::Number(Number::from(*self))))
+    }
+}
+
+#[async_trait::async_trait]
+impl Resolver for isize {
+    async fn resolve_field(&self, _ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
+        Ok(Some(GqlValue::Number(Number::from(*self))))
     }
 }

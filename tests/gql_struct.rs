@@ -6,19 +6,20 @@ struct Post {
 }
 
 #[derive(GqlStruct)]
-pub struct Show {
+pub struct Person {
     pub name: String,
     pub description: String,
+    pub age: i32,
 }
 
 #[tokio::test]
 async fn it_works() {
-    let show = Show {
+    let person = Person {
         name: String::from("test"),
         description: String::from("test description"),
+        age: 32,
     };
-    let name = show.name().await.unwrap();
-    println!("{}", name);
-    let des = show.description().await.unwrap();
+    let name = person.name().await.unwrap();
+    let des = person.description().await.unwrap();
     println!("{}", des);
 }
