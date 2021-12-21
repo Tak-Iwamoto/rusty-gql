@@ -1,23 +1,14 @@
-use rusty_gql::GqlModel;
+use rusty_gql::GqlStruct;
 
 struct Post {
     title: String,
     description: String,
 }
 
-#[derive(GqlModel)]
+#[derive(GqlStruct)]
 pub struct Show {
     pub name: String,
     pub description: String,
-}
-
-impl Show {
-    fn posts() -> Vec<Post> {
-        vec![Post {
-            title: "post 1".to_string(),
-            description: "description".to_string(),
-        }]
-    }
 }
 
 #[tokio::test]

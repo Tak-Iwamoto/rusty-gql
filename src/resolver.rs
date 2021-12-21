@@ -13,7 +13,10 @@ pub type ResolverFuture<'a> = BoxFuture<'a, ResolverResult<(String, GqlValue)>>;
 
 #[async_trait]
 pub trait SelectionSetResolver: Resolver {
-    async fn resolve_selection_set(&self, ctx: &SelectionSetContext<'_>) -> ResolverResult<GqlValue>;
+    async fn resolve_selection_set(
+        &self,
+        ctx: &SelectionSetContext<'_>,
+    ) -> ResolverResult<GqlValue>;
 }
 
 #[async_trait]
@@ -26,6 +29,20 @@ impl<T: Resolver> Resolver for &T {
     #[allow(clippy::trivially_copy_pass_by_ref)]
     async fn resolve_field(&self, ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
         T::resolve_field(*self, ctx).await
+    }
+}
+
+#[async_trait::async_trait]
+impl Resolver for str {
+    async fn resolve_field(&self, _ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
+        Ok(Some(GqlValue::String(self.to_string())))
+    }
+}
+
+#[async_trait::async_trait]
+impl Resolver for String {
+    async fn resolve_field(&self, _ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
+        Ok(Some(GqlValue::String(self.clone())))
     }
 }
 

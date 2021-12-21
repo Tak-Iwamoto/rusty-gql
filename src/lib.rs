@@ -33,5 +33,5 @@ pub use types::{
 
 pub type ResolverResult<T> = ::std::result::Result<T, GqlError>;
 
-pub use rusty_gql_codegen::GqlModel;
+pub use rusty_gql_codegen::GqlStruct;
 pub use rusty_gql_codegen::GqlResolver;

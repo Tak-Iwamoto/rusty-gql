@@ -7,7 +7,7 @@ use crate::error::CodegenResult;
 
 #[derive(FromField)]
 #[darling(attributes(gql), forward_attrs(doc))]
-pub struct ModelField {
+pub struct GqlStructField {
     pub ident: Option<Ident>,
     pub ty: Type,
     pub vis: Visibility,
@@ -16,14 +16,14 @@ pub struct ModelField {
 
 #[derive(FromDeriveInput)]
 #[darling(attributes(gql), forward_attrs(doc))]
-pub struct Model {
+pub struct GqlStruct {
     pub ident: Ident,
     pub generics: Generics,
     pub attrs: Vec<Attribute>,
-    pub data: Data<Ignored, ModelField>,
+    pub data: Data<Ignored, GqlStructField>,
 }
 
-pub fn parse_gql_model_input(input: &Model) -> CodegenResult<TokenStream> {
+pub fn parse_gql_struct_input(input: &GqlStruct) -> CodegenResult<TokenStream> {
     let struct_name = &input.ident;
     let (impl_generics, ty_generics, where_clause) = &input.generics.split_for_impl();
 
@@ -48,11 +48,12 @@ pub fn parse_gql_model_input(input: &Model) -> CodegenResult<TokenStream> {
         let field_name = field_ident.unraw().to_string();
 
         resolvers.push(quote! {
-            if ctx.current_field.name == #field_name {
+            if ctx.item.name == #field_name {
                 let resolve_fn = async move {
                     self.#field_ident().await
                 };
-                let obj = resolve_fn.await;
+                // TODO: error handling
+                let obj = resolve_fn.await.unwrap();
                 let ctx_selection_set = ctx.with_selection_set(&ctx.item.selection_set);
                 return ctx_selection_set.resolve_selection_parallelly(&obj).await.map(Some);
             }
@@ -60,7 +61,7 @@ pub fn parse_gql_model_input(input: &Model) -> CodegenResult<TokenStream> {
 
         getters.push(quote! {
             // convert to async method
-            #vis async fn #field_ident(&self) -> rusty_gql::Response<#return_type> {
+            #vis async fn #field_ident(&self) -> rusty_gql::ResolverResult<#return_type> {
                 ::std::result::Result::Ok(::std::clone::Clone::clone(&self.#field_ident))
             }
         });
