@@ -19,4 +19,5 @@ pub async fn test_build_schema() {
 
     let req = serde_json::from_str::<Request>(query_doc).unwrap();
     let res = execute(&container, req).await;
+    println!("{:?}", res.data);
 }

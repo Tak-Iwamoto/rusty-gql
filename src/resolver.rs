@@ -70,6 +70,16 @@ impl Resolver for i32 {
 }
 
 #[async_trait::async_trait]
+impl SelectionSetResolver for i32 {
+    async fn resolve_selection_set(
+        &self,
+        _ctx: &SelectionSetContext<'_>,
+    ) -> ResolverResult<GqlValue> {
+        Ok(GqlValue::Number(Number::from(*self)))
+    }
+}
+
+#[async_trait::async_trait]
 impl Resolver for i64 {
     async fn resolve_field(&self, _ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
         Ok(Some(GqlValue::Number(Number::from(*self))))

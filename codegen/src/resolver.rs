@@ -96,9 +96,7 @@ pub fn parse_resolver_item_impl(item_impl: &mut ItemImpl) -> Result<TokenStream,
                     // TODO: error handling
                     let obj = resolve_fn.await.unwrap();
                     let ctx_selection_set = ctx.with_selection_set(&ctx.item.selection_set);
-                    // let res = ctx_selection_set.resolve_selection_parallelly(&obj).await;
-                    // println!("{:?}", &res);
-                    return ctx_selection_set.resolve_selection_parallelly(&obj).await.map(Some);
+                    return obj.resolve_selection_set(&ctx_selection_set).await.map(Some);
                 }
             });
         }
