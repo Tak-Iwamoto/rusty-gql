@@ -21,5 +21,4 @@ async fn it_works() {
     };
     let name = person.name().await.unwrap();
     let des = person.description().await.unwrap();
-    println!("{}", des);
 }

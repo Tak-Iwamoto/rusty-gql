@@ -147,8 +147,6 @@ impl<'a> SelectionSetContext<'a> {
     // ) -> ResolverResult<GqlValue> {
     //     let mut futures = Vec::new();
     //     for item in iter.into_iter() {
-    //         let ctx = self.clone();
-    //         let ctx_field = &ctx.with_field(field);
     //         futures.push(async move {
     //             item.resolve_field(ctx_field)
     //                 .await

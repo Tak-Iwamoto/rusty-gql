@@ -33,5 +33,31 @@ pub use types::{
 
 pub type ResolverResult<T> = ::std::result::Result<T, GqlError>;
 
-pub use rusty_gql_codegen::GqlStruct;
 pub use rusty_gql_codegen::GqlResolver;
+pub use rusty_gql_codegen::GqlStruct;
+
+#[derive(Clone)]
+pub struct EmptyMutation;
+
+#[async_trait::async_trait]
+impl Resolver for EmptyMutation {
+    async fn resolve_field(
+        &self,
+        ctx: &FieldContext<'_>,
+    ) -> ResolverResult<Option<GqlValue>> {
+        Ok(None)
+    }
+}
+
+#[derive(Clone)]
+pub struct EmptySubscription;
+
+#[async_trait::async_trait]
+impl Resolver for EmptySubscription {
+    async fn resolve_field(
+        &self,
+        ctx: &FieldContext<'_>,
+    ) -> ResolverResult<Option<GqlValue>> {
+        Ok(None)
+    }
+}

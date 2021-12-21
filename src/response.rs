@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{error::GqlError, GqlValue};
 
-#[derive(Serialize, Deserialize, Default)]
+#[derive(Serialize, Deserialize, Default, Debug)]
 pub struct Response {
     #[serde(default)]
     pub data: GqlValue,
