@@ -49,6 +49,16 @@ impl Resolver for String {
 }
 
 #[async_trait::async_trait]
+impl SelectionSetResolver for String {
+    async fn resolve_selection_set(
+        &self,
+        _ctx: &SelectionSetContext<'_>,
+    ) -> ResolverResult<GqlValue> {
+        Ok(GqlValue::String(self.clone()))
+    }
+}
+
+#[async_trait::async_trait]
 impl Resolver for i8 {
     async fn resolve_field(&self, _ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
         Ok(Some(GqlValue::Number(Number::from(*self))))

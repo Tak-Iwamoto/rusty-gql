@@ -1,3 +1,10 @@
 type Query {
   value: Int
+  person: Person
+}
+
+type Person {
+  name: String!
+  description: String!
+  age: Int!
 }

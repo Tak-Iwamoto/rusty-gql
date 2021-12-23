@@ -55,7 +55,7 @@ pub fn parse_gql_struct_input(input: &GqlStruct) -> CodegenResult<TokenStream> {
                 // TODO: error handling
                 let obj = resolve_fn.await.unwrap();
                 let ctx_selection_set = ctx.with_selection_set(&ctx.item.selection_set);
-                return ctx_selection_set.resolve_selection_parallelly(&obj).await.map(Some);
+                return obj.resolve_selection_set(&ctx_selection_set).await.map(Some);
             }
         });
 
