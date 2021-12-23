@@ -1,7 +1,7 @@
 mod boolean;
 mod number;
+mod object;
 mod string;
-use std::collections::HashMap;
 
 use async_trait::async_trait;
 use futures_util::future::BoxFuture;
@@ -34,15 +34,3 @@ impl<T: Resolver> Resolver for &T {
         T::resolve_field(*self, ctx).await
     }
 }
-
-// #[async_trait::async_trait]
-// impl<V> Resolver for BTreeMap<String, V>
-// where
-//     V: Serialize + Send + Sync,
-// {
-//     async fn resolve_field(&self, _ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
-//         let mut value = BTreeMap::new();
-//         BTreeMap::clone_from(&mut value, self);
-//         Ok(Some(GqlValue::Object(value)))
-//     }
-// }
