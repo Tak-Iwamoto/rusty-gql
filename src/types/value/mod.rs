@@ -1,3 +1,5 @@
+mod serializer;
+
 use std::collections::BTreeMap;
 
 use graphql_parser::schema::Value;
