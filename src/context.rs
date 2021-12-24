@@ -7,7 +7,7 @@ use crate::{
 };
 use graphql_parser::{
     query::{Field, Selection, SelectionSet},
-    schema::Directive,
+    schema::{Directive, Value},
 };
 
 #[derive(Debug, Clone)]
@@ -54,8 +54,22 @@ impl<'a, T> ExecutionContext<'a, T> {
                 "include" => false,
                 _ => continue,
             };
+
+            for (key, value) in dir.arguments {
+                if key != "if" {
+                    continue;
+                } else {
+                    if let Value::Boolean(cond) = value {
+                        if skip && cond {
+                            return true;
+                        }
+                    }
+                }
+            }
+
             return skip;
         }
+
         false
     }
     pub fn add_error(&self, error: &GqlError) {
