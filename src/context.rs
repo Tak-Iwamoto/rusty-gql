@@ -3,7 +3,7 @@ use std::collections::BTreeMap;
 
 use crate::{
     error::GqlError, operation::ArcOperation, path::GraphQLPath, resolver::ResolverFuture,
-    types::schema::ArcSchema, GqlValue, Resolver, ResolverResult,
+    types::schema::ArcSchema, GqlValue, Resolver, ResolverResult, SelectionSetResolver,
 };
 use graphql_parser::{
     query::{Field, Selection, SelectionSet},
@@ -55,12 +55,12 @@ impl<'a, T> ExecutionContext<'a, T> {
                 _ => continue,
             };
 
-            for (key, value) in dir.arguments {
+            for (key, value) in &dir.arguments {
                 if key != "if" {
                     continue;
                 } else {
                     if let Value::Boolean(cond) = value {
-                        if skip && cond {
+                        if skip && *cond {
                             return true;
                         }
                     }
@@ -154,22 +154,18 @@ impl<'a> SelectionSetContext<'a> {
         Ok(GqlValue::Object(gql_obj_map))
     }
 
-    // async fn resolve_list<'b, T: Resolver>(
-    //     &'b self,
-    //     parent_type: &'b T,
-    //     iter: impl IntoIterator<Item = T>,
-    // ) -> ResolverResult<GqlValue> {
-    //     let mut futures = Vec::new();
-    //     for item in iter.into_iter() {
-    //         futures.push(async move {
-    //             item.resolve_field(ctx_field)
-    //                 .await
-    //                 .map(|v| v.unwrap_or_default())
-    //         })
-    //     }
-    //     let result = try_join_all(futures).await?;
-    //     Ok(GqlValue::List(result))
-    // }
+    async fn resolve_list<'b, T: SelectionSetResolver>(
+        &'b self,
+        parent_type: &'b T,
+        iter: impl IntoIterator<Item = T>,
+    ) -> ResolverResult<GqlValue> {
+        let mut futures = Vec::new();
+        for item in iter.into_iter() {
+            futures.push(async move { item.resolve_selection_set(self).await })
+        }
+        let result = try_join_all(futures).await?;
+        Ok(GqlValue::List(result))
+    }
 
     pub fn collect_fields<'b, T: Resolver>(
         &'b self,
