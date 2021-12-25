@@ -7,7 +7,7 @@ use crate::error::CodegenResult;
 
 #[derive(FromField)]
 #[darling(attributes(gql), forward_attrs(doc))]
-pub struct GqlStructField {
+pub struct GqlDataField {
     pub ident: Option<Ident>,
     pub ty: Type,
     pub vis: Visibility,
@@ -16,14 +16,14 @@ pub struct GqlStructField {
 
 #[derive(FromDeriveInput)]
 #[darling(attributes(gql), forward_attrs(doc))]
-pub struct GqlStruct {
+pub struct GqlData {
     pub ident: Ident,
     pub generics: Generics,
     pub attrs: Vec<Attribute>,
-    pub data: Data<Ignored, GqlStructField>,
+    pub data: Data<Ignored, GqlDataField>,
 }
 
-pub fn parse_gql_struct_input(input: &GqlStruct) -> CodegenResult<TokenStream> {
+pub fn parse_gql_struct_input(input: &GqlData) -> CodegenResult<TokenStream> {
     let struct_name = &input.ident;
     let (impl_generics, ty_generics, where_clause) = &input.generics.split_for_impl();
 

@@ -1,5 +1,5 @@
 mod error;
-mod gql_struct;
+mod data;
 mod resolver;
 mod types;
 mod utils;
@@ -9,7 +9,7 @@ use proc_macro::{self, TokenStream};
 use syn::{parse_macro_input, AttributeArgs, DeriveInput, ItemImpl};
 
 use crate::{
-    gql_struct::{parse_gql_struct_input, GqlStruct},
+    data::{parse_gql_struct_input, GqlData},
     resolver::parse_resolver_item_impl,
 };
 
@@ -25,11 +25,11 @@ pub fn GqlResolver(_args: TokenStream, input: TokenStream) -> TokenStream {
     expanded
 }
 
-#[proc_macro_derive(GqlStruct)]
+#[proc_macro_derive(GqlData)]
 pub fn derive_model(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
 
-    let args = match GqlStruct::from_derive_input(&input) {
+    let args = match GqlData::from_derive_input(&input) {
         Ok(v) => v,
         Err(e) => {
             return TokenStream::from(e.write_errors());

@@ -2,7 +2,7 @@ use rusty_gql::*;
 
 #[tokio::test]
 async fn it_works() {
-    #[derive(GqlStruct)]
+    #[derive(GqlData)]
     pub struct Person {
         pub name: String,
         pub description: String,
