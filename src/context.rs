@@ -20,6 +20,22 @@ pub struct ExecutionContext<'a, T> {
 
 pub type FieldContext<'a> = ExecutionContext<'a, &'a Field<'a, String>>;
 
+impl<'a> FieldContext<'a> {
+    pub fn get_arg_value(&self, arg_name: &str) -> Option<GqlValue> {
+        let value = self
+            .item
+            .arguments
+            .iter()
+            .find(|(name, _)| name == arg_name)
+            .map(|(_, v)| v);
+
+        match value {
+            Some(v) => Some(GqlValue::from(v.clone())),
+            None => None,
+        }
+    }
+}
+
 pub type SelectionSetContext<'a> = ExecutionContext<'a, &'a SelectionSet<'a, String>>;
 
 impl<'a, T> ExecutionContext<'a, T> {

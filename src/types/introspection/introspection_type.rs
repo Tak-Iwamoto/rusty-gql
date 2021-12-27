@@ -1,3 +1,5 @@
+use rusty_gql_codegen::GqlResolver;
+
 use crate::{types::GqlValueType, GqlTypeDefinition, Schema};
 
 use super::{enum_value::__EnumValue, field::__Field, input_value::__InputValue};

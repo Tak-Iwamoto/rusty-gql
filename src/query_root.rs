@@ -1,4 +1,6 @@
-use crate::Resolver;
+use crate::{
+    error::GqlError, types::__Type, GqlValue, Resolver, ResolverResult, SelectionSetResolver,
+};
 
 pub(crate) struct QueryRoot<T> {
     query: T,
@@ -9,12 +11,32 @@ impl<T: Resolver> Resolver for QueryRoot<T> {
     async fn resolve_field(
         &self,
         ctx: &crate::FieldContext<'_>,
-    ) -> crate::ResolverResult<Option<crate::GqlValue>> {
+    ) -> ResolverResult<Option<crate::GqlValue>> {
         if ctx.item.name == "__schema" {
             let ctx_selection_set = ctx.with_selection_set(&ctx.item.selection_set);
             Ok(None)
         } else if ctx.item.name == "__type" {
-            Ok(None)
+            match &ctx.get_arg_value("name") {
+                Some(value) => {
+                    let ctx_selection_set = ctx.with_selection_set(&ctx.item.selection_set);
+                    if let GqlValue::String(v) = value {
+                        let ty =
+                            ctx_selection_set.schema.type_definitions.get(v).map(|ty| {
+                                __Type::from_type_definition(ctx_selection_set.schema, ty)
+                            });
+                        match ty {
+                            Some(intro_ty) => SelectionSetResolver::resolve_selection_set(
+                                &intro_ty,
+                                &ctx_selection_set,
+                            ),
+                            None => Err(GqlError::new(format!("{} is not defined", v), None)),
+                        }
+                    }
+                }
+                None => {
+                    return Ok(None);
+                }
+            }
         } else {
             self.query.resolve_field(ctx).await
         }
