@@ -9,7 +9,7 @@ use graphql_parser::{query::Field, schema::Type};
 
 use crate::{
     context::{FieldContext, SelectionSetContext},
-    GqlTypeDefinition, GqlValue, ResolverResult, Schema,
+    GqlValue, ResolverResult, Schema,
 };
 
 pub type ResolverFuture<'a> = BoxFuture<'a, ResolverResult<(String, GqlValue)>>;
