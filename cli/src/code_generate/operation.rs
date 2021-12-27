@@ -1,6 +1,7 @@
 use std::{collections::BTreeMap, io::Error};
 
 use codegen::Scope;
+use futures_util::future::try_join_all;
 use rusty_gql::{self, GqlField, OperationType};
 
 use super::utils::{create_file, PathStr};
