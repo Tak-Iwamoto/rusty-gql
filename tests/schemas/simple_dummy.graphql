@@ -1,10 +1,17 @@
 type Query {
   value: Int
   person: Person
+  obj: Obj
 }
 
 type Person {
   name: String!
   description: String!
   age: Int!
+}
+
+
+type Obj {
+  key1: i32
+  key2: i32
 }

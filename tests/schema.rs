@@ -1,3 +1,5 @@
+use std::collections::BTreeMap;
+
 use rusty_gql::*;
 
 #[tokio::test]
@@ -8,6 +10,13 @@ pub async fn test_build_schema() {
     impl Query {
         async fn value(&self, _ctx: &FieldContext<'_>) -> i32 {
             10
+        }
+        async fn obj(&self, _ctx: &FieldContext<'_>) -> BTreeMap<String, i32> {
+            let mut map = BTreeMap::new();
+            map.insert("key1".to_string(), 1);
+            map.insert("key2".to_string(), 2);
+            println!("{:?}", map);
+            map
         }
     }
     let contents = std::fs::read_to_string("./tests/schemas/simple_dummy.graphql").unwrap();
@@ -20,4 +29,8 @@ pub async fn test_build_schema() {
     let req = serde_json::from_str::<Request>(query_doc).unwrap();
     let res = execute(&container, req).await;
     println!("{:?}", res.data);
+
+    let obj_req = serde_json::from_str::<Request>(r#"{"query": "{ obj }"}"#).unwrap();
+    let obj_res = execute(&container, obj_req).await;
+    println!("{:?}", obj_res.data);
 }
