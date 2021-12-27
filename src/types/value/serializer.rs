@@ -234,11 +234,13 @@ impl ser::SerializeSeq for SerializeSeq {
     where
         T: serde::Serialize,
     {
-        todo!()
+        let value = value.serialize(Serializer)?;
+        self.0.push(value);
+        Ok(())
     }
 
     fn end(self) -> Result<Self::Ok, Self::Error> {
-        todo!()
+        Ok(GqlValue::List(self.0))
     }
 }
 
@@ -253,11 +255,13 @@ impl ser::SerializeTuple for SerializeTuple {
     where
         T: serde::Serialize,
     {
-        todo!()
+        let value = value.serialize(Serializer)?;
+        self.0.push(value);
+        Ok(())
     }
 
     fn end(self) -> Result<Self::Ok, Self::Error> {
-        todo!()
+        Ok(GqlValue::List(self.0))
     }
 }
 
