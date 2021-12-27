@@ -1,16 +1,19 @@
 use rusty_gql_codegen::GqlResolver;
 
-use crate::{types::GqlValueType, GqlTypeDefinition, Schema};
+use crate::{
+    types::GqlValueType, FieldContext, GqlTypeDefinition, GqlValue, Resolver, ResolverResult,
+    Schema, SelectionSetContext, SelectionSetResolver,
+};
 
 use super::{enum_value::__EnumValue, field::__Field, input_value::__InputValue};
 
-pub(crate) enum TypeDetail<'a> {
+enum TypeDetail<'a> {
     Named(&'a GqlTypeDefinition),
     NonNull(&'a str),
     List(&'a str),
 }
 
-pub(crate) struct __Type<'a> {
+pub struct __Type<'a> {
     schema: &'a Schema,
     detail: TypeDetail<'a>,
 }
@@ -25,6 +28,21 @@ pub(crate) enum __TypeKind {
     InputObject,
     List,
     NonNull,
+}
+
+impl ToString for __TypeKind {
+    fn to_string(&self) -> String {
+        match self {
+            __TypeKind::Scalar => "SCALAR".to_string(),
+            __TypeKind::Object => "OBJECT".to_string(),
+            __TypeKind::Interface => "INTERFACE".to_string(),
+            __TypeKind::Union => "UNION".to_string(),
+            __TypeKind::Enum => "ENUM".to_string(),
+            __TypeKind::InputObject => "INPUT_OBJECT".to_string(),
+            __TypeKind::List => "LIST".to_string(),
+            __TypeKind::NonNull => "NON_NULL".to_string(),
+        }
+    }
 }
 
 impl<'a> __Type<'a> {
@@ -196,5 +214,143 @@ impl<'a> __Type<'a> {
                 }
             }
         }
+    }
+}
+
+#[async_trait::async_trait]
+impl<'a> Resolver for __Type<'a> {
+    async fn resolve_field(&self, ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
+        if ctx.item.name == "kind" {
+            let kind = self.kind().await;
+            let ctx_selection_set = ctx.with_selection_set(&ctx.item.selection_set);
+
+            return SelectionSetResolver::resolve_selection_set(
+                &kind.to_string(),
+                &ctx_selection_set,
+            )
+            .await
+            .map(Some);
+        }
+
+        if ctx.item.name == "name" {
+            let name = self.name().await;
+            let ctx_selection_set = ctx.with_selection_set(&ctx.item.selection_set);
+
+            match name {
+                Some(ty_name) => {
+                    return SelectionSetResolver::resolve_selection_set(
+                        ty_name,
+                        &ctx_selection_set,
+                    )
+                    .await
+                    .map(Some);
+                }
+                None => return Ok(None),
+            }
+        }
+
+        if ctx.item.name == "description" {
+            let desc = self.description().await;
+            let ctx_selection_set = ctx.with_selection_set(&ctx.item.selection_set);
+
+            match desc {
+                Some(v) => {
+                    return SelectionSetResolver::resolve_selection_set(v, &ctx_selection_set)
+                        .await
+                        .map(Some);
+                }
+                None => return Ok(None),
+            }
+        }
+
+        if ctx.item.name == "fields" {
+            let fields = self.fields().await;
+            let ctx_selection_set = ctx.with_selection_set(&ctx.item.selection_set);
+
+            match fields {
+                Some(v) => {
+                    return SelectionSetResolver::resolve_selection_set(&v, &ctx_selection_set)
+                        .await
+                        .map(Some);
+                }
+                None => return Ok(None),
+            }
+        }
+        if ctx.item.name == "interfaces" {
+            let interfaces = self.interfaces().await;
+            let ctx_selection_set = ctx.with_selection_set(&ctx.item.selection_set);
+
+            match interfaces {
+                Some(v) => {
+                    return SelectionSetResolver::resolve_selection_set(&v, &ctx_selection_set)
+                        .await
+                        .map(Some);
+                }
+                None => return Ok(None),
+            }
+        }
+        if ctx.item.name == "possibleTypes" {
+            let types = self.possible_types().await;
+            let ctx_selection_set = ctx.with_selection_set(&ctx.item.selection_set);
+
+            match types {
+                Some(v) => {
+                    return SelectionSetResolver::resolve_selection_set(&v, &ctx_selection_set)
+                        .await
+                        .map(Some);
+                }
+                None => return Ok(None),
+            }
+        }
+        if ctx.item.name == "enumValues" {
+            let values = self.enum_values().await;
+            let ctx_selection_set = ctx.with_selection_set(&ctx.item.selection_set);
+
+            match values {
+                Some(v) => {
+                    return SelectionSetResolver::resolve_selection_set(&v, &ctx_selection_set)
+                        .await
+                        .map(Some);
+                }
+                None => return Ok(None),
+            }
+        }
+        if ctx.item.name == "inputFields" {
+            let values = self.input_fields().await;
+            let ctx_selection_set = ctx.with_selection_set(&ctx.item.selection_set);
+
+            match values {
+                Some(v) => {
+                    return SelectionSetResolver::resolve_selection_set(&v, &ctx_selection_set)
+                        .await
+                        .map(Some);
+                }
+                None => return Ok(None),
+            }
+        }
+        if ctx.item.name == "ofType" {
+            let ty = self.of_type().await;
+            let ctx_selection_set = ctx.with_selection_set(&ctx.item.selection_set);
+
+            match ty {
+                Some(v) => {
+                    return SelectionSetResolver::resolve_selection_set(&v, &ctx_selection_set)
+                        .await
+                        .map(Some);
+                }
+                None => return Ok(None),
+            }
+        }
+        Ok(None)
+    }
+}
+
+#[async_trait::async_trait]
+impl<'a> SelectionSetResolver for __Type<'a> {
+    async fn resolve_selection_set(
+        &self,
+        ctx: &SelectionSetContext<'_>,
+    ) -> ResolverResult<GqlValue> {
+        ctx.resolve_selection_parallelly(self).await
     }
 }

@@ -28,9 +28,13 @@ impl<T: Resolver> Resolver for QueryRoot<T> {
                             Some(intro_ty) => SelectionSetResolver::resolve_selection_set(
                                 &intro_ty,
                                 &ctx_selection_set,
-                            ),
+                            )
+                            .await
+                            .map(Some),
                             None => Err(GqlError::new(format!("{} is not defined", v), None)),
                         }
+                    } else {
+                        Ok(None)
                     }
                 }
                 None => {

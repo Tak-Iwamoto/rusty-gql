@@ -4,3 +4,4 @@ mod field;
 mod input_value;
 mod introspection_type;
 mod schema;
+pub use introspection_type::__Type;
