@@ -5,18 +5,15 @@ use crate::{
 
 use super::{directive::__Directive, introspection_type::__Type};
 
-// type __Schema {
-//     types: [__Type!]!
-//     queryType: __Type!
-//     mutationType: __Type
-//     subscriptionType: __Type
-//     directives: [__Directive!]!
-//   }
-pub(crate) struct __Schema<'a> {
+pub struct __Schema<'a> {
     detail: &'a Schema,
 }
 
 impl<'a> __Schema<'a> {
+    pub fn new(schema: &'a Schema) -> Self {
+        __Schema { detail: schema }
+    }
+
     async fn types(&self) -> Vec<__Type<'a>> {
         let mut result = Vec::new();
         for (_, def) in &self.detail.type_definitions {

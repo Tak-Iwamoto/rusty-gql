@@ -1,5 +1,7 @@
 use crate::{
-    error::GqlError, types::__Type, GqlValue, Resolver, ResolverResult, SelectionSetResolver,
+    error::GqlError,
+    types::{__Schema, __Type},
+    GqlValue, Resolver, ResolverResult, SelectionSetResolver,
 };
 
 pub(crate) struct QueryRoot<T> {
@@ -14,7 +16,11 @@ impl<T: Resolver> Resolver for QueryRoot<T> {
     ) -> ResolverResult<Option<crate::GqlValue>> {
         if ctx.item.name == "__schema" {
             let ctx_selection_set = ctx.with_selection_set(&ctx.item.selection_set);
-            Ok(None)
+            let schema_intro = __Schema::new(ctx.schema);
+            return schema_intro
+                .resolve_selection_set(&ctx_selection_set)
+                .await
+                .map(Some);
         } else if ctx.item.name == "__type" {
             match &ctx.get_arg_value("name") {
                 Some(value) => {

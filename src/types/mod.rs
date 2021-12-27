@@ -15,6 +15,7 @@ mod value_type;
 pub mod schema;
 pub use argument::GqlArgument;
 pub use field::GqlField;
+pub use introspection::__Schema;
 pub use introspection::__Type;
 pub use scalar::GqlScalar;
 pub use schema::Schema;
