@@ -1,4 +1,6 @@
-use crate::{GqlField, Resolver, Schema, SelectionSetResolver};
+use crate::{
+    GqlField, GqlValue, Resolver, ResolverResult, Schema, SelectionSetContext, SelectionSetResolver,
+};
 
 use super::{input_value::__InputValue, introspection_type::__Type};
 
@@ -71,6 +73,15 @@ impl<'a> Resolver for __Field<'a> {
             }
         }
 
+        if ctx.item.name == "args" {
+            let args = self.args().await;
+            let ctx_selection_set = ctx.with_selection_set(&ctx.item.selection_set);
+
+            return SelectionSetResolver::resolve_selection_set(&args, &ctx_selection_set)
+                .await
+                .map(Some);
+        }
+
         if ctx.item.name == "type" {
             let ty = self.ty().await;
             let ctx_selection_set = ctx.with_selection_set(&ctx.item.selection_set);
@@ -96,8 +107,8 @@ impl<'a> Resolver for __Field<'a> {
 impl<'a> SelectionSetResolver for __Field<'a> {
     async fn resolve_selection_set(
         &self,
-        ctx: &crate::SelectionSetContext<'_>,
-    ) -> crate::ResolverResult<crate::GqlValue> {
+        ctx: &SelectionSetContext<'_>,
+    ) -> ResolverResult<GqlValue> {
         ctx.resolve_selection_parallelly(self).await
     }
 }

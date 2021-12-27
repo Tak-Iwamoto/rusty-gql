@@ -1,4 +1,7 @@
-use crate::{Resolver, Schema};
+use crate::{
+    FieldContext, GqlValue, Resolver, ResolverResult, Schema, SelectionSetContext,
+    SelectionSetResolver,
+};
 
 use super::{directive::__Directive, introspection_type::__Type};
 
@@ -11,16 +14,6 @@ use super::{directive::__Directive, introspection_type::__Type};
 //   }
 pub(crate) struct __Schema<'a> {
     detail: &'a Schema,
-}
-
-#[async_trait::async_trait]
-impl<'a> Resolver for __Schema<'a> {
-    async fn resolve_field(
-        &self,
-        ctx: &crate::FieldContext<'_>,
-    ) -> crate::ResolverResult<Option<crate::GqlValue>> {
-        Ok(None)
-    }
 }
 
 impl<'a> __Schema<'a> {
@@ -63,5 +56,83 @@ impl<'a> __Schema<'a> {
             result.push(directive);
         }
         result
+    }
+}
+
+#[async_trait::async_trait]
+impl<'a> Resolver for __Schema<'a> {
+    async fn resolve_field(&self, ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
+        if ctx.item.name == "types" {
+            let types = self.types().await;
+            let ctx_selection_set = ctx.with_selection_set(&ctx.item.selection_set);
+
+            return SelectionSetResolver::resolve_selection_set(&types, &ctx_selection_set)
+                .await
+                .map(Some);
+        }
+        if ctx.item.name == "queryType" {
+            let ty = self.query_type().await;
+            let ctx_selection_set = ctx.with_selection_set(&ctx.item.selection_set);
+
+            return SelectionSetResolver::resolve_selection_set(&ty, &ctx_selection_set)
+                .await
+                .map(Some);
+        }
+        if ctx.item.name == "mutationType" {
+            let ty = self.mutation_type().await;
+            let ctx_selection_set = ctx.with_selection_set(&ctx.item.selection_set);
+
+            match ty {
+                Some(mutation_ty) => {
+                    return SelectionSetResolver::resolve_selection_set(
+                        &mutation_ty,
+                        &ctx_selection_set,
+                    )
+                    .await
+                    .map(Some);
+                }
+                None => {
+                    return Ok(None);
+                }
+            }
+        }
+        if ctx.item.name == "subscriptionType" {
+            let ty = self.subscription_type().await;
+            let ctx_selection_set = ctx.with_selection_set(&ctx.item.selection_set);
+
+            match ty {
+                Some(subscription_ty) => {
+                    return SelectionSetResolver::resolve_selection_set(
+                        &subscription_ty,
+                        &ctx_selection_set,
+                    )
+                    .await
+                    .map(Some);
+                }
+                None => {
+                    return Ok(None);
+                }
+            }
+        }
+        if ctx.item.name == "directives" {
+            let directives = self.directives().await;
+            let ctx_selection_set = ctx.with_selection_set(&ctx.item.selection_set);
+
+            return SelectionSetResolver::resolve_selection_set(&directives, &ctx_selection_set)
+                .await
+                .map(Some);
+        }
+
+        Ok(None)
+    }
+}
+
+#[async_trait::async_trait]
+impl<'a> SelectionSetResolver for __Schema<'a> {
+    async fn resolve_selection_set(
+        &self,
+        ctx: &SelectionSetContext<'_>,
+    ) -> ResolverResult<GqlValue> {
+        ctx.resolve_selection_parallelly(self).await
     }
 }

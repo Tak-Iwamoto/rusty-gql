@@ -2,7 +2,7 @@ use graphql_parser::schema::DirectiveLocation;
 
 use crate::{
     types::GqlDirectiveDefinition, FieldContext, GqlValue, Resolver, ResolverResult, Schema,
-    SelectionSetResolver,
+    SelectionSetResolver, SelectionSetContext,
 };
 
 use super::input_value::__InputValue;
@@ -115,7 +115,7 @@ impl<'a> Resolver for __Directive<'a> {
 }
 
 #[async_trait::async_trait]
-impl<'a> SelectionSetResolver for __Type<'a> {
+impl<'a> SelectionSetResolver for __Directive<'a> {
     async fn resolve_selection_set(
         &self,
         ctx: &SelectionSetContext<'_>,
