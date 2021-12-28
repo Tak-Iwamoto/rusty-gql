@@ -35,7 +35,6 @@ pub use variables::Variables;
 
 pub type ResolverResult<T> = ::std::result::Result<T, GqlError>;
 
-pub use rusty_gql_codegen::GqlData;
 pub use rusty_gql_codegen::GqlResolver;
 
 #[derive(Clone)]

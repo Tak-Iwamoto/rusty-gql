@@ -2,11 +2,23 @@ use rusty_gql::*;
 
 #[tokio::test]
 async fn it_works() {
-    #[derive(GqlData)]
     pub struct Person {
         pub name: String,
         pub description: String,
         pub age: i32,
+    }
+
+    #[GqlResolver]
+    impl Person {
+        async fn name(&self, _ctx: &FieldContext<'_>) -> String {
+            self.name.clone()
+        }
+        async fn description(&self, _ctx: &FieldContext<'_>) -> String {
+            self.description.clone()
+        }
+        async fn age(&self, _ctx: &FieldContext<'_>) -> i32 {
+            self.age
+        }
     }
 
     struct Query;
