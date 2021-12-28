@@ -3,6 +3,7 @@ mod context;
 mod error;
 mod executor;
 mod graphiql_html;
+mod input;
 mod operation;
 mod path;
 mod query_root;

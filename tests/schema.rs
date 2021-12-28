@@ -8,10 +8,10 @@ pub async fn test_build_schema() {
 
     #[GqlResolver]
     impl Query {
-        async fn value(&self, _ctx: &FieldContext<'_>) -> i32 {
+        async fn value(&self) -> i32 {
             10
         }
-        async fn obj(&self, _ctx: &FieldContext<'_>) -> BTreeMap<String, i32> {
+        async fn obj(&self) -> BTreeMap<String, i32> {
             let mut map = BTreeMap::new();
             map.insert("key1".to_string(), 1);
             map.insert("key2".to_string(), 2);
