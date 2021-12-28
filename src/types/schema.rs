@@ -411,7 +411,7 @@ mod tests {
 
     #[test]
     fn it_works() {
-        let contents = fs::read_to_string("src/tests/github.graphql");
+        let contents = fs::read_to_string("tests/schemas/github.graphql");
         let schema = build_schema(contents.unwrap().as_str()).unwrap();
 
         assert!(schema.queries.get("repository").is_some());

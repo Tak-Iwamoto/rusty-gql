@@ -1,6 +1,6 @@
+mod directive;
 mod operation;
 mod type_definition;
-mod directive;
 mod utils;
 
 use std::io::Error;
@@ -17,7 +17,8 @@ pub async fn build_graphql_schema(schema_doc: &str) -> Result<(), Error> {
 
     let query_task = build_operation_files(&schema.queries, OperationType::Query);
     let mutation_task = build_operation_files(&schema.mutations, OperationType::Mutation);
-    let subscription_task = build_operation_files(&schema.subscriptions, OperationType::Subscription);
+    let subscription_task =
+        build_operation_files(&schema.subscriptions, OperationType::Subscription);
 
     try_join_all(vec![query_task, mutation_task, subscription_task]).await?;
 
@@ -38,20 +39,4 @@ async fn create_dirs() -> Result<Vec<()>, Error> {
     futures.push(tokio::fs::create_dir_all("graphql/input"));
     let res = try_join_all(futures).await;
     res
-}
-
-#[cfg(test)]
-mod tests {
-    use std::fs;
-
-    use crate::code_generate::build_graphql_schema;
-
-    #[tokio::test]
-    async fn it_works() {
-        let schema_doc = fs::read_to_string("../src/tests/github.graphql").unwrap();
-        match build_graphql_schema(&schema_doc).await {
-            Ok(_) => println!("success"),
-            Err(err) => println!("{}", err.to_string()),
-        }
-    }
 }

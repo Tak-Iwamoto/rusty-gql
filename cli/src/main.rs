@@ -13,7 +13,7 @@ mod exit_codes;
 async fn run() -> Result<ExitCode> {
     let matches = build_app().get_matches();
     if matches.subcommand_matches("gen").is_some() {
-        let schema_doc = std::fs::read_to_string("../src/tests/github.graphql").unwrap();
+        let schema_doc = std::fs::read_to_string("../tests/schemas/github.graphql").unwrap();
         build_graphql_schema(&schema_doc).await?;
         return Ok(ExitCode::Success);
     }
