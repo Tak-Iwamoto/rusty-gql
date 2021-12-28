@@ -15,12 +15,10 @@ async fn run() -> Result<ExitCode> {
     if matches.subcommand_matches("gen").is_some() {
         let schema_doc = std::fs::read_to_string("../src/tests/github.graphql").unwrap();
         build_graphql_schema(&schema_doc).await?;
-        println!("generate command");
         return Ok(ExitCode::Success);
     }
 
     if let Some(new_matches) = matches.subcommand_matches("new") {
-        println!("new command");
         if let Some(app_name) = new_matches.value_of("name") {
             println!("app_name: {:?}", app_name);
         }

@@ -52,7 +52,7 @@ mod tests {
 
         let map = BTreeMap::from([
             ("a".to_string(), GqlValue::Number(Number::from(1))),
-            ("b".to_string(), GqlValue::Number(Number::from(1))),
+            ("b".to_string(), GqlValue::Number(Number::from(2))),
         ]);
         let obj = Response::new(GqlValue::Object(map));
         assert_eq!(

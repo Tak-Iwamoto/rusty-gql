@@ -39,4 +39,49 @@ impl GqlScalar {
             Value::Object(_) => false,
         }
     }
+
+    pub fn string_scalar() -> Self {
+        GqlScalar {
+            name: "String".to_string(),
+            description: None,
+            position: Pos::default(),
+            directives: vec![],
+        }
+    }
+
+    pub fn int_scalar() -> Self {
+        GqlScalar {
+            name: "Int".to_string(),
+            description: None,
+            position: Pos::default(),
+            directives: vec![],
+        }
+    }
+
+    pub fn float_scalar() -> Self {
+        GqlScalar {
+            name: "Float".to_string(),
+            description: None,
+            position: Pos::default(),
+            directives: vec![],
+        }
+    }
+
+    pub fn boolean_scalar() -> Self {
+        GqlScalar {
+            name: "Boolean".to_string(),
+            description: None,
+            position: Pos::default(),
+            directives: vec![],
+        }
+    }
+
+    pub fn id_scalar() -> Self {
+        GqlScalar {
+            name: "ID".to_string(),
+            description: None,
+            position: Pos::default(),
+            directives: vec![],
+        }
+    }
 }

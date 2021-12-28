@@ -15,7 +15,6 @@ pub async fn test_build_schema() {
             let mut map = BTreeMap::new();
             map.insert("key1".to_string(), 1);
             map.insert("key2".to_string(), 2);
-            println!("{:?}", map);
             map
         }
     }

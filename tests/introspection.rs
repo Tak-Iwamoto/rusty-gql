@@ -1,0 +1,52 @@
+use std::collections::BTreeMap;
+
+use rusty_gql::*;
+
+#[tokio::test]
+async fn test_introspection_works() {
+    struct Query;
+
+    #[GqlResolver]
+    impl Query {
+        async fn value(&self, _ctx: &FieldContext<'_>) -> i32 {
+            10
+        }
+        async fn obj(&self, _ctx: &FieldContext<'_>) -> BTreeMap<String, i32> {
+            let mut map = BTreeMap::new();
+            map.insert("key1".to_string(), 1);
+            map.insert("key2".to_string(), 2);
+            map
+        }
+    }
+    let contents = std::fs::read_to_string("./tests/schemas/github.graphql").unwrap();
+    let query_root = QueryRoot { query: Query };
+
+    let container = ArcContainer::new(
+        contents.as_str(),
+        query_root,
+        EmptyMutation,
+        EmptySubscription,
+    )
+    .unwrap();
+
+    let query_doc = r#"{
+        __type(name: "User") {
+            name
+            fields {
+                name
+                type {
+                name
+                kind
+                }
+                __typename
+            }
+        }
+    }"#;
+    let req = Request {
+        query: query_doc.to_string(),
+        operation_name: None,
+        variables: Variables(BTreeMap::new()),
+    };
+    let res = execute(&container, req).await;
+    println!("{:?}", res.data);
+}

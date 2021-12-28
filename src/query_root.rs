@@ -4,8 +4,8 @@ use crate::{
     GqlValue, Resolver, ResolverResult, SelectionSetResolver,
 };
 
-pub(crate) struct QueryRoot<T> {
-    query: T,
+pub struct QueryRoot<T> {
+    pub query: T,
 }
 
 #[async_trait::async_trait]

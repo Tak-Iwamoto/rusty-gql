@@ -1,5 +1,3 @@
-use rusty_gql_codegen::GqlResolver;
-
 use crate::{
     types::GqlValueType, FieldContext, GqlTypeDefinition, GqlValue, Resolver, ResolverResult,
     Schema, SelectionSetContext, SelectionSetResolver,

@@ -56,6 +56,26 @@ pub fn build_schema(schema_doc: &str) -> Result<Schema, GqlError> {
     let mut mutation_root_type = None;
     let mut subscription_root_type = None;
 
+    type_definitions.insert(
+        "String".to_string(),
+        GqlTypeDefinition::Scalar(GqlScalar::string_scalar()),
+    );
+    type_definitions.insert(
+        "Int".to_string(),
+        GqlTypeDefinition::Scalar(GqlScalar::int_scalar()),
+    );
+    type_definitions.insert(
+        "Float".to_string(),
+        GqlTypeDefinition::Scalar(GqlScalar::float_scalar()),
+    );
+    type_definitions.insert(
+        "Boolean".to_string(),
+        GqlTypeDefinition::Scalar(GqlScalar::boolean_scalar()),
+    );
+    type_definitions.insert(
+        "ID".to_string(),
+        GqlTypeDefinition::Scalar(GqlScalar::id_scalar()),
+    );
     for node in parsed_schema.definitions {
         match node {
             graphql_parser::schema::Definition::SchemaDefinition(schema) => {

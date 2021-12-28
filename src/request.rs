@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::variables::Variables;
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct Request {
     #[serde(default)]

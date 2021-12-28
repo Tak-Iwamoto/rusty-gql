@@ -235,6 +235,11 @@ fn get_operation_type<'a>(
 
     if schema.queries.contains_key(root_fieldname) {
         return Ok(OperationType::Query);
+    } else if root_fieldname == "__type"
+        || root_fieldname == "__schema"
+        || root_fieldname == "__typename"
+    {
+        return Ok(OperationType::Query);
     } else if schema.mutations.contains_key(root_fieldname) {
         return Ok(OperationType::Mutation);
     } else if schema.subscriptions.contains_key(root_fieldname) {
