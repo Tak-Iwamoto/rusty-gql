@@ -29,7 +29,7 @@ async fn test_introspection_works() {
     )
     .unwrap();
 
-    let query_doc = r#"{
+    let user_type_query = r#"{
         __type(name: "User") {
             name
             fields {
@@ -43,10 +43,27 @@ async fn test_introspection_works() {
         }
     }"#;
     let req = Request {
-        query: query_doc.to_string(),
+        query: user_type_query.to_string(),
         operation_name: None,
         variables: Variables(BTreeMap::new()),
     };
     let res = execute(&container, req).await;
-    println!("{:?}", res.data);
+    let res_string = serde_json::to_string(&res.data).unwrap();
+    println!("{:?}", res_string);
+
+    let schema_name_query = r#"{
+        __schema {
+            types {
+                name
+            }
+        }
+    }"#;
+    let req = Request {
+        query: schema_name_query.to_string(),
+        operation_name: None,
+        variables: Variables(BTreeMap::new()),
+    };
+    let res = execute(&container, req).await;
+    let res_string = serde_json::to_string(&res.data).unwrap();
+    println!("{:?}", res_string);
 }
