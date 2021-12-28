@@ -23,7 +23,7 @@ pub struct GqlData {
     pub data: Data<Ignored, GqlDataField>,
 }
 
-pub fn parse_gql_struct_input(input: &GqlData) -> CodegenResult<TokenStream> {
+pub fn parse_gql_data_input(input: &GqlData) -> CodegenResult<TokenStream> {
     let struct_name = &input.ident;
     let (impl_generics, ty_generics, where_clause) = &input.generics.split_for_impl();
 

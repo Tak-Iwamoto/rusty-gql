@@ -1,15 +1,15 @@
-mod error;
 mod data;
+mod error;
 mod resolver;
 mod types;
 mod utils;
 
 use darling::FromDeriveInput;
 use proc_macro::{self, TokenStream};
-use syn::{parse_macro_input, AttributeArgs, DeriveInput, ItemImpl};
+use syn::{parse_macro_input, DeriveInput, ItemImpl};
 
 use crate::{
-    data::{parse_gql_struct_input, GqlData},
+    data::{parse_gql_data_input, GqlData},
     resolver::parse_resolver_item_impl,
 };
 
@@ -26,7 +26,7 @@ pub fn GqlResolver(_args: TokenStream, input: TokenStream) -> TokenStream {
 }
 
 #[proc_macro_derive(GqlData)]
-pub fn derive_model(input: TokenStream) -> TokenStream {
+pub fn derive_data(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
 
     let args = match GqlData::from_derive_input(&input) {
@@ -36,7 +36,7 @@ pub fn derive_model(input: TokenStream) -> TokenStream {
         }
     };
 
-    let expanded = match parse_gql_struct_input(&args) {
+    let expanded = match parse_gql_data_input(&args) {
         Ok(generated) => generated,
         Err(err) => err.to_token_stream().into(),
     };
