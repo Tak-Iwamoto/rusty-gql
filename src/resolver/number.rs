@@ -173,11 +173,48 @@ impl SelectionSetResolver for isize {
     }
 }
 
-// #[async_trait::async_trait]
-// impl Resolver for f64 {
-//     async fn resolve_field(&self, _ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
-//         Ok(Some(GqlValue::Number(
-//             Number::from_f64(*self).unwrap_or_default(),
-//         )))
-//     }
-// }
+#[async_trait::async_trait]
+impl Resolver for f32 {
+    async fn resolve_field(&self, _ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
+        match Number::from_f64(*self as f64) {
+            Some(n) => Ok(Some(GqlValue::Number(n))),
+            None => Ok(Some(GqlValue::Null)),
+        }
+    }
+}
+
+#[async_trait::async_trait]
+impl SelectionSetResolver for f32 {
+    async fn resolve_selection_set(
+        &self,
+        _ctx: &SelectionSetContext<'_>,
+    ) -> ResolverResult<GqlValue> {
+        match Number::from_f64(*self as f64) {
+            Some(n) => Ok(GqlValue::Number(n)),
+            None => Ok(GqlValue::Null),
+        }
+    }
+}
+
+#[async_trait::async_trait]
+impl Resolver for f64 {
+    async fn resolve_field(&self, _ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
+        match Number::from_f64(*self) {
+            Some(n) => Ok(Some(GqlValue::Number(n))),
+            None => Ok(Some(GqlValue::Null)),
+        }
+    }
+}
+
+#[async_trait::async_trait]
+impl SelectionSetResolver for f64 {
+    async fn resolve_selection_set(
+        &self,
+        _ctx: &SelectionSetContext<'_>,
+    ) -> ResolverResult<GqlValue> {
+        match Number::from_f64(*self) {
+            Some(n) => Ok(GqlValue::Number(n)),
+            None => Ok(GqlValue::Null),
+        }
+    }
+}
