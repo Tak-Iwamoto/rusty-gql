@@ -1,10 +1,10 @@
 use proc_macro::{self, TokenStream};
 use quote::quote;
-use syn::{ext::IdentExt, Block, ImplItem, ItemImpl, ReturnType, Type, TypeReference};
+use syn::{ext::IdentExt, Block, ImplItem, ItemImpl, ReturnType};
 
 use crate::utils::{get_method_args, is_result_type};
 
-pub fn parse_resolver_item_impl(item_impl: &mut ItemImpl) -> Result<TokenStream, syn::Error> {
+pub fn generate_gql_resolver(item_impl: &mut ItemImpl) -> Result<TokenStream, syn::Error> {
     let self_name = &item_impl.self_ty;
 
     let generics = &item_impl.generics;

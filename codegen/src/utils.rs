@@ -1,4 +1,4 @@
-use syn::{AttributeArgs, Ident, ImplItemMethod, Pat, PatIdent, ReturnType, Type, TypeParamBound};
+use syn::{AttributeArgs, ImplItemMethod, Pat, Type, TypeParamBound};
 
 fn check_path_name(path: &syn::Path, value: &str) -> bool {
     path.segments.len() == 1 && path.segments[0].ident == value
