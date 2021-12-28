@@ -18,7 +18,7 @@ pub use async_trait;
 
 pub use container::ArcContainer;
 pub use context::{ExecutionContext, FieldContext, SelectionSetContext};
-use error::GqlError;
+pub use error::GqlError;
 pub use executor::execute;
 pub use graphiql_html::playground_html;
 pub use operation::OperationType;
@@ -42,7 +42,7 @@ pub struct EmptyMutation;
 
 #[async_trait::async_trait]
 impl Resolver for EmptyMutation {
-    async fn resolve_field(&self, ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
+    async fn resolve_field(&self, _ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
         Ok(None)
     }
 }
@@ -52,7 +52,7 @@ pub struct EmptySubscription;
 
 #[async_trait::async_trait]
 impl Resolver for EmptySubscription {
-    async fn resolve_field(&self, ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
+    async fn resolve_field(&self, _ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
         Ok(None)
     }
 }

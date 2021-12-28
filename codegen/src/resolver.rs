@@ -45,7 +45,7 @@ pub fn generate_gql_resolver(item_impl: &mut ItemImpl) -> Result<TokenStream, sy
                 method.block =
                     syn::parse2::<Block>(result_block).expect("ItemImpl method is invalid.");
                 method.sig.output = syn::parse2::<ReturnType>(
-                    quote! { -> ::std::result::Result<#return_type, String>},
+                    quote! { -> ::std::result::Result<#return_type, rusty_gql::GqlError>},
                 )
                 .expect("ItemImpl return type is invalid.");
             }
@@ -81,16 +81,10 @@ pub fn generate_gql_resolver(item_impl: &mut ItemImpl) -> Result<TokenStream, sy
                 args.push(quote! { #arg })
             }
 
-            let resolve_obj = quote! {
-                {
-                    self.#method_name(ctx).await
-                }
-            };
-
             resolvers.push(quote! {
                 if ctx.item.name == #field_name {
                     let resolve_fn = async move {
-                        #resolve_obj
+                        self.#method_name(ctx).await
                     };
 
                     // TODO: error handling
