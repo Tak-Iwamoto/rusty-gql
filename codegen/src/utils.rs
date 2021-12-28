@@ -1,4 +1,4 @@
-use syn::{AttributeArgs, ImplItemMethod, Pat, Type, TypeParamBound};
+use syn::{AttributeArgs, ImplItemMethod, Pat, PatIdent, Type, TypeParamBound};
 
 fn check_path_name(path: &syn::Path, value: &str) -> bool {
     path.segments.len() == 1 && path.segments[0].ident == value
@@ -42,7 +42,7 @@ pub fn get_type_name(ty: &Type) -> Result<String, syn::Error> {
     }
 }
 
-pub fn get_method_args(method: &ImplItemMethod) -> Result<Vec<proc_macro2::Ident>, syn::Error> {
+pub fn get_method_args(method: &ImplItemMethod) -> Result<Vec<PatIdent>, syn::Error> {
     let mut args = Vec::new();
     if method.sig.inputs.is_empty() {}
 
@@ -65,7 +65,7 @@ pub fn get_method_args(method: &ImplItemMethod) -> Result<Vec<proc_macro2::Ident
                 }
 
                 if let Pat::Ident(ident) = &*pat_type.pat {
-                    args.push(ident.ident.clone());
+                    args.push(ident.clone());
                 } else {
                     return Err(syn::Error::new_spanned(pat_type, "Invalid arg"));
                 }

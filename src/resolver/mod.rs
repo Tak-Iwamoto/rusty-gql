@@ -6,11 +6,10 @@ mod string;
 
 use async_trait::async_trait;
 use futures_util::future::BoxFuture;
-use graphql_parser::{query::Field, schema::Type};
 
 use crate::{
     context::{FieldContext, SelectionSetContext},
-    GqlValue, ResolverResult, Schema,
+    GqlValue, ResolverResult,
 };
 
 pub type ResolverFuture<'a> = BoxFuture<'a, ResolverResult<(String, GqlValue)>>;

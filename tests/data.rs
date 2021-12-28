@@ -10,13 +10,13 @@ async fn it_works() {
 
     #[GqlResolver]
     impl Person {
-        async fn name(&self, _ctx: &FieldContext<'_>) -> String {
+        async fn name(&self) -> String {
             self.name.clone()
         }
-        async fn description(&self, _ctx: &FieldContext<'_>) -> String {
+        async fn description(&self) -> String {
             self.description.clone()
         }
-        async fn age(&self, _ctx: &FieldContext<'_>) -> i32 {
+        async fn age(&self) -> i32 {
             self.age
         }
     }
@@ -25,7 +25,7 @@ async fn it_works() {
 
     #[GqlResolver]
     impl Query {
-        async fn person(&self, _ctx: &FieldContext<'_>) -> Person {
+        async fn person(&self, ctx: &FieldContext<'_>) -> Person {
             let person = Person {
                 name: String::from("test"),
                 description: String::from("test description"),

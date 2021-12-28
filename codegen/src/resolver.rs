@@ -1,6 +1,6 @@
 use proc_macro::{self, TokenStream};
 use quote::quote;
-use syn::{ext::IdentExt, Block, ImplItem, ItemImpl, ReturnType};
+use syn::{ext::IdentExt, Block, FnArg, ImplItem, ItemImpl, ReturnType, Type, TypeReference};
 
 use crate::utils::{get_method_args, is_result_type};
 
@@ -49,42 +49,55 @@ pub fn generate_gql_resolver(item_impl: &mut ItemImpl) -> Result<TokenStream, sy
                 )
                 .expect("ItemImpl return type is invalid.");
             }
-            // let should_create_context = &method
-            //     .sig
-            //     .inputs
-            //     .iter()
-            //     .nth(1)
-            //     .map(|x| {
-            //         if let FnArg::Typed(pat) = x {
-            //             if let Type::Reference(TypeReference { elem, .. }) = &*pat.ty {
-            //                 if let Type::Path(path) = elem.as_ref() {
-            //                     return path.path.segments.last().unwrap().ident != "FieldContext";
-            //                 }
-            //             }
-            //         };
-            //         true
-            //     })
-            //     .unwrap_or(true);
 
-            // if *should_create_context {
-            //     let arg_ctx = syn::parse2::<FnArg>(quote! { ctx: &rusty_gql::FieldContext<'_> })
-            //         .expect("invalid arg type");
-            //     method.sig.inputs.insert(1, arg_ctx);
-            // }
+            let is_contain_context = &method
+                .sig
+                .inputs
+                .iter()
+                .find(|x| {
+                    if let FnArg::Typed(pat) = x {
+                        if let Type::Reference(TypeReference { elem, .. }) = &*pat.ty {
+                            if let Type::Path(path) = elem.as_ref() {
+                                return path.path.segments.last().unwrap().ident == "FieldContext";
+                            }
+                        }
+                    };
+                    false
+                })
+                .is_some();
+
+            if !*is_contain_context {
+                let arg_ctx = syn::parse2::<FnArg>(quote! { ctx: &rusty_gql::FieldContext<'_> })
+                    .expect("invalid arg type");
+                method.sig.inputs.insert(1, arg_ctx);
+            }
             let method_name = &method.sig.ident;
             let field_name = method_name.unraw().to_string();
 
-            let arg_idents = get_method_args(&method)?;
+            let method_args = get_method_args(&method)?;
             let mut args = Vec::new();
+            let mut gql_arg_values = Vec::new();
 
-            for arg in &arg_idents {
-                args.push(quote! { #arg })
+            for arg in method_args {
+                args.push(quote! { #arg });
+                let ident = arg.ident;
+                let name = &ident.unraw().to_string();
+                // ctxだけは除くhack
+                if name != "ctx" {
+                    gql_arg_values.push(quote! {
+                        let #ident = match ctx.get_arg_value(#ident) {
+                            Some(value) => value,
+                            None => rusty_gql::GqlValue::Null,
+                        };
+                    });
+                }
             }
 
             resolvers.push(quote! {
                 if ctx.item.name == #field_name {
                     let resolve_fn = async move {
-                        self.#method_name(ctx).await
+                        #(#gql_arg_values)*
+                        self.#method_name(#(#args),*).await
                     };
 
                     // TODO: error handling
