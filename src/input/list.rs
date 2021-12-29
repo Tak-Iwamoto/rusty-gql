@@ -1,4 +1,4 @@
-use std::collections::{HashSet, LinkedList, VecDeque};
+use std::collections::{BTreeSet, HashSet, LinkedList, VecDeque};
 use std::convert::TryInto;
 use std::hash::Hash;
 
@@ -49,6 +49,32 @@ impl<T: GqlInputType + Eq + Hash> GqlInputType for HashSet<T> {
                 }
                 let hash_set: HashSet<T> = result.into_iter().collect();
                 Ok(hash_set)
+            }
+            value => Ok({
+                let mut result = Self::default();
+                result.insert(T::from_gql_value(Some(value))?);
+                result
+            }),
+        }
+    }
+
+    fn to_gql_value(&self) -> GqlValue {
+        let values = self.into_iter().map(|v| v.to_gql_value()).collect();
+        GqlValue::List(values)
+    }
+}
+
+impl<T: GqlInputType + Ord> GqlInputType for BTreeSet<T> {
+    fn from_gql_value(value: Option<GqlValue>) -> Result<Self, String> {
+        match value.unwrap_or_default() {
+            GqlValue::List(list) => {
+                let mut result = Vec::new();
+                for v in list {
+                    let value = T::from_gql_value(Some(v))?;
+                    result.push(value)
+                }
+                let tree_set: BTreeSet<T> = result.into_iter().collect();
+                Ok(tree_set)
             }
             value => Ok({
                 let mut result = Self::default();
