@@ -19,7 +19,7 @@ pub use async_trait;
 
 pub use container::ArcContainer;
 pub use context::{ExecutionContext, FieldContext, SelectionSetContext};
-pub use error::GqlError;
+pub use error::{ErrorWrapper, GqlError};
 pub use executor::execute;
 pub use graphiql_html::playground_html;
 pub use operation::OperationType;

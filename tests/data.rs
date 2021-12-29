@@ -22,6 +22,12 @@ async fn it_works() {
         async fn test(&self, v: i32) -> i32 {
             v
         }
+        async fn test_optional(&self, v: i32) -> Option<i32> {
+            Some(v)
+        }
+        async fn test_result(&self, v: i32) -> Result<i32, String> {
+            Ok(v)
+        }
     }
 
     struct Query;
