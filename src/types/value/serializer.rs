@@ -1,6 +1,6 @@
 use std::collections::BTreeMap;
 use std::error::Error;
-use std::fmt::{Display, Write};
+use std::fmt::Display;
 
 use serde::ser::{self, Impossible};
 use serde_json::Number;

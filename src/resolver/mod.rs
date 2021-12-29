@@ -2,6 +2,7 @@ mod boolean;
 mod list;
 mod number;
 mod object;
+mod optional;
 mod string;
 
 use async_trait::async_trait;

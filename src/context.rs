@@ -2,8 +2,9 @@ use futures_util::future::try_join_all;
 use std::collections::BTreeMap;
 
 use crate::{
-    error::GqlError, operation::ArcOperation, path::GraphQLPath, resolver::ResolverFuture,
-    types::schema::ArcSchema, GqlValue, Resolver, ResolverResult, SelectionSetResolver,
+    error::GqlError, input::GqlInputType, operation::ArcOperation, path::GraphQLPath,
+    resolver::ResolverFuture, types::schema::ArcSchema, GqlValue, Resolver, ResolverResult,
+    SelectionSetResolver,
 };
 use graphql_parser::{
     query::{Field, Selection, SelectionSet},
@@ -21,17 +22,20 @@ pub struct ExecutionContext<'a, T> {
 pub type FieldContext<'a> = ExecutionContext<'a, &'a Field<'a, String>>;
 
 impl<'a> FieldContext<'a> {
-    pub fn get_arg_value(&self, arg_name: &str) -> Option<GqlValue> {
+    pub fn get_arg_value<T: GqlInputType>(&self, arg_name: &str) -> ResolverResult<T> {
         let value = self
             .item
             .arguments
             .iter()
             .find(|(name, _)| name == arg_name)
             .map(|(_, v)| v);
-
-        match value {
-            Some(v) => Some(GqlValue::from(v.clone())),
-            None => None,
+        let gql_value = match value {
+            Some(v) => GqlValue::from(v.clone()),
+            None => GqlValue::Null,
+        };
+        match T::from_gql_value(Some(gql_value)) {
+            Ok(v) => Ok(v),
+            Err(err) => Err(GqlError::new(err, None)),
         }
     }
 }
