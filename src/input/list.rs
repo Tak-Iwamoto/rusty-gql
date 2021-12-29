@@ -69,21 +69,53 @@ impl<T: GqlInputType + Eq + Hash> GqlInputType for HashSet<T> {
 #[async_trait::async_trait]
 impl<T: GqlInputType> GqlInputType for LinkedList<T> {
     fn from_gql_value(value: Option<GqlValue>) -> Result<Self, String> {
-        todo!()
+        match value.unwrap_or_default() {
+            GqlValue::List(list) => {
+                let mut result = Vec::new();
+                for v in list {
+                    let value = T::from_gql_value(Some(v))?;
+                    result.push(value)
+                }
+                let linked_list: LinkedList<T> = result.into_iter().collect();
+                Ok(linked_list)
+            }
+            value => Ok({
+                let mut result = Self::default();
+                result.push_front(T::from_gql_value(Some(value))?);
+                result
+            }),
+        }
     }
 
     fn to_gql_value(&self) -> GqlValue {
-        todo!()
+        let values = self.into_iter().map(|v| v.to_gql_value()).collect();
+        GqlValue::List(values)
     }
 }
 
 #[async_trait::async_trait]
 impl<T: GqlInputType> GqlInputType for VecDeque<T> {
     fn from_gql_value(value: Option<GqlValue>) -> Result<Self, String> {
-        todo!()
+        match value.unwrap_or_default() {
+            GqlValue::List(list) => {
+                let mut result = Vec::new();
+                for v in list {
+                    let value = T::from_gql_value(Some(v))?;
+                    result.push(value)
+                }
+                let vec_deque: VecDeque<T> = result.into_iter().collect();
+                Ok(vec_deque)
+            }
+            value => Ok({
+                let mut result = Self::default();
+                result.push_back(T::from_gql_value(Some(value))?);
+                result
+            }),
+        }
     }
 
     fn to_gql_value(&self) -> GqlValue {
-        todo!()
+        let values = self.into_iter().map(|v| v.to_gql_value()).collect();
+        GqlValue::List(values)
     }
 }
