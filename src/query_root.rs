@@ -27,11 +27,10 @@ impl<T: Resolver> Resolver for QueryRoot<T> {
                 .get(&type_name)
                 .map(|ty| __Type::from_type_definition(ctx_selection_set.schema, ty));
             match ty {
-                Some(intro_ty) => {
-                    SelectionSetResolver::resolve_selection_set(&intro_ty, &ctx_selection_set)
-                        .await
-                        .map(Some)
-                }
+                Some(intro_ty) => intro_ty
+                    .resolve_selection_set(&ctx_selection_set)
+                    .await
+                    .map(Some),
                 None => Err(GqlError::new(format!("{} is not defined", type_name), None)),
             }
         } else {

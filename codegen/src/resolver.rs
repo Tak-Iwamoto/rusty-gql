@@ -85,8 +85,7 @@ pub fn generate_gql_resolver(item_impl: &mut ItemImpl) -> Result<TokenStream, sy
                         self.#method_name(ctx, #(#args),*).await
                     };
 
-                    // TODO: error handling
-                    let obj = resolve_fn.await.unwrap();
+                    let obj = resolve_fn.await?;
                     let ctx_selection_set = ctx.with_selection_set(&ctx.item.selection_set);
                     return obj.resolve_selection_set(&ctx_selection_set).await.map(Some);
                 }
