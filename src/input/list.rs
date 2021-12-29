@@ -1,4 +1,4 @@
-use std::collections::{HashSet, LinkedList};
+use std::collections::{HashSet, LinkedList, VecDeque};
 use std::convert::TryInto;
 use std::hash::Hash;
 
@@ -14,22 +14,19 @@ fn vec_to_array<T, const N: usize>(v: Vec<T>) -> [T; N] {
 #[async_trait::async_trait]
 impl<T: GqlInputType, const N: usize> GqlInputType for [T; N] {
     fn from_gql_value(value: Option<GqlValue>) -> Result<Self, String> {
-        match value {
-            Some(value) => match value {
-                GqlValue::List(list) => {
-                    let mut result = Vec::new();
-                    for v in list {
-                        let value = T::from_gql_value(Some(v))?;
-                        result.push(value)
-                    }
-                    Ok(vec_to_array(result))
+        match value.unwrap_or_default() {
+            GqlValue::List(list) => {
+                let mut result = Vec::new();
+                for v in list {
+                    let value = T::from_gql_value(Some(v))?;
+                    result.push(value)
                 }
-                invalid_value => Err(format!(
-                    "Expected type: list, but found {}",
-                    invalid_value.to_string()
-                )),
-            },
-            None => Err("Expected type: list, but not found".to_string()),
+                Ok(vec_to_array(result))
+            }
+            invalid_value => Err(format!(
+                "Expected type: list, but found {}",
+                invalid_value.to_string()
+            )),
         }
     }
 
@@ -42,23 +39,21 @@ impl<T: GqlInputType, const N: usize> GqlInputType for [T; N] {
 #[async_trait::async_trait]
 impl<T: GqlInputType + Eq + Hash> GqlInputType for HashSet<T> {
     fn from_gql_value(value: Option<GqlValue>) -> Result<Self, String> {
-        match value {
-            Some(value) => match value {
-                GqlValue::List(list) => {
-                    let mut result = Vec::new();
-                    for v in list {
-                        let value = T::from_gql_value(Some(v))?;
-                        result.push(value)
-                    }
-                    let hash_set: HashSet<T> = result.into_iter().collect();
-                    Ok(hash_set)
+        match value.unwrap_or_default() {
+            GqlValue::List(list) => {
+                let mut result = Vec::new();
+                for v in list {
+                    let value = T::from_gql_value(Some(v))?;
+                    result.push(value)
                 }
-                invalid_value => Err(format!(
-                    "Expected type: list, but found {}",
-                    invalid_value.to_string()
-                )),
-            },
-            None => Err("Expected type: list, but not found".to_string()),
+                let hash_set: HashSet<T> = result.into_iter().collect();
+                Ok(hash_set)
+            }
+            value => Ok({
+                let mut result = Self::default();
+                result.insert(T::from_gql_value(Some(value))?);
+                result
+            }),
         }
     }
 
@@ -70,6 +65,17 @@ impl<T: GqlInputType + Eq + Hash> GqlInputType for HashSet<T> {
 
 #[async_trait::async_trait]
 impl<T: GqlInputType> GqlInputType for LinkedList<T> {
+    fn from_gql_value(value: Option<GqlValue>) -> Result<Self, String> {
+        todo!()
+    }
+
+    fn to_gql_value(&self) -> GqlValue {
+        todo!()
+    }
+}
+
+#[async_trait::async_trait]
+impl<T: GqlInputType> GqlInputType for VecDeque<T> {
     fn from_gql_value(value: Option<GqlValue>) -> Result<Self, String> {
         todo!()
     }
