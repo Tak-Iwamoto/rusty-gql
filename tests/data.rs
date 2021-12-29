@@ -19,6 +19,9 @@ async fn it_works() {
         async fn age(&self) -> i32 {
             self.age
         }
+        async fn test(&self, v: i32) -> i32 {
+            v
+        }
     }
 
     struct Query;

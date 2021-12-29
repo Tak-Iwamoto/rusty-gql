@@ -1,6 +1,6 @@
 use proc_macro::{self, TokenStream};
 use quote::quote;
-use syn::{ext::IdentExt, Block, FnArg, ImplItem, ItemImpl, ReturnType, Type, TypeReference};
+use syn::{ext::IdentExt, Block, FnArg, ImplItem, ItemImpl, ReturnType};
 
 use crate::utils::{get_method_args_without_context, is_context_type, is_result_type};
 
@@ -69,16 +69,12 @@ pub fn generate_gql_resolver(item_impl: &mut ItemImpl) -> Result<TokenStream, sy
             let mut args = Vec::new();
             let mut gql_arg_values = Vec::new();
 
-            for arg in method_args {
-                args.push(quote! { #arg });
-                let ident = arg.ident;
-                let name = &ident.unraw().to_string();
-                // ctxだけは除くhack
+            for (arg_ident, ty) in method_args {
+                args.push(quote! { #arg_ident });
+                let ident = arg_ident.ident;
+                let name = ident.unraw().to_string();
                 gql_arg_values.push(quote! {
-                    let #ident = match ctx.get_arg_value(#ident) {
-                        Some(value) => value,
-                        None => rusty_gql::GqlValue::Null,
-                    };
+                    let #ident = ctx.get_arg_value::<#ty>(#name)?;
                 });
             }
 

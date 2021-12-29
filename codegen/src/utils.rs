@@ -1,8 +1,6 @@
 use syn::{
-    AttributeArgs, FnArg, ImplItemMethod, Pat, PatIdent, PatType, Type, TypeParamBound,
-    TypeReference,
+    AttributeArgs, FnArg, ImplItemMethod, Pat, PatIdent, Type, TypeParamBound, TypeReference,
 };
-
 fn check_path_name(path: &syn::Path, value: &str) -> bool {
     path.segments.len() == 1 && path.segments[0].ident == value
 }
@@ -47,7 +45,7 @@ pub fn get_type_name(ty: &Type) -> Result<String, syn::Error> {
 
 pub fn get_method_args_without_context(
     method: &ImplItemMethod,
-) -> Result<Vec<PatIdent>, syn::Error> {
+) -> Result<Vec<(PatIdent, Type)>, syn::Error> {
     let mut args = Vec::new();
     if method.sig.inputs.is_empty() {
         return Err(syn::Error::new_spanned(
@@ -80,7 +78,7 @@ pub fn get_method_args_without_context(
                 }
 
                 if let Pat::Ident(ident) = &*pat_type.pat {
-                    args.push(ident.clone());
+                    args.push((ident.clone(), pat_type.ty.as_ref().clone()));
                 } else {
                     return Err(syn::Error::new_spanned(pat_type, "Invalid arg"));
                 }

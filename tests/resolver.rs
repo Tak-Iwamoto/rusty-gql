@@ -7,17 +7,16 @@ pub struct Query;
 
 #[derive(Debug)]
 pub struct Show {
-    name: String,
-    description: String,
+    pub name: String,
+    pub description: String,
 }
 
 #[async_trait]
 impl Resolver for Show {
     async fn resolve_field(
         &self,
-        ctx: &FieldContext<'_>,
+        _ctx: &FieldContext<'_>,
     ) -> rusty_gql::ResolverResult<Option<GqlValue>> {
-        // resolve_object(self, ctx, true).await.map(Some)
         Ok(Some(GqlValue::Null))
     }
 }
@@ -26,7 +25,7 @@ impl Resolver for Show {
 impl SelectionSetResolver for Show {
     async fn resolve_selection_set(
         &self,
-        ctx: &SelectionSetContext<'_>,
+        _ctx: &SelectionSetContext<'_>,
     ) -> rusty_gql::ResolverResult<GqlValue> {
         Ok(GqlValue::Null)
     }
@@ -34,7 +33,7 @@ impl SelectionSetResolver for Show {
 
 #[GqlResolver]
 impl Query {
-    pub async fn get_shows(&self, ctx: &FieldContext<'_>) -> Show {
+    pub async fn get_shows(&self) -> Show {
         let show = Show {
             name: "test".to_string(),
             description: "test".to_string(),
@@ -42,7 +41,7 @@ impl Query {
         show
     }
 
-    pub async fn get_show2(&self, ctx: &FieldContext<'_>) -> Show {
+    pub async fn get_show2(&self) -> Show {
         let show = Show {
             name: "test".to_string(),
             description: "test".to_string(),
