@@ -2,7 +2,7 @@ use proc_macro::{self, TokenStream};
 use quote::quote;
 use syn::{ext::IdentExt, Block, FnArg, ImplItem, ItemImpl, ReturnType, Type, TypeReference};
 
-use crate::utils::{get_method_args, is_result_type};
+use crate::utils::{get_method_args_without_context, is_context_type, is_result_type};
 
 pub fn generate_gql_resolver(item_impl: &mut ItemImpl) -> Result<TokenStream, syn::Error> {
     let self_name = &item_impl.self_ty;
@@ -54,16 +54,7 @@ pub fn generate_gql_resolver(item_impl: &mut ItemImpl) -> Result<TokenStream, sy
                 .sig
                 .inputs
                 .iter()
-                .find(|x| {
-                    if let FnArg::Typed(pat) = x {
-                        if let Type::Reference(TypeReference { elem, .. }) = &*pat.ty {
-                            if let Type::Path(path) = elem.as_ref() {
-                                return path.path.segments.last().unwrap().ident == "FieldContext";
-                            }
-                        }
-                    };
-                    false
-                })
+                .find(|arg| is_context_type(arg))
                 .is_some();
 
             if !*is_contain_context {
@@ -74,7 +65,7 @@ pub fn generate_gql_resolver(item_impl: &mut ItemImpl) -> Result<TokenStream, sy
             let method_name = &method.sig.ident;
             let field_name = method_name.unraw().to_string();
 
-            let method_args = get_method_args(&method)?;
+            let method_args = get_method_args_without_context(&method)?;
             let mut args = Vec::new();
             let mut gql_arg_values = Vec::new();
 
@@ -83,21 +74,19 @@ pub fn generate_gql_resolver(item_impl: &mut ItemImpl) -> Result<TokenStream, sy
                 let ident = arg.ident;
                 let name = &ident.unraw().to_string();
                 // ctxだけは除くhack
-                if name != "ctx" {
-                    gql_arg_values.push(quote! {
-                        let #ident = match ctx.get_arg_value(#ident) {
-                            Some(value) => value,
-                            None => rusty_gql::GqlValue::Null,
-                        };
-                    });
-                }
+                gql_arg_values.push(quote! {
+                    let #ident = match ctx.get_arg_value(#ident) {
+                        Some(value) => value,
+                        None => rusty_gql::GqlValue::Null,
+                    };
+                });
             }
 
             resolvers.push(quote! {
                 if ctx.item.name == #field_name {
                     let resolve_fn = async move {
                         #(#gql_arg_values)*
-                        self.#method_name(#(#args),*).await
+                        self.#method_name(ctx, #(#args),*).await
                     };
 
                     // TODO: error handling
