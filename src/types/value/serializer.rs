@@ -104,7 +104,7 @@ impl ser::Serializer for Serializer {
         }
     }
 
-    fn serialize_char(self, v: char) -> Result<Self::Ok, Self::Error> {
+    fn serialize_char(self, _v: char) -> Result<Self::Ok, Self::Error> {
         Err(SerializerError("char cannot be serialized.".to_string()))
     }
 
@@ -112,7 +112,7 @@ impl ser::Serializer for Serializer {
         Ok(GqlValue::String(v.to_string()))
     }
 
-    fn serialize_bytes(self, v: &[u8]) -> Result<Self::Ok, Self::Error> {
+    fn serialize_bytes(self, _v: &[u8]) -> Result<Self::Ok, Self::Error> {
         Err(SerializerError("bytes cannot be serialized.".to_string()))
     }
 
@@ -131,7 +131,7 @@ impl ser::Serializer for Serializer {
         Ok(GqlValue::Null)
     }
 
-    fn serialize_unit_struct(self, name: &'static str) -> Result<Self::Ok, Self::Error> {
+    fn serialize_unit_struct(self, _name: &'static str) -> Result<Self::Ok, Self::Error> {
         Ok(GqlValue::Null)
     }
 
@@ -201,7 +201,7 @@ impl ser::Serializer for Serializer {
         ))
     }
 
-    fn serialize_map(self, len: Option<usize>) -> Result<Self::SerializeMap, Self::Error> {
+    fn serialize_map(self, _len: Option<usize>) -> Result<Self::SerializeMap, Self::Error> {
         Ok(SerializeMap {
             map: BTreeMap::new(),
             key: None,
@@ -210,8 +210,8 @@ impl ser::Serializer for Serializer {
 
     fn serialize_struct(
         self,
-        name: &'static str,
-        len: usize,
+        _name: &'static str,
+        _len: usize,
     ) -> Result<Self::SerializeStruct, Self::Error> {
         Ok(SerializeStruct(BTreeMap::new()))
     }
@@ -562,8 +562,8 @@ impl serde::Serializer for KeySerializer {
         Err(cannot_serialize_except_string())
     }
 
-    fn serialize_map(self, len: Option<usize>) -> Result<Self::SerializeMap, Self::Error> {
-        todo!()
+    fn serialize_map(self, _len: Option<usize>) -> Result<Self::SerializeMap, Self::Error> {
+        Err(cannot_serialize_except_string())
     }
 
     fn serialize_struct(

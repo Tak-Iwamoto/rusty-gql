@@ -28,7 +28,7 @@ async fn it_works() {
 
     #[GqlResolver]
     impl Query {
-        async fn person(&self, ctx: &FieldContext<'_>) -> Person {
+        async fn person(&self) -> Person {
             let person = Person {
                 name: String::from("test"),
                 description: String::from("test description"),

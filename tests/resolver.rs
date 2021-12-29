@@ -49,9 +49,3 @@ impl Query {
         show
     }
 }
-
-#[tokio::test]
-async fn it_works() {
-    let query = Query {};
-    // let value = query.result_test().await;
-}

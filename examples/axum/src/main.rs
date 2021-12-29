@@ -16,7 +16,7 @@ struct Query;
 impl Resolver for Query {
     async fn resolve_field(
         &self,
-        ctx: &rusty_gql::FieldContext<'_>,
+        _ctx: &rusty_gql::FieldContext<'_>,
     ) -> rusty_gql::ResolverResult<Option<rusty_gql::GqlValue>> {
         Ok(None)
     }
