@@ -30,7 +30,13 @@ impl<'a> FieldContext<'a> {
             .find(|(name, _)| name == arg_name)
             .map(|(_, v)| v);
         let gql_value = match value {
-            Some(v) => GqlValue::from(v.clone()),
+            Some(v) => {
+                if let Value::Variable(var_name) = v {
+                    self.resolve_variable_value(var_name)?
+                } else {
+                    GqlValue::from(v.clone())
+                }
+            }
             None => GqlValue::Null,
         };
         match T::from_gql_value(Some(gql_value)) {
