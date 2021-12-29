@@ -200,9 +200,13 @@ impl<'a> SelectionSetContext<'a> {
                     }
                     if field.name == "__typename" {
                         let field_name = field.name.clone();
+                        let type_name = match self.schema.type_definitions.get(&field_name) {
+                            Some(type_def) => type_def.name(),
+                            None => "Null",
+                        };
 
                         resolvers.push(Box::pin(async move {
-                            Ok((field_name, GqlValue::String("typename".to_string())))
+                            Ok((field_name, GqlValue::String(type_name.to_string())))
                         }));
                         continue;
                     }
