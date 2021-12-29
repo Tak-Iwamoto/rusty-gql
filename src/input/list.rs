@@ -14,19 +14,22 @@ fn vec_to_array<T, const N: usize>(v: Vec<T>) -> [T; N] {
 #[async_trait::async_trait]
 impl<T: GqlInputType, const N: usize> GqlInputType for [T; N] {
     fn from_gql_value(value: Option<GqlValue>) -> Result<Self, String> {
-        match value.unwrap_or_default() {
-            GqlValue::List(list) => {
-                let mut result = Vec::new();
-                for v in list {
-                    let value = T::from_gql_value(Some(v))?;
-                    result.push(value)
+        match value {
+            Some(value) => match value {
+                GqlValue::List(list) => {
+                    let mut result = Vec::new();
+                    for v in list {
+                        let value = T::from_gql_value(Some(v))?;
+                        result.push(value)
+                    }
+                    Ok(vec_to_array(result))
                 }
-                Ok(vec_to_array(result))
-            }
-            invalid_value => Err(format!(
-                "Expected type: list, but found {}",
-                invalid_value.to_string()
-            )),
+                invalid_value => Err(format!(
+                    "Expected type: list, but found {}",
+                    invalid_value.to_string()
+                )),
+            },
+            None => Err("Expected type: list, but not found".to_string()),
         }
     }
 
