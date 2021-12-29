@@ -12,7 +12,12 @@ pub async fn execute<Query: Resolver, Mutation: Resolver, Subscription: Resolver
     container: &ArcContainer<Query, Mutation, Subscription>,
     request: Request,
 ) -> Response {
-    let operation = build_operation(&request.query, &container.schema, request.operation_name);
+    let operation = build_operation(
+        &request.query,
+        request.operation_name,
+        request.variables,
+        &container.schema,
+    );
 
     let operation = match operation {
         Ok(op) => ArcOperation::new(op),

@@ -9,7 +9,7 @@ use graphql_parser::{
     schema::Directive,
 };
 
-use crate::{error::GqlError, types::schema::ArcSchema, Schema};
+use crate::{error::GqlError, types::schema::ArcSchema, Request, Schema, Variables};
 
 #[derive(Debug)]
 pub struct Operation<'a> {
@@ -20,6 +20,7 @@ pub struct Operation<'a> {
     pub root_field: Field<'a, String>,
     pub fragment_definitions: BTreeMap<String, FragmentDefinition<'a, String>>,
     pub errors: Mutex<Vec<GqlError>>,
+    pub variables: Variables,
 }
 
 #[derive(Debug)]
@@ -66,11 +67,12 @@ impl ToString for OperationType {
 }
 
 pub fn build_operation<'a>(
-    query_doc: &'a str,
-    schema: &'a ArcSchema,
+    query: &'a str,
     operation_name: Option<String>,
+    variables: Variables,
+    schema: &'a ArcSchema,
 ) -> Result<Operation<'a>, GqlError> {
-    let parsed_query = match graphql_parser::parse_query::<String>(query_doc) {
+    let parsed_query = match graphql_parser::parse_query::<String>(query) {
         Ok(parsed) => parsed,
         Err(_) => return Err(GqlError::new("failed to parse query", None)),
     };
@@ -174,6 +176,7 @@ pub fn build_operation<'a>(
                         selection_set: definition.selection_set,
                         root_field: definition.root_field,
                         errors: Default::default(),
+                        variables,
                     })
                 }
                 None => Err(GqlError::new(
@@ -193,6 +196,7 @@ pub fn build_operation<'a>(
                     selection_set: definition.selection_set,
                     root_field: definition.root_field,
                     errors: Default::default(),
+                    variables,
                 })
             }
             None => match operation_definitions.values().next() {
@@ -206,6 +210,7 @@ pub fn build_operation<'a>(
                         selection_set: definition.selection_set,
                         root_field: definition.root_field,
                         errors: Default::default(),
+                        variables,
                     })
                 }
                 None => Err(GqlError::new("operation does not exist", None)),

@@ -95,6 +95,22 @@ impl<'a, T> ExecutionContext<'a, T> {
     pub fn add_error(&self, error: &GqlError) {
         self.operation.errors.lock().unwrap().push(error.clone());
     }
+
+    pub fn resolve_variable_value(&self, name: &str) -> ResolverResult<GqlValue> {
+        let v = self
+            .operation
+            .variable_definitions
+            .iter()
+            .find(|var_def| var_def.name == name)
+            .and_then(|var_def| self.operation.variables.0.get(&var_def.name));
+        match v {
+            Some(value) => Ok(value.clone()),
+            None => Err(GqlError::new(
+                format!("Variable {} is not defined", name),
+                None,
+            )),
+        }
+    }
 }
 
 fn build_gql_object(target_obj: &mut BTreeMap<String, GqlValue>, gql_value: (String, GqlValue)) {
