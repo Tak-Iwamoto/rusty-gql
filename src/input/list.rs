@@ -11,7 +11,6 @@ fn vec_to_array<T, const N: usize>(v: Vec<T>) -> [T; N] {
         .unwrap_or_else(|v: Vec<T>| panic!("Expected a Vec of length {} but it was {}", N, v.len()))
 }
 
-#[async_trait::async_trait]
 impl<T: GqlInputType, const N: usize> GqlInputType for [T; N] {
     fn from_gql_value(value: Option<GqlValue>) -> Result<Self, String> {
         match value {
@@ -39,7 +38,6 @@ impl<T: GqlInputType, const N: usize> GqlInputType for [T; N] {
     }
 }
 
-#[async_trait::async_trait]
 impl<T: GqlInputType + Eq + Hash> GqlInputType for HashSet<T> {
     fn from_gql_value(value: Option<GqlValue>) -> Result<Self, String> {
         match value.unwrap_or_default() {
@@ -66,7 +64,6 @@ impl<T: GqlInputType + Eq + Hash> GqlInputType for HashSet<T> {
     }
 }
 
-#[async_trait::async_trait]
 impl<T: GqlInputType> GqlInputType for LinkedList<T> {
     fn from_gql_value(value: Option<GqlValue>) -> Result<Self, String> {
         match value.unwrap_or_default() {
@@ -93,7 +90,6 @@ impl<T: GqlInputType> GqlInputType for LinkedList<T> {
     }
 }
 
-#[async_trait::async_trait]
 impl<T: GqlInputType> GqlInputType for VecDeque<T> {
     fn from_gql_value(value: Option<GqlValue>) -> Result<Self, String> {
         match value.unwrap_or_default() {
