@@ -2,17 +2,8 @@ use std::io::Error;
 use tokio::io::AsyncWriteExt;
 
 pub struct PathStr<'a> {
-    paths: Vec<&'a str>,
-    base_path: Option<&'a str>,
-}
-
-impl<'a> PathStr<'a> {
-    pub fn new(paths: Vec<&'a str>) -> Self {
-        PathStr {
-            paths,
-            base_path: None,
-        }
-    }
+    pub paths: Vec<&'a str>,
+    pub base_path: Option<&'a str>,
 }
 
 impl<'a> ToString for PathStr<'a> {

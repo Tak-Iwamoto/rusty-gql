@@ -7,7 +7,7 @@ use std::io::Error;
 
 use futures_util::future::try_join_all;
 use rusty_gql::{build_schema, OperationType};
-use tokio::io::AsyncWriteExt;
+use utils::create_file;
 
 use self::{operation::build_operation_files, type_definition::build_type_definition_files};
 
@@ -30,9 +30,7 @@ pub async fn build_graphql_schema(schema_doc: &str) -> Result<(), Error> {
 }
 
 async fn create_mod_file() -> tokio::io::Result<()> {
-    let mut file = tokio::fs::File::create("graphql/mod.rs").await?;
-    file.write(b"mod input;\nmod interface;\nmod model;\nmod query;\nmod mutation;\nmod subscription;\nmod scalar;\n").await?;
-    Ok(())
+    create_file("graphql/mod.rs", "mod input;\nmod interface;\nmod model;\nmod query;\nmod mutation;\nmod subscription;\nmod scalar;\n").await
 }
 
 async fn create_dirs() -> Result<Vec<()>, Error> {

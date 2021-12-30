@@ -24,7 +24,11 @@ pub async fn build_operation_files(
         futures.push(task);
     }
     let mod_file_str = build_mod_file_str(&operations, operation_type);
-    let mod_file_path = PathStr::new(vec![operation_str, "mod"]).to_string();
+    let mod_file_path = PathStr {
+        paths: vec![operation_str, "mod"],
+        base_path: None,
+    }
+    .to_string();
     create_file(&mod_file_path, &mod_file_str).await?;
 
     let res = try_join_all(futures).await;
@@ -80,7 +84,11 @@ fn build_query_str(
 }
 
 async fn build_operation_file(field: &GqlField, operation_str: &str) -> Result<(), Error> {
-    let path = PathStr::new(vec![operation_str, &field.name]).to_string();
+    let path = PathStr {
+        paths: vec![operation_str, &field.name],
+        base_path: None,
+    }
+    .to_string();
     if tokio::fs::File::open(&path).await.is_err() {
         let content = build_field_str(&field);
         create_file(&path, &content).await?;
