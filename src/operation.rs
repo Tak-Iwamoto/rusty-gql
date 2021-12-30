@@ -9,7 +9,7 @@ use graphql_parser::{
     schema::Directive,
 };
 
-use crate::{error::GqlError, types::schema::ArcSchema, Request, Schema, Variables};
+use crate::{error::GqlError, types::schema::ArcSchema, Schema, Variables};
 
 #[derive(Debug)]
 pub struct Operation<'a> {
