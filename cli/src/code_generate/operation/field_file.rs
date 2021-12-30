@@ -25,6 +25,7 @@ impl<'a> FileStrategy for FieldFile<'a> {
             fn_scope.arg(arg.name.as_str(), arg.meta_type.to_rust_type_str());
         }
         fn_scope.vis("pub");
+        fn_scope.line("todo!()");
         scope.to_string()
     }
 }
