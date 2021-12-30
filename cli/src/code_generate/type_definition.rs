@@ -62,7 +62,7 @@ fn build_object_str(gql_obj: &GqlObject) -> String {
     let struct_scope = scope.new_struct(gql_obj.name.as_str()).vis("pub");
 
     for field in &gql_obj.fields {
-        struct_scope.field(&field.name, field.meta_type.to_rust_type());
+        struct_scope.field(&field.name, field.meta_type.to_rust_type_str());
     }
 
     scope.to_string()
@@ -75,7 +75,7 @@ fn build_interface_str(gql_interface: &GqlInterface) -> String {
     for field in &gql_interface.fields {
         trait_scope
             .new_fn(&field.name)
-            .ret(field.meta_type.to_rust_type());
+            .ret(field.meta_type.to_rust_type_str());
     }
     scope.to_string()
 }
@@ -96,7 +96,7 @@ fn build_input_object_str(gql_input: &GqlInputObject) -> String {
     let struct_scope = scope.new_struct(gql_input.name.as_str()).vis("pub");
 
     for field in &gql_input.fields {
-        struct_scope.field(&field.name, field.meta_type.to_rust_type());
+        struct_scope.field(&field.name, field.meta_type.to_rust_type_str());
     }
 
     scope.to_string()

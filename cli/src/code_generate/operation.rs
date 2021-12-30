@@ -64,7 +64,7 @@ fn build_query_str(
         let f = imp.new_fn(&operation_name);
         let mut args_str = String::from("");
         for arg in &method.arguments {
-            f.arg(arg.name.as_str(), arg.meta_type.to_rust_type());
+            f.arg(arg.name.as_str(), arg.meta_type.to_rust_type_str());
             args_str += format!("{},", &arg.name).as_str();
         }
 
@@ -95,7 +95,7 @@ fn build_field_str(field: &GqlField) -> String {
     let fn_scope = scope.new_fn(field.name.as_str());
 
     for arg in &field.arguments {
-        fn_scope.arg(arg.name.as_str(), arg.meta_type.to_rust_type());
+        fn_scope.arg(arg.name.as_str(), arg.meta_type.to_rust_type_str());
     }
     fn_scope.vis("pub");
     scope.to_string()
