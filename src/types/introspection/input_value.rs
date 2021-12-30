@@ -1,5 +1,6 @@
 use crate::{
-    FieldContext, GqlArgument, GqlValue, Resolver, ResolverResult, Schema, SelectionSetResolver,
+    FieldContext, FieldResolver, GqlArgument, GqlValue, ResolverResult, Schema,
+    SelectionSetResolver,
 };
 
 use super::introspection_type::__Type;
@@ -38,7 +39,7 @@ impl<'a> __InputValue<'a> {
 }
 
 #[async_trait::async_trait]
-impl<'a> Resolver for __InputValue<'a> {
+impl<'a> FieldResolver for __InputValue<'a> {
     async fn resolve_field(&self, ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
         if ctx.item.name == "name" {
             let name = self.name().await;

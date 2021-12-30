@@ -1,5 +1,6 @@
 use crate::{
-    GqlField, GqlValue, Resolver, ResolverResult, Schema, SelectionSetContext, SelectionSetResolver,
+    FieldResolver, GqlField, GqlValue, ResolverResult, Schema, SelectionSetContext,
+    SelectionSetResolver,
 };
 
 use super::{input_value::__InputValue, introspection_type::__Type};
@@ -45,7 +46,7 @@ impl<'a> __Field<'a> {
 }
 
 #[async_trait::async_trait]
-impl<'a> Resolver for __Field<'a> {
+impl<'a> FieldResolver for __Field<'a> {
     async fn resolve_field(
         &self,
         ctx: &crate::FieldContext<'_>,

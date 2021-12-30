@@ -1,11 +1,12 @@
 use std::collections::{BTreeSet, HashSet, LinkedList, VecDeque};
 
 use crate::{
-    FieldContext, GqlValue, Resolver, ResolverResult, SelectionSetContext, SelectionSetResolver,
+    FieldContext, FieldResolver, GqlValue, ResolverResult, SelectionSetContext,
+    SelectionSetResolver,
 };
 
 #[async_trait::async_trait]
-impl<T: Resolver, const N: usize> Resolver for [T; N] {
+impl<T: FieldResolver, const N: usize> FieldResolver for [T; N] {
     async fn resolve_field(&self, ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
         let mut result = Vec::new();
         for value in self {
@@ -33,7 +34,7 @@ impl<T: SelectionSetResolver, const N: usize> SelectionSetResolver for [T; N] {
 }
 
 #[async_trait::async_trait]
-impl<T: Resolver> Resolver for HashSet<T> {
+impl<T: FieldResolver> FieldResolver for HashSet<T> {
     async fn resolve_field(&self, ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
         let mut result = Vec::new();
         for value in self {
@@ -61,7 +62,7 @@ impl<T: SelectionSetResolver> SelectionSetResolver for HashSet<T> {
 }
 
 #[async_trait::async_trait]
-impl<'a, T: Resolver + 'a> Resolver for &'a [T] {
+impl<'a, T: FieldResolver + 'a> FieldResolver for &'a [T] {
     async fn resolve_field(&self, ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
         let mut result = Vec::new();
         for value in self.iter() {
@@ -89,7 +90,7 @@ impl<'a, T: SelectionSetResolver + 'a> SelectionSetResolver for &'a [T] {
 }
 
 #[async_trait::async_trait]
-impl<T: Resolver> Resolver for VecDeque<T> {
+impl<T: FieldResolver> FieldResolver for VecDeque<T> {
     async fn resolve_field(&self, ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
         let mut result = Vec::new();
         for value in self.iter() {
@@ -117,7 +118,7 @@ impl<T: SelectionSetResolver> SelectionSetResolver for VecDeque<T> {
 }
 
 #[async_trait::async_trait]
-impl<T: Resolver> Resolver for LinkedList<T> {
+impl<T: FieldResolver> FieldResolver for LinkedList<T> {
     async fn resolve_field(&self, ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
         let mut result = Vec::new();
         for value in self.iter() {
@@ -145,7 +146,7 @@ impl<T: SelectionSetResolver> SelectionSetResolver for LinkedList<T> {
 }
 
 #[async_trait::async_trait]
-impl<T: Resolver> Resolver for Vec<T> {
+impl<T: FieldResolver> FieldResolver for Vec<T> {
     async fn resolve_field(&self, ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
         let mut result = Vec::new();
         for value in self.iter() {

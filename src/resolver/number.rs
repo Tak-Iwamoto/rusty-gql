@@ -1,11 +1,12 @@
 use serde_json::Number;
 
 use crate::{
-    FieldContext, GqlValue, Resolver, ResolverResult, SelectionSetContext, SelectionSetResolver,
+    FieldContext, FieldResolver, GqlValue, ResolverResult, SelectionSetContext,
+    SelectionSetResolver,
 };
 
 #[async_trait::async_trait]
-impl Resolver for i8 {
+impl FieldResolver for i8 {
     async fn resolve_field(&self, _ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
         Ok(Some(GqlValue::Number(Number::from(*self))))
     }
@@ -22,7 +23,7 @@ impl SelectionSetResolver for i8 {
 }
 
 #[async_trait::async_trait]
-impl Resolver for i16 {
+impl FieldResolver for i16 {
     async fn resolve_field(&self, _ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
         Ok(Some(GqlValue::Number(Number::from(*self))))
     }
@@ -39,7 +40,7 @@ impl SelectionSetResolver for i16 {
 }
 
 #[async_trait::async_trait]
-impl Resolver for i32 {
+impl FieldResolver for i32 {
     async fn resolve_field(&self, _ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
         Ok(Some(GqlValue::Number(Number::from(*self))))
     }
@@ -56,7 +57,7 @@ impl SelectionSetResolver for i32 {
 }
 
 #[async_trait::async_trait]
-impl Resolver for i64 {
+impl FieldResolver for i64 {
     async fn resolve_field(&self, _ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
         Ok(Some(GqlValue::Number(Number::from(*self))))
     }
@@ -73,7 +74,7 @@ impl SelectionSetResolver for i64 {
 }
 
 #[async_trait::async_trait]
-impl Resolver for u8 {
+impl FieldResolver for u8 {
     async fn resolve_field(&self, _ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
         Ok(Some(GqlValue::Number(Number::from(*self))))
     }
@@ -89,7 +90,7 @@ impl SelectionSetResolver for u8 {
     }
 }
 #[async_trait::async_trait]
-impl Resolver for u16 {
+impl FieldResolver for u16 {
     async fn resolve_field(&self, _ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
         Ok(Some(GqlValue::Number(Number::from(*self))))
     }
@@ -106,7 +107,7 @@ impl SelectionSetResolver for u16 {
 }
 
 #[async_trait::async_trait]
-impl Resolver for u32 {
+impl FieldResolver for u32 {
     async fn resolve_field(&self, _ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
         Ok(Some(GqlValue::Number(Number::from(*self))))
     }
@@ -123,7 +124,7 @@ impl SelectionSetResolver for u32 {
 }
 
 #[async_trait::async_trait]
-impl Resolver for u64 {
+impl FieldResolver for u64 {
     async fn resolve_field(&self, _ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
         Ok(Some(GqlValue::Number(Number::from(*self))))
     }
@@ -140,7 +141,7 @@ impl SelectionSetResolver for u64 {
 }
 
 #[async_trait::async_trait]
-impl Resolver for usize {
+impl FieldResolver for usize {
     async fn resolve_field(&self, _ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
         Ok(Some(GqlValue::Number(Number::from(*self))))
     }
@@ -157,7 +158,7 @@ impl SelectionSetResolver for usize {
 }
 
 #[async_trait::async_trait]
-impl Resolver for isize {
+impl FieldResolver for isize {
     async fn resolve_field(&self, _ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
         Ok(Some(GqlValue::Number(Number::from(*self))))
     }
@@ -174,7 +175,7 @@ impl SelectionSetResolver for isize {
 }
 
 #[async_trait::async_trait]
-impl Resolver for f32 {
+impl FieldResolver for f32 {
     async fn resolve_field(&self, _ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
         match Number::from_f64(*self as f64) {
             Some(n) => Ok(Some(GqlValue::Number(n))),
@@ -197,7 +198,7 @@ impl SelectionSetResolver for f32 {
 }
 
 #[async_trait::async_trait]
-impl Resolver for f64 {
+impl FieldResolver for f64 {
     async fn resolve_field(&self, _ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
         match Number::from_f64(*self) {
             Some(n) => Ok(Some(GqlValue::Number(n))),

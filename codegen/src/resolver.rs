@@ -98,7 +98,7 @@ pub fn generate_gql_resolver(item_impl: &mut ItemImpl) -> Result<TokenStream, sy
         #item_impl
 
         #[rusty_gql::async_trait::async_trait]
-        impl #generics rusty_gql::Resolver for #self_name #generics_params #where_clause {
+        impl #generics rusty_gql::FieldResolver for #self_name #generics_params #where_clause {
             async fn resolve_field(&self, ctx: &rusty_gql::FieldContext<'_>) -> rusty_gql::ResolverResult<::std::option::Option<rusty_gql::GqlValue>> {
                 #(#resolvers)*
                 Ok(::std::option::Option::None)

@@ -6,7 +6,7 @@ use rusty_gql::*;
 async fn test_introspection_works() {
     struct Query;
 
-    #[GqlResolver]
+    #[Resolver]
     impl Query {
         async fn value(&self) -> i32 {
             10
@@ -22,7 +22,7 @@ async fn test_introspection_works() {
     let query_root = QueryRoot { query: Query };
 
     let container = ArcContainer::new(
-        contents.as_str(),
+        &vec![contents.as_str()],
         query_root,
         EmptyMutation,
         EmptySubscription,

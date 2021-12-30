@@ -1,7 +1,7 @@
 use crate::{
     error::GqlError,
     types::{__Schema, __Type},
-    FieldContext, GqlValue, Resolver, ResolverResult, SelectionSetResolver,
+    FieldContext, FieldResolver, GqlValue, ResolverResult, SelectionSetResolver,
 };
 
 pub struct QueryRoot<T> {
@@ -9,7 +9,7 @@ pub struct QueryRoot<T> {
 }
 
 #[async_trait::async_trait]
-impl<T: Resolver> Resolver for QueryRoot<T> {
+impl<T: FieldResolver> FieldResolver for QueryRoot<T> {
     async fn resolve_field(&self, ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
         if ctx.item.name == "__schema" {
             let ctx_selection_set = ctx.with_selection_set(&ctx.item.selection_set);

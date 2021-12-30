@@ -13,7 +13,7 @@ use axum::{
 struct Query;
 
 #[rusty_gql::async_trait::async_trait]
-impl Resolver for Query {
+impl FieldResolver for Query {
     async fn resolve_field(
         &self,
         _ctx: &rusty_gql::FieldContext<'_>,
@@ -26,7 +26,7 @@ impl Resolver for Query {
 struct Mutation;
 
 #[rusty_gql::async_trait::async_trait]
-impl Resolver for Mutation {
+impl FieldResolver for Mutation {
     async fn resolve_field(
         &self,
         ctx: &rusty_gql::FieldContext<'_>,
@@ -39,7 +39,7 @@ impl Resolver for Mutation {
 struct Subscription;
 
 #[rusty_gql::async_trait::async_trait]
-impl Resolver for Subscription {
+impl FieldResolver for Subscription {
     async fn resolve_field(
         &self,
         ctx: &rusty_gql::FieldContext<'_>,

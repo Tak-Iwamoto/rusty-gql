@@ -26,5 +26,4 @@ impl<'a> FileStrategy for InputObjectFile<'a> {
 
         scope.to_string()
     }
-
 }

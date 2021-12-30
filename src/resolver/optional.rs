@@ -1,9 +1,10 @@
 use crate::{
-    FieldContext, GqlValue, Resolver, ResolverResult, SelectionSetContext, SelectionSetResolver,
+    FieldContext, FieldResolver, GqlValue, ResolverResult, SelectionSetContext,
+    SelectionSetResolver,
 };
 
 #[async_trait::async_trait]
-impl<T: Resolver> Resolver for Option<T> {
+impl<T: FieldResolver> FieldResolver for Option<T> {
     async fn resolve_field(&self, ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
         match self {
             Some(resolver) => resolver.resolve_field(ctx).await,

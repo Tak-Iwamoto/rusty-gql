@@ -25,7 +25,7 @@ pub use graphiql_html::playground_html;
 pub use operation::OperationType;
 pub use query_root::QueryRoot;
 pub use request::{receive_http_request, HttpRequestError, Request};
-pub use resolver::{Resolver, SelectionSetResolver};
+pub use resolver::{FieldResolver, SelectionSetResolver};
 pub use response::Response;
 pub use types::schema::build_schema;
 pub use types::{
@@ -36,13 +36,13 @@ pub use variables::Variables;
 
 pub type ResolverResult<T> = ::std::result::Result<T, GqlError>;
 
-pub use rusty_gql_codegen::GqlResolver;
+pub use rusty_gql_codegen::Resolver;
 
 #[derive(Clone)]
 pub struct EmptyMutation;
 
 #[async_trait::async_trait]
-impl Resolver for EmptyMutation {
+impl FieldResolver for EmptyMutation {
     async fn resolve_field(&self, _ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
         Ok(None)
     }
@@ -52,7 +52,7 @@ impl Resolver for EmptyMutation {
 pub struct EmptySubscription;
 
 #[async_trait::async_trait]
-impl Resolver for EmptySubscription {
+impl FieldResolver for EmptySubscription {
     async fn resolve_field(&self, _ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
         Ok(None)
     }

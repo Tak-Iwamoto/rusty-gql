@@ -1,6 +1,6 @@
 use graphql_parser::{schema::InputValue, Pos};
 
-use super::{directive::GqlDirective, value_type::GqlValueType, value::GqlValue};
+use super::{directive::GqlDirective, value::GqlValue, value_type::GqlValueType};
 
 #[derive(Debug, Clone)]
 pub struct GqlArgument {

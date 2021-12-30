@@ -8,7 +8,7 @@ async fn it_works() {
         pub age: i32,
     }
 
-    #[GqlResolver]
+    #[Resolver]
     impl Person {
         async fn name(&self) -> String {
             self.name.clone()
@@ -32,7 +32,7 @@ async fn it_works() {
 
     struct Query;
 
-    #[GqlResolver]
+    #[Resolver]
     impl Query {
         async fn person(&self) -> Person {
             let person = Person {
@@ -46,8 +46,13 @@ async fn it_works() {
 
     let contents = std::fs::read_to_string("./tests/schemas/simple_dummy.graphql").unwrap();
 
-    let container =
-        ArcContainer::new(contents.as_str(), Query, EmptyMutation, EmptySubscription).unwrap();
+    let container = ArcContainer::new(
+        &vec![contents.as_str()],
+        Query,
+        EmptyMutation,
+        EmptySubscription,
+    )
+    .unwrap();
 
     let name_query = r#"{"query": "{ person { name } }"}"#;
     let name_req = serde_json::from_str::<Request>(name_query).unwrap();

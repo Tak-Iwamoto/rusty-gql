@@ -1,5 +1,5 @@
 use crate::{
-    types::GqlEnumValue, FieldContext, GqlValue, Resolver, ResolverResult, Schema,
+    types::GqlEnumValue, FieldContext, FieldResolver, GqlValue, ResolverResult, Schema,
     SelectionSetResolver,
 };
 
@@ -30,7 +30,7 @@ impl<'a> __EnumValue<'a> {
 }
 
 #[async_trait::async_trait]
-impl<'a> Resolver for __EnumValue<'a> {
+impl<'a> FieldResolver for __EnumValue<'a> {
     async fn resolve_field(&self, ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
         if ctx.item.name == "name" {
             let name = self.name().await;

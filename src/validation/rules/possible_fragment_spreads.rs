@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use graphql_parser::query::{Definition, Document, TypeCondition, FragmentSpread};
+use graphql_parser::query::{Definition, Document, FragmentSpread, TypeCondition};
 
 use crate::validation::visitor::{ValidationContext, Visitor};
 
@@ -23,16 +23,15 @@ impl<'a> Visitor<'a> for PossibleFragmentSpreads<'a> {
         ctx: &mut ValidationContext,
         fragment_spread: &'a FragmentSpread<'a, String>,
     ) {
-        if let Some(fragment_type) = self.fragment_types.get(&fragment_spread.fragment_name.as_str()) {
+        if let Some(fragment_type) = self
+            .fragment_types
+            .get(&fragment_spread.fragment_name.as_str())
+        {
             if let Some(current_type) = ctx.current_type() {
                 if let TypeCondition::On(on_type) = fragment_type {
-                    if let Some(schema_on_type) = ctx.schema.type_definitions.get(on_type) {
-
-                    }
+                    if let Some(schema_on_type) = ctx.schema.type_definitions.get(on_type) {}
                 }
-
             }
-
         }
     }
 }

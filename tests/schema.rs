@@ -6,7 +6,7 @@ use rusty_gql::*;
 pub async fn test_build_schema() {
     struct Query;
 
-    #[GqlResolver]
+    #[Resolver]
     impl Query {
         async fn value(&self) -> i32 {
             10
@@ -20,8 +20,13 @@ pub async fn test_build_schema() {
     }
     let contents = std::fs::read_to_string("./tests/schemas/simple_dummy.graphql").unwrap();
 
-    let container =
-        ArcContainer::new(contents.as_str(), Query, EmptyMutation, EmptySubscription).unwrap();
+    let container = ArcContainer::new(
+        &vec![contents.as_str()],
+        Query,
+        EmptyMutation,
+        EmptySubscription,
+    )
+    .unwrap();
 
     let query_doc = r#"{"query": "{ value }"}"#;
 

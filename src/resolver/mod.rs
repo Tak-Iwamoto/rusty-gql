@@ -16,7 +16,7 @@ use crate::{
 pub type ResolverFuture<'a> = BoxFuture<'a, ResolverResult<(String, GqlValue)>>;
 
 #[async_trait]
-pub trait SelectionSetResolver: Resolver {
+pub trait SelectionSetResolver: FieldResolver {
     async fn resolve_selection_set(
         &self,
         ctx: &SelectionSetContext<'_>,
@@ -24,12 +24,12 @@ pub trait SelectionSetResolver: Resolver {
 }
 
 #[async_trait]
-pub trait Resolver: Send + Sync {
+pub trait FieldResolver: Send + Sync {
     async fn resolve_field(&self, ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>>;
 }
 
 #[async_trait::async_trait]
-impl<T: Resolver> Resolver for &T {
+impl<T: FieldResolver> FieldResolver for &T {
     #[allow(clippy::trivially_copy_pass_by_ref)]
     async fn resolve_field(&self, ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
         T::resolve_field(*self, ctx).await
