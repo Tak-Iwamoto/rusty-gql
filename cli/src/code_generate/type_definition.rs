@@ -13,11 +13,18 @@ pub async fn build_type_definition_files(
 ) -> Result<Vec<()>, Error> {
     let mut futures = Vec::new();
     for (_, type_def) in type_definitions.iter() {
+        if reserved_scalar_names().contains(&type_def.name()) {
+            continue;
+        }
         let task = build_type_definition_file(type_def);
         futures.push(task);
     }
     let res = try_join_all(futures).await;
     res
+}
+
+fn reserved_scalar_names() -> Vec<&'static str> {
+    vec!["String", "Int", "Float", "Boolean"]
 }
 
 async fn build_type_definition_file(type_def: &GqlTypeDefinition) -> Result<(), Error> {
