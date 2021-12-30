@@ -29,8 +29,6 @@ async fn visit_dirs(path: &Path) -> std::io::Result<Vec<String>> {
 async fn run() -> Result<ExitCode> {
     let matches = build_app().get_matches();
     if matches.subcommand_matches("generate").is_some() {
-        let path = std::env::current_dir().unwrap();
-        println!("starting dir: {}", path.display());
         let files = visit_dirs(Path::new("./tests/schemas")).await?;
 
         let files: Vec<&str> = files.iter().map(|s| &**s).collect();
