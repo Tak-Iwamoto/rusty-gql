@@ -19,7 +19,7 @@ impl<'a> FileStrategy for EnumFile<'a> {
     }
 
     fn base_path(&self) -> String {
-        "input".to_string()
+        "model".to_string()
     }
 
     fn file_name(&self) -> String {
