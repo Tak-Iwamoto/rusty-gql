@@ -31,6 +31,20 @@ impl ToString for GqlTypeDefinition {
 }
 
 impl GqlTypeDefinition {
+    pub fn from_schema_type_def<'a>(ty_def: &TypeDefinition<'a, String>) -> Self {
+        match ty_def {
+            TypeDefinition::Scalar(v) => GqlTypeDefinition::Scalar(GqlScalar::from(v.clone())),
+            TypeDefinition::Object(v) => GqlTypeDefinition::Object(GqlObject::from(v.clone())),
+            TypeDefinition::Interface(v) => {
+                GqlTypeDefinition::Interface(GqlInterface::from(v.clone()))
+            }
+            TypeDefinition::Union(v) => GqlTypeDefinition::Union(GqlUnion::from(v.clone())),
+            TypeDefinition::Enum(v) => GqlTypeDefinition::Enum(GqlEnum::from(v.clone())),
+            TypeDefinition::InputObject(v) => {
+                GqlTypeDefinition::InputObject(GqlInputObject::from(v.clone()))
+            }
+        }
+    }
     pub fn type_name_from_def<'a>(type_definition: &TypeDefinition<'a, String>) -> String {
         match type_definition {
             TypeDefinition::Scalar(scalar) => scalar.name.clone(),

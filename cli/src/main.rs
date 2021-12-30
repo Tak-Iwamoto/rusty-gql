@@ -11,7 +11,7 @@ mod exit_codes;
 
 async fn run() -> Result<ExitCode> {
     let matches = build_app().get_matches();
-    if matches.subcommand_matches("gen").is_some() {
+    if matches.subcommand_matches("generate").is_some() {
         let schema_doc = std::fs::read_to_string("../tests/schemas/github.graphql").unwrap();
         create_gql_files(&schema_doc).await?;
         return Ok(ExitCode::Success);
