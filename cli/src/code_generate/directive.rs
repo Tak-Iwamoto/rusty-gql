@@ -33,7 +33,7 @@ impl<'a> FileStrategy for DirectiveFile<'a> {
     }
 }
 
-pub async fn build_directive_files(
+pub async fn create_directive_files(
     directives: &BTreeMap<String, GqlDirectiveDefinition>,
 ) -> Result<Vec<()>, Error> {
     let mut futures = Vec::new();

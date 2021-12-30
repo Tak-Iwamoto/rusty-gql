@@ -16,7 +16,7 @@ use self::{
 
 use super::build_file;
 
-pub async fn build_type_definition_files(
+pub async fn create_type_definition_files(
     type_definitions: &BTreeMap<String, GqlTypeDefinition>,
 ) -> Result<Vec<()>, Error> {
     let mut futures = Vec::new();
@@ -24,7 +24,7 @@ pub async fn build_type_definition_files(
         if reserved_scalar_names().contains(&type_def.name()) {
             continue;
         }
-        let task = build_type_definition_file(type_def);
+        let task = create_type_definition_file(type_def);
         futures.push(task);
     }
     let res = try_join_all(futures).await;
@@ -32,10 +32,10 @@ pub async fn build_type_definition_files(
 }
 
 fn reserved_scalar_names() -> Vec<&'static str> {
-    vec!["String", "Int", "Float", "Boolean"]
+    vec!["String", "Int", "Float", "Boolean", "ID"]
 }
 
-async fn build_type_definition_file(type_def: &GqlTypeDefinition) -> Result<(), Error> {
+async fn create_type_definition_file(type_def: &GqlTypeDefinition) -> Result<(), Error> {
     match type_def {
         GqlTypeDefinition::Scalar(def) => build_file(ScalarFile { def }).await,
         GqlTypeDefinition::Object(def) => build_file(ObjectFile { def }).await,

@@ -9,7 +9,7 @@ use self::{field_file::FieldFile, operation_mod_file::OperationModFile};
 
 use super::build_file;
 
-pub async fn build_operation_files(
+pub async fn create_operation_files(
     operations: &BTreeMap<String, GqlField>,
     operation_type: OperationType,
 ) -> Result<Vec<()>, Error> {

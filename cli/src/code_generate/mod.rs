@@ -8,8 +8,8 @@ use futures_util::future::try_join_all;
 use rusty_gql::{build_schema, OperationType};
 
 use self::{
-    directive::build_directive_files, operation::build_operation_files,
-    type_definition::build_type_definition_files,
+    directive::create_directive_files, operation::create_operation_files,
+    type_definition::create_type_definition_files,
 };
 use tokio::io::AsyncWriteExt;
 
@@ -41,21 +41,21 @@ async fn create_file(path: &str, content: &str) -> Result<(), Error> {
     Ok(())
 }
 
-pub async fn build_graphql_schema(schema_doc: &str) -> Result<(), Error> {
+pub async fn create_gql_files(schema_doc: &str) -> Result<(), Error> {
     let schema = build_schema(schema_doc).unwrap();
 
     create_dirs().await?;
     create_mod_file().await?;
 
-    let query_task = build_operation_files(&schema.queries, OperationType::Query);
-    let mutation_task = build_operation_files(&schema.mutations, OperationType::Mutation);
+    let query_task = create_operation_files(&schema.queries, OperationType::Query);
+    let mutation_task = create_operation_files(&schema.mutations, OperationType::Mutation);
     let subscription_task =
-        build_operation_files(&schema.subscriptions, OperationType::Subscription);
+        create_operation_files(&schema.subscriptions, OperationType::Subscription);
 
     try_join_all(vec![query_task, mutation_task, subscription_task]).await?;
 
-    build_type_definition_files(&schema.type_definitions).await?;
-    build_directive_files(&schema.directives).await?;
+    create_type_definition_files(&schema.type_definitions).await?;
+    create_directive_files(&schema.directives).await?;
     Ok(())
 }
 

@@ -4,7 +4,7 @@ use anyhow::Result;
 use app::build_app;
 use exit_codes::ExitCode;
 
-use crate::code_generate::build_graphql_schema;
+use crate::code_generate::create_gql_files;
 
 mod app;
 mod code_generate;
@@ -14,7 +14,7 @@ async fn run() -> Result<ExitCode> {
     let matches = build_app().get_matches();
     if matches.subcommand_matches("gen").is_some() {
         let schema_doc = std::fs::read_to_string("../tests/schemas/github.graphql").unwrap();
-        build_graphql_schema(&schema_doc).await?;
+        create_gql_files(&schema_doc).await?;
         return Ok(ExitCode::Success);
     }
 
