@@ -41,8 +41,8 @@ async fn create_file(path: &str, content: &str) -> Result<(), Error> {
     Ok(())
 }
 
-pub(crate) async fn create_gql_files(schema_doc: &str) -> Result<(), Error> {
-    let schema = build_schema(schema_doc).unwrap();
+pub(crate) async fn create_gql_files(schema_documents: &[&str]) -> Result<(), Error> {
+    let schema = build_schema(schema_documents).unwrap();
 
     create_dirs().await?;
     create_mod_file().await?;

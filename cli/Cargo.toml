@@ -6,6 +6,7 @@ version = "0.1.0"
 [dependencies]
 actix-web = "3.3.2"
 anyhow = "1.0.51"
+async-recursion = "0.3.2"
 axum = "0.4.2"
 clap = "3.0.0-beta.5"
 codegen = "0.1.3"
