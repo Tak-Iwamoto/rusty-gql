@@ -29,7 +29,7 @@ async fn visit_dirs(path: &Path) -> std::io::Result<Vec<String>> {
 async fn run() -> Result<ExitCode> {
     let matches = build_app().get_matches();
     if matches.subcommand_matches("generate").is_some() {
-        let files = visit_dirs(Path::new("./tests/schemas")).await?;
+        let files = visit_dirs(Path::new("./schemas")).await?;
 
         let files: Vec<&str> = files.iter().map(|s| &**s).collect();
 
