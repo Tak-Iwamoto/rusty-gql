@@ -11,6 +11,14 @@ pub struct OperationModFile<'a> {
 }
 
 impl<'a> FileStrategy for OperationModFile<'a> {
+    fn base_path(&self) -> String {
+        self.operation_type.to_string().to_lowercase()
+    }
+
+    fn file_name(&self) -> String {
+        "mod".to_string()
+    }
+
     fn content(&self) -> String {
         let mut result = String::from("");
 
@@ -22,14 +30,6 @@ impl<'a> FileStrategy for OperationModFile<'a> {
         result += &self.build_query_str();
 
         result
-    }
-
-    fn base_path(&self) -> String {
-        self.operation_type.to_string().to_lowercase()
-    }
-
-    fn file_name(&self) -> String {
-        "mod".to_string()
     }
 }
 

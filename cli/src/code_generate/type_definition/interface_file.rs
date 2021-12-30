@@ -8,6 +8,14 @@ pub struct InterfaceFile<'a> {
 }
 
 impl<'a> FileStrategy for InterfaceFile<'a> {
+    fn base_path(&self) -> String {
+        "interface".to_string()
+    }
+
+    fn file_name(&self) -> String {
+        self.def.name.to_string()
+    }
+
     fn content(&self) -> String {
         let mut scope = Scope::new();
         let trait_scope = scope.new_trait(self.def.name.as_str()).vis("pub");
@@ -18,13 +26,5 @@ impl<'a> FileStrategy for InterfaceFile<'a> {
                 .ret(field.meta_type.to_rust_type_str());
         }
         scope.to_string()
-    }
-
-    fn base_path(&self) -> String {
-        "interface".to_string()
-    }
-
-    fn file_name(&self) -> String {
-        self.def.name.to_string()
     }
 }

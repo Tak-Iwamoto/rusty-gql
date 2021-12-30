@@ -9,6 +9,14 @@ pub struct FieldFile<'a> {
 }
 
 impl<'a> FileStrategy for FieldFile<'a> {
+    fn base_path(&self) -> String {
+        self.base_path.to_string()
+    }
+
+    fn file_name(&self) -> String {
+        self.def.name.to_string()
+    }
+
     fn content(&self) -> String {
         let mut scope = Scope::new();
         let fn_scope = scope.new_fn(self.def.name.as_str());
@@ -18,13 +26,5 @@ impl<'a> FileStrategy for FieldFile<'a> {
         }
         fn_scope.vis("pub");
         scope.to_string()
-    }
-
-    fn base_path(&self) -> String {
-        self.base_path.to_string()
-    }
-
-    fn file_name(&self) -> String {
-        self.def.name.to_string()
     }
 }

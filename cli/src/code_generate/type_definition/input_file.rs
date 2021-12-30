@@ -8,6 +8,14 @@ pub struct InputObjectFile<'a> {
 }
 
 impl<'a> FileStrategy for InputObjectFile<'a> {
+    fn base_path(&self) -> String {
+        "input".to_string()
+    }
+
+    fn file_name(&self) -> String {
+        self.def.name.to_string()
+    }
+
     fn content(&self) -> String {
         let mut scope = Scope::new();
         let struct_scope = scope.new_struct(self.def.name.as_str()).vis("pub");
@@ -19,11 +27,4 @@ impl<'a> FileStrategy for InputObjectFile<'a> {
         scope.to_string()
     }
 
-    fn base_path(&self) -> String {
-        "input".to_string()
-    }
-
-    fn file_name(&self) -> String {
-        self.def.name.to_string()
-    }
 }

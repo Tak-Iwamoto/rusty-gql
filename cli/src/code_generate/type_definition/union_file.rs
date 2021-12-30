@@ -8,6 +8,14 @@ pub struct UnionFile<'a> {
 }
 
 impl<'a> FileStrategy for UnionFile<'a> {
+    fn base_path(&self) -> String {
+        "model".to_string()
+    }
+
+    fn file_name(&self) -> String {
+        self.def.name.to_string()
+    }
+
     fn content(&self) -> String {
         let mut scope = Scope::new();
         let enum_scope = scope.new_enum(self.def.name.as_str()).vis("pub");
@@ -17,13 +25,5 @@ impl<'a> FileStrategy for UnionFile<'a> {
         }
 
         scope.to_string()
-    }
-
-    fn base_path(&self) -> String {
-        "model".to_string()
-    }
-
-    fn file_name(&self) -> String {
-        self.def.name.to_string()
     }
 }

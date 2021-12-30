@@ -1,4 +1,5 @@
 mod directive;
+mod mod_file;
 mod operation;
 mod type_definition;
 
@@ -8,17 +9,17 @@ use futures_util::future::try_join_all;
 use rusty_gql::{build_schema, OperationType};
 
 use self::{
-    directive::create_directive_files, operation::create_operation_files,
+    directive::create_directive_files, mod_file::ModFile, operation::create_operation_files,
     type_definition::create_type_definition_files,
 };
 use tokio::io::AsyncWriteExt;
 
 pub(crate) trait FileStrategy {
-    fn content(&self) -> String;
+    fn base_path(&self) -> String;
 
     fn file_name(&self) -> String;
 
-    fn base_path(&self) -> String;
+    fn content(&self) -> String;
 }
 
 pub(crate) async fn build_file<T: FileStrategy>(strategy: T) -> Result<(), Error> {
@@ -44,8 +45,8 @@ async fn create_file(path: &str, content: &str) -> Result<(), Error> {
 pub(crate) async fn create_gql_files(schema_documents: &[&str]) -> Result<(), Error> {
     let schema = build_schema(schema_documents).unwrap();
 
-    create_dirs().await?;
-    create_mod_file().await?;
+    create_root_dirs().await?;
+    create_root_mod_file().await?;
 
     let query_task = create_operation_files(&schema.queries, OperationType::Query);
     let mutation_task = create_operation_files(&schema.mutations, OperationType::Mutation);
@@ -59,11 +60,25 @@ pub(crate) async fn create_gql_files(schema_documents: &[&str]) -> Result<(), Er
     Ok(())
 }
 
-async fn create_mod_file() -> tokio::io::Result<()> {
-    create_file("graphql/mod.rs", "mod input;\nmod interface;\nmod model;\nmod query;\nmod mutation;\nmod subscription;\nmod scalar;\n").await
+async fn create_root_mod_file() -> tokio::io::Result<()> {
+    let file_names = vec![
+        "query".to_string(),
+        "mutation".to_string(),
+        "subscription".to_string(),
+        "model".to_string(),
+        "directive".to_string(),
+        "scalar".to_string(),
+        "input".to_string(),
+        "interface".to_string(),
+    ];
+    build_file(ModFile {
+        base_path: "".to_string(),
+        file_names,
+    })
+    .await
 }
 
-async fn create_dirs() -> Result<Vec<()>, Error> {
+async fn create_root_dirs() -> Result<Vec<()>, Error> {
     let mut futures = Vec::new();
     futures.push(tokio::fs::create_dir_all("graphql"));
     futures.push(tokio::fs::create_dir_all("graphql/query"));
