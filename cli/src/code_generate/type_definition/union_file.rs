@@ -1,12 +1,13 @@
 use codegen::Scope;
 use rusty_gql::GqlUnion;
 
-use super::TypeDefinitionFileStrategy;
+use crate::code_generate::FileStrategy;
+
 pub struct UnionFile<'a> {
     pub def: &'a GqlUnion,
 }
 
-impl<'a> TypeDefinitionFileStrategy for UnionFile<'a> {
+impl<'a> FileStrategy for UnionFile<'a> {
     fn content(&self) -> String {
         let mut scope = Scope::new();
         let enum_scope = scope.new_enum(self.def.name.as_str()).vis("pub");

@@ -1,13 +1,13 @@
 use codegen::Scope;
 use rusty_gql::GqlInputObject;
 
-use super::TypeDefinitionFileStrategy;
+use crate::code_generate::FileStrategy;
 
 pub struct InputObjectFile<'a> {
     pub def: &'a GqlInputObject,
 }
 
-impl<'a> TypeDefinitionFileStrategy for InputObjectFile<'a> {
+impl<'a> FileStrategy for InputObjectFile<'a> {
     fn content(&self) -> String {
         let mut scope = Scope::new();
         let struct_scope = scope.new_struct(self.def.name.as_str()).vis("pub");

@@ -1,13 +1,13 @@
 use codegen::Scope;
 use rusty_gql::GqlInterface;
 
-use super::TypeDefinitionFileStrategy;
+use crate::code_generate::FileStrategy;
 
 pub struct InterfaceFile<'a> {
     pub def: &'a GqlInterface,
 }
 
-impl<'a> TypeDefinitionFileStrategy for InterfaceFile<'a> {
+impl<'a> FileStrategy for InterfaceFile<'a> {
     fn content(&self) -> String {
         let mut scope = Scope::new();
         let trait_scope = scope.new_trait(self.def.name.as_str()).vis("pub");

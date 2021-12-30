@@ -9,7 +9,33 @@ use futures_util::future::try_join_all;
 use rusty_gql::{build_schema, OperationType};
 use utils::create_file;
 
-use self::{operation::build_operation_files, type_definition::build_type_definition_files};
+use self::{
+    operation::build_operation_files, type_definition::build_type_definition_files, utils::PathStr,
+};
+
+pub(crate) trait FileStrategy {
+    fn content(&self) -> String;
+
+    fn file_name(&self) -> String;
+
+    fn base_path(&self) -> String;
+}
+pub(crate) async fn build_file<T: FileStrategy>(strategy: T) -> Result<(), Error> {
+    let base_path = strategy.base_path();
+    let file_name = strategy.file_name();
+    let path = PathStr {
+        paths: vec![base_path.as_str(), file_name.as_str()],
+        base_path: None,
+    }
+    .to_string();
+    if tokio::fs::File::open(&path).await.is_err() {
+        let content = strategy.content();
+        create_file(&path, &content).await?;
+        Ok(())
+    } else {
+        Ok(())
+    }
+}
 
 pub async fn build_graphql_schema(schema_doc: &str) -> Result<(), Error> {
     let schema = build_schema(schema_doc).unwrap();
