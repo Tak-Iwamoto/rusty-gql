@@ -29,8 +29,8 @@ pub use resolver::{Resolver, SelectionSetResolver};
 pub use response::Response;
 pub use types::schema::build_schema;
 pub use types::{
-    GqlArgument, GqlDirective, GqlEnum, GqlField, GqlInputObject, GqlInterface, GqlObject,
-    GqlScalar, GqlTypeDefinition, GqlUnion, GqlValue, Schema,
+    GqlArgument, GqlDirective, GqlDirectiveDefinition, GqlEnum, GqlField, GqlInputObject,
+    GqlInterface, GqlObject, GqlScalar, GqlTypeDefinition, GqlUnion, GqlValue, Schema,
 };
 pub use variables::Variables;
 

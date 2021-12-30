@@ -7,7 +7,10 @@ use std::io::Error;
 use futures_util::future::try_join_all;
 use rusty_gql::{build_schema, OperationType};
 
-use self::{operation::build_operation_files, type_definition::build_type_definition_files};
+use self::{
+    directive::build_directive_files, operation::build_operation_files,
+    type_definition::build_type_definition_files,
+};
 use tokio::io::AsyncWriteExt;
 
 pub(crate) trait FileStrategy {
@@ -19,7 +22,11 @@ pub(crate) trait FileStrategy {
 }
 
 pub(crate) async fn build_file<T: FileStrategy>(strategy: T) -> Result<(), Error> {
-    let path = format!("graphql/{}/{}.rs", strategy.base_path(), strategy.file_name());
+    let path = format!(
+        "graphql/{}/{}.rs",
+        strategy.base_path(),
+        strategy.file_name()
+    );
     if tokio::fs::File::open(&path).await.is_err() {
         create_file(&path, &strategy.content()).await?;
         Ok(())
@@ -47,8 +54,8 @@ pub async fn build_graphql_schema(schema_doc: &str) -> Result<(), Error> {
 
     try_join_all(vec![query_task, mutation_task, subscription_task]).await?;
 
-    let types_task = build_type_definition_files(&schema.type_definitions);
-    types_task.await?;
+    build_type_definition_files(&schema.type_definitions).await?;
+    build_directive_files(&schema.directives).await?;
     Ok(())
 }
 
@@ -66,6 +73,7 @@ async fn create_dirs() -> Result<Vec<()>, Error> {
     futures.push(tokio::fs::create_dir_all("graphql/scalar"));
     futures.push(tokio::fs::create_dir_all("graphql/interface"));
     futures.push(tokio::fs::create_dir_all("graphql/input"));
+    futures.push(tokio::fs::create_dir_all("graphql/directive"));
     let res = try_join_all(futures).await;
     res
 }
