@@ -1,5 +1,5 @@
 mod serializer;
-pub use serializer::serialize_to_gql_value;
+pub use serializer::serialize_into_gql_value;
 
 use std::collections::BTreeMap;
 

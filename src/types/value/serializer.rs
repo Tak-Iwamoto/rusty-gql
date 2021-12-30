@@ -31,7 +31,7 @@ impl ser::Error for SerializerError {
 
 struct Serializer;
 
-pub fn serialize_to_gql_value<T: ser::Serialize>(value: T) -> Result<GqlValue, SerializerError> {
+pub fn serialize_into_gql_value<T: ser::Serialize>(value: T) -> Result<GqlValue, SerializerError> {
     value.serialize(Serializer)
 }
 

@@ -3,7 +3,7 @@ use std::collections::{BTreeMap, HashMap};
 use serde::Serialize;
 
 use crate::{
-    types::value::serialize_to_gql_value, FieldContext, GqlValue, Resolver, ResolverResult,
+    types::value::serialize_into_gql_value, FieldContext, GqlValue, Resolver, ResolverResult,
     SelectionSetContext, SelectionSetResolver,
 };
 
@@ -18,7 +18,7 @@ where
         for (name, v) in self {
             map.insert(
                 name.to_string(),
-                serialize_to_gql_value(v).unwrap_or_default(),
+                serialize_into_gql_value(v).unwrap_or_default(),
             );
         }
         Ok(Some(GqlValue::Object(map)))
@@ -39,7 +39,7 @@ where
         for (name, v) in self {
             map.insert(
                 name.to_string(),
-                serialize_to_gql_value(v).unwrap_or_default(),
+                serialize_into_gql_value(v).unwrap_or_default(),
             );
         }
         Ok(GqlValue::Object(map))
@@ -57,7 +57,7 @@ where
         for (name, v) in self {
             map.insert(
                 name.to_string(),
-                serialize_to_gql_value(v).unwrap_or_default(),
+                serialize_into_gql_value(v).unwrap_or_default(),
             );
         }
         Ok(Some(GqlValue::Object(map)))
@@ -78,7 +78,7 @@ where
         for (name, v) in self {
             map.insert(
                 name.to_string(),
-                serialize_to_gql_value(v).unwrap_or_default(),
+                serialize_into_gql_value(v).unwrap_or_default(),
             );
         }
         Ok(GqlValue::Object(map))

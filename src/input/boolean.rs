@@ -16,7 +16,7 @@ impl GqlInputType for bool {
         }
     }
 
-    fn to_gql_value(&self) -> GqlValue {
+    fn into_gql_value(&self) -> GqlValue {
         GqlValue::Boolean(*self)
     }
 }

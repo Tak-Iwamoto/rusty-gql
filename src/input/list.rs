@@ -32,8 +32,8 @@ impl<T: GqlInputType, const N: usize> GqlInputType for [T; N] {
         }
     }
 
-    fn to_gql_value(&self) -> GqlValue {
-        let values = self.into_iter().map(|v| v.to_gql_value()).collect();
+    fn into_gql_value(&self) -> GqlValue {
+        let values = self.into_iter().map(|v| v.into_gql_value()).collect();
         GqlValue::List(values)
     }
 }
@@ -58,8 +58,8 @@ impl<T: GqlInputType + Eq + Hash> GqlInputType for HashSet<T> {
         }
     }
 
-    fn to_gql_value(&self) -> GqlValue {
-        let values = self.into_iter().map(|v| v.to_gql_value()).collect();
+    fn into_gql_value(&self) -> GqlValue {
+        let values = self.into_iter().map(|v| v.into_gql_value()).collect();
         GqlValue::List(values)
     }
 }
@@ -84,8 +84,8 @@ impl<T: GqlInputType + Ord> GqlInputType for BTreeSet<T> {
         }
     }
 
-    fn to_gql_value(&self) -> GqlValue {
-        let values = self.into_iter().map(|v| v.to_gql_value()).collect();
+    fn into_gql_value(&self) -> GqlValue {
+        let values = self.into_iter().map(|v| v.into_gql_value()).collect();
         GqlValue::List(values)
     }
 }
@@ -110,8 +110,8 @@ impl<T: GqlInputType> GqlInputType for LinkedList<T> {
         }
     }
 
-    fn to_gql_value(&self) -> GqlValue {
-        let values = self.into_iter().map(|v| v.to_gql_value()).collect();
+    fn into_gql_value(&self) -> GqlValue {
+        let values = self.into_iter().map(|v| v.into_gql_value()).collect();
         GqlValue::List(values)
     }
 }
@@ -136,8 +136,8 @@ impl<T: GqlInputType> GqlInputType for VecDeque<T> {
         }
     }
 
-    fn to_gql_value(&self) -> GqlValue {
-        let values = self.into_iter().map(|v| v.to_gql_value()).collect();
+    fn into_gql_value(&self) -> GqlValue {
+        let values = self.into_iter().map(|v| v.into_gql_value()).collect();
         GqlValue::List(values)
     }
 }

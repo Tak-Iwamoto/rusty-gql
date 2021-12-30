@@ -16,7 +16,7 @@ impl GqlInputType for String {
         }
     }
 
-    fn to_gql_value(&self) -> GqlValue {
+    fn into_gql_value(&self) -> GqlValue {
         GqlValue::String(self.clone())
     }
 }

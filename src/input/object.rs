@@ -24,10 +24,10 @@ impl<T: GqlInputType> GqlInputType for BTreeMap<String, T> {
         }
     }
 
-    fn to_gql_value(&self) -> GqlValue {
+    fn into_gql_value(&self) -> GqlValue {
         let mut result = BTreeMap::new();
         for (key, value) in self {
-            result.insert(key.clone(), T::to_gql_value(value.clone()));
+            result.insert(key.clone(), T::into_gql_value(value.clone()));
         }
         GqlValue::Object(result)
     }
@@ -53,10 +53,10 @@ impl<T: GqlInputType> GqlInputType for HashMap<String, T> {
         }
     }
 
-    fn to_gql_value(&self) -> GqlValue {
+    fn into_gql_value(&self) -> GqlValue {
         let mut result = BTreeMap::new();
         for (key, value) in self {
-            result.insert(key.clone(), T::to_gql_value(value.clone()));
+            result.insert(key.clone(), T::into_gql_value(value.clone()));
         }
         GqlValue::Object(result)
     }
