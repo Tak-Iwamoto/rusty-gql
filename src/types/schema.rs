@@ -310,15 +310,22 @@ pub fn build_schema(schema_documents: &[&str]) -> Result<Schema, GqlError> {
         }
     }
 
-    let query_type_name = schema_definition
-        .map(|def| def.query.unwrap_or_else(|| "Query".to_string()))
-        .unwrap_or_else(|| "Query".to_string());
-    let mutation_type_name = schema_definition
-        .map(|def| def.query.unwrap_or_else(|| "Mutation".to_string()))
-        .unwrap_or_else(|| "Mutation".to_string());
-    let subscription_type_name = schema_definition
-        .map(|def| def.query.unwrap_or_else(|| "Subscription".to_string()))
-        .unwrap_or_else(|| "Subscription".to_string());
+    let mut query_type_name = "Query".to_string();
+    let mut mutation_type_name = "Mutation".to_string();
+    let mut subscription_type_name = "Subscription".to_string();
+
+    if let Some(def) = schema_definition {
+        if let Some(query) = def.query {
+            query_type_name = query;
+        }
+        if let Some(mutation) = def.mutation {
+            mutation_type_name = mutation;
+        }
+        if let Some(subscription) = def.subscription {
+            subscription_type_name = subscription;
+        }
+    }
+
     match type_definitions.get(&query_type_name) {
         Some(query_def) => {
             if let GqlTypeDefinition::Object(def) = query_def {
@@ -346,6 +353,7 @@ pub fn build_schema(schema_documents: &[&str]) -> Result<Schema, GqlError> {
             mutations.insert(f.name.to_string(), GqlField::from(f.clone()));
         }
     }
+
     Ok(Schema {
         queries,
         mutations,
@@ -368,5 +376,12 @@ mod tests {
 
         assert!(schema.queries.get("repository").is_some());
         assert!(schema.type_definitions.get("AddCommentInput").is_some());
+
+        let base = fs::read_to_string("tests/schemas/pet_schema.graphql").unwrap();
+        let extend = fs::read_to_string("tests/schemas/extend.graphql").unwrap();
+        let schema = build_schema(&vec![base.as_str(), extend.as_str()]).unwrap();
+
+        assert!(schema.queries.get("pets").is_some());
+        assert!(schema.queries.get("authors").is_some());
     }
 }

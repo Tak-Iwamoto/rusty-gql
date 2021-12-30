@@ -38,7 +38,7 @@ where
     Subscription: Resolver,
 {
     pub fn new(
-        schema_doc: &str,
+        schema_doc: &[&str],
         query: Query,
         mutation: Mutation,
         subscription: Subscription,

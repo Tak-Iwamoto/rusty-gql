@@ -266,7 +266,7 @@ mod tests {
     #[test]
     fn it_works() {
         let schema_doc = fs::read_to_string("tests/schemas/github.graphql").unwrap();
-        let schema = ArcSchema::new(build_schema(schema_doc.as_str()).unwrap());
+        let schema = ArcSchema::new(build_schema(&vec![schema_doc.as_str()]).unwrap());
         let query_doc = fs::read_to_string("tests/schemas/multiple_operation.graphql").unwrap();
         let parsed_query = graphql_parser::parse_query::<String>(&query_doc).unwrap();
 
