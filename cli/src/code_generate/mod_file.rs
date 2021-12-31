@@ -1,6 +1,6 @@
 use crate::code_generate::FileDefinition;
 
-use super::build_file_path_str;
+use super::file_path_str;
 
 pub struct ModFile<'a> {
     pub file_names: Vec<String>,
@@ -18,6 +18,6 @@ impl<'a> FileDefinition for ModFile<'a> {
     }
 
     fn path(&self) -> String {
-        build_file_path_str(self.path, vec!["mod"])
+        file_path_str(vec![self.path, "mod"])
     }
 }

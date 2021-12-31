@@ -34,14 +34,13 @@ pub(crate) async fn create_file<T: FileDefinition>(strategy: T) -> Result<(), Er
     }
 }
 
-pub(crate) fn build_file_path_str(base_path: &str, paths: Vec<&str>) -> String {
-    let file_path = paths.join("/");
-    format!("{}/{}.rs", base_path, file_path)
+pub(crate) fn file_path_str(paths: Vec<&str>) -> String {
+    let path_str = paths.join("/");
+    format!("{}.rs", path_str)
 }
 
-pub(crate) fn build_dir_path_str(base_path: &str, paths: Vec<&str>) -> String {
-    let file_path = paths.join("/");
-    format!("{}/{}", base_path, file_path)
+pub(crate) fn dir_path_str(paths: Vec<&str>) -> String {
+    paths.join("/")
 }
 
 pub(crate) async fn create_gql_files(schema_documents: &[&str], path: &str) -> Result<(), Error> {
