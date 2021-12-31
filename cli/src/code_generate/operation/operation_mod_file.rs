@@ -1,6 +1,7 @@
 use std::collections::BTreeMap;
 
 use codegen::{Scope, Type};
+use heck::ToSnakeCase;
 use rusty_gql::{GqlField, OperationType};
 
 use crate::code_generate::FileDefinition;
@@ -19,8 +20,9 @@ impl<'a> FileDefinition for OperationModFile<'a> {
     fn content(&self) -> String {
         let mut result = String::from("");
 
-        for (file_name, _) in self.operations.iter() {
-            result += format!("mod {file_name};\n", file_name = file_name,).as_str();
+        for (operation_name, _) in self.operations.iter() {
+            let file_name = operation_name.to_snake_case();
+            result += format!("mod {};\n", file_name,).as_str();
         }
 
         result += "\n";
@@ -49,9 +51,10 @@ impl<'a> OperationModFile<'a> {
             f.set_async(true);
             f.ret(Type::new(method.meta_type.name()));
 
+            let file_name = operation_name.to_snake_case();
             f.line(format!(
                 "{file_name}::{method}({args}).await",
-                file_name = operation_name,
+                file_name = file_name,
                 method = method.name,
                 args = args_str
             ));
