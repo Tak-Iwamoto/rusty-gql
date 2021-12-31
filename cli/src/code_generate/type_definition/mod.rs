@@ -14,7 +14,7 @@ use self::{
     object_file::ObjectFile, scalar_file::ScalarFile, union_file::UnionFile,
 };
 
-use super::{build_file, build_file_path, graphql_mod_file::GqlModFile};
+use super::{create_file, build_file_path_str, graphql_mod_file::GqlModFile};
 
 pub async fn create_type_definition_files(
     type_definitions: &BTreeMap<String, GqlTypeDefinition>,
@@ -43,25 +43,25 @@ pub async fn create_type_definition_files(
         }
     }
 
-    build_file(GqlModFile {
+    create_file(GqlModFile {
         path: &format!("{}/{}", base_path, "model"),
         file_names: model_file_names,
     })
     .await?;
 
-    build_file(GqlModFile {
+    create_file(GqlModFile {
         path: &format!("{}/{}", base_path, "interface"),
         file_names: interface_file_names,
     })
     .await?;
 
-    build_file(GqlModFile {
+    create_file(GqlModFile {
         path: &format!("{}/{}", base_path, "input"),
         file_names: input_file_names,
     })
     .await?;
 
-    build_file(GqlModFile {
+    create_file(GqlModFile {
         path: &format!("{}/{}", base_path, "scalar"),
         file_names: scalar_file_names,
     })
@@ -79,11 +79,11 @@ async fn create_type_definition_file(
     base_path: &str,
 ) -> Result<(), Error> {
     match type_def {
-        GqlTypeDefinition::Scalar(def) => build_file(ScalarFile { def, base_path }).await,
-        GqlTypeDefinition::Object(def) => build_file(ObjectFile { def, base_path }).await,
-        GqlTypeDefinition::Interface(def) => build_file(InterfaceFile { def, base_path }).await,
-        GqlTypeDefinition::Union(def) => build_file(UnionFile { def, base_path }).await,
-        GqlTypeDefinition::Enum(def) => build_file(EnumFile { def, base_path }).await,
-        GqlTypeDefinition::InputObject(def) => build_file(InputObjectFile { def, base_path }).await,
+        GqlTypeDefinition::Scalar(def) => create_file(ScalarFile { def, base_path }).await,
+        GqlTypeDefinition::Object(def) => create_file(ObjectFile { def, base_path }).await,
+        GqlTypeDefinition::Interface(def) => create_file(InterfaceFile { def, base_path }).await,
+        GqlTypeDefinition::Union(def) => create_file(UnionFile { def, base_path }).await,
+        GqlTypeDefinition::Enum(def) => create_file(EnumFile { def, base_path }).await,
+        GqlTypeDefinition::InputObject(def) => create_file(InputObjectFile { def, base_path }).await,
     }
 }

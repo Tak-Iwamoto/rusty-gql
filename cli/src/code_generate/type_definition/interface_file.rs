@@ -1,7 +1,7 @@
 use codegen::Scope;
 use rusty_gql::GqlInterface;
 
-use crate::code_generate::{build_file_path, FileStrategy};
+use crate::code_generate::{build_file_path_str, FileStrategy};
 
 pub struct InterfaceFile<'a> {
     pub def: &'a GqlInterface,
@@ -10,7 +10,7 @@ pub struct InterfaceFile<'a> {
 
 impl<'a> FileStrategy for InterfaceFile<'a> {
     fn path(&self) -> String {
-        build_file_path(self.base_path, vec!["interface", &self.def.name])
+        build_file_path_str(self.base_path, vec!["interface", &self.def.name])
     }
 
     fn content(&self) -> String {

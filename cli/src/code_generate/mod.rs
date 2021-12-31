@@ -23,25 +23,20 @@ pub(crate) trait FileStrategy {
     fn content(&self) -> String;
 }
 
-pub(crate) async fn build_file<T: FileStrategy>(strategy: T) -> Result<(), Error> {
+pub(crate) async fn create_file<T: FileStrategy>(strategy: T) -> Result<(), Error> {
     let path = strategy.path();
     if tokio::fs::File::open(&path).await.is_err() {
-        create_file(&path, &strategy.content()).await?;
+        let mut file = tokio::fs::File::create(&path).await?;
+        file.write(strategy.content().as_bytes()).await?;
         Ok(())
     } else {
         Ok(())
     }
 }
 
-pub(crate) fn build_file_path(base_path: &str, paths: Vec<&str>) -> String {
+pub(crate) fn build_file_path_str(base_path: &str, paths: Vec<&str>) -> String {
     let file_path = paths.join("/");
     format!("{}/{}.rs", base_path, file_path)
-}
-
-async fn create_file(path: &str, content: &str) -> Result<(), Error> {
-    let mut file = tokio::fs::File::create(&path).await?;
-    file.write(content.as_bytes()).await?;
-    Ok(())
 }
 
 pub(crate) async fn create_gql_files(
@@ -91,7 +86,7 @@ fn gql_file_types() -> Vec<String> {
 }
 async fn create_root_mod_file(base_path: &str) -> tokio::io::Result<()> {
     let file_names = gql_file_types();
-    build_file(GqlModFile {
+    create_file(GqlModFile {
         path: base_path,
         file_names,
     })
