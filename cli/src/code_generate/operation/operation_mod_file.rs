@@ -5,13 +5,13 @@ use rusty_gql::{GqlField, OperationType};
 
 use crate::code_generate::{build_file_path_str, FileStrategy};
 
-pub struct OperationGqlModFile<'a> {
+pub struct OperationModFile<'a> {
     pub operations: &'a BTreeMap<String, GqlField>,
     pub operation_type: OperationType,
     pub base_path: String,
 }
 
-impl<'a> FileStrategy for OperationGqlModFile<'a> {
+impl<'a> FileStrategy for OperationModFile<'a> {
     fn path(&self) -> String {
         build_file_path_str(
             &self.base_path,
@@ -33,7 +33,7 @@ impl<'a> FileStrategy for OperationGqlModFile<'a> {
     }
 }
 
-impl<'a> OperationGqlModFile<'a> {
+impl<'a> OperationModFile<'a> {
     fn build_query_str(&self) -> String {
         let mut scope = Scope::new();
         let struct_name = self.operation_type.to_string();

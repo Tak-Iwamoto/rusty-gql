@@ -14,7 +14,7 @@ use self::{
     object_file::ObjectFile, scalar_file::ScalarFile, union_file::UnionFile,
 };
 
-use super::{build_dir_path_str, create_file, graphql_mod_file::GqlModFile};
+use super::{build_dir_path_str, create_file, graphql_mod_file::ModFile};
 
 pub async fn create_type_definition_files(
     type_definitions: &BTreeMap<String, GqlTypeDefinition>,
@@ -43,25 +43,25 @@ pub async fn create_type_definition_files(
         }
     }
 
-    create_file(GqlModFile {
+    create_file(ModFile {
         path: &build_dir_path_str(base_path, vec!["model"]),
         file_names: model_file_names,
     })
     .await?;
 
-    create_file(GqlModFile {
+    create_file(ModFile {
         path: &build_dir_path_str(base_path, vec!["interface"]),
         file_names: interface_file_names,
     })
     .await?;
 
-    create_file(GqlModFile {
+    create_file(ModFile {
         path: &build_dir_path_str(base_path, vec!["input"]),
         file_names: input_file_names,
     })
     .await?;
 
-    create_file(GqlModFile {
+    create_file(ModFile {
         path: &build_dir_path_str(base_path, vec!["scalar"]),
         file_names: scalar_file_names,
     })

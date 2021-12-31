@@ -5,7 +5,7 @@ use futures_util::future::try_join_all;
 use rusty_gql::{self, GqlField, OperationType};
 use std::{collections::BTreeMap, io::Error};
 
-use self::{field_file::FieldFile, operation_mod_file::OperationGqlModFile};
+use self::{field_file::FieldFile, operation_mod_file::OperationModFile};
 
 use super::{build_dir_path_str, create_file};
 
@@ -25,7 +25,7 @@ pub async fn create_operation_files(
         futures.push(task);
     }
 
-    create_file(OperationGqlModFile {
+    create_file(OperationModFile {
         operation_type,
         operations,
         base_path: base_path.to_string(),

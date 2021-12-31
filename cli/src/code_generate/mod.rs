@@ -10,7 +10,7 @@ use futures_util::future::try_join_all;
 use rusty_gql::{build_schema, OperationType};
 
 use self::{
-    directive::create_directive_files, graphql_mod_file::GqlModFile,
+    directive::create_directive_files, graphql_mod_file::ModFile,
     operation::create_operation_files, type_definition::create_type_definition_files,
 };
 
@@ -91,7 +91,7 @@ fn gql_file_types() -> Vec<String> {
 }
 async fn create_root_mod_file(base_path: &str) -> tokio::io::Result<()> {
     let file_names = gql_file_types();
-    create_file(GqlModFile {
+    create_file(ModFile {
         path: base_path,
         file_names,
     })

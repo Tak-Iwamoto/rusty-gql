@@ -2,12 +2,12 @@ use crate::code_generate::FileStrategy;
 
 use super::build_file_path_str;
 
-pub struct GqlModFile<'a> {
+pub struct ModFile<'a> {
     pub file_names: Vec<String>,
     pub path: &'a str,
 }
 
-impl<'a> FileStrategy for GqlModFile<'a> {
+impl<'a> FileStrategy for ModFile<'a> {
     fn content(&self) -> String {
         let mut result = String::from("");
         for name in &self.file_names {
