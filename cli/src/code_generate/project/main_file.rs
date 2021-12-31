@@ -1,10 +1,10 @@
-use crate::code_generate::FileStrategy;
+use crate::code_generate::FileDefinition;
 
 pub struct MainFile<'a> {
     pub app_name: &'a str,
 }
 
-impl<'a> FileStrategy for MainFile<'a> {
+impl<'a> FileDefinition for MainFile<'a> {
     fn path(&self) -> String {
         format!("{}/src/main.rs", self.app_name)
     }

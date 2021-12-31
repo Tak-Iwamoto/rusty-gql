@@ -1,14 +1,14 @@
 use codegen::Scope;
 use rusty_gql::GqlObject;
 
-use crate::code_generate::FileStrategy;
+use crate::code_generate::FileDefinition;
 
 pub struct ObjectFile<'a> {
     pub def: &'a GqlObject,
     pub path: &'a str,
 }
 
-impl<'a> FileStrategy for ObjectFile<'a> {
+impl<'a> FileDefinition for ObjectFile<'a> {
     fn path(&self) -> String {
         self.path.to_string()
     }

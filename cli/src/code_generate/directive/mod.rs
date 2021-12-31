@@ -4,7 +4,7 @@ use codegen::Scope;
 use futures_util::future::try_join_all;
 use rusty_gql::GqlDirectiveDefinition;
 
-use crate::code_generate::FileStrategy;
+use crate::code_generate::FileDefinition;
 
 use super::{build_dir_path_str, build_file_path_str, create_file, graphql_mod_file::ModFile};
 
@@ -13,7 +13,7 @@ pub struct DirectiveFile<'a> {
     pub path: String,
 }
 
-impl<'a> FileStrategy for DirectiveFile<'a> {
+impl<'a> FileDefinition for DirectiveFile<'a> {
     fn content(&self) -> String {
         let mut scope = Scope::new();
         let struct_scope = scope.new_struct(self.def.name.as_str()).vis("pub");

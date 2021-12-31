@@ -1,14 +1,14 @@
 use codegen::Scope;
 use rusty_gql::GqlUnion;
 
-use crate::code_generate::FileStrategy;
+use crate::code_generate::FileDefinition;
 
 pub struct UnionFile<'a> {
     pub def: &'a GqlUnion,
     pub path: &'a str,
 }
 
-impl<'a> FileStrategy for UnionFile<'a> {
+impl<'a> FileDefinition for UnionFile<'a> {
     fn path(&self) -> String {
         self.path.to_string()
     }

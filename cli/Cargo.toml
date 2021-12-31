@@ -1,9 +1,9 @@
 [package]
 name = "rusty-gql-cli"
 edition = "2021"
-version = "0.0.2"
+version = "0.0.3"
 authors = ["Tak-Iwamoto"]
-description = "A Command line tool for rusty-gql "
+description = "A Command line tool for rusty-gql"
 license = "MIT"
 documentation = "https://github.com/Tak-Iwamoto/rusty-gql"
 homepage = "https://github.com/Tak-Iwamoto/rusty-gql"

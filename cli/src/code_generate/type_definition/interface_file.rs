@@ -1,14 +1,14 @@
 use codegen::Scope;
 use rusty_gql::GqlInterface;
 
-use crate::code_generate::FileStrategy;
+use crate::code_generate::FileDefinition;
 
 pub struct InterfaceFile<'a> {
     pub def: &'a GqlInterface,
     pub path: &'a str,
 }
 
-impl<'a> FileStrategy for InterfaceFile<'a> {
+impl<'a> FileDefinition for InterfaceFile<'a> {
     fn path(&self) -> String {
         self.path.to_string()
     }

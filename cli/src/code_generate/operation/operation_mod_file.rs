@@ -3,7 +3,7 @@ use std::collections::BTreeMap;
 use codegen::Scope;
 use rusty_gql::{GqlField, OperationType};
 
-use crate::code_generate::FileStrategy;
+use crate::code_generate::FileDefinition;
 
 pub struct OperationModFile<'a> {
     pub operations: &'a BTreeMap<String, GqlField>,
@@ -11,7 +11,7 @@ pub struct OperationModFile<'a> {
     pub path: String,
 }
 
-impl<'a> FileStrategy for OperationModFile<'a> {
+impl<'a> FileDefinition for OperationModFile<'a> {
     fn path(&self) -> String {
         self.path.to_string()
     }

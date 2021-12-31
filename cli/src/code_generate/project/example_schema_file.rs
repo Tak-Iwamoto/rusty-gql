@@ -1,10 +1,10 @@
-use crate::code_generate::FileStrategy;
+use crate::code_generate::FileDefinition;
 
 pub struct StarWarsSchemaFile<'a> {
     pub app_name: &'a str,
 }
 
-impl<'a> FileStrategy for StarWarsSchemaFile<'a> {
+impl<'a> FileDefinition for StarWarsSchemaFile<'a> {
     fn path(&self) -> String {
         format!("{}/schemas/starwars.graphql", self.app_name)
     }

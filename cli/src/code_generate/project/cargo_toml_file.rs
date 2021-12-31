@@ -1,10 +1,10 @@
-use crate::code_generate::FileStrategy;
+use crate::code_generate::FileDefinition;
 
 pub struct CargoTomlFile<'a> {
     pub app_name: &'a str,
 }
 
-impl<'a> FileStrategy for CargoTomlFile<'a> {
+impl<'a> FileDefinition for CargoTomlFile<'a> {
     fn path(&self) -> String {
         format!("{}/Cargo.toml", self.app_name)
     }

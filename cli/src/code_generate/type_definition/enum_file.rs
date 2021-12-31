@@ -1,13 +1,13 @@
 use codegen::Scope;
 use rusty_gql::GqlEnum;
 
-use crate::code_generate::FileStrategy;
+use crate::code_generate::FileDefinition;
 pub struct EnumFile<'a> {
     pub def: &'a GqlEnum,
     pub path: &'a str,
 }
 
-impl<'a> FileStrategy for EnumFile<'a> {
+impl<'a> FileDefinition for EnumFile<'a> {
     fn path(&self) -> String {
         self.path.to_string()
     }

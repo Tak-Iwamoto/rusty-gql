@@ -1,14 +1,14 @@
 use codegen::Scope;
 use rusty_gql::GqlInputObject;
 
-use crate::code_generate::FileStrategy;
+use crate::code_generate::FileDefinition;
 
 pub struct InputObjectFile<'a> {
     pub def: &'a GqlInputObject,
     pub path: &'a str,
 }
 
-impl<'a> FileStrategy for InputObjectFile<'a> {
+impl<'a> FileDefinition for InputObjectFile<'a> {
     fn path(&self) -> String {
         self.path.to_string()
     }
