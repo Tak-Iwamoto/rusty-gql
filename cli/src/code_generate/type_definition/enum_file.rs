@@ -1,16 +1,17 @@
 use codegen::Scope;
 use rusty_gql::GqlEnum;
 
-use crate::code_generate::{build_file_path_str, FileStrategy};
+use crate::code_generate::FileStrategy;
 pub struct EnumFile<'a> {
     pub def: &'a GqlEnum,
-    pub base_path: &'a str,
+    pub path: &'a str,
 }
 
 impl<'a> FileStrategy for EnumFile<'a> {
     fn path(&self) -> String {
-        build_file_path_str(self.base_path, vec!["model", &self.def.name])
+        self.path.to_string()
     }
+
     fn content(&self) -> String {
         let mut scope = Scope::new();
         let enum_scope = scope.new_enum(self.def.name.as_str()).vis("pub");

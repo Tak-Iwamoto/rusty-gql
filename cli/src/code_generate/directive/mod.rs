@@ -10,7 +10,7 @@ use super::{build_dir_path_str, build_file_path_str, create_file, graphql_mod_fi
 
 pub struct DirectiveFile<'a> {
     pub def: &'a GqlDirectiveDefinition,
-    pub base_path: String,
+    pub path: String,
 }
 
 impl<'a> FileStrategy for DirectiveFile<'a> {
@@ -26,7 +26,7 @@ impl<'a> FileStrategy for DirectiveFile<'a> {
     }
 
     fn path(&self) -> String {
-        build_file_path_str(&self.base_path, vec!["directive", &self.def.name])
+        self.path.to_string()
     }
 }
 
@@ -37,9 +37,10 @@ pub async fn create_directive_files(
     let mut futures = Vec::new();
     let mut file_names = Vec::new();
     for (_, directive) in directives.iter() {
+        let path = build_file_path_str(base_path, vec!["directive", &directive.name]);
         futures.push(create_file(DirectiveFile {
             def: directive,
-            base_path: base_path.to_string(),
+            path,
         }));
         file_names.push(directive.name.clone());
     }
