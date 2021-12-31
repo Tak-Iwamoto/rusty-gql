@@ -16,6 +16,9 @@ pub struct Schema {
     pub subscriptions: BTreeMap<String, GqlField>,
     pub directives: BTreeMap<String, GqlDirectiveDefinition>,
     pub type_definitions: BTreeMap<String, GqlTypeDefinition>,
+    pub query_type_name: String,
+    pub mutation_type_name: String,
+    pub subscription_type_name: String,
 }
 
 #[derive(Debug)]
@@ -350,7 +353,7 @@ pub fn build_schema(schema_documents: &[&str]) -> Result<Schema, GqlError> {
         type_definitions.get(&subscription_type_name)
     {
         for f in &subscription_def.fields {
-            mutations.insert(f.name.to_string(), GqlField::from(f.clone()));
+            subscriptions.insert(f.name.to_string(), GqlField::from(f.clone()));
         }
     }
 
@@ -360,6 +363,9 @@ pub fn build_schema(schema_documents: &[&str]) -> Result<Schema, GqlError> {
         subscriptions,
         directives,
         type_definitions,
+        query_type_name,
+        mutation_type_name,
+        subscription_type_name,
     })
 }
 
