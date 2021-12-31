@@ -22,6 +22,7 @@ impl<'a> FileStrategy for FieldFile<'a> {
         }
         fn_scope.vis("pub");
         fn_scope.line("todo!()");
+        fn_scope.set_async(true);
         scope.to_string()
     }
 }

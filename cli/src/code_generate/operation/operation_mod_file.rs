@@ -47,9 +47,10 @@ impl<'a> OperationModFile<'a> {
                 f.arg(arg.name.as_str(), arg.meta_type.to_rust_type_str());
                 args_str += format!("{},", &arg.name).as_str();
             }
+            f.set_async(true);
 
             f.line(format!(
-                "{file_name}::{method}({args})",
+                "{file_name}::{method}({args}).await",
                 file_name = operation_name,
                 method = method.name,
                 args = args_str
