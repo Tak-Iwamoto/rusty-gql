@@ -1,7 +1,7 @@
 use codegen::Scope;
 use rusty_gql::GqlObject;
 
-use crate::code_generate::{concat_file_path, FileStrategy};
+use crate::code_generate::{build_file_path, FileStrategy};
 
 pub struct ObjectFile<'a> {
     pub def: &'a GqlObject,
@@ -10,7 +10,7 @@ pub struct ObjectFile<'a> {
 
 impl<'a> FileStrategy for ObjectFile<'a> {
     fn path(&self) -> String {
-        concat_file_path(self.base_path, vec!["model", &self.def.name])
+        build_file_path(self.base_path, vec!["model", &self.def.name])
     }
 
     fn content(&self) -> String {

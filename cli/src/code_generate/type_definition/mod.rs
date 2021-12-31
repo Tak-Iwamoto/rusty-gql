@@ -14,7 +14,7 @@ use self::{
     object_file::ObjectFile, scalar_file::ScalarFile, union_file::UnionFile,
 };
 
-use super::{build_file, concat_file_path, graphql_mod_file::GqlModFile};
+use super::{build_file, build_file_path, graphql_mod_file::GqlModFile};
 
 pub async fn create_type_definition_files(
     type_definitions: &BTreeMap<String, GqlTypeDefinition>,

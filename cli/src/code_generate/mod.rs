@@ -25,7 +25,6 @@ pub(crate) trait FileStrategy {
 
 pub(crate) async fn build_file<T: FileStrategy>(strategy: T) -> Result<(), Error> {
     let path = strategy.path();
-    println!("{:?}", &path);
     if tokio::fs::File::open(&path).await.is_err() {
         create_file(&path, &strategy.content()).await?;
         Ok(())
@@ -34,7 +33,7 @@ pub(crate) async fn build_file<T: FileStrategy>(strategy: T) -> Result<(), Error
     }
 }
 
-pub(crate) fn concat_file_path(base_path: &str, paths: Vec<&str>) -> String {
+pub(crate) fn build_file_path(base_path: &str, paths: Vec<&str>) -> String {
     let file_path = paths.join("/");
     format!("{}/{}.rs", base_path, file_path)
 }

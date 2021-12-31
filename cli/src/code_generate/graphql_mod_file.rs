@@ -1,6 +1,6 @@
 use crate::code_generate::FileStrategy;
 
-use super::concat_file_path;
+use super::build_file_path;
 
 pub struct GqlModFile<'a> {
     pub file_names: Vec<String>,
@@ -18,6 +18,6 @@ impl<'a> FileStrategy for GqlModFile<'a> {
     }
 
     fn path(&self) -> String {
-        concat_file_path(self.path, vec!["mod"])
+        build_file_path(self.path, vec!["mod"])
     }
 }
