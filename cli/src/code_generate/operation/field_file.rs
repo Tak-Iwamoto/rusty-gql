@@ -1,4 +1,4 @@
-use codegen::Scope;
+use codegen::{Scope, Type};
 use rusty_gql::GqlField;
 
 use crate::code_generate::FileDefinition;
@@ -21,8 +21,9 @@ impl<'a> FileDefinition for FieldFile<'a> {
             fn_scope.arg(arg.name.as_str(), arg.meta_type.to_rust_type_str());
         }
         fn_scope.vis("pub");
-        fn_scope.line("todo!()");
         fn_scope.set_async(true);
+        fn_scope.line("todo!()");
+        fn_scope.ret(Type::new(&self.def.meta_type.name()));
         scope.to_string()
     }
 }

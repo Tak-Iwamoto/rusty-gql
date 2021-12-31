@@ -1,7 +1,7 @@
 [package]
 name = "rusty-gql"
 edition = "2021"
-version = "0.1.0"
+version = "0.0.2"
 authors = ["Tak-Iwamoto"]
 description = "Schema first GraphQL Library for Rust"
 license = "MIT"
@@ -11,7 +11,7 @@ repository = "https://github.com/Tak-Iwamoto/rusty-gql"
 readme = "README.md"
 
 [workspace]
-members = ["examples/*", "codegen", "cli", "frameworks/axum", "frameworks/actix_web"]
+members = ["examples/*", "codegen", "cli", "frameworks/axum"]
 
 [dependencies]
 anyhow = "1.0.44"

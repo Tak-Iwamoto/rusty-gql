@@ -23,7 +23,7 @@ edition = "2021"
 [dependencies]
 axum = {version = "0.4.2", features = ["headers"]}
 hyper = "0.14.16"
-rusty-gql = {registry = "ktra", version = "0.1.0"}
+rusty-gql = {registry = "ktra", version = "0.0.2"}
 rusty-gql-axum = {registry = "ktra", version = "0.0.1"}
 tokio = {version = "1.12.0", features = ["full"]}"#
         .replace("APP_NAME", app_name)

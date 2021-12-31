@@ -1,6 +1,6 @@
 use std::collections::BTreeMap;
 
-use codegen::Scope;
+use codegen::{Scope, Type};
 use rusty_gql::{GqlField, OperationType};
 
 use crate::code_generate::FileDefinition;
@@ -44,7 +44,10 @@ impl<'a> OperationModFile<'a> {
                 f.arg(arg.name.as_str(), arg.meta_type.to_rust_type_str());
                 args_str += format!("{},", &arg.name).as_str();
             }
+            // remove last `,`
+            args_str.pop();
             f.set_async(true);
+            f.ret(Type::new(method.meta_type.name()));
 
             f.line(format!(
                 "{file_name}::{method}({args}).await",

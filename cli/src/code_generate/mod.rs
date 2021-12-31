@@ -60,7 +60,7 @@ pub(crate) async fn create_gql_files(schema_documents: &[&str], path: &str) -> R
 
     try_join_all(vec![query_task, mutation_task, subscription_task]).await?;
 
-    create_type_definition_files(&schema.type_definitions, path).await?;
+    create_type_definition_files(&schema, path).await?;
     create_directive_files(&schema.directives, path).await?;
     Ok(())
 }

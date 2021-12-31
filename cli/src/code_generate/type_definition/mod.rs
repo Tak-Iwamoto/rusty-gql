@@ -6,8 +6,8 @@ mod scalar_file;
 mod union_file;
 
 use futures_util::future::try_join_all;
-use rusty_gql::GqlTypeDefinition;
-use std::{collections::BTreeMap, io::Error};
+use rusty_gql::{GqlTypeDefinition, Schema};
+use std::io::Error;
 
 use self::{
     enum_file::EnumFile, input_file::InputObjectFile, interface_file::InterfaceFile,
@@ -17,7 +17,7 @@ use self::{
 use super::{build_dir_path_str, build_file_path_str, create_file, mod_file::ModFile};
 
 pub async fn create_type_definition_files(
-    type_definitions: &BTreeMap<String, GqlTypeDefinition>,
+    schema: &Schema,
     base_path: &str,
 ) -> Result<Vec<()>, Error> {
     let mut futures = Vec::new();
@@ -26,10 +26,20 @@ pub async fn create_type_definition_files(
     let mut input_file_names = Vec::new();
     let mut scalar_file_names = Vec::new();
 
-    for (_, type_def) in type_definitions.iter() {
+    for (_, type_def) in schema.type_definitions.iter() {
         if reserved_scalar_names().contains(&type_def.name()) {
             continue;
         }
+        let operation_type_names = vec![
+            &schema.query_type_name,
+            &schema.mutation_type_name,
+            &schema.subscription_type_name,
+        ];
+        let name = type_def.name();
+        if operation_type_names.contains(&&name.to_string()) {
+            continue;
+        }
+
         let task = create_type_definition_file(type_def, base_path);
         futures.push(task);
 
