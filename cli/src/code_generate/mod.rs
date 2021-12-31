@@ -39,6 +39,11 @@ pub(crate) fn build_file_path_str(base_path: &str, paths: Vec<&str>) -> String {
     format!("{}/{}.rs", base_path, file_path)
 }
 
+pub(crate) fn build_dir_path_str(base_path: &str, paths: Vec<&str>) -> String {
+    let file_path = paths.join("/");
+    format!("{}/{}", base_path, file_path)
+}
+
 pub(crate) async fn create_gql_files(
     schema_documents: &[&str],
     base_path: Option<&str>,
@@ -67,7 +72,7 @@ pub(crate) async fn create_gql_files(
 
 fn graphql_path(base_path: Option<&str>) -> String {
     match base_path {
-        Some(path) => format!("{}/graphql", path),
+        Some(path) => build_dir_path_str(path, vec!["graphql"]),
         None => "graphql".to_string(),
     }
 }

@@ -13,12 +13,10 @@ pub struct OperationGqlModFile<'a> {
 
 impl<'a> FileStrategy for OperationGqlModFile<'a> {
     fn path(&self) -> String {
-        let path = format!(
-            "{}/{}",
-            &self.operation_type.to_string().to_lowercase(),
-            "mod"
-        );
-        build_file_path_str(&self.base_path, vec![&path])
+        build_file_path_str(
+            &self.base_path,
+            vec![&self.operation_type.to_string().to_lowercase(), "mod"],
+        )
     }
 
     fn content(&self) -> String {
