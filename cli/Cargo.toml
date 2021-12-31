@@ -1,7 +1,13 @@
 [package]
-edition = "2021"
 name = "rusty-gql-cli"
+edition = "2021"
 version = "0.1.0"
+authors = ["Tak-Iwamoto"]
+description = "A Command line tool for rusty-gql "
+license = "MIT"
+documentation = "https://github.com/Tak-Iwamoto/rusty-gql"
+homepage = "https://github.com/Tak-Iwamoto/rusty-gql"
+repository = "https://github.com/Tak-Iwamoto/rusty-gql"
 
 [dependencies]
 actix-web = "3.3.2"

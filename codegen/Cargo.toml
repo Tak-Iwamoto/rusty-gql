@@ -2,6 +2,12 @@
 edition = "2021"
 name = "rusty-gql-codegen"
 version = "0.1.0"
+authors = ["Tak-Iwamoto"]
+description = "Macro for rusty-gql"
+license = "MIT"
+documentation = "https://github.com/Tak-Iwamoto/rusty-gql"
+homepage = "https://github.com/Tak-Iwamoto/rusty-gql"
+repository = "https://github.com/Tak-Iwamoto/rusty-gql"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [lib]
