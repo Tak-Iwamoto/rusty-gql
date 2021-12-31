@@ -4,7 +4,7 @@ use async_recursion::async_recursion;
 use exit_codes::ExitCode;
 use std::{path::Path, process};
 
-use crate::code_generate::{build_file, create_gql_files, CargoTomlFile, MainFile};
+use crate::code_generate::{create_gql_files, create_project_files};
 
 mod app;
 mod code_generate;
@@ -40,9 +40,7 @@ async fn run() -> Result<ExitCode> {
 
     if let Some(new_matches) = matches.subcommand_matches("new") {
         if let Some(app_name) = new_matches.value_of("name") {
-            tokio::fs::create_dir_all(format!("{}/src", app_name).as_str()).await?;
-            build_file(MainFile { app_name }).await?;
-            build_file(CargoTomlFile { app_name }).await?;
+            create_project_files(app_name).await?;
             println!("Successfully created the rusty-gql project!");
             return Ok(ExitCode::Success);
             // if let Some(server_lib) = new_matches.value_of("lib") {
