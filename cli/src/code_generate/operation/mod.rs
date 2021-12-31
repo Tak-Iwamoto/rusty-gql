@@ -12,14 +12,18 @@ use super::build_file;
 pub async fn create_operation_files(
     operations: &BTreeMap<String, GqlField>,
     operation_type: OperationType,
+    base_path: &String,
 ) -> Result<Vec<()>, Error> {
+    let field_base_path = format!(
+        "{}/{}",
+        base_path,
+        operation_type.clone().to_string().to_lowercase()
+    );
     let mut futures = Vec::new();
-    let base_path = operation_type.to_string().to_lowercase();
-
     for (_, field) in operations.iter() {
         let task = build_file(FieldFile {
             def: field,
-            base_path: base_path.to_string(),
+            base_path: field_base_path.to_string(),
         });
         futures.push(task);
     }
@@ -27,6 +31,7 @@ pub async fn create_operation_files(
     build_file(OperationGqlModFile {
         operation_type,
         operations,
+        base_path: base_path.to_string(),
     })
     .await?;
 

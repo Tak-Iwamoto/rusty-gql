@@ -35,7 +35,7 @@ async fn generate_gql_files(app_name: Option<&str>) -> Result<(), std::io::Error
 
     let files: Vec<&str> = files.iter().map(|s| &**s).collect();
 
-    create_gql_files(&files).await
+    create_gql_files(&files, app_name).await
 }
 
 async fn run() -> Result<ExitCode> {

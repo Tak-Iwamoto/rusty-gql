@@ -14,10 +14,11 @@ use self::{
     object_file::ObjectFile, scalar_file::ScalarFile, union_file::UnionFile,
 };
 
-use super::{build_file, graphql_mod_file::GqlModFile};
+use super::{build_file, concat_file_path, graphql_mod_file::GqlModFile};
 
 pub async fn create_type_definition_files(
     type_definitions: &BTreeMap<String, GqlTypeDefinition>,
+    base_path: &str,
 ) -> Result<Vec<()>, Error> {
     let mut futures = Vec::new();
     let mut model_file_names = Vec::new();
@@ -29,7 +30,7 @@ pub async fn create_type_definition_files(
         if reserved_scalar_names().contains(&type_def.name()) {
             continue;
         }
-        let task = create_type_definition_file(type_def);
+        let task = create_type_definition_file(type_def, base_path);
         futures.push(task);
 
         match type_def {
@@ -43,25 +44,25 @@ pub async fn create_type_definition_files(
     }
 
     build_file(GqlModFile {
-        base_path: "model".to_string(),
+        path: &format!("{}/{}", base_path, "model"),
         file_names: model_file_names,
     })
     .await?;
 
     build_file(GqlModFile {
-        base_path: "interface".to_string(),
+        path: &format!("{}/{}", base_path, "interface"),
         file_names: interface_file_names,
     })
     .await?;
 
     build_file(GqlModFile {
-        base_path: "input".to_string(),
+        path: &format!("{}/{}", base_path, "input"),
         file_names: input_file_names,
     })
     .await?;
 
     build_file(GqlModFile {
-        base_path: "scalar".to_string(),
+        path: &format!("{}/{}", base_path, "scalar"),
         file_names: scalar_file_names,
     })
     .await?;
@@ -73,13 +74,16 @@ fn reserved_scalar_names() -> Vec<&'static str> {
     vec!["String", "Int", "Float", "Boolean", "ID"]
 }
 
-async fn create_type_definition_file(type_def: &GqlTypeDefinition) -> Result<(), Error> {
+async fn create_type_definition_file(
+    type_def: &GqlTypeDefinition,
+    base_path: &str,
+) -> Result<(), Error> {
     match type_def {
-        GqlTypeDefinition::Scalar(def) => build_file(ScalarFile { def }).await,
-        GqlTypeDefinition::Object(def) => build_file(ObjectFile { def }).await,
-        GqlTypeDefinition::Interface(def) => build_file(InterfaceFile { def }).await,
-        GqlTypeDefinition::Union(def) => build_file(UnionFile { def }).await,
-        GqlTypeDefinition::Enum(def) => build_file(EnumFile { def }).await,
-        GqlTypeDefinition::InputObject(def) => build_file(InputObjectFile { def }).await,
+        GqlTypeDefinition::Scalar(def) => build_file(ScalarFile { def, base_path }).await,
+        GqlTypeDefinition::Object(def) => build_file(ObjectFile { def, base_path }).await,
+        GqlTypeDefinition::Interface(def) => build_file(InterfaceFile { def, base_path }).await,
+        GqlTypeDefinition::Union(def) => build_file(UnionFile { def, base_path }).await,
+        GqlTypeDefinition::Enum(def) => build_file(EnumFile { def, base_path }).await,
+        GqlTypeDefinition::InputObject(def) => build_file(InputObjectFile { def, base_path }).await,
     }
 }

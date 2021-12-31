@@ -25,6 +25,7 @@ pub(crate) trait FileStrategy {
 
 pub(crate) async fn build_file<T: FileStrategy>(strategy: T) -> Result<(), Error> {
     let path = strategy.path();
+    println!("{:?}", &path);
     if tokio::fs::File::open(&path).await.is_err() {
         create_file(&path, &strategy.content()).await?;
         Ok(())
@@ -33,9 +34,9 @@ pub(crate) async fn build_file<T: FileStrategy>(strategy: T) -> Result<(), Error
     }
 }
 
-pub(crate) fn graphql_file_path(paths: Vec<&str>) -> String {
+pub(crate) fn concat_file_path(base_path: &str, paths: Vec<&str>) -> String {
     let file_path = paths.join("/");
-    format!("graphql/{}.rs", file_path)
+    format!("{}/{}.rs", base_path, file_path)
 }
 
 async fn create_file(path: &str, content: &str) -> Result<(), Error> {
@@ -44,26 +45,41 @@ async fn create_file(path: &str, content: &str) -> Result<(), Error> {
     Ok(())
 }
 
-pub(crate) async fn create_gql_files(schema_documents: &[&str]) -> Result<(), Error> {
+pub(crate) async fn create_gql_files(
+    schema_documents: &[&str],
+    base_path: Option<&str>,
+) -> Result<(), Error> {
     let schema = build_schema(schema_documents).unwrap();
 
-    create_root_dirs().await?;
-    create_root_mod_file().await?;
+    let gql_base_path = graphql_path(base_path);
+    create_root_dirs(&gql_base_path).await?;
+    create_root_mod_file(&gql_base_path).await?;
 
-    let query_task = create_operation_files(&schema.queries, OperationType::Query);
-    let mutation_task = create_operation_files(&schema.mutations, OperationType::Mutation);
-    let subscription_task =
-        create_operation_files(&schema.subscriptions, OperationType::Subscription);
+    let query_task = create_operation_files(&schema.queries, OperationType::Query, &gql_base_path);
+    let mutation_task =
+        create_operation_files(&schema.mutations, OperationType::Mutation, &gql_base_path);
+    let subscription_task = create_operation_files(
+        &schema.subscriptions,
+        OperationType::Subscription,
+        &gql_base_path,
+    );
 
     try_join_all(vec![query_task, mutation_task, subscription_task]).await?;
 
-    create_type_definition_files(&schema.type_definitions).await?;
-    create_directive_files(&schema.directives).await?;
+    create_type_definition_files(&schema.type_definitions, &gql_base_path).await?;
+    create_directive_files(&schema.directives, &gql_base_path).await?;
     Ok(())
 }
 
-async fn create_root_mod_file() -> tokio::io::Result<()> {
-    let file_names = vec![
+fn graphql_path(base_path: Option<&str>) -> String {
+    match base_path {
+        Some(path) => format!("{}/graphql", path),
+        None => "graphql".to_string(),
+    }
+}
+
+fn gql_file_types() -> Vec<String> {
+    vec![
         "query".to_string(),
         "mutation".to_string(),
         "subscription".to_string(),
@@ -72,24 +88,22 @@ async fn create_root_mod_file() -> tokio::io::Result<()> {
         "scalar".to_string(),
         "input".to_string(),
         "interface".to_string(),
-    ];
+    ]
+}
+async fn create_root_mod_file(base_path: &str) -> tokio::io::Result<()> {
+    let file_names = gql_file_types();
     build_file(GqlModFile {
-        base_path: "".to_string(),
+        path: base_path,
         file_names,
     })
     .await
 }
 
-async fn create_root_dirs() -> Result<Vec<()>, Error> {
+async fn create_root_dirs(base_path: &str) -> Result<Vec<()>, Error> {
     let mut futures = Vec::new();
-    futures.push(tokio::fs::create_dir_all("graphql/query"));
-    futures.push(tokio::fs::create_dir_all("graphql/mutation"));
-    futures.push(tokio::fs::create_dir_all("graphql/subscription"));
-    futures.push(tokio::fs::create_dir_all("graphql/model"));
-    futures.push(tokio::fs::create_dir_all("graphql/scalar"));
-    futures.push(tokio::fs::create_dir_all("graphql/interface"));
-    futures.push(tokio::fs::create_dir_all("graphql/input"));
-    futures.push(tokio::fs::create_dir_all("graphql/directive"));
+    for name in gql_file_types() {
+        futures.push(tokio::fs::create_dir_all(format!("{}/{}", base_path, name)));
+    }
     let res = try_join_all(futures).await;
     res
 }

@@ -1,13 +1,13 @@
 use crate::code_generate::FileStrategy;
 
-use super::graphql_file_path;
+use super::concat_file_path;
 
-pub struct GqlModFile {
+pub struct GqlModFile<'a> {
     pub file_names: Vec<String>,
-    pub base_path: String,
+    pub path: &'a str,
 }
 
-impl<'a> FileStrategy for GqlModFile {
+impl<'a> FileStrategy for GqlModFile<'a> {
     fn content(&self) -> String {
         let mut result = String::from("");
         for name in &self.file_names {
@@ -18,6 +18,6 @@ impl<'a> FileStrategy for GqlModFile {
     }
 
     fn path(&self) -> String {
-        graphql_file_path(vec![self.base_path.as_str(), "mod"])
+        concat_file_path(self.path, vec!["mod"])
     }
 }

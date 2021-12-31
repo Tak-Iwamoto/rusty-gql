@@ -1,15 +1,16 @@
 use codegen::Scope;
 use rusty_gql::GqlInterface;
 
-use crate::code_generate::{graphql_file_path, FileStrategy};
+use crate::code_generate::{concat_file_path, FileStrategy};
 
 pub struct InterfaceFile<'a> {
     pub def: &'a GqlInterface,
+    pub base_path: &'a str,
 }
 
 impl<'a> FileStrategy for InterfaceFile<'a> {
     fn path(&self) -> String {
-        graphql_file_path(vec!["interface", &self.def.name])
+        concat_file_path(self.base_path, vec!["interface", &self.def.name])
     }
 
     fn content(&self) -> String {
