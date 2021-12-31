@@ -1,7 +1,7 @@
 use codegen::Scope;
 use rusty_gql::GqlInputObject;
 
-use crate::code_generate::FileDefinition;
+use crate::code_generate::{use_gql_definitions, FileDefinition};
 
 pub struct InputObjectFile<'a> {
     pub def: &'a GqlInputObject,
@@ -21,6 +21,6 @@ impl<'a> FileDefinition for InputObjectFile<'a> {
             struct_scope.field(&field.name, field.meta_type.to_rust_type_str());
         }
 
-        scope.to_string()
+        format!("{}\n\n{}", use_gql_definitions(), scope.to_string())
     }
 }

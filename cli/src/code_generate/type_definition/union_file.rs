@@ -1,7 +1,7 @@
 use codegen::Scope;
 use rusty_gql::GqlUnion;
 
-use crate::code_generate::FileDefinition;
+use crate::code_generate::{use_gql_definitions, FileDefinition};
 
 pub struct UnionFile<'a> {
     pub def: &'a GqlUnion,
@@ -21,6 +21,6 @@ impl<'a> FileDefinition for UnionFile<'a> {
             enum_scope.new_variant(&value);
         }
 
-        scope.to_string()
+        format!("{}\n\n{}", use_gql_definitions(), scope.to_string())
     }
 }

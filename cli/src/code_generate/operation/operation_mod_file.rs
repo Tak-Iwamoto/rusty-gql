@@ -4,7 +4,7 @@ use codegen::{Scope, Type};
 use heck::ToSnakeCase;
 use rusty_gql::{GqlField, OperationType};
 
-use crate::code_generate::FileDefinition;
+use crate::code_generate::{use_gql_definitions, FileDefinition};
 
 pub struct OperationModFile<'a> {
     pub operations: &'a BTreeMap<String, GqlField>,
@@ -60,6 +60,6 @@ impl<'a> OperationModFile<'a> {
             ));
         }
 
-        scope.to_string()
+        format!("{}\n\n{}", use_gql_definitions(), scope.to_string())
     }
 }

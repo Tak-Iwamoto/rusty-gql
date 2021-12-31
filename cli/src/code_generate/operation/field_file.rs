@@ -1,7 +1,7 @@
 use codegen::{Scope, Type};
 use rusty_gql::GqlField;
 
-use crate::code_generate::FileDefinition;
+use crate::code_generate::{use_gql_definitions, FileDefinition};
 
 pub struct FieldFile<'a> {
     pub def: &'a GqlField,
@@ -24,6 +24,7 @@ impl<'a> FileDefinition for FieldFile<'a> {
         fn_scope.set_async(true);
         fn_scope.line("todo!()");
         fn_scope.ret(Type::new(&self.def.meta_type.name()));
-        scope.to_string()
+
+        format!("{}\n\n{}", use_gql_definitions(), scope.to_string())
     }
 }

@@ -1,7 +1,7 @@
 use codegen::Scope;
 use rusty_gql::GqlEnum;
 
-use crate::code_generate::FileDefinition;
+use crate::code_generate::{use_gql_definitions, FileDefinition};
 pub struct EnumFile<'a> {
     pub def: &'a GqlEnum,
     pub path: &'a str,
@@ -20,6 +20,6 @@ impl<'a> FileDefinition for EnumFile<'a> {
             enum_scope.new_variant(&value.name);
         }
 
-        scope.to_string()
+        format!("{}\n\n{}", use_gql_definitions(), scope.to_string())
     }
 }

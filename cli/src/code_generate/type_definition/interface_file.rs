@@ -1,7 +1,7 @@
 use codegen::Scope;
 use rusty_gql::GqlInterface;
 
-use crate::code_generate::FileDefinition;
+use crate::code_generate::{use_gql_definitions, FileDefinition};
 
 pub struct InterfaceFile<'a> {
     pub def: &'a GqlInterface,
@@ -26,6 +26,10 @@ impl<'a> FileDefinition for InterfaceFile<'a> {
                 .arg_ref_self()
                 .ret(field.meta_type.to_rust_type_str());
         }
-        format!("#[async_trait::async_trait]\n{}", scope.to_string())
+        format!(
+            "{}\n\n#[async_trait::async_trait]\n{}",
+            use_gql_definitions(),
+            scope.to_string()
+        )
     }
 }

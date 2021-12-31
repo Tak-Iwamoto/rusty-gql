@@ -2,6 +2,7 @@ mod directive;
 mod mod_file;
 mod operation;
 mod project;
+mod root_mod_file;
 mod type_definition;
 
 use std::io::Error;
@@ -10,8 +11,8 @@ use futures_util::future::try_join_all;
 use rusty_gql::{build_schema, OperationType};
 
 use self::{
-    directive::create_directive_files, mod_file::ModFile, operation::create_operation_files,
-    type_definition::create_type_definition_files,
+    directive::create_directive_files, operation::create_operation_files,
+    root_mod_file::RootModFile, type_definition::create_type_definition_files,
 };
 
 pub use project::create_project_files;
@@ -78,7 +79,7 @@ fn gql_file_types() -> Vec<String> {
 }
 async fn create_root_mod_file(path: &str) -> tokio::io::Result<()> {
     let file_names = gql_file_types();
-    create_file(ModFile { path, file_names }).await
+    create_file(RootModFile { path, file_names }).await
 }
 
 async fn create_root_dirs(path: &str) -> Result<Vec<()>, Error> {
@@ -87,4 +88,9 @@ async fn create_root_dirs(path: &str) -> Result<Vec<()>, Error> {
         futures.push(tokio::fs::create_dir_all(format!("{}/{}", path, name)));
     }
     try_join_all(futures).await
+}
+
+pub(crate) fn use_gql_definitions() -> &'static str {
+    r#"use crate::graphql::*;
+use rusty_gql::*;"#
 }
