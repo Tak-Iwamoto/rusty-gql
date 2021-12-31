@@ -30,7 +30,7 @@ pub use response::Response;
 pub use types::schema::build_schema;
 pub use types::{
     GqlArgument, GqlDirective, GqlDirectiveDefinition, GqlEnum, GqlField, GqlInputObject,
-    GqlInterface, GqlObject, GqlScalar, GqlTypeDefinition, GqlUnion, GqlValue, Schema,
+    GqlInterface, GqlObject, GqlScalar, GqlTypeDefinition, GqlUnion, GqlValue, Schema, ID,
 };
 pub use variables::Variables;
 
