@@ -1,5 +1,7 @@
+mod cargo_toml_file;
 mod directive;
 mod graphql_mod_file;
+mod main_file;
 mod operation;
 mod type_definition;
 
@@ -9,9 +11,12 @@ use futures_util::future::try_join_all;
 use rusty_gql::{build_schema, OperationType};
 
 use self::{
-    directive::create_directive_files, graphql_mod_file::ModFile,
+    directive::create_directive_files, graphql_mod_file::GqlModFile,
     operation::create_operation_files, type_definition::create_type_definition_files,
 };
+pub use cargo_toml_file::CargoTomlFile;
+pub use main_file::MainFile;
+
 use tokio::io::AsyncWriteExt;
 
 pub(crate) trait FileStrategy {
@@ -70,7 +75,7 @@ async fn create_root_mod_file() -> tokio::io::Result<()> {
         "input".to_string(),
         "interface".to_string(),
     ];
-    build_file(ModFile {
+    build_file(GqlModFile {
         base_path: "".to_string(),
         file_names,
     })

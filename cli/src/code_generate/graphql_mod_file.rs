@@ -2,12 +2,12 @@ use crate::code_generate::FileStrategy;
 
 use super::graphql_file_path;
 
-pub struct ModFile {
+pub struct GqlModFile {
     pub file_names: Vec<String>,
     pub base_path: String,
 }
 
-impl<'a> FileStrategy for ModFile {
+impl<'a> FileStrategy for GqlModFile {
     fn content(&self) -> String {
         let mut result = String::from("");
         for name in &self.file_names {

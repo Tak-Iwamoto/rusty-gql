@@ -1,24 +1,3 @@
-pub fn main_file_content() -> &'static str {
-    r#"fn main() {
-    println!("Hello, world!");
-}"#
-}
-
-pub fn cargo_toml_content(app_name: &str) -> String {
-    r#"[package]
-name = "APP_NAME"
-version = "0.1.0"
-edition = "2021"
-
-[dependencies]
-axum = {version = "0.4.2", features = ["headers"]}
-hyper = "0.14.16"
-rusty-gql = "^1"
-rusty-gql-axum = {path = "../../frameworks/axum"}
-tokio = {version = "1.12.0", features = ["full"]}"#
-        .replace("APP_NAME", app_name)
-}
-
 pub fn starwars_schema() -> &'static str {
     r#"
         schema {
