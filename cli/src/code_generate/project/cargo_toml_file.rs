@@ -21,6 +21,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+async-trait = "0.1.52"
 axum = {version = "0.4.2", features = ["headers"]}
 hyper = "0.14.16"
 rusty-gql = {registry = "ktra", version = "0.0.2"}

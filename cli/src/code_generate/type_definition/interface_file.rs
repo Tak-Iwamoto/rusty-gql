@@ -26,6 +26,6 @@ impl<'a> FileDefinition for InterfaceFile<'a> {
                 .arg_ref_self()
                 .ret(field.meta_type.to_rust_type_str());
         }
-        scope.to_string()
+        format!("#[async_trait::async_trait]\n{}", scope.to_string())
     }
 }
