@@ -25,7 +25,7 @@ pub async fn create_operation_files(
         ]);
         let task = create_file(FieldFile {
             def: field,
-            path: file_path_str(vec![&filename]),
+            path: filename,
         });
         futures.push(task);
     }
