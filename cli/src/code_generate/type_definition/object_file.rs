@@ -1,19 +1,15 @@
 use codegen::Scope;
 use rusty_gql::GqlObject;
 
-use crate::code_generate::FileStrategy;
+use crate::code_generate::{graphql_file_path, FileStrategy};
 
 pub struct ObjectFile<'a> {
     pub def: &'a GqlObject,
 }
 
 impl<'a> FileStrategy for ObjectFile<'a> {
-    fn base_path(&self) -> String {
-        "model".to_string()
-    }
-
-    fn file_name(&self) -> String {
-        self.def.name.to_string()
+    fn path(&self) -> String {
+        graphql_file_path(vec!["model", &self.def.name])
     }
 
     fn content(&self) -> String {

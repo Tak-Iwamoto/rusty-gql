@@ -1,7 +1,7 @@
 use codegen::Scope;
 use rusty_gql::GqlField;
 
-use crate::code_generate::FileStrategy;
+use crate::code_generate::{graphql_file_path, FileStrategy};
 
 pub struct FieldFile<'a> {
     pub def: &'a GqlField,
@@ -9,12 +9,8 @@ pub struct FieldFile<'a> {
 }
 
 impl<'a> FileStrategy for FieldFile<'a> {
-    fn base_path(&self) -> String {
-        self.base_path.to_string()
-    }
-
-    fn file_name(&self) -> String {
-        self.def.name.to_string()
+    fn path(&self) -> String {
+        graphql_file_path(vec![&self.base_path, &self.def.name])
     }
 
     fn content(&self) -> String {

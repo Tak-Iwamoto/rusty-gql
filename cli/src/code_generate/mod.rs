@@ -1,5 +1,5 @@
 mod directive;
-mod mod_file;
+mod graphql_mod_file;
 mod operation;
 mod type_definition;
 
@@ -9,31 +9,30 @@ use futures_util::future::try_join_all;
 use rusty_gql::{build_schema, OperationType};
 
 use self::{
-    directive::create_directive_files, mod_file::ModFile, operation::create_operation_files,
-    type_definition::create_type_definition_files,
+    directive::create_directive_files, graphql_mod_file::ModFile,
+    operation::create_operation_files, type_definition::create_type_definition_files,
 };
 use tokio::io::AsyncWriteExt;
 
 pub(crate) trait FileStrategy {
-    fn base_path(&self) -> String;
-
-    fn file_name(&self) -> String;
+    fn path(&self) -> String;
 
     fn content(&self) -> String;
 }
 
 pub(crate) async fn build_file<T: FileStrategy>(strategy: T) -> Result<(), Error> {
-    let path = format!(
-        "graphql/{}/{}.rs",
-        strategy.base_path(),
-        strategy.file_name()
-    );
+    let path = strategy.path();
     if tokio::fs::File::open(&path).await.is_err() {
         create_file(&path, &strategy.content()).await?;
         Ok(())
     } else {
         Ok(())
     }
+}
+
+pub(crate) fn graphql_file_path(paths: Vec<&str>) -> String {
+    let file_path = paths.join("/");
+    format!("graphql/{}.rs", file_path)
 }
 
 async fn create_file(path: &str, content: &str) -> Result<(), Error> {
@@ -80,7 +79,6 @@ async fn create_root_mod_file() -> tokio::io::Result<()> {
 
 async fn create_root_dirs() -> Result<Vec<()>, Error> {
     let mut futures = Vec::new();
-    futures.push(tokio::fs::create_dir_all("graphql"));
     futures.push(tokio::fs::create_dir_all("graphql/query"));
     futures.push(tokio::fs::create_dir_all("graphql/mutation"));
     futures.push(tokio::fs::create_dir_all("graphql/subscription"));

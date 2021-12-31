@@ -1,19 +1,15 @@
 use codegen::Scope;
 use rusty_gql::GqlInputObject;
 
-use crate::code_generate::FileStrategy;
+use crate::code_generate::{graphql_file_path, FileStrategy};
 
 pub struct InputObjectFile<'a> {
     pub def: &'a GqlInputObject,
 }
 
 impl<'a> FileStrategy for InputObjectFile<'a> {
-    fn base_path(&self) -> String {
-        "input".to_string()
-    }
-
-    fn file_name(&self) -> String {
-        self.def.name.to_string()
+    fn path(&self) -> String {
+        graphql_file_path(vec!["input", &self.def.name])
     }
 
     fn content(&self) -> String {

@@ -6,7 +6,7 @@ use rusty_gql::GqlDirectiveDefinition;
 
 use crate::code_generate::FileStrategy;
 
-use super::{build_file, mod_file::ModFile};
+use super::{build_file, graphql_file_path, graphql_mod_file::ModFile};
 
 pub struct DirectiveFile<'a> {
     pub def: &'a GqlDirectiveDefinition,
@@ -24,12 +24,8 @@ impl<'a> FileStrategy for DirectiveFile<'a> {
         scope.to_string()
     }
 
-    fn base_path(&self) -> String {
-        "directive".to_string()
-    }
-
-    fn file_name(&self) -> String {
-        self.def.name.to_string()
+    fn path(&self) -> String {
+        graphql_file_path(vec!["directive", &self.def.name])
     }
 }
 

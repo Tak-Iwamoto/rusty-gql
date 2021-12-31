@@ -1,19 +1,15 @@
 use codegen::Scope;
 use rusty_gql::GqlUnion;
 
-use crate::code_generate::FileStrategy;
+use crate::code_generate::{graphql_file_path, FileStrategy};
 
 pub struct UnionFile<'a> {
     pub def: &'a GqlUnion,
 }
 
 impl<'a> FileStrategy for UnionFile<'a> {
-    fn base_path(&self) -> String {
-        "model".to_string()
-    }
-
-    fn file_name(&self) -> String {
-        self.def.name.to_string()
+    fn path(&self) -> String {
+        graphql_file_path(vec!["model", &self.def.name])
     }
 
     fn content(&self) -> String {

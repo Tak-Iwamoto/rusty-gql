@@ -1,5 +1,7 @@
 use crate::code_generate::FileStrategy;
 
+use super::graphql_file_path;
+
 pub struct ModFile {
     pub file_names: Vec<String>,
     pub base_path: String,
@@ -15,11 +17,7 @@ impl<'a> FileStrategy for ModFile {
         result
     }
 
-    fn base_path(&self) -> String {
-        self.base_path.to_string()
-    }
-
-    fn file_name(&self) -> String {
-        "mod".to_string()
+    fn path(&self) -> String {
+        graphql_file_path(vec![self.base_path.as_str(), "mod"])
     }
 }

@@ -1,20 +1,15 @@
 use codegen::Scope;
 use rusty_gql::GqlEnum;
 
-use crate::code_generate::FileStrategy;
+use crate::code_generate::{graphql_file_path, FileStrategy};
 pub struct EnumFile<'a> {
     pub def: &'a GqlEnum,
 }
 
 impl<'a> FileStrategy for EnumFile<'a> {
-    fn base_path(&self) -> String {
-        "model".to_string()
+    fn path(&self) -> String {
+        graphql_file_path(vec!["model", &self.def.name])
     }
-
-    fn file_name(&self) -> String {
-        self.def.name.to_string()
-    }
-
     fn content(&self) -> String {
         let mut scope = Scope::new();
         let enum_scope = scope.new_enum(self.def.name.as_str()).vis("pub");
