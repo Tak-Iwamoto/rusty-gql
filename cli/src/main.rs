@@ -31,7 +31,6 @@ async fn visit_dirs(path: &Path) -> std::io::Result<Vec<String>> {
 
 async fn run() -> Result<ExitCode> {
     let matches = build_app().get_matches();
-    println!("{:?}", &matches);
     if matches.subcommand_matches("generate").is_some() {
         let files = visit_dirs(Path::new("./schemas")).await?;
 
