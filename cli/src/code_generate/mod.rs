@@ -1,9 +1,7 @@
-mod cargo_toml_file;
 mod directive;
-mod example_schema_file;
 mod graphql_mod_file;
-mod main_file;
 mod operation;
+mod project;
 mod type_definition;
 
 use std::io::Error;
@@ -15,10 +13,8 @@ use self::{
     directive::create_directive_files, graphql_mod_file::GqlModFile,
     operation::create_operation_files, type_definition::create_type_definition_files,
 };
-pub use cargo_toml_file::CargoTomlFile;
-pub use example_schema_file::StarWarsSchemaFile;
-pub use main_file::MainFile;
 
+pub use project::create_project_files;
 use tokio::io::AsyncWriteExt;
 
 pub(crate) trait FileStrategy {
@@ -46,29 +42,6 @@ async fn create_file(path: &str, content: &str) -> Result<(), Error> {
     let mut file = tokio::fs::File::create(&path).await?;
     file.write(content.as_bytes()).await?;
     Ok(())
-}
-
-pub async fn create_project_files(app_name: &str) -> Result<(), Error> {
-    try_join_all(vec![
-        tokio::fs::create_dir_all(format!("{}/src", app_name).as_str()),
-        tokio::fs::create_dir_all(format!("{}/schemas", app_name).as_str()),
-    ])
-    .await?;
-    create_main_file(app_name).await?;
-    create_cargo_toml(app_name).await?;
-    create_example_gql_schema(app_name).await
-}
-
-async fn create_main_file(app_name: &str) -> Result<(), Error> {
-    build_file(MainFile { app_name }).await
-}
-
-async fn create_cargo_toml(app_name: &str) -> Result<(), Error> {
-    build_file(CargoTomlFile { app_name }).await
-}
-
-async fn create_example_gql_schema(app_name: &str) -> Result<(), Error> {
-    build_file(StarWarsSchemaFile { app_name }).await
 }
 
 pub(crate) async fn create_gql_files(schema_documents: &[&str]) -> Result<(), Error> {
