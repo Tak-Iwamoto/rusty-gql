@@ -1,13 +1,13 @@
 [package]
-edition = "2021"
-name = "rusty-gql-axum"
-version = "0.1.0"
 authors = ["Tak-Iwamoto"]
 description = "axum integration for rusty-gql"
-license = "MIT"
 documentation = "https://github.com/Tak-Iwamoto/rusty-gql"
+edition = "2021"
 homepage = "https://github.com/Tak-Iwamoto/rusty-gql"
+license = "MIT"
+name = "rusty-gql-axum"
 repository = "https://github.com/Tak-Iwamoto/rusty-gql"
+version = "0.0.1"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -15,8 +15,8 @@ repository = "https://github.com/Tak-Iwamoto/rusty-gql"
 async-trait = "0.1.52"
 axum = {version = "0.4.2", features = ["ws", "headers"]}
 bytes = "1.1.0"
-futures-util = { version = "0.3.18", default-features = false, features = ["io", "sink"] }
+futures-util = {version = "0.3.18", default-features = false, features = ["io", "sink"]}
 http-body = "0.4.4"
-rusty-gql = {path = "../..", version = "0.1.0"}
+rusty-gql = {registry = "ktra", version = "0.1.0"}
 serde_urlencoded = "0.7.0"
 tokio-util = {version = "0.6.9", default-features = false, features = ["io", "compat"]}

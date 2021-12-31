@@ -9,7 +9,6 @@ use crate::code_generate::{create_gql_files, create_project_files};
 mod app;
 mod code_generate;
 mod exit_codes;
-mod mock;
 
 #[async_recursion]
 async fn visit_dirs(path: &Path) -> std::io::Result<Vec<String>> {
@@ -27,15 +26,23 @@ async fn visit_dirs(path: &Path) -> std::io::Result<Vec<String>> {
     Ok(schemas)
 }
 
+fn gql_files_path(app_name: Option<&str>) -> String {
+    match app_name {
+        Some(path) => format!("{}/src/graphql", path),
+        None => "src/graphql".to_string(),
+    }
+}
+
 async fn generate_gql_files(app_name: Option<&str>) -> Result<(), std::io::Error> {
     let path = app_name
         .map(|name| format!("{}/schemas", name))
-        .unwrap_or("./schemas".to_string());
-    let files = visit_dirs(Path::new(&path)).await?;
+        .unwrap_or("schemas".to_string());
+    let schema_contents = visit_dirs(Path::new(&path)).await?;
 
-    let files: Vec<&str> = files.iter().map(|s| &**s).collect();
+    let schema_contents: Vec<&str> = schema_contents.iter().map(|s| &**s).collect();
 
-    create_gql_files(&files, app_name).await
+    let gql_files_path = gql_files_path(app_name);
+    create_gql_files(&schema_contents, &gql_files_path).await
 }
 
 async fn run() -> Result<ExitCode> {

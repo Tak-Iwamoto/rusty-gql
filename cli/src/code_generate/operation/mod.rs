@@ -12,7 +12,7 @@ use super::{build_file_path_str, create_file};
 pub async fn create_operation_files(
     operations: &BTreeMap<String, GqlField>,
     operation_type: OperationType,
-    base_path: &String,
+    base_path: &str,
 ) -> Result<Vec<()>, Error> {
     let mut futures = Vec::new();
     for (_, field) in operations.iter() {
