@@ -33,7 +33,7 @@ impl<'a> FileDefinition for ObjectFile<'a> {
                 struct_scope.field(&field.name, &return_ty);
             }
             let block_str = if is_gql_primitive_ty {
-                format!("self.{}", &field.name)
+                format!("self.{}.clone()", &field.name)
             } else {
                 "todo!()".to_string()
             };
@@ -62,7 +62,7 @@ impl<'a> FileDefinition for ObjectFile<'a> {
         }
 
         format!(
-            "{}\n\n{}\n\n#[async_trait::async_trait]\n{}",
+            "{}\n\n{}\n{}",
             use_gql_definitions(),
             struct_scope_base.to_string(),
             impl_scope.to_string()

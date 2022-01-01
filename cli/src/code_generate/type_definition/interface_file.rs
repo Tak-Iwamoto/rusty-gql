@@ -1,4 +1,4 @@
-use codegen::Scope;
+use codegen::{Scope, Type};
 use rusty_gql::GqlInterface;
 
 use crate::code_generate::{use_gql_definitions, util::gql_value_ty_to_rust_ty, FileDefinition};
@@ -22,19 +22,23 @@ impl<'a> FileDefinition for InterfaceFile<'a> {
 
         for field in &self.def.fields {
             let return_ty = gql_value_ty_to_rust_ty(&field.meta_type);
-            let return_name = if self
+            let is_interface_return_ty = self
                 .interface_names
-                .contains(&field.meta_type.name().to_string())
-            {
-                format!("dyn {}", return_ty)
+                .contains(&field.meta_type.name().to_string());
+            if is_interface_return_ty {
+                trait_scope
+                    .new_fn(&field.name)
+                    .set_async(true)
+                    .arg_ref_self()
+                    .generic(&format!("T: {}", &field.meta_type.name()))
+                    .ret(Type::new("T"));
             } else {
-                return_ty
-            };
-            trait_scope
-                .new_fn(&field.name)
-                .set_async(true)
-                .arg_ref_self()
-                .ret(return_name);
+                trait_scope
+                    .new_fn(&field.name)
+                    .set_async(true)
+                    .arg_ref_self()
+                    .ret(Type::new(&return_ty));
+            }
         }
         format!(
             "{}\n\n#[async_trait::async_trait]\n{}",
