@@ -7,8 +7,8 @@ mod union_file;
 
 use futures_util::future::try_join_all;
 use heck::ToSnakeCase;
-use rusty_gql::{GqlTypeDefinition, Schema};
-use std::io::Error;
+use rusty_gql::{GqlInterface, GqlTypeDefinition, Schema};
+use std::{collections::BTreeMap, io::Error};
 
 use self::{
     enum_file::EnumFile, input_file::InputObjectFile, interface_file::InterfaceFile,
@@ -26,6 +26,8 @@ pub async fn create_type_definition_files(
     let mut interface_file_names = Vec::new();
     let mut input_file_names = Vec::new();
     let mut scalar_file_names = Vec::new();
+
+    let mut interfaces_map = BTreeMap::new();
 
     for (_, type_def) in schema.type_definitions.iter() {
         if reserved_scalar_names().contains(&type_def.name()) {
@@ -45,12 +47,15 @@ pub async fn create_type_definition_files(
             GqlTypeDefinition::Union(v) => model_file_names.push(v.name.clone()),
             GqlTypeDefinition::Enum(v) => model_file_names.push(v.name.clone()),
             GqlTypeDefinition::Object(v) => model_file_names.push(v.name.clone()),
-            GqlTypeDefinition::Interface(v) => interface_file_names.push(v.name.clone()),
+            GqlTypeDefinition::Interface(v) => {
+                interfaces_map.insert(v.name.clone(), v.clone());
+                interface_file_names.push(v.name.clone())
+            }
             GqlTypeDefinition::InputObject(v) => input_file_names.push(v.name.clone()),
             GqlTypeDefinition::Scalar(v) => scalar_file_names.push(v.name.clone()),
         }
 
-        let task = create_type_definition_file(type_def, base_path, interface_file_names.clone());
+        let task = create_type_definition_file(type_def, base_path, interfaces_map.clone());
         futures.push(task);
     }
 
@@ -88,7 +93,7 @@ pub(crate) fn reserved_scalar_names() -> Vec<&'static str> {
 async fn create_type_definition_file(
     type_def: &GqlTypeDefinition,
     base_path: &str,
-    interface_names: Vec<String>,
+    interfaces_map: BTreeMap<String, GqlInterface>,
 ) -> Result<(), Error> {
     match type_def {
         GqlTypeDefinition::Scalar(def) => {
@@ -100,7 +105,7 @@ async fn create_type_definition_file(
             create_file(ObjectFile {
                 def,
                 path: &path,
-                interface_names: &interface_names,
+                interfaces_map: &interfaces_map,
             })
             .await
         }
@@ -113,7 +118,7 @@ async fn create_type_definition_file(
             create_file(InterfaceFile {
                 def,
                 path: &path,
-                interface_names: &interface_names,
+                interface_names: &interfaces_map.keys().cloned().collect::<Vec<_>>(),
             })
             .await
         }
