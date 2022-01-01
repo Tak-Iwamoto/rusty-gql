@@ -2,7 +2,7 @@ use std::collections::BTreeMap;
 
 use codegen::{Scope, Type};
 use heck::ToSnakeCase;
-use rusty_gql::{GqlInterface, GqlObject};
+use rusty_gql::{GqlField, GqlInterface, GqlObject};
 
 use crate::code_generate::{
     use_gql_definitions,
@@ -23,12 +23,10 @@ impl<'a> FileDefinition for ObjectFile<'a> {
 
     fn content(&self) -> String {
         let mut struct_scope_base = Scope::new();
-        let mut impl_scope = Scope::new();
         let struct_name = &self.def.name;
         let struct_scope = struct_scope_base
             .new_struct(&struct_name.to_string())
             .vis("pub");
-        let imp = impl_scope.new_impl(&struct_name.to_string());
 
         let mut implemented_fields = Vec::new();
         let mut impl_str = Vec::new();
@@ -46,21 +44,14 @@ impl<'a> FileDefinition for ObjectFile<'a> {
                     let f = impl_interface.new_fn(&field_name);
                     f.set_async(true);
                     implemented_fields.push(field_name.to_string());
-                    let mut args_str = String::from("");
                     for arg in &field.arguments {
                         f.arg(
                             &arg.name.to_snake_case(),
                             gql_value_ty_to_rust_ty(&arg.meta_type),
                         );
-                        args_str += format!("{},", &arg.name.to_snake_case()).as_str();
                     }
-                    // remove last `,`
-                    args_str.pop();
 
-                    let interface_names = self.interfaces_map.keys().collect::<Vec<_>>();
-                    let is_interface_return_ty =
-                        interface_names.contains(&&field.meta_type.name().to_string());
-                    if is_interface_return_ty {
+                    if self.is_return_interface_ty(field) {
                         f.generic(&format!("T: {}", &field.meta_type.name()));
                         f.ret(Type::new("T"));
                     } else {
@@ -68,23 +59,20 @@ impl<'a> FileDefinition for ObjectFile<'a> {
                     }
                     f.arg_ref_self();
 
-                    let is_primitive_ty = is_gql_primitive_ty(&field.meta_type.name());
-                    let block_str = if is_primitive_ty {
-                        format!("self.{}.clone()", &field_name)
-                    } else {
-                        "todo!()".to_string()
-                    };
+                    let block_str = build_block_str(&field, &field_name);
                     f.line(block_str);
                 }
             }
             impl_str.push(scope.to_string());
         }
 
+        let mut impl_scope = Scope::new();
+        let struct_imp = impl_scope.new_impl(&struct_name.to_string());
+
         for field in &self.def.fields {
             let field_name = &field.name.to_snake_case();
             let return_ty = gql_value_ty_to_rust_ty(&field.meta_type);
-            let is_primitive_ty = is_gql_primitive_ty(&field.meta_type.name());
-            if is_primitive_ty {
+            if is_return_primitive_ty(&field) {
                 struct_scope.field(&field_name, &return_ty);
             }
 
@@ -92,46 +80,55 @@ impl<'a> FileDefinition for ObjectFile<'a> {
                 continue;
             }
 
-            let f = imp.new_fn(&field_name);
-            let mut args_str = String::from("");
+            let f = struct_imp.new_fn(&field_name);
             for arg in &field.arguments {
                 f.arg(
                     &arg.name.to_snake_case(),
                     gql_value_ty_to_rust_ty(&arg.meta_type),
                 );
-                args_str += format!("{},", &arg.name.to_snake_case()).as_str();
             }
-            // remove last `,`
-            args_str.pop();
 
+            f.arg_ref_self();
             f.set_async(true);
 
-            let interface_names = self.interfaces_map.keys().collect::<Vec<_>>();
-            let is_interface_return_ty =
-                interface_names.contains(&&field.meta_type.name().to_string());
-            if is_interface_return_ty {
+            if self.is_return_interface_ty(field) {
                 f.generic(&format!("T: {}", &field.meta_type.name()));
                 f.ret(Type::new("T"));
             } else {
                 f.ret(Type::new(&return_ty));
             }
-            f.arg_ref_self();
 
-            let block_str = if is_primitive_ty {
-                format!("self.{}.clone()", &field_name)
-            } else {
-                "todo!()".to_string()
-            };
+            let block_str = build_block_str(&field, &field_name);
             f.line(block_str);
         }
 
         let impl_content = impl_str.join("\n");
         format!(
-            "{}\n\n{}\n{}\n{}",
+            "{}\n\n{}\n{}\n\n{}",
             use_gql_definitions(),
             struct_scope_base.to_string(),
             impl_content,
             impl_scope.to_string()
         )
     }
+}
+
+impl<'a> ObjectFile<'a> {
+    fn is_return_interface_ty(&self, field: &GqlField) -> bool {
+        let interface_names = self.interfaces_map.keys().collect::<Vec<_>>();
+        interface_names.contains(&&field.meta_type.name().to_string())
+    }
+}
+
+fn is_return_primitive_ty(field: &GqlField) -> bool {
+    is_gql_primitive_ty(&field.meta_type.name())
+}
+
+fn build_block_str(field: &GqlField, name: &str) -> String {
+    let block_str = if is_return_primitive_ty(&field) {
+        format!("self.{}.clone()", &name)
+    } else {
+        "todo!()".to_string()
+    };
+    block_str
 }
