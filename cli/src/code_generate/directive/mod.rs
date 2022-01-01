@@ -6,7 +6,9 @@ use rusty_gql::GqlDirectiveDefinition;
 
 use crate::code_generate::FileDefinition;
 
-use super::{dir_path_str, file_path_str, create_file, mod_file::ModFile};
+use super::{
+    create_file, dir_path_str, file_path_str, mod_file::ModFile, util::gql_value_ty_to_rust_ty,
+};
 
 pub struct DirectiveFile<'a> {
     pub def: &'a GqlDirectiveDefinition,
@@ -19,7 +21,7 @@ impl<'a> FileDefinition for DirectiveFile<'a> {
         let struct_scope = scope.new_struct(self.def.name.as_str()).vis("pub");
 
         for field in &self.def.arguments {
-            struct_scope.field(&field.name, field.meta_type.to_rust_type_str());
+            struct_scope.field(&field.name, gql_value_ty_to_rust_ty(&field.meta_type));
         }
 
         scope.to_string()

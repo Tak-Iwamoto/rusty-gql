@@ -4,6 +4,7 @@ mod operation;
 mod project;
 mod root_mod_file;
 mod type_definition;
+mod util;
 
 use std::io::Error;
 

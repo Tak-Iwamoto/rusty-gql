@@ -1,14 +1,16 @@
 use std::collections::{BTreeMap, HashMap};
 
-use codegen::Scope;
+use codegen::{Scope, Type};
 use rusty_gql::{GqlField, GqlObject};
 
-use crate::code_generate::{use_gql_definitions, FileDefinition};
+use crate::code_generate::{
+    type_definition::reserved_scalar_names, use_gql_definitions, util::gql_value_ty_to_rust_ty,
+    FileDefinition,
+};
 
 pub struct ObjectFile<'a> {
     pub def: &'a GqlObject,
     pub path: &'a str,
-    pub interface_names: &'a Vec<String>,
 }
 
 impl<'a> FileDefinition for ObjectFile<'a> {
@@ -17,26 +19,38 @@ impl<'a> FileDefinition for ObjectFile<'a> {
     }
 
     fn content(&self) -> String {
-        let mut scope = Scope::new();
-        let struct_scope = scope.new_struct(self.def.name.as_str()).vis("pub");
+        let mut struct_scope_base = Scope::new();
+        let mut impl_scope = Scope::new();
+        let struct_name = self.def.name.as_str();
+        let struct_scope = struct_scope_base
+            .new_struct(&struct_name.to_string())
+            .vis("pub");
+        let imp = impl_scope.new_impl(&struct_name.to_string());
 
-        let st_def = StructDefinition {
-            fields: &self.def.fields,
-            interface_names: self.interface_names,
-        };
-
-        for (field_name, ty_name) in st_def.build_struct_fields() {
-            struct_scope.field(&field_name, ty_name);
-        }
-
-        if !st_def.generics_idents().is_empty() {
-            for (bound_key, bound_ty) in st_def.bound_map() {
-                struct_scope.bound(&bound_key, bound_ty);
+        for field in &self.def.fields {
+            let return_ty = gql_value_ty_to_rust_ty(&field.meta_type);
+            if reserved_scalar_names().contains(&field.meta_type.name()) {
+                struct_scope.field(&field.name, return_ty);
+            } else {
+                let f = imp.new_fn(&field.name);
+                let mut args_str = String::from("");
+                for arg in &field.arguments {
+                    f.arg(arg.name.as_str(), gql_value_ty_to_rust_ty(&arg.meta_type));
+                    args_str += format!("{},", &arg.name).as_str();
+                }
+                // remove last `,`
+                args_str.pop();
+                f.set_async(true);
+                f.ret(Type::new(&return_ty));
             }
-            struct_scope.generic(&st_def.generics_str());
         }
 
-        format!("{}\n\n{}", use_gql_definitions(), scope.to_string())
+        format!(
+            "{}\n\n{}\n\n#[async_trait::async_trait]\n{}",
+            use_gql_definitions(),
+            struct_scope_base.to_string(),
+            impl_scope.to_string()
+        )
     }
 }
 
@@ -72,7 +86,10 @@ impl<'a> StructDefinition<'a> {
             if self.is_return_trait(field) {
                 continue;
             }
-            map.insert(field.name.to_string(), field.meta_type.to_rust_type_str());
+            map.insert(
+                field.name.to_string(),
+                gql_value_ty_to_rust_ty(&field.meta_type),
+            );
         }
         for (generics_str, field) in self.generics_idents() {
             map.insert(field.name.to_string(), generics_str);

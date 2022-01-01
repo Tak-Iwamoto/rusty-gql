@@ -8,7 +8,7 @@ mod union_file;
 use futures_util::future::try_join_all;
 use heck::ToSnakeCase;
 use rusty_gql::{GqlTypeDefinition, Schema};
-use std::io::Error;
+use std::{collections::BTreeMap, io::Error};
 
 use self::{
     enum_file::EnumFile, input_file::InputObjectFile, interface_file::InterfaceFile,
@@ -41,10 +41,17 @@ pub async fn create_type_definition_files(
             continue;
         }
 
+        let mut obj_impl_interfaces_map = BTreeMap::new();
         match type_def {
             GqlTypeDefinition::Union(v) => model_file_names.push(v.name.clone()),
             GqlTypeDefinition::Enum(v) => model_file_names.push(v.name.clone()),
-            GqlTypeDefinition::Object(v) => model_file_names.push(v.name.clone()),
+            GqlTypeDefinition::Object(v) => {
+                if !v.implements_interfaces.is_empty() {
+                    obj_impl_interfaces_map
+                        .insert(v.name.to_string(), v.implements_interfaces.clone());
+                }
+                model_file_names.push(v.name.clone());
+            }
             GqlTypeDefinition::Interface(v) => interface_file_names.push(v.name.clone()),
             GqlTypeDefinition::InputObject(v) => input_file_names.push(v.name.clone()),
             GqlTypeDefinition::Scalar(v) => scalar_file_names.push(v.name.clone()),
@@ -81,7 +88,7 @@ pub async fn create_type_definition_files(
     try_join_all(futures).await
 }
 
-fn reserved_scalar_names() -> Vec<&'static str> {
+pub(crate) fn reserved_scalar_names() -> Vec<&'static str> {
     vec!["String", "Int", "Float", "Boolean", "ID"]
 }
 
@@ -97,12 +104,7 @@ async fn create_type_definition_file(
         }
         GqlTypeDefinition::Object(def) => {
             let path = file_path_str(vec![base_path, "model", &type_def.name().to_snake_case()]);
-            create_file(ObjectFile {
-                def,
-                path: &path,
-                interface_names: &interface_names,
-            })
-            .await
+            create_file(ObjectFile { def, path: &path }).await
         }
         GqlTypeDefinition::Interface(def) => {
             let path = file_path_str(vec![

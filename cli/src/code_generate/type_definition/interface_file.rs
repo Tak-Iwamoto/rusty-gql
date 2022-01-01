@@ -1,7 +1,7 @@
 use codegen::Scope;
 use rusty_gql::GqlInterface;
 
-use crate::code_generate::{use_gql_definitions, FileDefinition};
+use crate::code_generate::{use_gql_definitions, util::gql_value_ty_to_rust_ty, FileDefinition};
 
 pub struct InterfaceFile<'a> {
     pub def: &'a GqlInterface,
@@ -21,13 +21,14 @@ impl<'a> FileDefinition for InterfaceFile<'a> {
             .vis("pub");
 
         for field in &self.def.fields {
+            let return_ty = gql_value_ty_to_rust_ty(&field.meta_type);
             let return_name = if self
                 .interface_names
                 .contains(&field.meta_type.name().to_string())
             {
-                format!("dyn {}", field.meta_type.to_rust_type_str())
+                format!("dyn {}", return_ty)
             } else {
-                field.meta_type.to_rust_type_str()
+                return_ty
             };
             trait_scope
                 .new_fn(&field.name)

@@ -16,16 +16,6 @@ impl GqlValueType {
         }
     }
 
-    pub fn to_rust_type_str(&self) -> String {
-        match self {
-            GqlValueType::NamedType(name) => gql_to_rust_type_str(name, true),
-            GqlValueType::ListType(list_type) => gql_to_rust_type_str(list_type.name(), false),
-            GqlValueType::NonNullType(non_null_type) => {
-                gql_to_rust_type_str(non_null_type.name(), false)
-            }
-        }
-    }
-
     pub fn to_parser_type<'a>(&self) -> Type<'a, String> {
         match self {
             GqlValueType::NamedType(name) => Type::NamedType(name.clone()),
@@ -50,23 +40,5 @@ impl<'a> From<Type<'a, String>> for GqlValueType {
                 GqlValueType::NonNullType(Box::new(Self::from(*non_null)))
             }
         }
-    }
-}
-
-fn gql_to_rust_type_str(gql_type: &str, optional: bool) -> String {
-    match gql_type {
-        "Int" => format_rust_type("i64", optional),
-        "Float" => format_rust_type("f64", optional),
-        "String" => format_rust_type("String", optional),
-        "Boolean" => format_rust_type("bool", optional),
-        _ => format_rust_type(gql_type, optional),
-    }
-}
-
-fn format_rust_type(type_name: &str, optional: bool) -> String {
-    if optional {
-        format!("Option<{}>", type_name)
-    } else {
-        type_name.to_string()
     }
 }

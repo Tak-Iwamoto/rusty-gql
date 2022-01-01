@@ -1,7 +1,7 @@
 use codegen::{Scope, Type};
 use rusty_gql::GqlField;
 
-use crate::code_generate::{use_gql_definitions, FileDefinition};
+use crate::code_generate::{use_gql_definitions, util::gql_value_ty_to_rust_ty, FileDefinition};
 
 pub struct FieldFile<'a> {
     pub def: &'a GqlField,
@@ -18,7 +18,7 @@ impl<'a> FileDefinition for FieldFile<'a> {
         let fn_scope = scope.new_fn(self.def.name.as_str());
 
         for arg in &self.def.arguments {
-            fn_scope.arg(arg.name.as_str(), arg.meta_type.to_rust_type_str());
+            fn_scope.arg(arg.name.as_str(), gql_value_ty_to_rust_ty(&arg.meta_type));
         }
         fn_scope.vis("pub");
         fn_scope.set_async(true);

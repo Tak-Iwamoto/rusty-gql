@@ -4,7 +4,7 @@ use codegen::{Scope, Type};
 use heck::ToSnakeCase;
 use rusty_gql::{GqlField, OperationType};
 
-use crate::code_generate::{use_gql_definitions, FileDefinition};
+use crate::code_generate::{use_gql_definitions, util::gql_value_ty_to_rust_ty, FileDefinition};
 
 pub struct OperationModFile<'a> {
     pub operations: &'a BTreeMap<String, GqlField>,
@@ -43,7 +43,7 @@ impl<'a> OperationModFile<'a> {
             let f = imp.new_fn(&operation_name);
             let mut args_str = String::from("");
             for arg in &method.arguments {
-                f.arg(arg.name.as_str(), arg.meta_type.to_rust_type_str());
+                f.arg(arg.name.as_str(), gql_value_ty_to_rust_ty(&arg.meta_type));
                 args_str += format!("{},", &arg.name).as_str();
             }
             // remove last `,`
