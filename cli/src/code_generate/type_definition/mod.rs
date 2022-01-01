@@ -90,7 +90,6 @@ async fn create_type_definition_file(
     base_path: &str,
     interface_names: Vec<String>,
 ) -> Result<(), Error> {
-    println!("{:?}", interface_names);
     match type_def {
         GqlTypeDefinition::Scalar(def) => {
             let path = file_path_str(vec![base_path, "scalar", &type_def.name().to_snake_case()]);
@@ -98,7 +97,12 @@ async fn create_type_definition_file(
         }
         GqlTypeDefinition::Object(def) => {
             let path = file_path_str(vec![base_path, "model", &type_def.name().to_snake_case()]);
-            create_file(ObjectFile { def, path: &path }).await
+            create_file(ObjectFile {
+                def,
+                path: &path,
+                interface_names: &interface_names,
+            })
+            .await
         }
         GqlTypeDefinition::Interface(def) => {
             let path = file_path_str(vec![
