@@ -18,7 +18,7 @@ impl<'a> FileDefinition for UnionFile<'a> {
         let enum_scope = scope.new_enum(&self.def.name).vis("pub");
 
         for value in &self.def.types {
-            enum_scope.new_variant(&value);
+            enum_scope.new_variant(&value).tuple(&value);
         }
 
         format!("{}\n\n{}", use_gql_definitions(), scope.to_string())
