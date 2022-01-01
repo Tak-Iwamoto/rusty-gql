@@ -1,4 +1,5 @@
 use codegen::{Scope, Type};
+use heck::ToSnakeCase;
 use rusty_gql::GqlInterface;
 
 use crate::code_generate::{use_gql_definitions, util::gql_value_ty_to_rust_ty, FileDefinition};
@@ -27,14 +28,14 @@ impl<'a> FileDefinition for InterfaceFile<'a> {
                 .contains(&field.meta_type.name().to_string());
             if is_interface_return_ty {
                 trait_scope
-                    .new_fn(&field.name)
+                    .new_fn(&field.name.to_snake_case())
                     .set_async(true)
                     .arg_ref_self()
                     .generic(&format!("T: {}", &field.meta_type.name()))
                     .ret(Type::new("T"));
             } else {
                 trait_scope
-                    .new_fn(&field.name)
+                    .new_fn(&field.name.to_snake_case())
                     .set_async(true)
                     .arg_ref_self()
                     .ret(Type::new(&return_ty));

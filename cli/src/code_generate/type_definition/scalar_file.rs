@@ -15,7 +15,7 @@ impl<'a> FileDefinition for ScalarFile<'a> {
 
     fn content(&self) -> String {
         let mut scope = Scope::new();
-        scope.new_struct(self.def.name.as_str()).vis("pub");
+        scope.new_struct(&self.def.name).vis("pub");
 
         format!("{}\n\n{}", use_gql_definitions(), scope.to_string())
     }

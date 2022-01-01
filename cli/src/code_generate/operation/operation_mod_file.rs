@@ -41,11 +41,14 @@ impl<'a> OperationModFile<'a> {
         let imp = scope.new_impl(&struct_name);
 
         for (operation_name, method) in self.operations.iter() {
-            let f = imp.new_fn(&operation_name);
+            let f = imp.new_fn(&operation_name.to_snake_case());
             let mut args_str = String::from("");
             for arg in &method.arguments {
-                f.arg(arg.name.as_str(), gql_value_ty_to_rust_ty(&arg.meta_type));
-                args_str += format!("{},", &arg.name).as_str();
+                f.arg(
+                    &arg.name.to_snake_case(),
+                    gql_value_ty_to_rust_ty(&arg.meta_type),
+                );
+                args_str += format!("{},", &arg.name.to_snake_case()).as_str();
             }
             // remove last `,`
             args_str.pop();
@@ -65,7 +68,7 @@ impl<'a> OperationModFile<'a> {
             f.line(format!(
                 "{file_name}::{method}({args}).await",
                 file_name = file_name,
-                method = method.name,
+                method = method.name.to_snake_case(),
                 args = args_str
             ));
         }

@@ -1,4 +1,5 @@
 use codegen::{Scope, Type};
+use heck::ToSnakeCase;
 use rusty_gql::GqlObject;
 
 use crate::code_generate::{
@@ -29,23 +30,28 @@ impl<'a> FileDefinition for ObjectFile<'a> {
         for field in &self.def.fields {
             let return_ty = gql_value_ty_to_rust_ty(&field.meta_type);
             let is_gql_primitive_ty = reserved_scalar_names().contains(&field.meta_type.name());
+            let field_name = &field.name.to_snake_case();
             if is_gql_primitive_ty {
-                struct_scope.field(&field.name, &return_ty);
+                struct_scope.field(&field_name, &return_ty);
             }
             let block_str = if is_gql_primitive_ty {
-                format!("self.{}.clone()", &field.name)
+                format!("self.{}.clone()", &field_name)
             } else {
                 "todo!()".to_string()
             };
 
-            let f = imp.new_fn(&field.name);
+            let f = imp.new_fn(&field_name);
             let mut args_str = String::from("");
             for arg in &field.arguments {
-                f.arg(arg.name.as_str(), gql_value_ty_to_rust_ty(&arg.meta_type));
-                args_str += format!("{},", &arg.name).as_str();
+                f.arg(
+                    &arg.name.to_snake_case(),
+                    gql_value_ty_to_rust_ty(&arg.meta_type),
+                );
+                args_str += format!("{},", &arg.name.to_snake_case()).as_str();
             }
             // remove last `,`
             args_str.pop();
+
             f.set_async(true);
 
             let is_interface_return_ty = self

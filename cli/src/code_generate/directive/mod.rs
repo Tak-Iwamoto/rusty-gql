@@ -18,7 +18,7 @@ pub struct DirectiveFile<'a> {
 impl<'a> FileDefinition for DirectiveFile<'a> {
     fn content(&self) -> String {
         let mut scope = Scope::new();
-        let struct_scope = scope.new_struct(self.def.name.as_str()).vis("pub");
+        let struct_scope = scope.new_struct(&self.def.name).vis("pub");
 
         for field in &self.def.arguments {
             struct_scope.field(&field.name, gql_value_ty_to_rust_ty(&field.meta_type));
