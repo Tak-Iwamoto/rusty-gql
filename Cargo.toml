@@ -1,7 +1,7 @@
 [package]
 name = "rusty-gql"
 edition = "2021"
-version = "0.0.2"
+version = "0.0.3"
 authors = ["Tak-Iwamoto"]
 description = "Schema first GraphQL Library for Rust"
 license = "MIT"
