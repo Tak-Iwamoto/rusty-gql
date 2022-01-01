@@ -15,8 +15,7 @@ impl<'a> FileDefinition for MainFile<'a> {
 }
 
 fn main_file_content() -> &'static str {
-    r#"
-mod graphql;
+    r#"mod graphql;
 
 fn main() {
     println!("Hello, world!");

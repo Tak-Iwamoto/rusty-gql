@@ -14,6 +14,7 @@ use rusty_gql::{build_schema, OperationType};
 use self::{
     directive::create_directive_files, operation::create_operation_files,
     root_mod_file::RootModFile, type_definition::create_type_definition_files,
+    util::interface_ty_names,
 };
 
 pub use project::create_project_files;
@@ -54,10 +55,25 @@ pub(crate) async fn create_gql_files(schema_documents: &[&str], path: &str) -> R
     create_root_dirs(path).await?;
     create_root_mod_file(path).await?;
 
-    let query_task = create_operation_files(&schema.queries, OperationType::Query, path);
-    let mutation_task = create_operation_files(&schema.mutations, OperationType::Mutation, path);
-    let subscription_task =
-        create_operation_files(&schema.subscriptions, OperationType::Subscription, path);
+    let interface_names = interface_ty_names(&schema.type_definitions);
+    let query_task = create_operation_files(
+        &schema.queries,
+        OperationType::Query,
+        path,
+        &interface_names,
+    );
+    let mutation_task = create_operation_files(
+        &schema.mutations,
+        OperationType::Mutation,
+        path,
+        &interface_names,
+    );
+    let subscription_task = create_operation_files(
+        &schema.subscriptions,
+        OperationType::Subscription,
+        path,
+        &interface_names,
+    );
 
     try_join_all(vec![query_task, mutation_task, subscription_task]).await?;
 

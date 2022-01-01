@@ -10,6 +10,7 @@ pub struct OperationModFile<'a> {
     pub operations: &'a BTreeMap<String, GqlField>,
     pub operation_type: OperationType,
     pub path: String,
+    pub interface_names: &'a Vec<String>,
 }
 
 impl<'a> FileDefinition for OperationModFile<'a> {
@@ -49,7 +50,16 @@ impl<'a> OperationModFile<'a> {
             // remove last `,`
             args_str.pop();
             f.set_async(true);
-            f.ret(Type::new(method.meta_type.name()));
+
+            let is_interface_return_ty = self
+                .interface_names
+                .contains(&method.meta_type.name().to_string());
+            if is_interface_return_ty {
+                f.generic(&format!("T: {}", &method.meta_type.name()));
+                f.ret(Type::new("T"));
+            } else {
+                f.ret(Type::new(&method.meta_type.name()));
+            }
 
             let file_name = operation_name.to_snake_case();
             f.line(format!(
