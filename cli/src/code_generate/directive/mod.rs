@@ -7,9 +7,7 @@ use rusty_gql::GqlDirectiveDefinition;
 
 use crate::code_generate::FileDefinition;
 
-use super::{
-    create_file, dir_path_str, file_path_str, mod_file::ModFile, util::gql_value_ty_to_rust_ty,
-};
+use super::{create_file, mod_file::ModFile, path_str, util::gql_value_ty_to_rust_ty};
 
 pub struct DirectiveFile<'a> {
     pub def: &'a GqlDirectiveDefinition,
@@ -41,19 +39,19 @@ pub async fn create_directive_files(
     base_path: &str,
 ) -> Result<Vec<()>, Error> {
     let mut futures = Vec::new();
-    let mut file_names = Vec::new();
+    let mut directive_names = Vec::new();
     for (_, directive) in directives.iter() {
         let dir_file_name = &directive.name.to_snake_case();
-        let path = file_path_str(vec![base_path, "directive", &dir_file_name]);
+        let path = path_str(vec![base_path, "directive", &dir_file_name], true);
         futures.push(create_file(DirectiveFile {
             def: directive,
             path,
         }));
-        file_names.push(directive.name.to_pascal_case().clone());
+        directive_names.push(directive.name.to_pascal_case().clone());
     }
     create_file(ModFile {
-        path: &dir_path_str(vec![base_path, "directive"]),
-        file_names,
+        path: &path_str(vec![base_path, "directive"], false),
+        struct_names: directive_names,
     })
     .await?;
 

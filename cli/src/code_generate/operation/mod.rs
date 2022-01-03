@@ -8,7 +8,7 @@ use std::{collections::BTreeMap, io::Error};
 
 use self::{field_file::FieldFile, operation_mod_file::OperationModFile};
 
-use super::{create_file, file_path_str};
+use super::{create_file, path_str};
 
 pub async fn create_operation_files(
     operations: &BTreeMap<String, GqlField>,
@@ -19,11 +19,14 @@ pub async fn create_operation_files(
     let mut futures = Vec::new();
 
     for (_, field) in operations.iter() {
-        let filename = file_path_str(vec![
-            base_path,
-            &operation_type.to_string().to_lowercase(),
-            &field.name.to_snake_case(),
-        ]);
+        let filename = path_str(
+            vec![
+                base_path,
+                &operation_type.to_string().to_lowercase(),
+                &field.name.to_snake_case(),
+            ],
+            true,
+        );
         let task = create_file(FieldFile {
             def: field,
             path: filename,
@@ -35,11 +38,10 @@ pub async fn create_operation_files(
     create_file(OperationModFile {
         operation_type: operation_type.clone(),
         operations,
-        path: file_path_str(vec![
-            base_path,
-            &operation_type.to_string().to_lowercase(),
-            "mod",
-        ]),
+        path: path_str(
+            vec![base_path, &operation_type.to_string().to_lowercase(), "mod"],
+            true,
+        ),
         interface_names: &interface_names,
     })
     .await?;

@@ -2,7 +2,7 @@ use heck::ToSnakeCase;
 
 use crate::code_generate::FileDefinition;
 
-use super::file_path_str;
+use super::path_str;
 
 pub struct RootModFile<'a> {
     pub file_names: Vec<String>,
@@ -23,6 +23,6 @@ impl<'a> FileDefinition for RootModFile<'a> {
     }
 
     fn path(&self) -> String {
-        file_path_str(vec![self.path, "mod"])
+        path_str(vec![self.path, "mod"], true)
     }
 }

@@ -37,13 +37,13 @@ pub(crate) async fn create_file<T: FileDefinition>(strategy: T) -> Result<(), Er
     }
 }
 
-pub(crate) fn file_path_str(paths: Vec<&str>) -> String {
-    let path_str = paths.join("/");
-    format!("{}.rs", path_str)
-}
-
-pub(crate) fn dir_path_str(paths: Vec<&str>) -> String {
-    paths.join("/")
+pub(crate) fn path_str(paths: Vec<&str>, is_file: bool) -> String {
+    if is_file {
+        let path_str = paths.join("/");
+        format!("{}.rs", path_str)
+    } else {
+        paths.join("/")
+    }
 }
 
 pub(crate) async fn create_gql_files(schema_documents: &[&str], path: &str) -> Result<(), Error> {
