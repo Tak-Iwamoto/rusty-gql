@@ -38,7 +38,6 @@ impl<'a> From<Directive<'a, String>> for GqlDirective {
     }
 }
 
-// TODO: introspection用のメソッドを定義する
 #[derive(Debug)]
 pub struct GqlDirectiveDefinition {
     pub position: Pos,
