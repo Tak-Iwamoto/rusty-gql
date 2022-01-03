@@ -41,10 +41,10 @@ impl<'a> OperationModFile<'a> {
         let imp = scope.new_impl(&struct_name);
 
         for (operation_name, method) in self.operations.iter() {
-            let f = imp.new_fn(&operation_name.to_snake_case());
+            let fn_scope = imp.new_fn(&operation_name.to_snake_case());
             let mut args_str = String::from("");
             for arg in &method.arguments {
-                f.arg(
+                fn_scope.arg(
                     &arg.name.to_snake_case(),
                     gql_value_ty_to_rust_ty(&arg.meta_type),
                 );
@@ -52,20 +52,23 @@ impl<'a> OperationModFile<'a> {
             }
             // remove last `,`
             args_str.pop();
-            f.set_async(true);
+            fn_scope.set_async(true);
+            fn_scope.vis("pub");
 
             let is_interface_return_ty = self
                 .interface_names
                 .contains(&method.meta_type.name().to_string());
+            let return_ty = gql_value_ty_to_rust_ty(&method.meta_type);
             if is_interface_return_ty {
-                f.generic(&format!("T: {}", &method.meta_type.name()));
-                f.ret(Type::new("T"));
+                let name = &method.meta_type.name();
+                fn_scope.generic(&format!("T: {}", name));
+                fn_scope.ret(Type::new(&return_ty.replace(name, "T")));
             } else {
-                f.ret(Type::new(&method.meta_type.name()));
+                fn_scope.ret(Type::new(&return_ty));
             }
 
             let file_name = operation_name.to_snake_case();
-            f.line(format!(
+            fn_scope.line(format!(
                 "{file_name}::{method}({args}).await",
                 file_name = file_name,
                 method = method.name.to_snake_case(),

@@ -51,8 +51,9 @@ impl<'a> FileDefinition for ObjectFile<'a> {
                     }
 
                     if self.is_return_interface_ty(field) {
-                        f.generic(&format!("T: {}", &field.meta_type.name()));
-                        f.ret(Type::new("T"));
+                        let name = field.meta_type.name();
+                        f.generic(&format!("T: {}", name));
+                        f.ret(Type::new(&return_ty.replace(name, "T")));
                     } else {
                         f.ret(Type::new(&return_ty));
                     }

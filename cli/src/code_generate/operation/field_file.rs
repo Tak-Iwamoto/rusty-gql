@@ -29,11 +29,14 @@ impl<'a> FileDefinition for FieldFile<'a> {
         let is_interface_return_ty = self
             .interface_names
             .contains(&self.def.meta_type.name().to_string());
+        let return_ty = gql_value_ty_to_rust_ty(&self.def.meta_type);
+
         if is_interface_return_ty {
-            fn_scope.generic(&format!("T: {}", &self.def.meta_type.name()));
-            fn_scope.ret(Type::new("T"));
+            let name = &self.def.meta_type.name();
+            fn_scope.generic(&format!("T: {}", name));
+            fn_scope.ret(Type::new(&return_ty.replace(name, "T")));
         } else {
-            fn_scope.ret(Type::new(&self.def.meta_type.name()));
+            fn_scope.ret(Type::new(&return_ty));
         }
 
         fn_scope.vis("pub");
