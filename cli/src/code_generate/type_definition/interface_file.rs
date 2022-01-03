@@ -22,23 +22,34 @@ impl<'a> FileDefinition for InterfaceFile<'a> {
             .vis("pub");
 
         for field in &self.def.fields {
+            let field_name = &field.name.to_snake_case();
             let return_ty = gql_value_ty_to_rust_ty(&field.meta_type);
             let is_interface_return_ty = self
                 .interface_names
                 .contains(&field.meta_type.name().to_string());
             if is_interface_return_ty {
-                trait_scope
-                    .new_fn(&field.name.to_snake_case())
-                    .set_async(true)
-                    .arg_ref_self()
-                    .generic(&format!("T: {}", &field.meta_type.name()))
-                    .ret(Type::new("T"));
+                let f = trait_scope.new_fn(&field_name);
+                f.set_async(true);
+                f.arg_ref_self();
+                f.generic(&format!("T: {}", &field.meta_type.name()));
+                f.ret(Type::new("T"));
+                for arg in &field.arguments {
+                    f.arg(
+                        &arg.name.to_snake_case(),
+                        gql_value_ty_to_rust_ty(&arg.meta_type),
+                    );
+                }
             } else {
-                trait_scope
-                    .new_fn(&field.name.to_snake_case())
-                    .set_async(true)
-                    .arg_ref_self()
-                    .ret(Type::new(&return_ty));
+                let f = trait_scope.new_fn(&field_name);
+                f.set_async(true);
+                f.arg_ref_self();
+                f.ret(Type::new(&return_ty));
+                for arg in &field.arguments {
+                    f.arg(
+                        &arg.name.to_snake_case(),
+                        gql_value_ty_to_rust_ty(&arg.meta_type),
+                    );
+                }
             }
         }
         format!(

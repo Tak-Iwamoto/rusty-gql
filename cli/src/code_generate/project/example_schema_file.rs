@@ -121,5 +121,18 @@ type Starship {
 }
 
 union SearchResult = Human | Droid | Starship
+directive @preview(
+    toggledBy: String!
+) on SCALAR | OBJECT | FIELD_DEFINITION | ARGUMENT_DEFINITION | INTERFACE | UNION | ENUM | ENUM_VALUE | INPUT_OBJECT | INPUT_FIELD_DEFINITION
+
+directive @possibleTypes(
+    abstractType: String
+    concreteTypes: [String!]!
+) on INPUT_FIELD_DEFINITION
+
+scalar Base64String
+scalar Date
+scalar DateTime
+
 "#
 }

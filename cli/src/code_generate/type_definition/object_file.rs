@@ -32,7 +32,6 @@ impl<'a> FileDefinition for ObjectFile<'a> {
         let mut impl_str = Vec::new();
         for interface in &self.def.implements_interfaces {
             let mut scope = Scope::new();
-            scope.new_struct(&struct_name);
             let impl_interface = scope.new_impl(&struct_name);
             impl_interface.impl_trait(interface);
             impl_interface.r#macro("#[async_trait::async_trait]");
@@ -104,7 +103,7 @@ impl<'a> FileDefinition for ObjectFile<'a> {
 
         let impl_content = impl_str.join("\n");
         format!(
-            "{}\n\n{}\n{}\n\n{}",
+            "{}\n\n{}\n\n{}\n\n{}",
             use_gql_definitions(),
             struct_scope_base.to_string(),
             impl_content,
