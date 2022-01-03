@@ -28,24 +28,26 @@ impl<'a> FileDefinition for InterfaceFile<'a> {
                 .interface_names
                 .contains(&field.meta_type.name().to_string());
             if is_interface_return_ty {
-                let f = trait_scope.new_fn(&field_name);
-                f.set_async(true);
-                f.arg_ref_self();
-                f.generic(&format!("T: {}", &field.meta_type.name()));
-                f.ret(Type::new("T"));
+                let fn_scope = trait_scope.new_fn(&field_name);
+                fn_scope.set_async(true);
+                fn_scope.arg_ref_self();
+
+                let name = &field.meta_type.name();
+                fn_scope.generic(&format!("T: {}", &name));
+                fn_scope.ret(Type::new(&return_ty.replace(name, "T")));
                 for arg in &field.arguments {
-                    f.arg(
+                    fn_scope.arg(
                         &arg.name.to_snake_case(),
                         gql_value_ty_to_rust_ty(&arg.meta_type),
                     );
                 }
             } else {
-                let f = trait_scope.new_fn(&field_name);
-                f.set_async(true);
-                f.arg_ref_self();
-                f.ret(Type::new(&return_ty));
+                let fn_scope = trait_scope.new_fn(&field_name);
+                fn_scope.set_async(true);
+                fn_scope.arg_ref_self();
+                fn_scope.ret(Type::new(&return_ty));
                 for arg in &field.arguments {
-                    f.arg(
+                    fn_scope.arg(
                         &arg.name.to_snake_case(),
                         gql_value_ty_to_rust_ty(&arg.meta_type),
                     );

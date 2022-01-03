@@ -40,11 +40,13 @@ impl<'a> FileDefinition for ObjectFile<'a> {
                 for field in &gql_interface.fields {
                     let field_name = &field.name.to_snake_case();
                     let return_ty = gql_value_ty_to_rust_ty(&field.meta_type);
-                    let f = impl_interface.new_fn(&field_name);
-                    f.set_async(true);
+                    let fn_scope = impl_interface.new_fn(&field_name);
+                    fn_scope.set_async(true);
+                    fn_scope.arg_ref_self();
+
                     implemented_fields.push(field_name.to_string());
                     for arg in &field.arguments {
-                        f.arg(
+                        fn_scope.arg(
                             &arg.name.to_snake_case(),
                             gql_value_ty_to_rust_ty(&arg.meta_type),
                         );
@@ -52,15 +54,14 @@ impl<'a> FileDefinition for ObjectFile<'a> {
 
                     if self.is_return_interface_ty(field) {
                         let name = field.meta_type.name();
-                        f.generic(&format!("T: {}", name));
-                        f.ret(Type::new(&return_ty.replace(name, "T")));
+                        fn_scope.generic(&format!("T: {}", name));
+                        fn_scope.ret(Type::new(&return_ty.replace(name, "T")));
                     } else {
-                        f.ret(Type::new(&return_ty));
+                        fn_scope.ret(Type::new(&return_ty));
                     }
-                    f.arg_ref_self();
 
                     let block_str = build_block_str(&field, &field_name);
-                    f.line(block_str);
+                    fn_scope.line(block_str);
                 }
             }
             impl_str.push(scope.to_string());
@@ -80,26 +81,27 @@ impl<'a> FileDefinition for ObjectFile<'a> {
                 continue;
             }
 
-            let f = struct_imp.new_fn(&field_name);
+            let fn_scope = struct_imp.new_fn(&field_name);
             for arg in &field.arguments {
-                f.arg(
+                fn_scope.arg(
                     &arg.name.to_snake_case(),
                     gql_value_ty_to_rust_ty(&arg.meta_type),
                 );
             }
 
-            f.arg_ref_self();
-            f.set_async(true);
+            fn_scope.arg_ref_self();
+            fn_scope.set_async(true);
 
             if self.is_return_interface_ty(field) {
-                f.generic(&format!("T: {}", &field.meta_type.name()));
-                f.ret(Type::new("T"));
+                let name = &field.meta_type.name();
+                fn_scope.generic(&format!("T: {}", &name));
+                fn_scope.ret(Type::new(&return_ty.replace(name, "T")));
             } else {
-                f.ret(Type::new(&return_ty));
+                fn_scope.ret(Type::new(&return_ty));
             }
 
             let block_str = build_block_str(&field, &field_name);
-            f.line(block_str);
+            fn_scope.line(block_str);
         }
 
         let impl_content = impl_str.join("\n");

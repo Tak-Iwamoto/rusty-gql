@@ -2,8 +2,6 @@ use std::collections::BTreeMap;
 
 use rusty_gql::{GqlTypeDefinition, GqlValueType};
 
-use super::type_definition::reserved_scalar_names;
-
 pub fn interface_ty_names(type_definitions: &BTreeMap<String, GqlTypeDefinition>) -> Vec<String> {
     type_definitions
         .iter()
@@ -14,10 +12,6 @@ pub fn interface_ty_names(type_definitions: &BTreeMap<String, GqlTypeDefinition>
 
 pub fn gql_value_ty_to_rust_ty(gql_value: &GqlValueType) -> String {
     value_ty_to_str(gql_value, true)
-}
-
-pub fn is_gql_primitive_ty(ty_name: &str) -> bool {
-    reserved_scalar_names().contains(&ty_name)
 }
 
 fn value_ty_to_str(gql_value: &GqlValueType, root: bool) -> String {
@@ -43,4 +37,12 @@ fn gql_to_rust_type_str(gql_type: &str, optional: bool) -> String {
     } else {
         name
     }
+}
+
+pub fn is_gql_primitive_ty(ty_name: &str) -> bool {
+    reserved_scalar_names().contains(&ty_name)
+}
+
+fn reserved_scalar_names() -> Vec<&'static str> {
+    vec!["String", "Int", "Float", "Boolean", "ID"]
 }

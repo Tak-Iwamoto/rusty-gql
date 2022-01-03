@@ -15,7 +15,7 @@ use self::{
     object_file::ObjectFile, scalar_file::ScalarFile, union_file::UnionFile,
 };
 
-use super::{create_file, mod_file::ModFile, path_str};
+use super::{create_file, mod_file::ModFile, path_str, util::is_gql_primitive_ty};
 
 pub async fn create_type_definition_files(
     schema: &Schema,
@@ -30,7 +30,7 @@ pub async fn create_type_definition_files(
     let mut interfaces_map = BTreeMap::new();
 
     for (_, type_def) in schema.type_definitions.iter() {
-        if reserved_scalar_names().contains(&type_def.name()) {
+        if is_gql_primitive_ty(&type_def.name()) {
             continue;
         }
         let operation_type_names = vec![
@@ -84,10 +84,6 @@ pub async fn create_type_definition_files(
     .await?;
 
     try_join_all(futures).await
-}
-
-pub(crate) fn reserved_scalar_names() -> Vec<&'static str> {
-    vec!["String", "Int", "Float", "Boolean", "ID"]
 }
 
 async fn create_type_definition_file(
