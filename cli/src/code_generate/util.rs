@@ -14,11 +14,15 @@ pub fn gql_value_ty_to_rust_ty(gql_value: &GqlValueType) -> String {
     value_ty_to_str(gql_value, true)
 }
 
-fn value_ty_to_str(gql_value: &GqlValueType, root: bool) -> String {
+fn value_ty_to_str(gql_value: &GqlValueType, optional: bool) -> String {
     match gql_value {
-        GqlValueType::NamedType(name) => gql_to_rust_type_str(name, root),
+        GqlValueType::NamedType(name) => gql_to_rust_type_str(name, optional),
         GqlValueType::ListType(list_type) => {
-            format!("Vec<{}>", value_ty_to_str(list_type, false))
+            if optional {
+                format!("Option<Vec<{}>>", value_ty_to_str(list_type, true))
+            } else {
+                format!("Vec<{}>", value_ty_to_str(list_type, true))
+            }
         }
         GqlValueType::NonNullType(non_null_type) => value_ty_to_str(non_null_type, false),
     }
