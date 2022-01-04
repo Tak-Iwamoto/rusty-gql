@@ -1,17 +1,17 @@
 use codegen::Scope;
-use heck::ToSnakeCase;
 use rusty_gql::GqlInputObject;
 
 use crate::code_generate::{use_gql_definitions, util::gql_value_ty_to_rust_ty, FileDefinition};
 
 pub struct InputObjectFile<'a> {
+    pub file_name: &'a str,
     pub def: &'a GqlInputObject,
     pub path: &'a str,
 }
 
 impl<'a> FileDefinition for InputObjectFile<'a> {
     fn name(&self) -> String {
-        self.def.name.to_snake_case()
+        self.file_name.to_string()
     }
 
     fn path(&self) -> String {

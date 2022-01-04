@@ -91,58 +91,63 @@ async fn create_type_definition_file(
     base_path: &str,
     interfaces_map: BTreeMap<String, GqlInterface>,
 ) -> Result<(), Error> {
+    let file_name = type_def.name().to_snake_case();
     match type_def {
         GqlTypeDefinition::Scalar(def) => {
-            let path = path_str(
-                vec![base_path, "scalar", &type_def.name().to_snake_case()],
-                true,
-            );
-            create_file(ScalarFile { def, path: &path }).await
+            let path = path_str(vec![base_path, "scalar", &file_name], true);
+            create_file(ScalarFile {
+                def,
+                path: &path,
+                file_name: &file_name,
+            })
+            .await
         }
         GqlTypeDefinition::Object(def) => {
-            let path = path_str(
-                vec![base_path, "model", &type_def.name().to_snake_case()],
-                true,
-            );
+            let path = path_str(vec![base_path, "model", &file_name], true);
             create_file(ObjectFile {
                 def,
                 path: &path,
                 interfaces_map: &interfaces_map,
+                file_name: &file_name,
             })
             .await
         }
         GqlTypeDefinition::Interface(def) => {
-            let path = path_str(
-                vec![base_path, "interface", &type_def.name().to_snake_case()],
-                true,
-            );
+            let path = path_str(vec![base_path, "interface", &file_name], true);
             create_file(InterfaceFile {
                 def,
                 path: &path,
                 interface_names: &interfaces_map.keys().cloned().collect::<Vec<_>>(),
+                file_name: &file_name,
             })
             .await
         }
         GqlTypeDefinition::Union(def) => {
-            let path = path_str(
-                vec![base_path, "model", &type_def.name().to_snake_case()],
-                true,
-            );
-            create_file(UnionFile { def, path: &path }).await
+            let path = path_str(vec![base_path, "model", &file_name], true);
+            create_file(UnionFile {
+                def,
+                path: &path,
+                file_name: &file_name,
+            })
+            .await
         }
         GqlTypeDefinition::Enum(def) => {
-            let path = path_str(
-                vec![base_path, "model", &type_def.name().to_snake_case()],
-                true,
-            );
-            create_file(EnumFile { def, path: &path }).await
+            let path = path_str(vec![base_path, "model", &file_name], true);
+            create_file(EnumFile {
+                def,
+                path: &path,
+                file_name: &file_name,
+            })
+            .await
         }
         GqlTypeDefinition::InputObject(def) => {
-            let path = path_str(
-                vec![base_path, "input", &type_def.name().to_snake_case()],
-                true,
-            );
-            create_file(InputObjectFile { def, path: &path }).await
+            let path = path_str(vec![base_path, "input", &file_name], true);
+            create_file(InputObjectFile {
+                def,
+                path: &path,
+                file_name: &file_name,
+            })
+            .await
         }
     }
 }

@@ -1,17 +1,17 @@
 use codegen::Scope;
-use heck::ToSnakeCase;
 use rusty_gql::GqlUnion;
 
 use crate::code_generate::{use_gql_definitions, FileDefinition};
 
 pub struct UnionFile<'a> {
+    pub file_name: &'a str,
     pub def: &'a GqlUnion,
     pub path: &'a str,
 }
 
 impl<'a> FileDefinition for UnionFile<'a> {
     fn name(&self) -> String {
-        self.def.name.to_snake_case()
+        self.file_name.to_string()
     }
 
     fn path(&self) -> String {

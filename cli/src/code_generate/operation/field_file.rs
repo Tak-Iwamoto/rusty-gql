@@ -5,6 +5,7 @@ use rusty_gql::GqlField;
 use crate::code_generate::{use_gql_definitions, util::gql_value_ty_to_rust_ty, FileDefinition};
 
 pub struct FieldFile<'a> {
+    pub file_name: String,
     pub def: &'a GqlField,
     pub path: String,
     pub interface_names: &'a Vec<String>,
@@ -12,7 +13,7 @@ pub struct FieldFile<'a> {
 
 impl<'a> FileDefinition for FieldFile<'a> {
     fn name(&self) -> String {
-        self.def.name.to_snake_case()
+        self.file_name.clone()
     }
 
     fn path(&self) -> String {

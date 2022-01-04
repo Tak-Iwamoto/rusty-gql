@@ -28,6 +28,7 @@ pub async fn create_operation_files(
             true,
         );
         let task = create_file(FieldFile {
+            file_name: field.name.to_snake_case(),
             def: field,
             path: filename,
             interface_names: &interface_names,

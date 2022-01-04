@@ -11,6 +11,7 @@ use crate::code_generate::{
 };
 
 pub struct ObjectFile<'a> {
+    pub file_name: &'a str,
     pub def: &'a GqlObject,
     pub path: &'a str,
     pub interfaces_map: &'a BTreeMap<String, GqlInterface>,
@@ -18,7 +19,7 @@ pub struct ObjectFile<'a> {
 
 impl<'a> FileDefinition for ObjectFile<'a> {
     fn name(&self) -> String {
-        self.def.name.to_snake_case()
+        self.file_name.to_string()
     }
 
     fn path(&self) -> String {
