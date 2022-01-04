@@ -35,7 +35,13 @@ pub(crate) async fn create_file<T: FileDefinition>(file_def: T) -> Result<(), Er
         file.write(file_def.content().as_bytes()).await?;
         Ok(())
     } else {
-        Ok(())
+        if file_def.name() == "mod.rs".to_string() {
+            let mut file = tokio::fs::File::create(&path).await?;
+            file.write(file_def.content().as_bytes()).await?;
+            Ok(())
+        } else {
+            Ok(())
+        }
     }
 }
 
