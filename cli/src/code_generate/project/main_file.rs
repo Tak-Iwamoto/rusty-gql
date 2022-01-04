@@ -5,6 +5,10 @@ pub struct MainFile<'a> {
 }
 
 impl<'a> FileDefinition for MainFile<'a> {
+    fn name(&self) -> String {
+        "main.rs".to_string()
+    }
+
     fn path(&self) -> String {
         format!("{}/src/main.rs", self.app_name)
     }

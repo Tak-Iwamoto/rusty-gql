@@ -25,4 +25,8 @@ impl<'a> FileDefinition for ModFile<'a> {
     fn path(&self) -> String {
         path_str(vec![self.path, "mod"], true)
     }
+
+    fn name(&self) -> String {
+        "mod.rs".to_string()
+    }
 }

@@ -10,6 +10,10 @@ pub struct RootModFile<'a> {
 }
 
 impl<'a> FileDefinition for RootModFile<'a> {
+    fn name(&self) -> String {
+        "mod.rs".to_string()
+    }
+
     fn content(&self) -> String {
         let mut mod_str = String::from("");
         let mut pub_use_str = String::from("");

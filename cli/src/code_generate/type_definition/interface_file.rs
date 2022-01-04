@@ -11,6 +11,10 @@ pub struct InterfaceFile<'a> {
 }
 
 impl<'a> FileDefinition for InterfaceFile<'a> {
+    fn name(&self) -> String {
+        self.def.name.to_snake_case()
+    }
+
     fn path(&self) -> String {
         self.path.to_string()
     }

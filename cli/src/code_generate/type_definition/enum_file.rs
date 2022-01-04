@@ -1,4 +1,5 @@
 use codegen::Scope;
+use heck::ToSnakeCase;
 use rusty_gql::GqlEnum;
 
 use crate::code_generate::{use_gql_definitions, FileDefinition};
@@ -8,6 +9,10 @@ pub struct EnumFile<'a> {
 }
 
 impl<'a> FileDefinition for EnumFile<'a> {
+    fn name(&self) -> String {
+        self.def.name.to_snake_case()
+    }
+
     fn path(&self) -> String {
         self.path.to_string()
     }

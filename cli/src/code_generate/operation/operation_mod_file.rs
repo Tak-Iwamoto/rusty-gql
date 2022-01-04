@@ -14,6 +14,10 @@ pub struct OperationModFile<'a> {
 }
 
 impl<'a> FileDefinition for OperationModFile<'a> {
+    fn name(&self) -> String {
+        "mod.rs".to_string()
+    }
+
     fn path(&self) -> String {
         self.path.to_string()
     }

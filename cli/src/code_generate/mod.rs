@@ -21,16 +21,18 @@ pub use project::create_project_files;
 use tokio::io::AsyncWriteExt;
 
 pub(crate) trait FileDefinition {
+    fn name(&self) -> String;
+
     fn path(&self) -> String;
 
     fn content(&self) -> String;
 }
 
-pub(crate) async fn create_file<T: FileDefinition>(strategy: T) -> Result<(), Error> {
-    let path = strategy.path();
+pub(crate) async fn create_file<T: FileDefinition>(file_def: T) -> Result<(), Error> {
+    let path = file_def.path();
     if tokio::fs::File::open(&path).await.is_err() {
         let mut file = tokio::fs::File::create(&path).await?;
-        file.write(strategy.content().as_bytes()).await?;
+        file.write(file_def.content().as_bytes()).await?;
         Ok(())
     } else {
         Ok(())

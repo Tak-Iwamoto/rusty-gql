@@ -12,6 +12,10 @@ impl<'a> FileDefinition for CargoTomlFile<'a> {
     fn content(&self) -> String {
         cargo_toml_content(self.app_name)
     }
+
+    fn name(&self) -> String {
+        "Cargo.toml".to_string()
+    }
 }
 
 fn cargo_toml_content(app_name: &str) -> String {

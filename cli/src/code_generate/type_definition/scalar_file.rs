@@ -1,4 +1,5 @@
 use codegen::Scope;
+use heck::ToSnakeCase;
 use rusty_gql::GqlScalar;
 
 use crate::code_generate::{use_gql_definitions, FileDefinition};
@@ -9,6 +10,10 @@ pub struct ScalarFile<'a> {
 }
 
 impl<'a> FileDefinition for ScalarFile<'a> {
+    fn name(&self) -> String {
+        self.def.name.to_snake_case()
+    }
+
     fn path(&self) -> String {
         self.path.to_string()
     }

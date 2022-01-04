@@ -5,6 +5,10 @@ pub struct StarWarsSchemaFile<'a> {
 }
 
 impl<'a> FileDefinition for StarWarsSchemaFile<'a> {
+    fn name(&self) -> String {
+        "starwars.graphql".to_string()
+    }
+
     fn path(&self) -> String {
         format!("{}/schemas/starwars.graphql", self.app_name)
     }

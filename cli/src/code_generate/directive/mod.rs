@@ -32,6 +32,10 @@ impl<'a> FileDefinition for DirectiveFile<'a> {
     fn path(&self) -> String {
         self.path.to_string()
     }
+
+    fn name(&self) -> String {
+        self.def.name.to_snake_case()
+    }
 }
 
 pub async fn create_directive_files(
