@@ -12,6 +12,7 @@ use super::{create_file, mod_file::ModFile, path_str, util::gql_value_ty_to_rust
 pub struct DirectiveFile<'a> {
     pub def: &'a GqlDirectiveDefinition,
     pub path: String,
+    pub file_name: String,
 }
 
 impl<'a> FileDefinition for DirectiveFile<'a> {
@@ -34,7 +35,7 @@ impl<'a> FileDefinition for DirectiveFile<'a> {
     }
 
     fn name(&self) -> String {
-        self.def.name.to_snake_case()
+        self.file_name.clone()
     }
 }
 
@@ -50,6 +51,7 @@ pub async fn create_directive_files(
         futures.push(create_file(DirectiveFile {
             def: directive,
             path,
+            file_name: dir_file_name.clone(),
         }));
         directive_names.push(directive.name.to_pascal_case().clone());
     }
