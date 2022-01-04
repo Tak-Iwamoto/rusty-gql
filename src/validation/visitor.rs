@@ -64,9 +64,9 @@ impl<'a> ValidationContext<'a> {
         }
     }
 
-    pub fn add_error<T: Into<String>>(&mut self, message: T, positions: Vec<Pos>) {
+    pub fn add_error<T: Into<String>>(&mut self, message: T, locations: Vec<Pos>) {
         self.errors.push(ValidationError {
-            positions,
+            locations,
             message: message.into(),
         })
     }

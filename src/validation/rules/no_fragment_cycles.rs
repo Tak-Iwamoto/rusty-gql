@@ -26,7 +26,7 @@ impl<'a> CycleDetector<'a> {
 
             if index.is_some() {
                 self.errors.push(ValidationError {
-                    positions: vec![],
+                    locations: vec![],
                     message: format!("Cannot spread fragment \"{}\"", name),
                 })
             } else if !self.visited.contains(name) {

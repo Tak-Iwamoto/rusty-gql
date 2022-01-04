@@ -18,7 +18,7 @@ pub struct Operation<'a> {
     pub variable_definitions: Vec<VariableDefinition<'a, String>>,
     pub selection_set: SelectionSet<'a, String>,
     pub root_field: Field<'a, String>,
-    pub fragment_definitions: BTreeMap<String, FragmentDefinition<'a, String>>,
+    pub fragment_definitions: HashMap<String, FragmentDefinition<'a, String>>,
     pub errors: Mutex<Vec<GqlError>>,
     pub variables: Variables,
 }
@@ -77,7 +77,7 @@ pub fn build_operation<'a>(
         Err(_) => return Err(GqlError::new("failed to parse query", None)),
     };
 
-    let mut fragment_definitions = BTreeMap::new();
+    let mut fragment_definitions = HashMap::new();
 
     let mut operation_definitions: HashMap<String, OperationDefinition> = HashMap::new();
     let no_name_key = "no_operation_name";
