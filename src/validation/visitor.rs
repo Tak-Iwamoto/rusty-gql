@@ -9,12 +9,32 @@ use graphql_parser::{
     Pos,
 };
 
-use crate::Schema;
+use crate::{error::Location, GqlError, Schema};
 
 #[derive(Clone)]
 pub struct ValidationError {
-    pub(crate) positions: Vec<Pos>,
+    pub(crate) locations: Vec<Pos>,
     pub(crate) message: String,
+}
+
+impl From<ValidationError> for GqlError {
+    fn from(err: ValidationError) -> Self {
+        let locations = err
+            .locations
+            .into_iter()
+            .map(|pos| Location {
+                line: pos.line,
+                column: pos.column,
+            })
+            .collect::<Vec<_>>();
+
+        Self {
+            message: err.message,
+            locations,
+            path: Vec::new(),
+            extensions: None,
+        }
+    }
 }
 
 #[derive(Clone)]
