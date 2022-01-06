@@ -7,7 +7,7 @@ use crate::validation::{
 
 #[derive(Default)]
 pub struct ArgumentsOfCorrectType<'a> {
-    pub current_args: Option<Vec<(String, Value<'a, String>)>>,
+    pub current_args: Option<&'a Vec<(String, Value<'a, String>)>>,
 }
 
 impl<'a> Visitor<'a> for ArgumentsOfCorrectType<'a> {
@@ -16,7 +16,7 @@ impl<'a> Visitor<'a> for ArgumentsOfCorrectType<'a> {
         _ctx: &mut ValidationContext,
         directive: &'a graphql_parser::schema::Directive<'a, String>,
     ) {
-        self.current_args = Some(directive.arguments.clone());
+        self.current_args = Some(&directive.arguments);
     }
 
     fn exit_directive(
@@ -32,7 +32,7 @@ impl<'a> Visitor<'a> for ArgumentsOfCorrectType<'a> {
         _ctx: &mut ValidationContext,
         field: &'a graphql_parser::query::Field<'a, String>,
     ) {
-        self.current_args = Some(field.arguments.clone());
+        self.current_args = Some(&field.arguments);
     }
 
     fn exit_field(
@@ -56,15 +56,15 @@ impl<'a> Visitor<'a> for ArgumentsOfCorrectType<'a> {
                     return;
                 }
 
-                if let Some(vars) = &ctx.variables {
-                    if let Some(def) = vars.get(arg_name) {
-                        if let Some(err_msg) =
-                            check_valid_input_value(&ctx.schema, &def.var_type, arg_value)
-                        {
-                            ctx.add_error(format!("Invalid value for argument {}", err_msg), vec![])
-                        }
-                    }
-                }
+                // if let Some(vars) = &ctx.variables {
+                //     if let Some(def) = vars.0.get(arg_name) {
+                //         if let Some(err_msg) =
+                //             check_valid_input_value(&ctx.schema, &def.var_type, arg_value)
+                //         {
+                //             ctx.add_error(format!("Invalid value for argument {}", err_msg), vec![])
+                //         }
+                //     }
+                // }
             }
             None => return,
         }

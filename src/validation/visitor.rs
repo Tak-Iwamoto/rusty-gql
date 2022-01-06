@@ -9,7 +9,7 @@ use graphql_parser::{
     Pos,
 };
 
-use crate::{error::Location, GqlError, Schema};
+use crate::{error::Location, GqlError, Schema, Variables};
 
 #[derive(Clone)]
 pub struct ValidationError {
@@ -42,7 +42,7 @@ pub struct ValidationContext<'a> {
     pub(crate) schema: &'a Schema,
     pub(crate) errors: Vec<ValidationError>,
     pub(crate) fragments: &'a HashMap<String, FragmentDefinition<'a, String>>,
-    pub(crate) variables: Option<HashMap<String, VariableDefinition<'a, String>>>,
+    pub(crate) variables: Option<&'a Variables>,
     pub type_stack: Vec<Option<&'a TypeDefinition<'a, String>>>,
     pub parent_type_stack: Vec<Option<&'a TypeDefinition<'a, String>>>,
 }
@@ -51,7 +51,7 @@ impl<'a> ValidationContext<'a> {
     pub fn new(
         schema: &'a Schema,
         doc: &'a Document<'a, String>,
-        variables: Option<HashMap<String, VariableDefinition<'a, String>>>,
+        variables: Option<&'a Variables>,
         fragments: &'a HashMap<String, FragmentDefinition<'a, String>>,
     ) -> Self {
         ValidationContext {
