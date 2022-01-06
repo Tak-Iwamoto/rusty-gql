@@ -2,7 +2,8 @@ use graphql_parser::Pos;
 
 use crate::validation::visitor::{ValidationContext, Visitor};
 
-pub struct KnownTypeNames {}
+#[derive(Default)]
+pub struct KnownTypeNames;
 
 impl<'a> Visitor<'a> for KnownTypeNames {
     fn enter_fragment_definition(

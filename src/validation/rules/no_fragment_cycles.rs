@@ -40,6 +40,7 @@ impl<'a> CycleDetector<'a> {
     }
 }
 
+#[derive(Default)]
 pub struct NoFragmentCycles<'a> {
     current_fragment: Option<&'a str>,
     fragment_spreads: HashMap<&'a str, Vec<&'a str>>,

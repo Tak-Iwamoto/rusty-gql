@@ -13,6 +13,7 @@ use crate::validation::{
     visitor::{ValidationContext, Visitor},
 };
 
+#[derive(Default)]
 pub struct VariablesInAllowedPosition<'a> {
     current_scope: Option<Scope<'a>>,
     variable_usages: HashMap<Scope<'a>, Vec<(&'a str, Pos, Type<'a, String>)>>,

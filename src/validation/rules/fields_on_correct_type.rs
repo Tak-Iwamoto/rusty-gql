@@ -5,6 +5,7 @@ use crate::{
     GqlTypeDefinition,
 };
 
+#[derive(Default)]
 pub struct FieldsOnCorrectType;
 
 impl<'a> Visitor<'a> for FieldsOnCorrectType {

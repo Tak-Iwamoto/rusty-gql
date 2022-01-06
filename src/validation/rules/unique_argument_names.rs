@@ -4,6 +4,7 @@ use graphql_parser::schema::Value;
 
 use crate::validation::visitor::Visitor;
 
+#[derive(Default)]
 pub struct UniqueArgumentNames<'a> {
     names: HashSet<&'a str>,
 }

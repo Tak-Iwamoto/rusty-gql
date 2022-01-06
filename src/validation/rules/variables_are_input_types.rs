@@ -1,5 +1,6 @@
 use crate::validation::visitor::{ValidationContext, Visitor};
 
+#[derive(Default)]
 pub struct VariablesAreInputTypes;
 
 impl<'a> Visitor<'a> for VariablesAreInputTypes {

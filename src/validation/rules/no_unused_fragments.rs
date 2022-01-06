@@ -10,6 +10,7 @@ use crate::validation::{
     visitor::{ValidationContext, Visitor},
 };
 
+#[derive(Default)]
 pub struct NoUnusedFragment<'a> {
     current_scope: Option<Scope<'a>>,
     fragment_spreads: HashMap<Scope<'a>, Vec<&'a str>>,

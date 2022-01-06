@@ -7,6 +7,7 @@ use crate::validation::{
     visitor::{ValidationContext, Visitor},
 };
 
+#[derive(Default)]
 pub struct NoUndefinedVariables<'a> {
     defined_variables: HashMap<Option<&'a str>, (Pos, HashSet<&'a str>)>,
     used_variables: HashMap<Scope<'a>, HashMap<&'a str, Pos>>,

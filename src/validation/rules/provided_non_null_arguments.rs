@@ -9,6 +9,7 @@ use crate::{
     GqlTypeDefinition,
 };
 
+#[derive(Default)]
 pub struct ProvidedNonNullArguments;
 
 impl<'a> Visitor<'a> for ProvidedNonNullArguments {

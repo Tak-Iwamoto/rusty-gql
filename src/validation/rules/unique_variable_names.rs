@@ -2,6 +2,7 @@ use std::collections::HashSet;
 
 use crate::validation::visitor::{ValidationContext, Visitor};
 
+#[derive(Default)]
 pub struct UniqueVariableNames<'a> {
     names: HashSet<&'a str>,
 }

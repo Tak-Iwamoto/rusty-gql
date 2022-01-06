@@ -5,6 +5,7 @@ use crate::{
     GqlTypeDefinition,
 };
 
+#[derive(Default)]
 pub struct FragmentsOnCompositeTypes;
 
 impl<'a> Visitor<'a> for FragmentsOnCompositeTypes {

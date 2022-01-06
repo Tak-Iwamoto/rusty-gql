@@ -5,6 +5,7 @@ use crate::validation::{
     visitor::{ValidationContext, Visitor},
 };
 
+#[derive(Default)]
 pub struct KnownDirectives {
     location_stack: Vec<DirectiveLocation>,
 }

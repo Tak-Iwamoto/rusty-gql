@@ -2,6 +2,7 @@ use graphql_parser::schema::Type;
 
 use crate::validation::{utils::check_valid_input_value, visitor::Visitor};
 
+#[derive(Default)]
 pub struct DefaultValueOfCorrectType;
 
 impl<'a> Visitor<'a> for DefaultValueOfCorrectType {

@@ -2,6 +2,7 @@ use graphql_parser::query::FragmentSpread;
 
 use crate::validation::visitor::{ValidationContext, Visitor};
 
+#[derive(Default)]
 pub struct KnownFragmentName;
 
 impl<'a> Visitor<'a> for KnownFragmentName {

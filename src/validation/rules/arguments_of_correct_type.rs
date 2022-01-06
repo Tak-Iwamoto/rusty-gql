@@ -5,6 +5,7 @@ use crate::validation::{
     visitor::{ValidationContext, Visitor},
 };
 
+#[derive(Default)]
 pub struct ArgumentsOfCorrectType<'a> {
     pub current_args: Option<Vec<(String, Value<'a, String>)>>,
 }

@@ -4,6 +4,7 @@ use graphql_parser::query::{Field, Selection, SelectionSet};
 
 use crate::validation::visitor::{ValidationContext, Visitor};
 
+#[derive(Default)]
 pub struct OverlappingFieldsCanBeMerged;
 
 impl<'a> Visitor<'a> for OverlappingFieldsCanBeMerged {

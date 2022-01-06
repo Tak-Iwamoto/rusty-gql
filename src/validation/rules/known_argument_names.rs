@@ -8,6 +8,7 @@ use crate::{
     GqlTypeDefinition,
 };
 
+#[derive(Default)]
 pub struct KnownArgumentNames<'a> {
     current_args: Option<(Vec<String>, ArgsPosition<'a>)>,
 }

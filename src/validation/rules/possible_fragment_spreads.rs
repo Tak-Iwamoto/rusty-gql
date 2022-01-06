@@ -4,6 +4,7 @@ use graphql_parser::query::{Definition, Document, FragmentSpread, TypeCondition}
 
 use crate::validation::visitor::{ValidationContext, Visitor};
 
+#[derive(Default)]
 pub struct PossibleFragmentSpreads<'a> {
     fragment_types: HashMap<&'a str, &'a TypeCondition<'a, String>>,
 }

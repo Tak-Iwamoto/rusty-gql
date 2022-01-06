@@ -83,6 +83,248 @@ impl<'a> ValidationContext<'a> {
     }
 }
 
+pub struct NewVisitor;
+
+impl NewVisitor {
+    pub(crate) fn with<V>(self, visitor: V) -> VisitorCons<V, Self> {
+        VisitorCons(visitor, self)
+    }
+}
+
+impl<'a> Visitor<'a> for NewVisitor {}
+
+pub(crate) struct VisitorCons<A, B>(A, B);
+
+impl<A, B> VisitorCons<A, B> {
+    pub(crate) fn with<V>(self, visitor: V) -> VisitorCons<V, Self> {
+        VisitorCons(visitor, self)
+    }
+}
+
+impl<'a, A, B> Visitor<'a> for VisitorCons<A, B>
+where
+    A: Visitor<'a> + 'a,
+    B: Visitor<'a> + 'a,
+{
+    fn enter_document(&mut self, ctx: &mut ValidationContext<'a>, doc: &'a Document<'a, String>) {
+        self.0.enter_document(ctx, doc);
+        self.1.enter_document(ctx, doc);
+    }
+
+    fn exit_document(&mut self, ctx: &mut ValidationContext<'a>, doc: &'a Document<'a, String>) {
+        self.0.exit_document(ctx, doc);
+        self.1.exit_document(ctx, doc);
+    }
+
+    fn enter_operation_definition(
+        &mut self,
+        ctx: &mut ValidationContext<'a>,
+        name: Option<&'a str>,
+        operation_definition: &'a OperationDefinition<'a, String>,
+    ) {
+        self.0
+            .enter_operation_definition(ctx, name, operation_definition);
+        self.1
+            .enter_operation_definition(ctx, name, operation_definition);
+    }
+
+    fn exit_operation_definition(
+        &mut self,
+        ctx: &mut ValidationContext<'a>,
+        name: Option<&'a str>,
+        operation_definition: &'a OperationDefinition<'a, String>,
+    ) {
+        self.0
+            .exit_operation_definition(ctx, name, operation_definition);
+        self.1
+            .exit_operation_definition(ctx, name, operation_definition);
+    }
+
+    fn enter_fragment_definition(
+        &mut self,
+        ctx: &mut ValidationContext,
+        name: &'a str,
+        fragment_definition: &'a FragmentDefinition<'a, String>,
+    ) {
+        self.0
+            .enter_fragment_definition(ctx, name, fragment_definition);
+        self.1
+            .enter_fragment_definition(ctx, name, fragment_definition);
+    }
+
+    fn exit_fragment_definition(
+        &mut self,
+        ctx: &mut ValidationContext,
+        name: &'a str,
+        fragment_definition: &'a FragmentDefinition<'a, String>,
+    ) {
+        self.0
+            .exit_fragment_definition(ctx, name, fragment_definition);
+        self.1
+            .exit_fragment_definition(ctx, name, fragment_definition);
+    }
+
+    fn enter_selection_set(
+        &mut self,
+        ctx: &mut ValidationContext<'a>,
+        selection_set: &'a SelectionSet<'a, String>,
+    ) {
+        self.0.enter_selection_set(ctx, selection_set);
+        self.1.enter_selection_set(ctx, selection_set);
+    }
+
+    fn exit_selection_set(
+        &mut self,
+        ctx: &mut ValidationContext,
+        selection_set: &'a SelectionSet<'a, String>,
+    ) {
+        self.0.exit_selection_set(ctx, selection_set);
+        self.1.exit_selection_set(ctx, selection_set);
+    }
+
+    fn enter_selection(
+        &mut self,
+        ctx: &mut ValidationContext,
+        selection: &'a Selection<'a, String>,
+    ) {
+        self.0.enter_selection(ctx, selection);
+        self.1.enter_selection(ctx, selection);
+    }
+
+    fn exit_selection(
+        &mut self,
+        ctx: &mut ValidationContext,
+        selection: &'a Selection<'a, String>,
+    ) {
+        self.0.exit_selection(ctx, selection);
+        self.1.exit_selection(ctx, selection);
+    }
+
+    fn enter_directive(
+        &mut self,
+        ctx: &mut ValidationContext,
+        directive: &'a Directive<'a, String>,
+    ) {
+        self.0.enter_directive(ctx, directive);
+        self.1.enter_directive(ctx, directive);
+    }
+
+    fn exit_directive(
+        &mut self,
+        ctx: &mut ValidationContext,
+        directive: &'a Directive<'a, String>,
+    ) {
+        self.0.exit_directive(ctx, directive);
+        self.1.exit_directive(ctx, directive);
+    }
+
+    fn enter_field(&mut self, ctx: &mut ValidationContext, field: &'a Field<'a, String>) {
+        self.0.enter_field(ctx, field);
+        self.1.enter_field(ctx, field);
+    }
+
+    fn exit_field(&mut self, ctx: &mut ValidationContext, field: &'a Field<'a, String>) {
+        self.0.exit_field(ctx, field);
+        self.1.exit_field(ctx, field);
+    }
+
+    fn enter_variable_definition(
+        &mut self,
+        ctx: &mut ValidationContext,
+        variable_definition: &'a VariableDefinition<'a, String>,
+    ) {
+        self.0.enter_variable_definition(ctx, variable_definition);
+        self.1.enter_variable_definition(ctx, variable_definition);
+    }
+
+    fn exit_variable_definition(
+        &mut self,
+        ctx: &mut ValidationContext,
+        variable_definition: &'a VariableDefinition<'a, String>,
+    ) {
+        self.0.exit_variable_definition(ctx, variable_definition);
+        self.1.exit_variable_definition(ctx, variable_definition);
+    }
+
+    fn enter_fragment_spread(
+        &mut self,
+        ctx: &mut ValidationContext,
+        fragment_spread: &'a FragmentSpread<'a, String>,
+    ) {
+        self.0.enter_fragment_spread(ctx, fragment_spread);
+        self.1.enter_fragment_spread(ctx, fragment_spread);
+    }
+
+    fn exit_fragment_spread(
+        &mut self,
+        ctx: &mut ValidationContext,
+        fragment_spread: &'a FragmentSpread<'a, String>,
+    ) {
+        self.0.exit_fragment_spread(ctx, fragment_spread);
+        self.1.exit_fragment_spread(ctx, fragment_spread);
+    }
+
+    fn enter_inline_fragment(
+        &mut self,
+        ctx: &mut ValidationContext,
+        inline_fragment: &'a InlineFragment<'a, String>,
+    ) {
+        self.0.enter_inline_fragment(ctx, inline_fragment);
+        self.1.enter_inline_fragment(ctx, inline_fragment);
+    }
+
+    fn exit_inline_fragment(
+        &mut self,
+        ctx: &mut ValidationContext,
+        inline_fragment: &'a InlineFragment<'a, String>,
+    ) {
+        self.0.exit_inline_fragment(ctx, inline_fragment);
+        self.1.exit_inline_fragment(ctx, inline_fragment);
+    }
+
+    fn enter_argument(
+        &mut self,
+        ctx: &mut ValidationContext,
+        arg_name: &'a str,
+        arg_value: &'a Value<'a, String>,
+    ) {
+        self.0.enter_argument(ctx, arg_name, arg_value);
+        self.1.enter_argument(ctx, arg_name, arg_value);
+    }
+
+    fn exit_argument(
+        &mut self,
+        ctx: &mut ValidationContext,
+        arg_name: &'a str,
+        arg_value: &'a Value<'a, String>,
+    ) {
+        self.0.exit_argument(ctx, arg_name, arg_value);
+        self.1.exit_argument(ctx, arg_name, arg_value);
+    }
+
+    fn enter_input_value(
+        &mut self,
+        ctx: &mut ValidationContext,
+        expected_type: &Option<Type<'a, String>>,
+        value: &'a Value<'a, String>,
+        pos: Pos,
+    ) {
+        self.0.enter_input_value(ctx, expected_type, value, pos);
+        self.1.enter_input_value(ctx, expected_type, value, pos);
+    }
+
+    fn exit_input_value(
+        &mut self,
+        ctx: &mut ValidationContext,
+        expected_type: &Option<Type<'a, String>>,
+        value: &'a Value<'a, String>,
+        pos: Pos,
+    ) {
+        self.0.exit_input_value(ctx, expected_type, value, pos);
+        self.1.exit_input_value(ctx, expected_type, value, pos);
+    }
+}
+
 pub trait Visitor<'a> {
     fn enter_document(&mut self, _ctx: &mut ValidationContext<'a>, _doc: &'a Document<'a, String>) {
     }
