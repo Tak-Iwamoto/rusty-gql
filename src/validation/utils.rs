@@ -2,7 +2,7 @@ use std::collections::HashSet;
 
 use graphql_parser::{
     query::OperationDefinition,
-    schema::{Type, Value},
+    schema::{Field, Type, TypeDefinition, Value},
     Pos,
 };
 
@@ -191,5 +191,59 @@ pub fn get_operation_def_position<'a>(
         OperationDefinition::Query(query) => query.position,
         OperationDefinition::Mutation(mutation) => mutation.position,
         OperationDefinition::Subscription(subscription) => subscription.position,
+    }
+}
+
+pub fn is_composite_type(ty: &GqlTypeDefinition) -> bool {
+    matches!(
+        ty,
+        &GqlTypeDefinition::Object(_)
+            | &GqlTypeDefinition::Interface(_)
+            | &GqlTypeDefinition::Union(_)
+    )
+}
+
+pub fn is_input_type(ty: &GqlTypeDefinition) -> bool {
+    matches!(
+        ty,
+        &GqlTypeDefinition::Scalar(_)
+            | &GqlTypeDefinition::InputObject(_)
+            | &GqlTypeDefinition::Enum(_)
+    )
+}
+
+pub fn is_leaf_type(ty: &GqlTypeDefinition) -> bool {
+    matches!(
+        ty,
+        &GqlTypeDefinition::Enum(_) | &GqlTypeDefinition::Scalar(_)
+    )
+}
+
+pub fn type_name_from_def<'a>(type_definition: &TypeDefinition<'a, String>) -> String {
+    match type_definition {
+        TypeDefinition::Scalar(scalar) => scalar.name.clone(),
+        TypeDefinition::Object(obj) => obj.name.clone(),
+        TypeDefinition::Interface(interface) => interface.name.clone(),
+        TypeDefinition::Union(uni) => uni.name.clone(),
+        TypeDefinition::Enum(enu) => enu.name.clone(),
+        TypeDefinition::InputObject(input_obj) => input_obj.name.clone(),
+    }
+}
+
+pub fn get_field_by_name<'a>(
+    type_definition: &TypeDefinition<'a, String>,
+    name: &str,
+) -> Option<Field<'a, String>> {
+    get_ty_def_fields(type_definition)
+        .and_then(|fields| fields.iter().find(|f| f.name == name).map(Clone::clone))
+}
+
+fn get_ty_def_fields<'a>(
+    type_definition: &TypeDefinition<'a, String>,
+) -> Option<Vec<Field<'a, String>>> {
+    match type_definition {
+        TypeDefinition::Object(obj) => Some(obj.fields.clone()),
+        TypeDefinition::Interface(interface) => Some(interface.fields.clone()),
+        _ => None,
     }
 }

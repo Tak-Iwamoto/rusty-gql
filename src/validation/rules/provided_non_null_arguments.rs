@@ -3,7 +3,7 @@ use graphql_parser::{query::Field, schema::Directive};
 use crate::{
     types::GqlValueType,
     validation::{
-        utils::get_type_name,
+        utils::{get_field_by_name, get_type_name, type_name_from_def},
         visitor::{ValidationContext, Visitor},
     },
     GqlTypeDefinition,
@@ -46,12 +46,10 @@ impl<'a> Visitor<'a> for ProvidedNonNullArguments {
             let is_exist = ctx
                 .schema
                 .type_definitions
-                .get(&GqlTypeDefinition::type_name_from_def(parent_type))
+                .get(&type_name_from_def(parent_type))
                 .is_some();
             if is_exist {
-                if let Some(target_field) =
-                    GqlTypeDefinition::get_field_by_name(&parent_type, &field.name)
-                {
+                if let Some(target_field) = get_field_by_name(&parent_type, &field.name) {
                     for arg in &target_field.arguments {
                         if GqlValueType::from(arg.value_type.clone()).is_non_null()
                             && !field.arguments.iter().any(|(name, _)| name.eq(&arg.name))
@@ -61,7 +59,7 @@ impl<'a> Visitor<'a> for ProvidedNonNullArguments {
                                     "Field {} argument {} of type {} is required but not provided",
                                     field.name,
                                     arg.name,
-                                    GqlTypeDefinition::type_name_from_def(parent_type),
+                                    type_name_from_def(parent_type),
                                 ),
                                 vec![field.position],
                             )

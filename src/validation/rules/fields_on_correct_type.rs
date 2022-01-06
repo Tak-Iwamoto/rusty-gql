@@ -1,7 +1,10 @@
 use graphql_parser::{query::Field, schema::TypeDefinition};
 
 use crate::{
-    validation::visitor::{ValidationContext, Visitor},
+    validation::{
+        utils::{get_field_by_name, type_name_from_def},
+        visitor::{ValidationContext, Visitor},
+    },
     GqlTypeDefinition,
 };
 
@@ -20,12 +23,12 @@ impl<'a> Visitor<'a> for FieldsOnCorrectType {
                 }
             }
 
-            if GqlTypeDefinition::get_field_by_name(&parent_type, &field.name).is_none() {
+            if get_field_by_name(&parent_type, &field.name).is_none() {
                 ctx.add_error(
                     format!(
                         "Unknown field \"{}\" on type \"{}\"",
                         field.name,
-                        GqlTypeDefinition::type_name_from_def(parent_type)
+                        type_name_from_def(parent_type)
                     ),
                     vec![field.position],
                 )

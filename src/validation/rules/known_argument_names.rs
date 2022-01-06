@@ -4,7 +4,10 @@ use graphql_parser::{
 };
 
 use crate::{
-    validation::visitor::{ValidationContext, Visitor},
+    validation::{
+        utils::{get_field_by_name, type_name_from_def},
+        visitor::{ValidationContext, Visitor},
+    },
     GqlTypeDefinition,
 };
 
@@ -49,9 +52,7 @@ impl<'a> Visitor<'a> for KnownArgumentNames<'a> {
 
     fn enter_field(&mut self, ctx: &mut ValidationContext, field: &'a Field<'a, String>) {
         if let Some(parent_type) = ctx.parent_type() {
-            if let Some(target_field) =
-                GqlTypeDefinition::get_field_by_name(parent_type, &field.name)
-            {
+            if let Some(target_field) = get_field_by_name(parent_type, &field.name) {
                 self.current_args = Some((
                     target_field
                         .arguments
@@ -60,7 +61,7 @@ impl<'a> Visitor<'a> for KnownArgumentNames<'a> {
                         .collect(),
                     ArgsPosition::Field {
                         field_name: &field.name,
-                        type_name: GqlTypeDefinition::type_name_from_def(parent_type),
+                        type_name: type_name_from_def(parent_type),
                     },
                 ))
             }

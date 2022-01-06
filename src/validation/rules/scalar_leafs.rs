@@ -1,7 +1,10 @@
 use graphql_parser::query::Field;
 
 use crate::{
-    validation::visitor::{ValidationContext, Visitor},
+    validation::{
+        utils::{get_field_by_name, is_leaf_type, type_name_from_def},
+        visitor::{ValidationContext, Visitor},
+    },
     GqlTypeDefinition,
 };
 
@@ -14,21 +17,19 @@ impl<'a> Visitor<'a> for ScalarLeafs {
             let is_exist = ctx
                 .schema
                 .type_definitions
-                .get(&GqlTypeDefinition::type_name_from_def(parent_type))
+                .get(&type_name_from_def(parent_type))
                 .is_some();
 
             if is_exist {
-                if let Some(target_field) =
-                    GqlTypeDefinition::get_field_by_name(parent_type, &field.name)
-                {
+                if let Some(target_field) = get_field_by_name(parent_type, &field.name) {
                     let target = ctx.schema.type_definitions.get(&target_field.name);
 
-                    if let Some(f) = target {
-                        if f.is_leaf_type() && !field.selection_set.items.is_empty() {
+                    if let Some(ty) = target {
+                        if is_leaf_type(ty) && !field.selection_set.items.is_empty() {
                             ctx.add_error(
-                        format!("Field {} must not have a selection items because type {} has no subfields", &field.name, f.to_string()),
+                        format!("Field {} must not have a selection items because type {} has no subfields", &field.name, ty.to_string()),
                         vec![field.position])
-                        } else if !f.is_leaf_type() && field.selection_set.items.is_empty() {
+                        } else if !is_leaf_type(ty) && field.selection_set.items.is_empty() {
                             ctx.add_error(
                                 format!("Field {} must have selection items", &field.name),
                                 vec![field.position],

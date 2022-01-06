@@ -1,4 +1,7 @@
-use crate::validation::visitor::{ValidationContext, Visitor};
+use crate::validation::{
+    utils::is_input_type,
+    visitor::{ValidationContext, Visitor},
+};
 
 #[derive(Default)]
 pub struct VariablesAreInputTypes;
@@ -9,10 +12,10 @@ impl<'a> Visitor<'a> for VariablesAreInputTypes {
         ctx: &mut ValidationContext,
         variable_definition: &'a graphql_parser::query::VariableDefinition<'a, String>,
     ) {
-        let gql_type = ctx.schema.type_definitions.get(&variable_definition.name);
+        let ty = ctx.schema.type_definitions.get(&variable_definition.name);
 
-        if let Some(variable_type) = gql_type {
-            if !variable_type.is_input_type() {
+        if let Some(variable_type) = ty {
+            if !is_input_type(variable_type) {
                 ctx.add_error(
                     format!(
                         "Variable {} cannot be non-input type {}",
