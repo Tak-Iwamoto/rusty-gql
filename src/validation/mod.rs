@@ -19,7 +19,6 @@ pub fn apply_validation<'a>(
 ) -> Result<(), Vec<GqlError>> {
     let mut ctx = ValidationContext::new(schema, query_doc, variables, fragments);
     let mut visitor = NewVisitor
-        .with(rules::ArgumentsOfCorrectType::default())
         .with(rules::DefaultValueOfCorrectType::default())
         .with(rules::FieldsOnCorrectType::default())
         .with(rules::FragmentsOnCompositeTypes::default())
@@ -39,6 +38,7 @@ pub fn apply_validation<'a>(
         .with(rules::UniqueVariableNames::default())
         .with(rules::VariablesAreInputTypes::default())
         .with(rules::VariablesInAllowedPosition::default());
+        // .with(rules::ArgumentsOfCorrectType::default())
 
     visit(&mut visitor, &mut ctx, query_doc, operation_name);
 
