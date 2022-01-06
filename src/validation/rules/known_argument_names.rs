@@ -3,12 +3,9 @@ use graphql_parser::{
     schema::{Directive, Value},
 };
 
-use crate::{
-    validation::{
-        utils::{get_field_by_name, type_name_from_def},
-        visitor::{ValidationContext, Visitor},
-    },
-    GqlTypeDefinition,
+use crate::validation::{
+    utils::{get_field_by_name, type_name_from_def},
+    visitor::{ValidationContext, Visitor},
 };
 
 #[derive(Default)]

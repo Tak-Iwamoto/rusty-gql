@@ -6,7 +6,6 @@ use crate::{
         utils::{get_field_by_name, get_type_name, type_name_from_def},
         visitor::{ValidationContext, Visitor},
     },
-    GqlTypeDefinition,
 };
 
 #[derive(Default)]

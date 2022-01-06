@@ -1,11 +1,8 @@
 use graphql_parser::{query::Field, schema::TypeDefinition};
 
-use crate::{
-    validation::{
-        utils::{get_field_by_name, type_name_from_def},
-        visitor::{ValidationContext, Visitor},
-    },
-    GqlTypeDefinition,
+use crate::validation::{
+    utils::{get_field_by_name, type_name_from_def},
+    visitor::{ValidationContext, Visitor},
 };
 
 #[derive(Default)]
