@@ -53,8 +53,8 @@ impl<'a> Visitor<'a> for KnownArgumentNames<'a> {
                 self.current_args = Some((
                     target_field
                         .arguments
-                        .into_iter()
-                        .map(|arg| arg.name)
+                        .iter()
+                        .map(|arg| arg.name.clone())
                         .collect(),
                     ArgsPosition::Field {
                         field_name: &field.name,

@@ -40,7 +40,7 @@ impl<'a> VariablesInAllowedPosition<'a> {
         if let Some(usages) = self.variable_usages.get(scope) {
             for (var_name, usage_pos, var_type) in usages {
                 if let Some(var_def) = variable_defs.iter().find(|def| def.name == *var_name) {
-                    if !is_gql_sub_type(var_type, &GqlValueType::from(var_def.var_type)) {
+                    if !is_gql_sub_type(var_type, &GqlValueType::from(var_def.var_type.clone())) {
                         ctx.add_error(
                             format!(
                                 "Variable {} of type {} used in positon expecting type {}",

@@ -644,8 +644,8 @@ fn visit_field<'a, T: Visitor<'a>>(
                     .find(|arg| &arg.name == arg_name)
             })
             .map(|arg| arg.meta_type.clone());
-        ctx.with_input_type(expected_ty, |ctx| {
-            visit_input_value(visitor, ctx, field.position, expected_ty, arg_value)
+        ctx.with_input_type(expected_ty.clone(), |ctx| {
+            visit_input_value(visitor, ctx, field.position, expected_ty.clone(), arg_value)
         });
         visitor.exit_argument(ctx, arg_name, arg_value);
     }
@@ -700,8 +700,14 @@ fn visit_directives<'a, T: Visitor<'a>>(
             let expected_ty = schema_directive
                 .and_then(|dir| dir.arguments.iter().find(|arg| &arg.name == arg_name))
                 .map(|arg| arg.meta_type.clone());
-            ctx.with_input_type(expected_ty, |ctx| {
-                visit_input_value(visitor, ctx, directive.position, expected_ty.clone(), arg_value)
+            ctx.with_input_type(expected_ty.clone(), |ctx| {
+                visit_input_value(
+                    visitor,
+                    ctx,
+                    directive.position,
+                    expected_ty.clone(),
+                    arg_value,
+                )
             });
             visitor.exit_argument(ctx, arg_name, arg_value);
         }
@@ -744,7 +750,7 @@ fn visit_input_value<'a, T: Visitor<'a>>(
     visitor.enter_input_value(ctx, &expected_type, value, pos);
     match value {
         Value::List(values) => {
-            if let Some(expected_ty) = expected_type {
+            if let Some(expected_ty) = expected_type.clone() {
                 if let GqlValueType::ListType(expected_ty) = expected_ty {
                     values.iter().for_each(|value| {
                         // visit_input_value(visitor, ctx, pos, &Some(expected_ty), value)
@@ -753,7 +759,7 @@ fn visit_input_value<'a, T: Visitor<'a>>(
             }
         }
         Value::Object(values) => {
-            if let Some(expected_ty) = expected_type {
+            if let Some(expected_ty) = expected_type.clone() {
                 if let GqlValueType::NamedType(expected_ty) = expected_ty {
                     if let Some(ty) = ctx.schema.type_definitions.get(&expected_ty) {
                         for (item_key, item_value) in values {
