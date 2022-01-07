@@ -1,8 +1,11 @@
-use graphql_parser::{query::Field, schema::TypeDefinition};
+use graphql_parser::query::Field;
 
-use crate::validation::{
-    utils::{get_field_by_name, type_name_from_def},
-    visitor::{ValidationContext, Visitor},
+use crate::{
+    validation::{
+        utils::type_name_from_def,
+        visitor::{ValidationContext, Visitor},
+    },
+    GqlTypeDefinition,
 };
 
 #[derive(Default)]
@@ -13,14 +16,14 @@ impl<'a> Visitor<'a> for FieldsOnCorrectType {
         if let Some(parent_type) = ctx.parent_type() {
             if matches!(
                 parent_type,
-                TypeDefinition::Union(_) | TypeDefinition::Interface(_)
+                GqlTypeDefinition::Union(_) | GqlTypeDefinition::Interface(_)
             ) {
                 if field.name == "__typename" {
                     return;
                 }
             }
 
-            if get_field_by_name(&parent_type, &field.name).is_none() {
+            if parent_type.get_field_by_name(&field.name).is_none() {
                 ctx.add_error(
                     format!(
                         "Unknown field \"{}\" on type \"{}\"",

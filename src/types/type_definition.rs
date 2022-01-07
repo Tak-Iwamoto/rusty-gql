@@ -75,4 +75,9 @@ impl GqlTypeDefinition {
             _ => None,
         }
     }
+
+    pub fn get_field_by_name(&self, name: &str) -> Option<&GqlField> {
+        self.fields()
+            .and_then(|fields| fields.into_iter().find(|f| f.name == name))
+    }
 }

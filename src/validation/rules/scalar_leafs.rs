@@ -1,7 +1,7 @@
 use graphql_parser::query::Field;
 
 use crate::validation::{
-    utils::{get_field_by_name, is_leaf_type, type_name_from_def},
+    utils::{is_leaf_type, type_name_from_def},
     visitor::{ValidationContext, Visitor},
 };
 
@@ -18,7 +18,7 @@ impl<'a> Visitor<'a> for ScalarLeafs {
                 .is_some();
 
             if is_exist {
-                if let Some(target_field) = get_field_by_name(parent_type, &field.name) {
+                if let Some(target_field) = parent_type.get_field_by_name(&field.name) {
                     let target = ctx.schema.type_definitions.get(&target_field.name);
 
                     if let Some(ty) = target {

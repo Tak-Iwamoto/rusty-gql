@@ -9,7 +9,11 @@ use graphql_parser::{
     Pos,
 };
 
-use crate::{error::Location, GqlError, Schema, Variables};
+use crate::{
+    error::Location, GqlError, GqlTypeDefinition, GqlValue, GqlValueType, Schema, Variables,
+};
+
+use super::utils::get_fragment_definition_on_str;
 
 #[derive(Clone)]
 pub struct ValidationError {
@@ -43,10 +47,9 @@ pub struct ValidationContext<'a> {
     pub(crate) errors: Vec<ValidationError>,
     pub(crate) fragments: &'a HashMap<String, FragmentDefinition<'a, String>>,
     pub(crate) variables: Option<&'a Variables>,
-    pub type_stack: Vec<Option<&'a TypeDefinition<'a, String>>>,
-    pub parent_type_stack: Vec<Option<&'a TypeDefinition<'a, String>>>,
+    pub type_stack: Vec<Option<&'a GqlTypeDefinition>>,
+    pub input_type: Vec<Option<GqlValueType>>,
 }
-
 impl<'a> ValidationContext<'a> {
     pub fn new(
         schema: &'a Schema,
@@ -56,11 +59,11 @@ impl<'a> ValidationContext<'a> {
     ) -> Self {
         ValidationContext {
             schema,
-            errors: vec![],
             fragments,
             variables,
-            type_stack: vec![],
-            parent_type_stack: vec![],
+            errors: Default::default(),
+            type_stack: Default::default(),
+            input_type: Default::default(),
         }
     }
 
@@ -74,15 +77,40 @@ impl<'a> ValidationContext<'a> {
         self.errors.extend(errors);
     }
 
-    pub fn current_type(&self) -> Option<&'a TypeDefinition<'a, String>> {
+    pub fn current_type(&self) -> Option<&'a GqlTypeDefinition> {
         self.type_stack.last().copied().flatten()
     }
+    pub fn parent_type(&self) -> Option<&'a GqlTypeDefinition> {
+        if self.type_stack.len() >= 2 {
+            self.type_stack
+                .get(self.type_stack.len() - 2)
+                .copied()
+                .flatten()
+        } else {
+            None
+        }
+    }
 
-    pub fn parent_type(&self) -> Option<&'a TypeDefinition<'a, String>> {
-        *self.parent_type_stack.last().unwrap_or(&None)
+    pub(crate) fn with_type<F: FnMut(&mut ValidationContext<'a>)>(
+        &mut self,
+        ty: Option<&'a GqlTypeDefinition>,
+        mut f: F,
+    ) {
+        self.type_stack.push(ty);
+        f(self);
+        self.type_stack.pop();
+    }
+
+    pub(crate) fn with_input_type<F: FnMut(&mut ValidationContext<'a>)>(
+        &mut self,
+        ty: Option<GqlValueType>,
+        mut f: F,
+    ) {
+        self.input_type.push(ty);
+        f(self);
+        self.input_type.pop();
     }
 }
-
 pub struct NewVisitor;
 
 impl NewVisitor {
@@ -305,7 +333,7 @@ where
     fn enter_input_value(
         &mut self,
         ctx: &mut ValidationContext,
-        expected_type: &Option<Type<'a, String>>,
+        expected_type: &Option<GqlValueType>,
         value: &'a Value<'a, String>,
         pos: Pos,
     ) {
@@ -316,7 +344,7 @@ where
     fn exit_input_value(
         &mut self,
         ctx: &mut ValidationContext,
-        expected_type: &Option<Type<'a, String>>,
+        expected_type: &Option<GqlValueType>,
         value: &'a Value<'a, String>,
         pos: Pos,
     ) {
@@ -461,7 +489,7 @@ pub trait Visitor<'a> {
     fn enter_input_value(
         &mut self,
         _ctx: &mut ValidationContext,
-        _expected_type: &Option<Type<'a, String>>,
+        _expected_type: &Option<GqlValueType>,
         _value: &'a Value<'a, String>,
         _pos: Pos,
     ) {
@@ -470,7 +498,7 @@ pub trait Visitor<'a> {
     fn exit_input_value(
         &mut self,
         _ctx: &mut ValidationContext,
-        _expected_type: &Option<Type<'a, String>>,
+        _expected_type: &Option<GqlValueType>,
         _value: &'a Value<'a, String>,
         _pos: Pos,
     ) {
@@ -499,30 +527,22 @@ fn visit_definitions<'a, T: Visitor<'a>>(
             Definition::Operation(operation_definition) => {
                 visit_operation_definition(visitor, ctx, operation_name, operation_definition);
             }
-            Definition::Fragment(fragment_definition) => visit_fragment_definition(
-                visitor,
-                ctx,
-                &fragment_definition.name,
-                fragment_definition,
-            ),
+            Definition::Fragment(fragment_definition) => {
+                let on_ty =
+                    get_fragment_definition_on_str(Some(&fragment_definition.type_condition));
+                if let Some(ty) = on_ty {
+                    ctx.with_type(ctx.schema.type_definitions.get(&ty), |ctx| {
+                        visit_fragment_definition(
+                            visitor,
+                            ctx,
+                            fragment_definition.name.as_str(),
+                            fragment_definition,
+                        )
+                    })
+                }
+            }
         }
         exit_definition(visitor, ctx, def, operation_name);
-    }
-}
-
-fn visit_definition<'a, T: Visitor<'a>>(
-    visitor: &mut T,
-    ctx: &mut ValidationContext<'a>,
-    definition: &'a Definition<'a, String>,
-    operation_name: Option<&'a str>,
-) {
-    match definition {
-        Definition::Operation(operation_definition) => {
-            visit_operation_definition(visitor, ctx, operation_name, operation_definition)
-        }
-        Definition::Fragment(fragment_def) => {
-            visitor.enter_fragment_definition(ctx, &fragment_def.name, fragment_def)
-        }
     }
 }
 
@@ -579,13 +599,27 @@ fn visit_selection<'a, T: Visitor<'a>>(
     visitor.enter_selection(ctx, selection);
     match selection {
         Selection::Field(field) => {
-            visit_field(visitor, ctx, field);
+            if field.name != "__typename" {
+                ctx.with_type(
+                    ctx.current_type()
+                        .and_then(|ty| ty.get_field_by_name(&field.name))
+                        .and_then(|f| ctx.schema.type_definitions.get(&f.name)),
+                    |ctx| visit_field(visitor, ctx, field),
+                )
+            }
         }
         Selection::FragmentSpread(fragment_spread) => {
             visit_fragment_spread(visitor, ctx, fragment_spread);
         }
         Selection::InlineFragment(inline_fragment) => {
-            visit_inline_fragment(visitor, ctx, inline_fragment);
+            let on_ty = get_fragment_definition_on_str(inline_fragment.type_condition.as_ref());
+            if let Some(ty) = on_ty {
+                ctx.with_type(ctx.schema.type_definitions.get(&ty), |ctx| {
+                    visit_inline_fragment(visitor, ctx, inline_fragment)
+                })
+            } else {
+                visit_inline_fragment(visitor, ctx, inline_fragment);
+            }
         }
     }
     visitor.exit_selection(ctx, selection);
@@ -600,6 +634,19 @@ fn visit_field<'a, T: Visitor<'a>>(
 
     for (arg_name, arg_value) in &field.arguments {
         visitor.enter_argument(ctx, arg_name, arg_value);
+        let expected_ty = ctx
+            .parent_type()
+            .and_then(|ty| ty.get_field_by_name(&field.name))
+            .and_then(|schema_field| {
+                schema_field
+                    .arguments
+                    .iter()
+                    .find(|arg| &arg.name == arg_name)
+            })
+            .map(|arg| arg.meta_type.clone());
+        ctx.with_input_type(expected_ty, |ctx| {
+            visit_input_value(visitor, ctx, field.position, expected_ty, arg_value)
+        });
         visitor.exit_argument(ctx, arg_name, arg_value);
     }
     visitor.exit_field(ctx, field);
@@ -646,8 +693,16 @@ fn visit_directives<'a, T: Visitor<'a>>(
     for directive in directives {
         visitor.enter_directive(ctx, directive);
 
+        let schema_directive = ctx.schema.directives.get(&directive.name);
+
         for (arg_name, arg_value) in &directive.arguments {
             visitor.enter_argument(ctx, arg_name, arg_value);
+            let expected_ty = schema_directive
+                .and_then(|dir| dir.arguments.iter().find(|arg| &arg.name == arg_name))
+                .map(|arg| arg.meta_type.clone());
+            ctx.with_input_type(expected_ty, |ctx| {
+                visit_input_value(visitor, ctx, directive.position, expected_ty.clone(), arg_value)
+            });
             visitor.exit_argument(ctx, arg_name, arg_value);
         }
         visitor.exit_directive(ctx, directive);
@@ -677,4 +732,46 @@ fn visit_variable_definitions<'a, T: Visitor<'a>>(
         visitor.enter_variable_definition(ctx, def);
         visitor.exit_variable_definition(ctx, def);
     }
+}
+
+fn visit_input_value<'a, T: Visitor<'a>>(
+    visitor: &mut T,
+    ctx: &mut ValidationContext<'a>,
+    pos: Pos,
+    expected_type: Option<GqlValueType>,
+    value: &'a Value<'a, String>,
+) {
+    visitor.enter_input_value(ctx, &expected_type, value, pos);
+    match value {
+        Value::List(values) => {
+            if let Some(expected_ty) = expected_type {
+                if let GqlValueType::ListType(expected_ty) = expected_ty {
+                    values.iter().for_each(|value| {
+                        // visit_input_value(visitor, ctx, pos, &Some(expected_ty), value)
+                    })
+                }
+            }
+        }
+        Value::Object(values) => {
+            if let Some(expected_ty) = expected_type {
+                if let GqlValueType::NamedType(expected_ty) = expected_ty {
+                    if let Some(ty) = ctx.schema.type_definitions.get(&expected_ty) {
+                        for (item_key, item_value) in values {
+                            if let Some(input_value) = ty.get_field_by_name(&item_key) {
+                                visit_input_value(
+                                    visitor,
+                                    ctx,
+                                    pos,
+                                    Some(input_value.meta_type.clone()),
+                                    item_value,
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        _ => {}
+    }
+    visitor.exit_input_value(ctx, &expected_type, value, pos)
 }

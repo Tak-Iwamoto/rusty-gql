@@ -8,15 +8,18 @@ use graphql_parser::{
     Pos,
 };
 
-use crate::validation::{
-    utils::{is_sub_type, Scope},
-    visitor::{ValidationContext, Visitor},
+use crate::{
+    validation::{
+        utils::{is_gql_sub_type, is_sub_type, Scope},
+        visitor::{ValidationContext, Visitor},
+    },
+    GqlValueType,
 };
 
 #[derive(Default)]
 pub struct VariablesInAllowedPosition<'a> {
     current_scope: Option<Scope<'a>>,
-    variable_usages: HashMap<Scope<'a>, Vec<(&'a str, Pos, Type<'a, String>)>>,
+    variable_usages: HashMap<Scope<'a>, Vec<(&'a str, Pos, GqlValueType)>>,
     variable_definitions: HashMap<Scope<'a>, Vec<&'a VariableDefinition<'a, String>>>,
     fragment_spreads: HashMap<Scope<'a>, HashSet<&'a str>>,
 }
@@ -37,11 +40,14 @@ impl<'a> VariablesInAllowedPosition<'a> {
         if let Some(usages) = self.variable_usages.get(scope) {
             for (var_name, usage_pos, var_type) in usages {
                 if let Some(var_def) = variable_defs.iter().find(|def| def.name == *var_name) {
-                    if !is_sub_type(var_type, &var_def.var_type) {
+                    if !is_gql_sub_type(var_type, &GqlValueType::from(var_def.var_type)) {
                         ctx.add_error(
                             format!(
                                 "Variable {} of type {} used in positon expecting type {}",
-                                var_name, var_type, &var_def.var_type
+                                var_name,
+                                // TODO: gqlのtypeの文字列に変換する
+                                var_type.name(),
+                                &var_def.var_type
                             ),
                             vec![var_def.position, *usage_pos],
                         )
@@ -112,7 +118,7 @@ impl<'a> Visitor<'a> for VariablesInAllowedPosition<'a> {
     fn enter_input_value(
         &mut self,
         _ctx: &mut ValidationContext,
-        expected_type: &Option<Type<'a, String>>,
+        expected_type: &Option<GqlValueType>,
         value: &'a Value<'a, String>,
         pos: Pos,
     ) {
