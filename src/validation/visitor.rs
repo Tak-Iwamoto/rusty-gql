@@ -674,6 +674,9 @@ fn visit_fragment_spread<'a, T: Visitor<'a>>(
 ) {
     visitor.enter_fragment_spread(ctx, fragment_spread);
     visit_directives(visitor, ctx, &fragment_spread.directives);
+    if let Some(fragment) = ctx.fragments.get(&fragment_spread.fragment_name) {
+        visit_selection_set(visitor, ctx, &fragment.selection_set);
+    }
     visitor.exit_fragment_spread(ctx, fragment_spread);
 }
 
