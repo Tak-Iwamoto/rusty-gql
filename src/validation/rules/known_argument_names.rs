@@ -163,8 +163,10 @@ mod tests {
     fn no_arguments_when_optional() {
         let query_doc = r#"
         {
-            search {
-                name
+            hero {
+                friendsConnection {
+                    totalCount
+                }
             }
         }
         "#;
@@ -178,8 +180,10 @@ mod tests {
     fn invalid_argument_name() {
         let query_doc = r#"
         {
-            droid(invalid: "value") {
-                name
+            hero {
+                friendsConnection(invalid: "value") {
+                    totalCount
+                }
             }
         }
         "#;
