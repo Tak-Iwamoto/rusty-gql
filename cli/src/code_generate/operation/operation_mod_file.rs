@@ -1,7 +1,6 @@
 use std::collections::BTreeMap;
 
 use codegen::{Scope, Type};
-use heck::ToSnakeCase;
 use rusty_gql::{GqlField, OperationType};
 
 use crate::code_generate::{use_gql_definitions, util::gql_value_ty_to_rust_ty, FileDefinition};
@@ -26,7 +25,7 @@ impl<'a> FileDefinition for OperationModFile<'a> {
         let mut result = String::from("");
 
         for (operation_name, _) in self.operations.iter() {
-            let file_name = operation_name.to_snake_case();
+            let file_name = operation_name;
             result += format!("mod {};\n", file_name,).as_str();
         }
 
@@ -45,14 +44,11 @@ impl<'a> OperationModFile<'a> {
         let imp = scope.new_impl(&struct_name);
 
         for (operation_name, method) in self.operations.iter() {
-            let fn_scope = imp.new_fn(&operation_name.to_snake_case());
+            let fn_scope = imp.new_fn(&operation_name);
             let mut args_str = String::from("");
             for arg in &method.arguments {
-                fn_scope.arg(
-                    &arg.name.to_snake_case(),
-                    gql_value_ty_to_rust_ty(&arg.meta_type),
-                );
-                args_str += format!("{},", &arg.name.to_snake_case()).as_str();
+                fn_scope.arg(&arg.name, gql_value_ty_to_rust_ty(&arg.meta_type));
+                args_str += format!("{},", &arg.name).as_str();
             }
             // remove last `,`
             args_str.pop();
@@ -71,11 +67,11 @@ impl<'a> OperationModFile<'a> {
                 fn_scope.ret(Type::new(&return_ty));
             }
 
-            let file_name = operation_name.to_snake_case();
+            let file_name = operation_name;
             fn_scope.line(format!(
                 "{file_name}::{method}({args}).await",
                 file_name = file_name,
-                method = method.name.to_snake_case(),
+                method = method.name,
                 args = args_str
             ));
         }

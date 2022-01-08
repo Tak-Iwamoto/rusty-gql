@@ -6,7 +6,6 @@ mod scalar_file;
 mod union_file;
 
 use futures_util::future::try_join_all;
-use heck::ToSnakeCase;
 use rusty_gql::{GqlInterface, GqlTypeDefinition, Schema};
 use std::{collections::BTreeMap, io::Error};
 
@@ -91,7 +90,7 @@ async fn create_type_definition_file(
     base_path: &str,
     interfaces_map: BTreeMap<String, GqlInterface>,
 ) -> Result<(), Error> {
-    let file_name = type_def.name().to_snake_case();
+    let file_name = type_def.name();
     match type_def {
         GqlTypeDefinition::Scalar(def) => {
             let path = path_str(vec![base_path, "scalar", &file_name], true);

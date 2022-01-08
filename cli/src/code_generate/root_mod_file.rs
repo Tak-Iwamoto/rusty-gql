@@ -1,5 +1,3 @@
-use heck::ToSnakeCase;
-
 use crate::code_generate::FileDefinition;
 
 use super::path_str;
@@ -18,9 +16,8 @@ impl<'a> FileDefinition for RootModFile<'a> {
         let mut mod_str = String::from("");
         let mut pub_use_str = String::from("");
         for name in &self.file_names {
-            let snake_case_name = name.to_snake_case();
-            mod_str += format!("mod {};\n", &snake_case_name).as_str();
-            pub_use_str += format!("pub use {}::*;\n", &snake_case_name).as_str();
+            mod_str += format!("mod {};\n", &name).as_str();
+            pub_use_str += format!("pub use {}::*;\n", &name).as_str();
         }
 
         format!("{}\n{}", mod_str, pub_use_str)

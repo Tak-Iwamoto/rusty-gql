@@ -1,5 +1,4 @@
 use codegen::{Scope, Type};
-use heck::ToSnakeCase;
 use rusty_gql::GqlInterface;
 
 use crate::code_generate::{use_gql_definitions, util::gql_value_ty_to_rust_ty, FileDefinition};
@@ -27,7 +26,7 @@ impl<'a> FileDefinition for InterfaceFile<'a> {
             .vis("pub");
 
         for field in &self.def.fields {
-            let field_name = &field.name.to_snake_case();
+            let field_name = &field.name;
             let return_ty = gql_value_ty_to_rust_ty(&field.meta_type);
             let is_interface_return_ty = self
                 .interface_names
@@ -41,10 +40,7 @@ impl<'a> FileDefinition for InterfaceFile<'a> {
                 fn_scope.generic(&format!("T: {}", &name));
                 fn_scope.ret(Type::new(&return_ty.replace(name, "T")));
                 for arg in &field.arguments {
-                    fn_scope.arg(
-                        &arg.name.to_snake_case(),
-                        gql_value_ty_to_rust_ty(&arg.meta_type),
-                    );
+                    fn_scope.arg(&arg.name, gql_value_ty_to_rust_ty(&arg.meta_type));
                 }
             } else {
                 let fn_scope = trait_scope.new_fn(&field_name);
@@ -52,10 +48,7 @@ impl<'a> FileDefinition for InterfaceFile<'a> {
                 fn_scope.arg_ref_self();
                 fn_scope.ret(Type::new(&return_ty));
                 for arg in &field.arguments {
-                    fn_scope.arg(
-                        &arg.name.to_snake_case(),
-                        gql_value_ty_to_rust_ty(&arg.meta_type),
-                    );
+                    fn_scope.arg(&arg.name, gql_value_ty_to_rust_ty(&arg.meta_type));
                 }
             }
         }

@@ -1,7 +1,6 @@
 use std::collections::BTreeMap;
 
 use codegen::{Scope, Type};
-use heck::ToSnakeCase;
 use rusty_gql::{GqlField, GqlInterface, GqlObject};
 
 use crate::code_generate::{
@@ -43,7 +42,7 @@ impl<'a> FileDefinition for ObjectFile<'a> {
 
             if let Some(gql_interface) = self.interfaces_map.get(interface) {
                 for field in &gql_interface.fields {
-                    let field_name = &field.name.to_snake_case();
+                    let field_name = &field.name;
                     let return_ty = gql_value_ty_to_rust_ty(&field.meta_type);
                     let fn_scope = impl_interface.new_fn(&field_name);
                     fn_scope.set_async(true);
@@ -51,10 +50,7 @@ impl<'a> FileDefinition for ObjectFile<'a> {
 
                     implemented_fields.push(field_name.to_string());
                     for arg in &field.arguments {
-                        fn_scope.arg(
-                            &arg.name.to_snake_case(),
-                            gql_value_ty_to_rust_ty(&arg.meta_type),
-                        );
+                        fn_scope.arg(&arg.name, gql_value_ty_to_rust_ty(&arg.meta_type));
                     }
 
                     if self.is_return_interface_ty(field) {
@@ -76,7 +72,7 @@ impl<'a> FileDefinition for ObjectFile<'a> {
         let struct_imp = impl_scope.new_impl(&struct_name.to_string());
 
         for field in &self.def.fields {
-            let field_name = &field.name.to_snake_case();
+            let field_name = &field.name;
             let return_ty = gql_value_ty_to_rust_ty(&field.meta_type);
             if is_return_primitive_ty(&field) {
                 struct_scope.field(&field_name, &return_ty);
@@ -88,10 +84,7 @@ impl<'a> FileDefinition for ObjectFile<'a> {
 
             let fn_scope = struct_imp.new_fn(&field_name);
             for arg in &field.arguments {
-                fn_scope.arg(
-                    &arg.name.to_snake_case(),
-                    gql_value_ty_to_rust_ty(&arg.meta_type),
-                );
+                fn_scope.arg(&arg.name, gql_value_ty_to_rust_ty(&arg.meta_type));
             }
 
             fn_scope.arg_ref_self();
