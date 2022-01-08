@@ -9,7 +9,10 @@ use graphql_parser::{
     Pos,
 };
 
-use crate::{error::Location, GqlError, GqlTypeDefinition, GqlValueType, Schema, Variables};
+use crate::{
+    error::Location, types::schema::ArcSchema, GqlError, GqlTypeDefinition, GqlValueType, Schema,
+    Variables,
+};
 
 use super::utils::get_fragment_definition_on_str;
 
@@ -41,7 +44,7 @@ impl From<ValidationError> for GqlError {
 
 #[derive(Clone)]
 pub struct ValidationContext<'a> {
-    pub(crate) schema: &'a Schema,
+    pub(crate) schema: &'a ArcSchema,
     pub(crate) errors: Vec<ValidationError>,
     pub(crate) fragments: &'a HashMap<String, FragmentDefinition<'a, String>>,
     pub(crate) variables: Option<&'a Variables>,
@@ -50,7 +53,7 @@ pub struct ValidationContext<'a> {
 }
 impl<'a> ValidationContext<'a> {
     pub fn new(
-        schema: &'a Schema,
+        schema: &'a ArcSchema,
         doc: &'a Document<'a, String>,
         variables: Option<&'a Variables>,
         fragments: &'a HashMap<String, FragmentDefinition<'a, String>>,
@@ -751,7 +754,7 @@ fn visit_input_value<'a, T: Visitor<'a>>(
             if let Some(expected_ty) = expected_type.clone() {
                 if let GqlValueType::ListType(expected_ty) = expected_ty {
                     values.iter().for_each(|value| {
-                        // visit_input_value(visitor, ctx, pos, &Some(expected_ty), value)
+                        visit_input_value(visitor, ctx, pos, Some(*expected_ty.clone()), value)
                     })
                 }
             }

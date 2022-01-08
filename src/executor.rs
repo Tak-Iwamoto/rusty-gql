@@ -12,8 +12,15 @@ pub async fn execute<Query: FieldResolver, Mutation: FieldResolver, Subscription
     container: &ArcContainer<Query, Mutation, Subscription>,
     request: Request,
 ) -> Response {
+    let query_doc = match graphql_parser::parse_query::<String>(&request.query) {
+        Ok(doc) => doc,
+        Err(_) => {
+            let err = GqlError::new("failed to parse query", None);
+            return Response::from_errors(vec![err]);
+        }
+    };
     let operation = build_operation(
-        &request.query,
+        &query_doc,
         request.operation_name,
         request.variables,
         &container.schema,

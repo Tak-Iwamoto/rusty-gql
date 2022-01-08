@@ -230,7 +230,6 @@ pub fn type_name_from_def<'a>(type_definition: &GqlTypeDefinition) -> String {
         GqlTypeDefinition::InputObject(input_obj) => input_obj.name.clone(),
     }
 }
-
 pub fn get_fragment_definition_on_str<'a>(
     type_condition: Option<&TypeCondition<'a, String>>,
 ) -> Option<String> {

@@ -5,7 +5,7 @@ use std::{
 };
 
 use graphql_parser::{
-    query::{Field, FragmentDefinition, SelectionSet, VariableDefinition},
+    query::{Document, Field, FragmentDefinition, SelectionSet, VariableDefinition},
     schema::Directive,
 };
 
@@ -67,29 +67,24 @@ impl ToString for OperationType {
 }
 
 pub fn build_operation<'a>(
-    query: &'a str,
+    doc: &'a Document<'a, String>,
     operation_name: Option<String>,
     variables: Variables,
     schema: &'a ArcSchema,
 ) -> Result<Operation<'a>, GqlError> {
-    let parsed_query = match graphql_parser::parse_query::<String>(query) {
-        Ok(parsed) => parsed,
-        Err(_) => return Err(GqlError::new("failed to parse query", None)),
-    };
-
     let mut fragment_definitions = HashMap::new();
 
     let mut operation_definitions: HashMap<String, OperationDefinition> = HashMap::new();
     let no_name_key = "no_operation_name";
 
-    if operation_name.is_none() && parsed_query.definitions.len() > 1 {
+    if operation_name.is_none() && &doc.definitions.len() > &1 {
         return Err(GqlError::new(
             "Must provide operation name if multiple operation exist",
             None,
         ));
     };
 
-    for definition in parsed_query.definitions {
+    for definition in doc.clone().definitions {
         match definition {
             graphql_parser::query::Definition::Operation(operation) => match operation {
                 graphql_parser::query::OperationDefinition::SelectionSet(selection_set) => {

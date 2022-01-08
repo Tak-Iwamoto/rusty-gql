@@ -1,4 +1,4 @@
-use rusty_gql::{execute, playground_html, ArcContainer, Resolver};
+use rusty_gql::{execute, playground_html, ArcContainer, FieldResolver, Resolver};
 use rusty_gql_axum::{GqlRequest, GqlResponse};
 use std::net::SocketAddr;
 

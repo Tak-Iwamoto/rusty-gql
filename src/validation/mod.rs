@@ -2,16 +2,17 @@ use std::collections::HashMap;
 
 use graphql_parser::query::{Document, FragmentDefinition};
 
-use crate::{GqlError, Schema, Variables};
+use crate::{types::schema::ArcSchema, GqlError, Schema, Variables};
 
 use self::visitor::{visit, NewVisitor, ValidationContext};
 
 mod rules;
+mod test_utils;
 mod utils;
 mod visitor;
 
 pub fn apply_validation<'a>(
-    schema: &'a Schema,
+    schema: &'a ArcSchema,
     query_doc: &'a Document<'a, String>,
     variables: Option<&'a Variables>,
     fragments: &'a HashMap<String, FragmentDefinition<'a, String>>,
@@ -38,7 +39,7 @@ pub fn apply_validation<'a>(
         .with(rules::UniqueVariableNames::default())
         .with(rules::VariablesAreInputTypes::default())
         .with(rules::VariablesInAllowedPosition::default());
-        // .with(rules::ArgumentsOfCorrectType::default())
+    // .with(rules::ArgumentsOfCorrectType::default())
 
     visit(&mut visitor, &mut ctx, query_doc, operation_name);
 
