@@ -11,6 +11,7 @@ type Query {
   droid(id: ID!): Droid
   human(id: ID!): Human
   starship(id: ID!): Starship
+  test_vars(a: String, b: String, c: String): Character
 }
 
 type Mutation {

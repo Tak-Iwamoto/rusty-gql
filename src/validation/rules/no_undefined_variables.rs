@@ -149,3 +149,67 @@ impl<'a> Visitor<'a> for NoUndefinedVariables<'a> {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::validation::test_utils::{
+        assert_passes_rule, get_query_fragment_definitions, parse_test_query, test_schema,
+    };
+
+    use super::NoUndefinedVariables;
+
+    fn factory<'a>() -> NoUndefinedVariables<'a> {
+        NoUndefinedVariables::default()
+    }
+
+    #[test]
+    fn all_vars_defined() {
+        let query_doc = r#"
+        query AllVars($a: String, $b: String, $c: String){
+            test_vars(a: $a, b: $b, c: $c)
+        }
+        "#;
+        let schema = &test_schema();
+        let doc = &parse_test_query(query_doc);
+        let fragments = &get_query_fragment_definitions(doc, schema);
+        assert_passes_rule(doc, schema, fragments, factory)
+    }
+
+    #[test]
+    fn all_vars_deeply_defined() {
+        let query_doc = r#"
+        query AllVars($a: String, $b: String, $c: String){
+            test_vars(a: $a) {
+                test_vars(b: $b) {
+                    test_vars(c: $c)
+                }
+            }
+        }
+        "#;
+        let schema = &test_schema();
+        let doc = &parse_test_query(query_doc);
+        let fragments = &get_query_fragment_definitions(doc, schema);
+        assert_passes_rule(doc, schema, fragments, factory)
+    }
+
+    #[test]
+    fn all_vars_deeply_defined_in_inline_fragments() {
+        let query_doc = r#"
+        query AllVars($a: String, $b: String, $c: String){
+            ... on Character {
+                test_vars(a: $a) {
+                    test_vars(b: $b) {
+                        ... on Character {
+                            test_vars(c: $c)
+                        }
+                    }
+                }
+            }
+        }
+        "#;
+        let schema = &test_schema();
+        let doc = &parse_test_query(query_doc);
+        let fragments = &get_query_fragment_definitions(doc, schema);
+        assert_passes_rule(doc, schema, fragments, factory)
+    }
+}
