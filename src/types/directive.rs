@@ -5,6 +5,8 @@ use graphql_parser::{
     Pos,
 };
 
+use crate::GqlValueType;
+
 use super::{argument::GqlArgument, value::GqlValue};
 
 #[derive(Debug, Clone)]
@@ -45,4 +47,72 @@ pub struct GqlDirectiveDefinition {
     pub description: Option<String>,
     pub arguments: Vec<GqlArgument>,
     pub locations: Vec<DirectiveLocation>,
+}
+
+impl GqlDirectiveDefinition {
+    pub fn skip_directive() -> Self {
+        GqlDirectiveDefinition {
+            position: Pos::default(),
+            name: "skip".to_string(),
+            description: None,
+            arguments: vec![GqlArgument {
+                name: "if".to_string(),
+                description: None,
+                position: Pos::default(),
+                meta_type: GqlValueType::NonNullType(Box::new(GqlValueType::NamedType(
+                    "Boolean".to_string(),
+                ))),
+                default_value: None,
+                directives: Default::default(),
+            }],
+            locations: vec![
+                DirectiveLocation::Field,
+                DirectiveLocation::FragmentSpread,
+                DirectiveLocation::InlineFragment,
+            ],
+        }
+    }
+
+    pub fn include_directive() -> Self {
+        GqlDirectiveDefinition {
+            position: Pos::default(),
+            name: "include".to_string(),
+            description: None,
+            arguments: vec![GqlArgument {
+                name: "if".to_string(),
+                description: None,
+                position: Pos::default(),
+                meta_type: GqlValueType::NonNullType(Box::new(GqlValueType::NamedType(
+                    "Boolean".to_string(),
+                ))),
+                default_value: None,
+                directives: Default::default(),
+            }],
+            locations: vec![
+                DirectiveLocation::Field,
+                DirectiveLocation::FragmentSpread,
+                DirectiveLocation::InlineFragment,
+            ],
+        }
+    }
+
+    pub fn deprecated_directive() -> Self {
+        GqlDirectiveDefinition {
+            position: Pos::default(),
+            name: "deprecated".to_string(),
+            description: None,
+            arguments: vec![GqlArgument {
+                name: "reason".to_string(),
+                description: None,
+                position: Pos::default(),
+                meta_type: GqlValueType::NamedType("String".to_string()),
+                default_value: None,
+                directives: Default::default(),
+            }],
+            locations: vec![
+                DirectiveLocation::FieldDefinition,
+                DirectiveLocation::EnumValue,
+            ],
+        }
+    }
 }

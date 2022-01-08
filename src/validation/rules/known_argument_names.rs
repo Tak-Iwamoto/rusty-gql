@@ -13,6 +13,7 @@ pub struct KnownArgumentNames<'a> {
     current_args: Option<(Vec<String>, ArgsPosition<'a>)>,
 }
 
+#[derive(Debug)]
 enum ArgsPosition<'a> {
     Directive(&'a str),
     Field {
@@ -27,13 +28,12 @@ impl<'a> Visitor<'a> for KnownArgumentNames<'a> {
         ctx: &mut ValidationContext,
         directive: &'a Directive<'a, String>,
     ) {
-        if ctx.schema.directives.get(&directive.name).is_some() {
+        if let Some(schema_directive) = ctx.schema.directives.get(&directive.name) {
             self.current_args = Some((
-                directive
+                schema_directive
                     .arguments
-                    .clone()
-                    .into_iter()
-                    .map(|arg| arg.0)
+                    .iter()
+                    .map(|arg| arg.name.clone())
                     .collect(),
                 ArgsPosition::Directive(&directive.name),
             ));
@@ -98,5 +98,124 @@ impl<'a> Visitor<'a> for KnownArgumentNames<'a> {
                 }
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::validation::test_utils::{
+        assert_fails_rule, assert_passes_rule, get_query_fragment_definitions, parse_test_query,
+        test_schema,
+    };
+
+    use super::KnownArgumentNames;
+
+    fn factory<'a>() -> KnownArgumentNames<'a> {
+        KnownArgumentNames::default()
+    }
+
+    #[test]
+    fn include_single_known_arguments() {
+        let query_doc = r#"
+        {
+            droid(id: 1) {
+                name
+            }
+        }
+        "#;
+        let schema = &test_schema();
+        let doc = &parse_test_query(query_doc);
+        let fragments = &get_query_fragment_definitions(doc, schema);
+        assert_passes_rule(doc, schema, fragments, factory);
+    }
+
+    #[test]
+    fn include_multiple_known_arguments() {
+        let query_doc = r#"
+        {
+            search(text: "value", episode: "") {
+                name
+            }
+        }
+        "#;
+        let schema = &test_schema();
+        let doc = &parse_test_query(query_doc);
+        let fragments = &get_query_fragment_definitions(doc, schema);
+        assert_passes_rule(doc, schema, fragments, factory);
+    }
+
+    #[test]
+    fn include_multiple_known_arguments_when_reverse_order() {
+        let query_doc = r#"
+        {
+            search(episode: "", text: "value") {
+                name
+            }
+        }
+        "#;
+        let schema = &test_schema();
+        let doc = &parse_test_query(query_doc);
+        let fragments = &get_query_fragment_definitions(doc, schema);
+        assert_passes_rule(doc, schema, fragments, factory);
+    }
+
+    #[test]
+    fn no_arguments_when_optional() {
+        let query_doc = r#"
+        {
+            search {
+                name
+            }
+        }
+        "#;
+        let schema = &test_schema();
+        let doc = &parse_test_query(query_doc);
+        let fragments = &get_query_fragment_definitions(doc, schema);
+        assert_passes_rule(doc, schema, fragments, factory);
+    }
+
+    #[test]
+    fn invalid_argument_name() {
+        let query_doc = r#"
+        {
+            droid(invalid: "value") {
+                name
+            }
+        }
+        "#;
+        let schema = &test_schema();
+        let doc = &parse_test_query(query_doc);
+        let fragments = &get_query_fragment_definitions(doc, schema);
+        assert_fails_rule(doc, schema, fragments, factory);
+    }
+
+    #[test]
+    fn known_directive_args() {
+        let query_doc = r#"
+        {
+            hero @include(if: true) {
+                name
+            }
+        }
+        "#;
+        let schema = &test_schema();
+        let doc = &parse_test_query(query_doc);
+        let fragments = &get_query_fragment_definitions(doc, schema);
+        assert_passes_rule(doc, schema, fragments, factory);
+    }
+
+    #[test]
+    fn unknown_directive_args() {
+        let query_doc = r#"
+        {
+            hero @include(unknown: true) {
+                name
+            }
+        }
+        "#;
+        let schema = &test_schema();
+        let doc = &parse_test_query(query_doc);
+        let fragments = &get_query_fragment_definitions(doc, schema);
+        assert_fails_rule(doc, schema, fragments, factory);
     }
 }

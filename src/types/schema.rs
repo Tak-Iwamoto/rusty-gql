@@ -68,6 +68,16 @@ pub fn build_schema(schema_documents: &[&str]) -> Result<Schema, GqlError> {
         GqlTypeDefinition::Scalar(GqlScalar::id_scalar()),
     );
 
+    directives.insert("skip".to_string(), GqlDirectiveDefinition::skip_directive());
+    directives.insert(
+        "include".to_string(),
+        GqlDirectiveDefinition::include_directive(),
+    );
+    directives.insert(
+        "deprecated".to_string(),
+        GqlDirectiveDefinition::deprecated_directive(),
+    );
+
     for doc in schema_documents {
         let parsed_schema =
             graphql_parser::parse_schema::<String>(doc).expect("failed to parse graphql schema");
