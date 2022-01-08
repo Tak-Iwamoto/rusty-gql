@@ -31,12 +31,7 @@ impl<'a> Visitor<'a> for KnownDirectives {
         _name: Option<&'a str>,
         _operation_definition: &'a OperationDefinition<'a, String>,
     ) {
-        let top = self.location_stack.pop();
-        assert!(
-            top == Some(DirectiveLocation::Query)
-                || top == Some(DirectiveLocation::Mutation)
-                || top == Some(DirectiveLocation::Subscription)
-        );
+        self.location_stack.pop();
     }
 
     fn enter_fragment_definition(
@@ -122,5 +117,85 @@ impl<'a> Visitor<'a> for KnownDirectives {
     ) {
         let top = self.location_stack.pop();
         assert_eq!(top, Some(DirectiveLocation::InlineFragment));
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::validation::test_utils::{
+        assert_fails_rule, assert_passes_rule, get_query_fragment_definitions, parse_test_query,
+        test_schema,
+    };
+
+    use super::*;
+
+    pub fn factory() -> KnownDirectives {
+        KnownDirectives::default()
+    }
+
+    #[test]
+    fn no_directives() {
+        let query_doc = r#"
+        query {
+            hero {
+                name
+            }
+        }
+        "#;
+        let schema = &test_schema();
+        let doc = &parse_test_query(query_doc);
+        let fragments = &get_query_fragment_definitions(doc, schema);
+        assert_passes_rule(doc, schema, fragments, factory)
+    }
+
+    #[test]
+    fn include_known_directive() {
+        let query_doc = r#"
+        {
+            hero @include(if: true) {
+                name
+            }
+            droid(id: 1) @skip(if: false) {
+                name
+            }
+        }
+        "#;
+        let schema = &test_schema();
+        let doc = &parse_test_query(query_doc);
+        let fragments = &get_query_fragment_definitions(doc, schema);
+        assert_passes_rule(doc, schema, fragments, factory)
+    }
+
+    #[test]
+    fn include_unknow_directive() {
+        let query_doc = r#"
+        {
+            hero @unknown {
+                name
+            }
+        }
+        "#;
+        let schema = &test_schema();
+        let doc = &parse_test_query(query_doc);
+        let fragments = &get_query_fragment_definitions(doc, schema);
+        assert_fails_rule(doc, schema, fragments, factory)
+    }
+
+    #[test]
+    fn include_multiple_unknown_directive() {
+        let query_doc = r#"
+        {
+            hero @unknown {
+                name
+            }
+            droid(id: 1) @unknown_dir(test: "value") {
+                name
+            }
+        }
+        "#;
+        let schema = &test_schema();
+        let doc = &parse_test_query(query_doc);
+        let fragments = &get_query_fragment_definitions(doc, schema);
+        assert_fails_rule(doc, schema, fragments, factory)
     }
 }

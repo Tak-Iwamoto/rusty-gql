@@ -650,6 +650,8 @@ fn visit_field<'a, T: Visitor<'a>>(
         });
         visitor.exit_argument(ctx, arg_name, arg_value);
     }
+    visit_directives(visitor, ctx, &field.directives);
+    visit_selection_set(visitor, ctx, &field.selection_set);
     visitor.exit_field(ctx, field);
 }
 
