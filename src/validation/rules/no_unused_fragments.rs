@@ -92,3 +92,134 @@ impl<'a> Visitor<'a> for NoUnusedFragment<'a> {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::validation::test_utils::{
+        assert_fails_rule, assert_passes_rule, get_query_fragment_definitions, parse_test_query,
+        test_schema,
+    };
+
+    use super::NoUnusedFragment;
+
+    fn factory<'a>() -> NoUnusedFragment<'a> {
+        NoUnusedFragment::default()
+    }
+
+    #[test]
+    fn all_fragment_used() {
+        let query_doc = r#"
+        {
+            hero {
+                ...Frag1
+                ... on Human {
+                    ...Frag2
+                }
+
+            }
+        }
+        fragment Frag1 on Human {
+            name
+            ...Frag3
+        }
+        fragment Frag2 on Human {
+            name
+        }
+        fragment Frag3 on Human {
+            name
+        }
+        "#;
+        let schema = &test_schema();
+        let doc = &parse_test_query(query_doc);
+        let fragments = &get_query_fragment_definitions(doc, schema);
+        assert_passes_rule(doc, schema, fragments, factory)
+    }
+
+    #[test]
+    fn with_unused_fragment() {
+        let query_doc = r#"
+        {
+            hero {
+                ...Frag1
+                ... on Human {
+                    ...Frag2
+                }
+
+            }
+        }
+        fragment Frag1 on Human {
+            name
+            ...Frag3
+        }
+        fragment Frag2 on Human {
+            name
+        }
+        fragment Frag3 on Human {
+            name
+        }
+        fragment UnusedFrag1 on Human {
+            name
+        }
+        "#;
+        let schema = &test_schema();
+        let doc = &parse_test_query(query_doc);
+        let fragments = &get_query_fragment_definitions(doc, schema);
+        assert_fails_rule(doc, schema, fragments, factory)
+    }
+
+    #[test]
+    fn with_unused_fragment_ref_cycle() {
+        let query_doc = r#"
+        {
+            hero {
+                ...Frag1
+                ... on Human {
+                    ...Frag2
+                }
+
+            }
+        }
+        fragment Frag1 on Human {
+            name
+            ...Frag3
+        }
+        fragment Frag2 on Human {
+            name
+        }
+        fragment Frag3 on Human {
+            name
+        }
+        fragment UnusedFrag1 on Human {
+            name
+            ...UnusedFrag2
+        }
+        fragment UnusedFrag2 on Human {
+            name
+            ...UnusedFrag1
+        }
+        "#;
+        let schema = &test_schema();
+        let doc = &parse_test_query(query_doc);
+        let fragments = &get_query_fragment_definitions(doc, schema);
+        assert_fails_rule(doc, schema, fragments, factory)
+    }
+
+    #[test]
+    fn with_unknown_and_unused_fragments() {
+        let query_doc = r#"
+        {
+            hero {
+                ...Frag1
+
+            }
+        }
+        fragment UnusedFrag1 on Human {
+            name
+        }
+        "#;
+        let schema = &test_schema();
+        let doc = &parse_test_query(query_doc);
+        let fragments = &get_query_fragment_definitions(doc, schema);
+        assert_fails_rule(doc, schema, fragments, factory)
+    }
+}
