@@ -5,13 +5,11 @@ use graphql_parser::{
         Definition, Document, Field, FragmentDefinition, FragmentSpread, InlineFragment,
         OperationDefinition, Selection, SelectionSet, VariableDefinition,
     },
-    schema::{Directive, Type, TypeDefinition, Value},
+    schema::{Directive, Value},
     Pos,
 };
 
-use crate::{
-    error::Location, GqlError, GqlTypeDefinition, GqlValue, GqlValueType, Schema, Variables,
-};
+use crate::{error::Location, GqlError, GqlTypeDefinition, GqlValueType, Schema, Variables};
 
 use super::utils::get_fragment_definition_on_str;
 

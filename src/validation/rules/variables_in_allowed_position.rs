@@ -4,13 +4,13 @@ use graphql_parser::{
     query::{
         Document, FragmentDefinition, FragmentSpread, OperationDefinition, VariableDefinition,
     },
-    schema::{Type, Value},
+    schema::Value,
     Pos,
 };
 
 use crate::{
     validation::{
-        utils::{is_gql_sub_type, is_sub_type, Scope},
+        utils::{is_sub_type, Scope},
         visitor::{ValidationContext, Visitor},
     },
     GqlValueType,
@@ -40,7 +40,7 @@ impl<'a> VariablesInAllowedPosition<'a> {
         if let Some(usages) = self.variable_usages.get(scope) {
             for (var_name, usage_pos, var_type) in usages {
                 if let Some(var_def) = variable_defs.iter().find(|def| def.name == *var_name) {
-                    if !is_gql_sub_type(var_type, &GqlValueType::from(var_def.var_type.clone())) {
+                    if !is_sub_type(var_type, &GqlValueType::from(var_def.var_type.clone())) {
                         ctx.add_error(
                             format!(
                                 "Variable {} of type {} used in positon expecting type {}",

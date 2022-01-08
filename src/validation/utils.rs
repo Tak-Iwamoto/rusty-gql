@@ -2,7 +2,7 @@ use std::collections::HashSet;
 
 use graphql_parser::{
     query::{OperationDefinition, TypeCondition},
-    schema::{Field, Type, TypeDefinition, Value},
+    schema::{Type, Value},
     Pos,
 };
 
@@ -137,36 +137,19 @@ pub fn check_valid_input_value(
     }
 }
 
-pub fn is_sub_type(base: &Type<'_, String>, sub: &Type<'_, String>) -> bool {
-    match (base, sub) {
-        (Type::NonNullType(base_type), Type::NonNullType(sub_type)) => {
-            is_sub_type(base_type, sub_type)
-        }
-        (Type::NamedType(base_type_name), Type::NonNullType(sub_type)) => {
-            let sub_type_name = get_type_name(&sub_type);
-            base_type_name.eq(&sub_type_name)
-        }
-        (Type::NamedType(base_type_name), Type::NamedType(sub_type_name)) => {
-            base_type_name.eq(sub_type_name)
-        }
-        (Type::ListType(base_type), Type::ListType(sub_type)) => is_sub_type(base_type, sub_type),
-        _ => false,
-    }
-}
-
-pub fn is_gql_sub_type(base: &GqlValueType, sub: &GqlValueType) -> bool {
+pub fn is_sub_type(base: &GqlValueType, sub: &GqlValueType) -> bool {
     match (base, sub) {
         (GqlValueType::NonNullType(base_type), GqlValueType::NonNullType(sub_type)) => {
-            is_gql_sub_type(base_type, sub_type)
+            is_sub_type(&*base_type, &*sub_type)
         }
         (GqlValueType::NamedType(base_type_name), GqlValueType::NonNullType(sub_type)) => {
-            base_type_name.eq(&sub.name())
+            base_type_name.eq(&sub_type.name())
         }
         (GqlValueType::NamedType(base_type_name), GqlValueType::NamedType(sub_type_name)) => {
             base_type_name.eq(sub_type_name)
         }
         (GqlValueType::ListType(base_type), GqlValueType::ListType(sub_type)) => {
-            is_gql_sub_type(base_type, sub_type)
+            is_sub_type(&*base_type, &*sub_type)
         }
         _ => false,
     }
@@ -245,24 +228,6 @@ pub fn type_name_from_def<'a>(type_definition: &GqlTypeDefinition) -> String {
         GqlTypeDefinition::Union(uni) => uni.name.clone(),
         GqlTypeDefinition::Enum(enu) => enu.name.clone(),
         GqlTypeDefinition::InputObject(input_obj) => input_obj.name.clone(),
-    }
-}
-
-pub fn get_field_by_name<'a>(
-    type_definition: &TypeDefinition<'a, String>,
-    name: &str,
-) -> Option<Field<'a, String>> {
-    get_ty_def_fields(type_definition)
-        .and_then(|fields| fields.iter().find(|f| f.name == name).map(Clone::clone))
-}
-
-fn get_ty_def_fields<'a>(
-    type_definition: &TypeDefinition<'a, String>,
-) -> Option<Vec<Field<'a, String>>> {
-    match type_definition {
-        TypeDefinition::Object(obj) => Some(obj.fields.clone()),
-        TypeDefinition::Interface(interface) => Some(interface.fields.clone()),
-        _ => None,
     }
 }
 
