@@ -48,9 +48,9 @@ impl<'a> Visitor<'a> for ProvidedNonNullArguments {
                 .get(&type_name_from_def(parent_type))
                 .is_some();
             if is_exist {
-                if let Some(target_field) = get_field_by_name(&parent_type, &field.name) {
+                if let Some(target_field) = parent_type.get_field_by_name(&field.name) {
                     for arg in &target_field.arguments {
-                        if GqlValueType::from(arg.value_type.clone()).is_non_null()
+                        if arg.meta_type.is_non_null()
                             && !field.arguments.iter().any(|(name, _)| name.eq(&arg.name))
                         {
                             ctx.add_error(

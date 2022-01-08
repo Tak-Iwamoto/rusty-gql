@@ -49,12 +49,12 @@ impl<'a> Visitor<'a> for KnownArgumentNames<'a> {
 
     fn enter_field(&mut self, ctx: &mut ValidationContext, field: &'a Field<'a, String>) {
         if let Some(parent_type) = ctx.parent_type() {
-            if let Some(target_field) = get_field_by_name(parent_type, &field.name) {
+            if let Some(target_field) = parent_type.get_field_by_name(&field.name) {
                 self.current_args = Some((
                     target_field
                         .arguments
-                        .into_iter()
-                        .map(|arg| arg.name)
+                        .iter()
+                        .map(|arg| arg.name.clone())
                         .collect(),
                     ArgsPosition::Field {
                         field_name: &field.name,
