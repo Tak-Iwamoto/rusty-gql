@@ -70,10 +70,12 @@ type Human implements Character {
   homePlanet: String
   height(unit: LengthUnit = METER): Float
   mass: Float
+  episode: Episode
   friends: [Character]
   friendsConnection(first: Int, after: ID): FriendsConnection!
   appearsIn: [Episode]!
   starships: [Starship]
+  isValid: Boolean
 }
 
 type Droid implements Character {
