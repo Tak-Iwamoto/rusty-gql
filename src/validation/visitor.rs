@@ -560,21 +560,31 @@ fn visit_operation_definition<'a, T: Visitor<'a>>(
             visit_selection_set(visitor, ctx, selection_set);
         }
         OperationDefinition::Query(query) => {
-            visit_variable_definitions(visitor, ctx, &query.variable_definitions);
-            visit_directives(visitor, ctx, &query.directives);
-            visit_selection_set(visitor, ctx, &query.selection_set);
+            let root_name = ctx.schema.query_type_name.to_string();
+            ctx.with_type(ctx.schema.type_definitions.get(&root_name), |ctx| {
+                visit_variable_definitions(visitor, ctx, &query.variable_definitions);
+                visit_directives(visitor, ctx, &query.directives);
+                visit_selection_set(visitor, ctx, &query.selection_set);
+            });
         }
         OperationDefinition::Mutation(mutation) => {
-            visit_variable_definitions(visitor, ctx, &mutation.variable_definitions);
-            visit_directives(visitor, ctx, &mutation.directives);
-            visit_selection_set(visitor, ctx, &mutation.selection_set);
+            let root_name = ctx.schema.mutation_type_name.to_string();
+            ctx.with_type(ctx.schema.type_definitions.get(&root_name), |ctx| {
+                visit_variable_definitions(visitor, ctx, &mutation.variable_definitions);
+                visit_directives(visitor, ctx, &mutation.directives);
+                visit_selection_set(visitor, ctx, &mutation.selection_set);
+            });
         }
         OperationDefinition::Subscription(subscription) => {
-            visit_variable_definitions(visitor, ctx, &subscription.variable_definitions);
-            visit_directives(visitor, ctx, &subscription.directives);
-            visit_selection_set(visitor, ctx, &subscription.selection_set);
+            let root_name = ctx.schema.subscription_type_name.to_string();
+            ctx.with_type(ctx.schema.type_definitions.get(&root_name), |ctx| {
+                visit_variable_definitions(visitor, ctx, &subscription.variable_definitions);
+                visit_directives(visitor, ctx, &subscription.directives);
+                visit_selection_set(visitor, ctx, &subscription.selection_set);
+            });
         }
     }
+
     visitor.exit_operation_definition(ctx, name, operation_definition);
 }
 
