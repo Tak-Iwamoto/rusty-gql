@@ -102,3 +102,19 @@ impl<'a> FindConflicts<'a> {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::validation::test_utils::{
+        assert_fails_rule, get_query_fragment_definitions, parse_test_query, test_schema,
+    };
+
+    use super::OverlappingFieldsCanBeMerged;
+
+    fn factory() -> OverlappingFieldsCanBeMerged {
+        OverlappingFieldsCanBeMerged
+    }
+
+    #[test]
+    fn todo() {}
+}
