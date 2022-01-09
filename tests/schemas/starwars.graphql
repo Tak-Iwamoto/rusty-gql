@@ -12,6 +12,8 @@ type Query {
   human(id: ID!): Human
   starship(id: ID!): Starship
   test_vars(a: String, b: String, c: String): Character
+  test_bool(boolArg: Boolean): Character
+  argTest: ArgsTest
 }
 
 type Mutation {
@@ -25,6 +27,27 @@ enum Episode {
   NEWHOPE
   EMPIRE
   JEDI
+}
+
+input ArgTestInput {
+  non_null_boolean_field: Boolean!
+  int_field: Int
+  string_field: String
+  boolean_field: Boolean
+  string_list_field: [String]
+}
+
+type ArgsTest {
+  intArgField(intArg: Int): String
+  nonNullIntArgField(intArg: Int!): String
+  stringArgField(stringArg: String): String
+  booleanArgField(booleanArg: Boolean): String
+  enumArgField(enumArg: LengthUnit): String
+  floatArgField(floatArg: Float): String
+  idArgField(idArg: ID): String
+  stringListArgField(stringListArg: [String]): String
+  inputArgField(inputArg: ArgTestInput): String
+  multiIntArgField(intArg1: Int, intArg2: Int): String
 }
 
 interface Character {

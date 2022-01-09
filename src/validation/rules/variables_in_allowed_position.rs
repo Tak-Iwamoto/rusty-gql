@@ -153,6 +153,87 @@ mod tests {
     }
 
     #[test]
+    fn boolean_into_boolean() {
+        let query_doc = r#"
+        query Test($boolArg: Boolean) {
+            test_bool(boolArg: $boolArg) {
+                name
+            }
+        }
+        "#;
+        let schema = &test_schema();
+        let doc = &parse_test_query(query_doc);
+        let fragments = &get_query_fragment_definitions(doc, schema);
+        assert_passes_rule(doc, schema, fragments, factory);
+    }
+
+    #[test]
+    fn boolean_into_boolean_with_fragment() {
+        let query_doc = r#"
+        fragment Frag on ArgsTest {
+            booleanArgField(booleanArg: $boolArg)
+        }
+        query Test($boolArg: Boolean) {
+            argTest {
+                ...Frag
+            }
+        }
+        "#;
+        let schema = &test_schema();
+        let doc = &parse_test_query(query_doc);
+        let fragments = &get_query_fragment_definitions(doc, schema);
+        assert_passes_rule(doc, schema, fragments, factory);
+    }
+
+    #[test]
+    fn non_null_boolean_into_boolean() {
+        let query_doc = r#"
+        query Test($boolArg: Boolean!) {
+            argTest {
+                booleanArgField(booleanArg: $boolArg)
+            }
+        }
+        "#;
+        let schema = &test_schema();
+        let doc = &parse_test_query(query_doc);
+        let fragments = &get_query_fragment_definitions(doc, schema);
+        assert_passes_rule(doc, schema, fragments, factory);
+    }
+
+    #[test]
+    fn non_nullboolean_into_boolean_with_fragment() {
+        let query_doc = r#"
+        fragment Frag on ArgsTest {
+            booleanArgField(booleanArg: $boolArg)
+        }
+        query Test($boolArg: Boolean!) {
+            argTest {
+                ...Frag
+            }
+        }
+        "#;
+        let schema = &test_schema();
+        let doc = &parse_test_query(query_doc);
+        let fragments = &get_query_fragment_definitions(doc, schema);
+        assert_passes_rule(doc, schema, fragments, factory);
+    }
+
+    #[test]
+    fn nullable_int_with_default_into_non_null_int() {
+        let query_doc = r#"
+        query Test($intArg: Int = 1) {
+            argTest {
+                nonNullIntArgField(intArg: $intArg)
+            }
+        }
+        "#;
+        let schema = &test_schema();
+        let doc = &parse_test_query(query_doc);
+        let fragments = &get_query_fragment_definitions(doc, schema);
+        assert_passes_rule(doc, schema, fragments, factory);
+    }
+
+    #[test]
     fn non_null_boolean_into_non_null_boolean_in_directive() {
         let query_doc = r#"
         query Test($boolVar: Boolean!) {
