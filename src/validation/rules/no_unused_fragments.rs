@@ -49,12 +49,9 @@ impl<'a> Visitor<'a> for NoUnusedFragment<'a> {
             }
         }
 
-        for fragment in &self.fragment_definitions {
-            if !reachable.contains(&fragment.0) {
-                ctx.add_error(
-                    format!("{} is unused fragment.", &fragment.0),
-                    vec![fragment.1],
-                )
+        for (name, pos) in &self.fragment_definitions {
+            if !reachable.contains(name) {
+                ctx.add_error(format!("{} is unused fragment.", name), vec![*pos])
             }
         }
     }
