@@ -106,19 +106,17 @@ pub fn build_operation<'a>(
         if let Definition::Operation(operation) = definition {
             match operation {
                 graphql_parser::query::OperationDefinition::SelectionSet(selection_set) => {
-                    if operation_name.is_none() {
-                        let root_field = get_root_field(&selection_set, &fragment_definitions)?;
-                        operation_definitions.insert(
-                            no_name_key.to_string(),
-                            OperationDefinition {
-                                operation_type: OperationType::Query,
-                                selection_set,
-                                root_field,
-                                directives: vec![],
-                                variable_definitions: vec![],
-                            },
-                        );
-                    }
+                    let root_field = get_root_field(&selection_set, &fragment_definitions)?;
+                    operation_definitions.insert(
+                        no_name_key.to_string(),
+                        OperationDefinition {
+                            operation_type: OperationType::Query,
+                            selection_set,
+                            root_field,
+                            directives: vec![],
+                            variable_definitions: vec![],
+                        },
+                    );
                 }
                 graphql_parser::query::OperationDefinition::Query(query) => {
                     let query_name = query.name.unwrap_or_else(|| no_name_key.to_string());

@@ -19,7 +19,6 @@ impl<'a> Visitor<'a> for FieldsOnCorrectType {
                     return;
                 }
             }
-            println!("{:?}", parent_type);
 
             if parent_type.get_field_by_name(&field.name).is_none() {
                 ctx.add_error(
