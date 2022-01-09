@@ -234,6 +234,96 @@ mod tests {
     }
 
     #[test]
+    fn string_list_into_string_list() {
+        let query_doc = r#"
+        query Test($stringListVar: [String]) {
+            argTest {
+                stringListArgField(stringListArg: $stringListVar)
+            }
+        }
+        "#;
+        let schema = &test_schema();
+        let doc = &parse_test_query(query_doc);
+        let fragments = &get_query_fragment_definitions(doc, schema);
+        assert_passes_rule(doc, schema, fragments, factory);
+    }
+
+    #[test]
+    fn non_null_string_list_into_string_list() {
+        let query_doc = r#"
+        query Test($stringListVar: [String!]) {
+            argTest {
+                stringListArgField(stringListArg: $stringListVar)
+            }
+        }
+        "#;
+        let schema = &test_schema();
+        let doc = &parse_test_query(query_doc);
+        let fragments = &get_query_fragment_definitions(doc, schema);
+        assert_passes_rule(doc, schema, fragments, factory);
+    }
+
+    #[test]
+    fn string_into_string_list_item_pos() {
+        let query_doc = r#"
+        query Test($stringVar: String) {
+            argTest {
+                stringListArgField(stringListArg: [$stringVar])
+            }
+        }
+        "#;
+        let schema = &test_schema();
+        let doc = &parse_test_query(query_doc);
+        let fragments = &get_query_fragment_definitions(doc, schema);
+        assert_passes_rule(doc, schema, fragments, factory);
+    }
+
+    #[test]
+    fn input_type_into_input_type() {
+        let query_doc = r#"
+        query Test($inputVar: ArgTestInput) {
+            argTest {
+                inputArgField(inputArg: $inputVar)
+            }
+        }
+        "#;
+        let schema = &test_schema();
+        let doc = &parse_test_query(query_doc);
+        let fragments = &get_query_fragment_definitions(doc, schema);
+        assert_passes_rule(doc, schema, fragments, factory);
+    }
+
+    #[test]
+    fn input_type_into_input_type_field_pos() {
+        let query_doc = r#"
+        query Test($boolVar: Boolean = true) {
+            argTest {
+                inputArgField(inputArg: {nonNullBooleanField: $boolVar})
+            }
+        }
+        "#;
+        let schema = &test_schema();
+        let doc = &parse_test_query(query_doc);
+        let fragments = &get_query_fragment_definitions(doc, schema);
+        assert_passes_rule(doc, schema, fragments, factory);
+    }
+
+    #[test]
+    fn non_nullstring_into_string_list_item_pos() {
+        let query_doc = r#"
+        query Test($stringVar: String!) {
+            argTest {
+                stringListArgField(stringListArg: [$stringVar])
+            }
+        }
+        "#;
+        let schema = &test_schema();
+        let doc = &parse_test_query(query_doc);
+        let fragments = &get_query_fragment_definitions(doc, schema);
+        assert_passes_rule(doc, schema, fragments, factory);
+    }
+
+    #[test]
     fn non_null_boolean_into_non_null_boolean_in_directive() {
         let query_doc = r#"
         query Test($boolVar: Boolean!) {

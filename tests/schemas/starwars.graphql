@@ -30,11 +30,11 @@ enum Episode {
 }
 
 input ArgTestInput {
-  non_null_boolean_field: Boolean!
-  int_field: Int
-  string_field: String
-  boolean_field: Boolean
-  string_list_field: [String]
+  nonNullBooleanField: Boolean!
+  intField: Int
+  stringField: String
+  booleanField: Boolean
+  stringListField: [String]
 }
 
 type ArgsTest {
