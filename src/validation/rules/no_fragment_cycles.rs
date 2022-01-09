@@ -97,3 +97,128 @@ impl<'a> Visitor<'a> for NoFragmentCycles<'a> {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::validation::test_utils::{
+        assert_fails_rule, assert_passes_rule, get_query_fragment_definitions, parse_test_query,
+        test_schema,
+    };
+
+    use super::NoFragmentCycles;
+
+    fn factory<'a>() -> NoFragmentCycles<'a> {
+        NoFragmentCycles::default()
+    }
+
+    #[test]
+    fn valid_single_reference() {
+        let query_doc = r#"
+        fragment Frag1 on Human { ...Frag2 }
+        fragment Frag2 on Human { name }
+        { __typename }
+        "#;
+        let schema = &test_schema();
+        let doc = &parse_test_query(query_doc);
+        let fragments = &get_query_fragment_definitions(doc, schema);
+        assert_passes_rule(doc, schema, fragments, factory)
+    }
+
+    #[test]
+    fn valid_twice_reference() {
+        let query_doc = r#"
+        fragment Frag1 on Human { ...Frag2 ...Frag2 }
+        fragment Frag2 on Human { name }
+        { __typename }
+        "#;
+        let schema = &test_schema();
+        let doc = &parse_test_query(query_doc);
+        let fragments = &get_query_fragment_definitions(doc, schema);
+        assert_passes_rule(doc, schema, fragments, factory)
+    }
+
+    #[test]
+    fn twice_reference_is_not_circular() {
+        let query_doc = r#"
+        fragment Frag1 on Human { ...Frag2 ...Frag2 }
+        fragment Frag2 on Human { ...Frag3 }
+        fragment Frag3 on Human { name }
+        { __typename }
+        "#;
+        let schema = &test_schema();
+        let doc = &parse_test_query(query_doc);
+        let fragments = &get_query_fragment_definitions(doc, schema);
+        assert_passes_rule(doc, schema, fragments, factory)
+    }
+
+    #[test]
+    fn double_fragments_with_interface() {
+        let query_doc = r#"
+        fragment Frag1 on Character {
+            ... on Human {
+                name
+            }
+            ... on Droid {
+                name
+            }
+        }
+        fragment Frag2 on Character {
+            ... on Human {
+                ...Frag1
+            }
+            ... on Droid {
+                ...Frag1
+            }
+        }
+        { __typename }
+        "#;
+        let schema = &test_schema();
+        let doc = &parse_test_query(query_doc);
+        let fragments = &get_query_fragment_definitions(doc, schema);
+        assert_passes_rule(doc, schema, fragments, factory)
+    }
+
+    #[test]
+    fn include_unknown_fragment() {
+        let query_doc = r#"
+        fragment Frag1 on Character {
+            ...UnknownFragment
+        }
+        { __typename }
+        "#;
+        let schema = &test_schema();
+        let doc = &parse_test_query(query_doc);
+        let fragments = &get_query_fragment_definitions(doc, schema);
+        assert_passes_rule(doc, schema, fragments, factory)
+    }
+
+    #[test]
+    fn spreading_itself() {
+        let query_doc = r#"
+        fragment Frag1 on Character {
+            ...Frag1
+        }
+        { __typename }
+        "#;
+        let schema = &test_schema();
+        let doc = &parse_test_query(query_doc);
+        let fragments = &get_query_fragment_definitions(doc, schema);
+        assert_fails_rule(doc, schema, fragments, factory)
+    }
+
+    #[test]
+    fn spreading_itself_in_inline_fragment() {
+        let query_doc = r#"
+        fragment Frag1 on Character {
+            ... on Human {
+                ...Frag1
+            }
+        }
+        { __typename }
+        "#;
+        let schema = &test_schema();
+        let doc = &parse_test_query(query_doc);
+        let fragments = &get_query_fragment_definitions(doc, schema);
+        assert_fails_rule(doc, schema, fragments, factory)
+    }
+}
