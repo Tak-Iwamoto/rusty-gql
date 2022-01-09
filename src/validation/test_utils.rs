@@ -1,7 +1,7 @@
 use core::panic;
 use std::collections::HashMap;
 
-use graphql_parser::query::{Document, Field, FragmentDefinition};
+use graphql_parser::query::{Document, FragmentDefinition};
 
 use crate::{
     build_schema,
@@ -14,15 +14,14 @@ use super::visitor::{visit, ValidationContext, ValidationError, Visitor};
 pub(crate) fn validate<'a, V, F>(
     doc: &'a Document<'a, String>,
     schema: &'a ArcSchema,
-    fragments: &'a HashMap<String, FragmentDefinition<'a, String>>,
-    root_field: &'a Field<'a, String>,
+    operation: &'a Operation<'a>,
     factory: F,
 ) -> Result<(), Vec<ValidationError>>
 where
     V: Visitor<'a> + 'a,
     F: Fn() -> V,
 {
-    let mut ctx = ValidationContext::new(&schema, &doc, None, &fragments, root_field);
+    let mut ctx = ValidationContext::new(&schema, &doc, None, &operation);
     let mut visitor = factory();
     visit(&mut visitor, &mut ctx, &doc, None);
 
@@ -39,13 +38,7 @@ macro_rules! check_passes_rule {
         let schema = &crate::validation::test_utils::test_schema();
         let doc = &crate::validation::test_utils::parse_test_query($query_doc);
         let operation = crate::validation::test_utils::build_test_operation(doc, schema);
-        crate::validation::test_utils::assert_passes_rule(
-            doc,
-            schema,
-            &operation.fragment_definitions,
-            &operation.root_field,
-            $factory,
-        );
+        crate::validation::test_utils::assert_passes_rule(doc, schema, &operation, $factory);
     };
 }
 
@@ -55,27 +48,20 @@ macro_rules! check_fails_rule {
         let schema = &crate::validation::test_utils::test_schema();
         let doc = &crate::validation::test_utils::parse_test_query($query_doc);
         let operation = crate::validation::test_utils::build_test_operation(doc, schema);
-        crate::validation::test_utils::assert_fails_rule(
-            doc,
-            schema,
-            &operation.fragment_definitions,
-            &operation.root_field,
-            $factory,
-        );
+        crate::validation::test_utils::assert_fails_rule(doc, schema, &operation, $factory);
     };
 }
 
 pub(crate) fn assert_passes_rule<'a, V, F>(
     doc: &'a Document<'a, String>,
     schema: &'a ArcSchema,
-    fragments: &'a HashMap<String, FragmentDefinition<'a, String>>,
-    root_field: &'a Field<'a, String>,
+    operation: &'a Operation<'a>,
     factory: F,
 ) where
     V: Visitor<'a> + 'a,
     F: Fn() -> V,
 {
-    if let Err(errors) = validate(doc, schema, fragments, root_field, factory) {
+    if let Err(errors) = validate(doc, schema, operation, factory) {
         for err in errors {
             if let Some(pos) = err.locations.first() {
                 println!("[{}:{}]", pos.line, pos.column);
@@ -89,14 +75,13 @@ pub(crate) fn assert_passes_rule<'a, V, F>(
 pub(crate) fn assert_fails_rule<'a, V, F>(
     doc: &'a Document<'a, String>,
     schema: &'a ArcSchema,
-    fragments: &'a HashMap<String, FragmentDefinition<'a, String>>,
-    root_field: &'a Field<'a, String>,
+    operation: &'a Operation<'a>,
     factory: F,
 ) where
     V: Visitor<'a> + 'a,
     F: Fn() -> V,
 {
-    if validate(doc, schema, fragments, root_field, factory).is_ok() {
+    if validate(doc, schema, operation, factory).is_ok() {
         panic!("should fail, but the rule passes");
     }
 }

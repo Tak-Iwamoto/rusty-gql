@@ -10,8 +10,10 @@ use graphql_parser::{
 };
 
 use crate::{
-    error::Location, types::schema::ArcSchema, GqlError, GqlTypeDefinition, GqlValueType, Schema,
-    Variables,
+    error::Location,
+    operation::{get_root_field_ty, Operation},
+    types::schema::ArcSchema,
+    GqlError, GqlTypeDefinition, GqlValueType, Schema, Variables,
 };
 
 use super::utils::get_fragment_definition_on_str;
@@ -49,6 +51,7 @@ pub struct ValidationContext<'a> {
     pub(crate) fragments: &'a HashMap<String, FragmentDefinition<'a, String>>,
     pub(crate) variables: Option<&'a Variables>,
     pub(crate) root_field: &'a Field<'a, String>,
+    pub(crate) operation: &'a Operation<'a>,
     pub type_stack: Vec<Option<&'a GqlTypeDefinition>>,
     pub input_type: Vec<Option<GqlValueType>>,
 }
@@ -57,14 +60,14 @@ impl<'a> ValidationContext<'a> {
         schema: &'a ArcSchema,
         doc: &'a Document<'a, String>,
         variables: Option<&'a Variables>,
-        fragments: &'a HashMap<String, FragmentDefinition<'a, String>>,
-        root_field: &'a Field<'a, String>,
+        operation: &'a Operation<'a>,
     ) -> Self {
         ValidationContext {
             schema,
-            fragments,
             variables,
-            root_field,
+            root_field: &operation.root_field,
+            fragments: &operation.fragment_definitions,
+            operation,
             errors: Default::default(),
             type_stack: Default::default(),
             input_type: Default::default(),
@@ -560,7 +563,10 @@ fn visit_operation_definition<'a, T: Visitor<'a>>(
 
     match operation_definition {
         OperationDefinition::SelectionSet(selection_set) => {
-            visit_selection_set(visitor, ctx, selection_set);
+            let root_ty = get_root_field_ty(&ctx.operation, &ctx.schema);
+            ctx.with_type(ctx.schema.type_definitions.get(root_ty.name()), |ctx| {
+                visit_selection_set(visitor, ctx, selection_set);
+            })
         }
         OperationDefinition::Query(query) => {
             let root_name = ctx.schema.query_type_name.to_string();

@@ -45,7 +45,6 @@ impl<'a> Visitor<'a> for KnownArgumentNames<'a> {
     }
 
     fn enter_field(&mut self, ctx: &mut ValidationContext, field: &'a Field<'a, String>) {
-        println!("{:?}", &ctx.type_stack);
         if let Some(parent_type) = ctx.parent_type() {
             if let Some(target_field) = parent_type.get_field_by_name(&field.name) {
                 self.current_args = Some((

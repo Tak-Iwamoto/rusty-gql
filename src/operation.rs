@@ -12,7 +12,7 @@ use graphql_parser::{
     schema::Directive,
 };
 
-use crate::{error::GqlError, types::schema::ArcSchema, Schema, Variables};
+use crate::{error::GqlError, types::schema::ArcSchema, GqlValueType, Schema, Variables};
 
 #[derive(Debug)]
 pub struct Operation<'a> {
@@ -260,6 +260,29 @@ fn get_operation_type<'a>(
             format!("{} is not contained in schema", root_fieldname),
             None,
         ))
+    }
+}
+
+pub fn get_root_field_ty<'a>(operation: &'a Operation<'a>, schema: &'a ArcSchema) -> GqlValueType {
+    match operation.operation_type {
+        OperationType::Query => schema
+            .queries
+            .get(&operation.root_field.name)
+            .expect("must be defined in Query")
+            .meta_type
+            .clone(),
+        OperationType::Mutation => schema
+            .mutations
+            .get(&operation.root_field.name)
+            .expect("must be defined in Query")
+            .meta_type
+            .clone(),
+        OperationType::Subscription => schema
+            .subscriptions
+            .get(&operation.root_field.name)
+            .expect("must be defined in Query")
+            .meta_type
+            .clone(),
     }
 }
 
