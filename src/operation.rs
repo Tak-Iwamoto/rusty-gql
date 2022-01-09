@@ -5,7 +5,10 @@ use std::{
 };
 
 use graphql_parser::{
-    query::{Definition, Document, Field, FragmentDefinition, SelectionSet, VariableDefinition},
+    query::{
+        Definition, Document, Field, FragmentDefinition, Selection, SelectionSet,
+        VariableDefinition,
+    },
     schema::Directive,
 };
 
@@ -68,13 +71,11 @@ impl ToString for OperationType {
 
 pub fn get_operation_definitions<'a>(
     doc: &'a Document<'a, String>,
-    schema: &'a ArcSchema,
 ) -> Vec<&'a graphql_parser::query::Definition<'a, String>> {
     doc.definitions
         .iter()
         .filter(|def| matches!(def, Definition::Operation(_)))
         .collect::<Vec<_>>()
-    // result
 }
 
 pub fn build_operation<'a>(
@@ -88,7 +89,7 @@ pub fn build_operation<'a>(
     let mut operation_definitions: HashMap<String, OperationDefinition> = HashMap::new();
     let no_name_key = "no_operation_name";
 
-    if operation_name.is_none() && get_operation_definitions(&doc, &schema).len() > 1 {
+    if operation_name.is_none() && get_operation_definitions(&doc).len() > 1 {
         return Err(GqlError::new(
             "Must provide operation name if multiple operation exist",
             None,
@@ -229,15 +230,14 @@ fn get_root_field<'a>(
     selection_set: &SelectionSet<'a, String>,
 ) -> Result<Field<'a, String>, GqlError> {
     let first_item = selection_set.items.first();
-    match first_item {
-        Some(item) => match item {
-            graphql_parser::query::Selection::Field(field) => Ok(field.clone()),
-            graphql_parser::query::Selection::FragmentSpread(_) => unreachable!(),
-            graphql_parser::query::Selection::InlineFragment(_) => unreachable!(),
-        },
-        None => Err(GqlError::new("Must have selection item", None)),
+    if let Some(item) = first_item {
+        if let Selection::Field(field) = item {
+            return Ok(field.clone());
+        }
     }
+    Err(GqlError::new("A query must have root field", None))
 }
+
 fn get_operation_type<'a>(
     schema: &'a Schema,
     root_field: &Field<'a, String>,
