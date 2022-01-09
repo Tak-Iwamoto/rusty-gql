@@ -249,6 +249,36 @@ mod tests {
     }
 
     #[test]
+    fn string_into_string_list() {
+        let query_doc = r#"
+        query Test($stringVar: String) {
+            argTest {
+                stringListArgField(stringListArg: $stringVar)
+            }
+        }
+        "#;
+        let schema = &test_schema();
+        let doc = &parse_test_query(query_doc);
+        let fragments = &get_query_fragment_definitions(doc, schema);
+        assert_fails_rule(doc, schema, fragments, factory);
+    }
+
+    #[test]
+    fn string_into_booleawn() {
+        let query_doc = r#"
+        query Test($stringVar: String) {
+            argTest {
+                booleanArgField(booleanArg: $stringVar)
+            }
+        }
+        "#;
+        let schema = &test_schema();
+        let doc = &parse_test_query(query_doc);
+        let fragments = &get_query_fragment_definitions(doc, schema);
+        assert_fails_rule(doc, schema, fragments, factory);
+    }
+
+    #[test]
     fn string_list_into_string_list() {
         let query_doc = r#"
         query Test($stringListVar: [String]) {
