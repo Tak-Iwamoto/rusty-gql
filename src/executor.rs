@@ -19,12 +19,7 @@ pub async fn execute<Query: FieldResolver, Mutation: FieldResolver, Subscription
             return Response::from_errors(vec![err]);
         }
     };
-    let operation = build_operation(
-        &query_doc,
-        request.operation_name,
-        request.variables,
-        &container.schema,
-    );
+    let operation = build_operation(&query_doc, request.operation_name, request.variables);
 
     let operation = match operation {
         Ok(op) => ArcOperation::new(op),

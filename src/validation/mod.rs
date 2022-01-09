@@ -1,8 +1,6 @@
-use std::collections::HashMap;
+use graphql_parser::query::Document;
 
-use graphql_parser::query::{Document, Field, FragmentDefinition};
-
-use crate::{operation::Operation, types::schema::ArcSchema, GqlError, Schema, Variables};
+use crate::{operation::Operation, types::schema::ArcSchema, GqlError, Variables};
 
 use self::visitor::{visit, NewVisitor, ValidationContext};
 

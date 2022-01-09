@@ -1,4 +1,4 @@
-query getRepository {
+query GetRepositoryAndLoginUser {
   repository(name: "react", owner: "facebook") {
     name
     owner {
@@ -6,5 +6,8 @@ query getRepository {
       login
     }
     url
+  }
+  viewer {
+    login
   }
 }

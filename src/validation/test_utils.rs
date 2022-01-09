@@ -1,7 +1,6 @@
 use core::panic;
-use std::collections::HashMap;
 
-use graphql_parser::query::{Document, FragmentDefinition};
+use graphql_parser::query::Document;
 
 use crate::{
     build_schema,
@@ -37,17 +36,16 @@ macro_rules! check_passes_rule {
     ($query_doc: expr, $factory: expr $(,)?) => {
         let schema = &crate::validation::test_utils::test_schema();
         let doc = &crate::validation::test_utils::parse_test_query($query_doc);
-        let operation = crate::validation::test_utils::build_test_operation(doc, schema);
+        let operation = crate::validation::test_utils::build_test_operation(doc);
         crate::validation::test_utils::assert_passes_rule(doc, schema, &operation, $factory);
     };
 }
-
 #[macro_export]
 macro_rules! check_fails_rule {
     ($query_doc: expr, $factory: expr $(,)?) => {
         let schema = &crate::validation::test_utils::test_schema();
         let doc = &crate::validation::test_utils::parse_test_query($query_doc);
-        let operation = crate::validation::test_utils::build_test_operation(doc, schema);
+        let operation = crate::validation::test_utils::build_test_operation(doc);
         crate::validation::test_utils::assert_fails_rule(doc, schema, &operation, $factory);
     };
 }
@@ -96,18 +94,6 @@ pub(crate) fn parse_test_query<'a>(query_doc: &'a str) -> Document<'a, String> {
     graphql_parser::parse_query::<String>(query_doc).unwrap()
 }
 
-pub(crate) fn get_query_fragment_definitions<'a>(
-    doc: &'a Document<'a, String>,
-    schema: &'a ArcSchema,
-) -> HashMap<String, FragmentDefinition<'a, String>> {
-    build_operation(&doc, None, Default::default(), schema)
-        .unwrap()
-        .fragment_definitions
-}
-
-pub(crate) fn build_test_operation<'a>(
-    doc: &'a Document<'a, String>,
-    schema: &'a ArcSchema,
-) -> Operation<'a> {
-    build_operation(&doc, None, Default::default(), schema).unwrap()
+pub(crate) fn build_test_operation<'a>(doc: &'a Document<'a, String>) -> Operation<'a> {
+    build_operation(&doc, None, Default::default()).unwrap()
 }

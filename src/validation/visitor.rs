@@ -48,8 +48,6 @@ pub struct ValidationContext<'a> {
     pub(crate) errors: Vec<ValidationError>,
     pub(crate) fragments: &'a HashMap<String, FragmentDefinition<'a, String>>,
     pub(crate) variables: Option<&'a Variables>,
-    pub(crate) root_field: &'a Field<'a, String>,
-    pub(crate) operation: &'a Operation<'a>,
     pub type_stack: Vec<Option<&'a GqlTypeDefinition>>,
     pub input_type: Vec<Option<GqlValueType>>,
 }
@@ -63,9 +61,7 @@ impl<'a> ValidationContext<'a> {
         ValidationContext {
             schema,
             variables,
-            root_field: &operation.root_field,
             fragments: &operation.fragment_definitions,
-            operation,
             errors: Default::default(),
             type_stack: Default::default(),
             input_type: Default::default(),
@@ -561,12 +557,8 @@ fn visit_operation_definition<'a, T: Visitor<'a>>(
 
     match operation_definition {
         OperationDefinition::SelectionSet(selection_set) => {
-            let root_ty = match ctx.operation.operation_type {
-                OperationType::Query => ctx.schema.query_type_name.to_string(),
-                OperationType::Mutation => ctx.schema.mutation_type_name.to_string(),
-                OperationType::Subscription => ctx.schema.subscription_type_name.to_string(),
-            };
-            ctx.with_type(ctx.schema.type_definitions.get(&root_ty), |ctx| {
+            let root_name = ctx.schema.query_type_name.to_string();
+            ctx.with_type(ctx.schema.type_definitions.get(&root_name), |ctx| {
                 visit_selection_set(visitor, ctx, selection_set);
             })
         }
