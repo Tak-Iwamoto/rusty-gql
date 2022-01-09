@@ -30,3 +30,43 @@ impl<'a> Visitor<'a> for UniqueVariableNames<'a> {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::validation::test_utils::{
+        assert_fails_rule, assert_passes_rule, get_query_fragment_definitions, parse_test_query,
+        test_schema,
+    };
+
+    use super::UniqueVariableNames;
+
+    fn factory<'a>() -> UniqueVariableNames<'a> {
+        UniqueVariableNames::default()
+    }
+
+    #[test]
+    fn unique_var_names() {
+        let query_doc = r#"
+        query Test($a: Int, $b: String) {
+            __typename
+        }
+        "#;
+        let schema = &test_schema();
+        let doc = &parse_test_query(query_doc);
+        let fragments = &get_query_fragment_definitions(doc, schema);
+        assert_passes_rule(doc, schema, fragments, factory);
+    }
+
+    #[test]
+    fn duplicate_var_names() {
+        let query_doc = r#"
+        query Test($a: Int, $a: String) {
+            __typename
+        }
+        "#;
+        let schema = &test_schema();
+        let doc = &parse_test_query(query_doc);
+        let fragments = &get_query_fragment_definitions(doc, schema);
+        assert_fails_rule(doc, schema, fragments, factory);
+    }
+}
