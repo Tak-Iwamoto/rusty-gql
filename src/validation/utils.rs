@@ -8,7 +8,7 @@ use graphql_parser::{
 
 use crate::{
     types::{GqlScalar, GqlValueType},
-    GqlTypeDefinition, Schema,
+    GqlTypeDefinition, GqlValue, Schema,
 };
 
 use super::visitor::ValidationContext;
@@ -137,7 +137,7 @@ pub fn check_valid_input_value(
     }
 }
 
-pub fn is_sub_type(base: &GqlValueType, sub: &GqlValueType) -> bool {
+pub fn is_sub_type<'a>(base: &GqlValueType, sub: &GqlValueType) -> bool {
     match (base, sub) {
         (GqlValueType::NonNullType(base_type), GqlValueType::NonNullType(sub_type)) => {
             is_sub_type(&*base_type, &*sub_type)

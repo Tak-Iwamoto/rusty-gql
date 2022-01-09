@@ -1,5 +1,7 @@
 use graphql_parser::schema::Type;
 
+use crate::GqlValue;
+
 #[derive(Debug, Clone)]
 pub enum GqlValueType {
     NamedType(String),
@@ -28,6 +30,31 @@ impl GqlValueType {
 
     pub fn is_non_null(&self) -> bool {
         matches!(self, &GqlValueType::NonNullType(_))
+    }
+
+    pub fn is_sub_type(&self, sub: &GqlValueType, default_value: &Option<GqlValue>) -> bool {
+        match (self, sub) {
+            (GqlValueType::NonNullType(base_type), GqlValueType::NonNullType(sub_type)) => {
+                base_type.is_sub_type(&*sub_type, default_value)
+            }
+            (GqlValueType::NamedType(base_type_name), GqlValueType::NonNullType(sub_type)) => {
+                base_type_name.eq(&sub_type.name())
+            }
+            (GqlValueType::NonNullType(base_type), GqlValueType::NamedType(sub_type)) => {
+                if let Some(default) = default_value {
+                    base_type.name().eq(sub_type)
+                } else {
+                    false
+                }
+            }
+            (GqlValueType::NamedType(base_type_name), GqlValueType::NamedType(sub_type_name)) => {
+                base_type_name.eq(sub_type_name)
+            }
+            (GqlValueType::ListType(base_type), GqlValueType::ListType(sub_type)) => {
+                base_type.is_sub_type(&*sub_type, default_value)
+            }
+            _ => false,
+        }
     }
 }
 
