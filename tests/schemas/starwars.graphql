@@ -76,6 +76,7 @@ type Human implements Character {
   appearsIn: [Episode]!
   starships: [Starship]
   isValid: Boolean
+  non_null_test(stringArg: String!, intArg: Int!): Character
 }
 
 type Droid implements Character {
