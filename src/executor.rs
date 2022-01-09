@@ -28,17 +28,13 @@ pub async fn execute<Query: FieldResolver, Mutation: FieldResolver, Subscription
 
     let ctx = build_context(&container.schema, &operation);
 
-    let ctx_selection_set = &ctx.with_selection_set(&operation.selection_set);
-
     let result = match operation.operation_type {
         OperationType::Query => {
-            ctx_selection_set
-                .resolve_selection_parallelly(&container.query_resolvers)
+            ctx.resolve_selection_parallelly(&container.query_resolvers)
                 .await
         }
         OperationType::Mutation => {
-            ctx_selection_set
-                .resolve_selection_serially(&container.mutation_resolvers)
+            ctx.resolve_selection_serially(&container.mutation_resolvers)
                 .await
         }
         OperationType::Subscription => {
@@ -51,7 +47,7 @@ pub async fn execute<Query: FieldResolver, Mutation: FieldResolver, Subscription
         Ok(value) => Response::new(value),
         Err(error) => {
             let mut errors = vec![error];
-            errors.extend(ctx_selection_set.operation.errors.lock().unwrap().clone());
+            errors.extend(ctx.operation.errors.lock().unwrap().clone());
             Response::from_errors(errors)
         }
     }

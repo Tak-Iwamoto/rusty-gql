@@ -16,7 +16,7 @@ pub fn apply_validation<'a>(
     operation: &'a Operation<'a>,
     operation_name: Option<&'a str>,
 ) -> Result<(), Vec<GqlError>> {
-    let mut ctx = ValidationContext::new(schema, query_doc, variables, operation);
+    let mut ctx = ValidationContext::new(schema, variables, operation);
     let mut visitor = NewVisitor
         .with(rules::DefaultValueOfCorrectType::default())
         .with(rules::FieldsOnCorrectType::default())

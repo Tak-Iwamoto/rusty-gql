@@ -20,7 +20,7 @@ where
     V: Visitor<'a> + 'a,
     F: Fn() -> V,
 {
-    let mut ctx = ValidationContext::new(&schema, &doc, None, &operation);
+    let mut ctx = ValidationContext::new(&schema, None, &operation);
     let mut visitor = factory();
     visit(&mut visitor, &mut ctx, &doc, None);
 

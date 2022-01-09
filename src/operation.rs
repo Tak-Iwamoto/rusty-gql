@@ -5,10 +5,7 @@ use std::{
 };
 
 use graphql_parser::{
-    query::{
-        Definition, Document, Field, FragmentDefinition, Selection, SelectionSet,
-        VariableDefinition,
-    },
+    query::{Definition, Document, FragmentDefinition, SelectionSet, VariableDefinition},
     schema::Directive,
 };
 
@@ -20,7 +17,6 @@ pub struct Operation<'a> {
     pub directives: Vec<Directive<'a, String>>,
     pub variable_definitions: Vec<VariableDefinition<'a, String>>,
     pub selection_set: SelectionSet<'a, String>,
-    pub root_field: Field<'a, String>,
     pub fragment_definitions: HashMap<String, FragmentDefinition<'a, String>>,
     pub errors: Mutex<Vec<GqlError>>,
     pub variables: Variables,
@@ -49,7 +45,6 @@ struct OperationDefinition<'a> {
     directives: Vec<Directive<'a, String>>,
     variable_definitions: Vec<VariableDefinition<'a, String>>,
     selection_set: SelectionSet<'a, String>,
-    root_field: Field<'a, String>,
 }
 
 #[derive(Clone, Debug)]
@@ -106,13 +101,11 @@ pub fn build_operation<'a>(
         if let Definition::Operation(operation) = definition {
             match operation {
                 graphql_parser::query::OperationDefinition::SelectionSet(selection_set) => {
-                    let root_field = get_root_field(&selection_set, &fragment_definitions)?;
                     operation_definitions.insert(
                         no_name_key.to_string(),
                         OperationDefinition {
                             operation_type: OperationType::Query,
                             selection_set,
-                            root_field,
                             directives: vec![],
                             variable_definitions: vec![],
                         },
@@ -120,13 +113,11 @@ pub fn build_operation<'a>(
                 }
                 graphql_parser::query::OperationDefinition::Query(query) => {
                     let query_name = query.name.unwrap_or_else(|| no_name_key.to_string());
-                    let root_field = get_root_field(&query.selection_set, &fragment_definitions)?;
                     operation_definitions.insert(
                         query_name,
                         OperationDefinition {
                             operation_type: OperationType::Query,
                             selection_set: query.selection_set,
-                            root_field,
                             directives: query.directives,
                             variable_definitions: query.variable_definitions,
                         },
@@ -134,14 +125,11 @@ pub fn build_operation<'a>(
                 }
                 graphql_parser::query::OperationDefinition::Mutation(mutation) => {
                     let mutation_name = mutation.name.unwrap_or_else(|| no_name_key.to_string());
-                    let root_field =
-                        get_root_field(&mutation.selection_set, &fragment_definitions)?;
                     operation_definitions.insert(
                         mutation_name,
                         OperationDefinition {
                             operation_type: OperationType::Mutation,
                             selection_set: mutation.selection_set,
-                            root_field,
                             directives: mutation.directives,
                             variable_definitions: mutation.variable_definitions,
                         },
@@ -150,14 +138,11 @@ pub fn build_operation<'a>(
                 graphql_parser::query::OperationDefinition::Subscription(subscription) => {
                     let subscription_name =
                         subscription.name.unwrap_or_else(|| no_name_key.to_string());
-                    let root_field =
-                        get_root_field(&subscription.selection_set, &fragment_definitions)?;
                     operation_definitions.insert(
                         subscription_name,
                         OperationDefinition {
                             operation_type: OperationType::Subscription,
                             selection_set: subscription.selection_set,
-                            root_field,
                             directives: subscription.directives,
                             variable_definitions: subscription.variable_definitions,
                         },
@@ -179,7 +164,6 @@ pub fn build_operation<'a>(
                         directives: definition.directives,
                         variable_definitions: definition.variable_definitions,
                         selection_set: definition.selection_set,
-                        root_field: definition.root_field,
                         errors: Default::default(),
                         variables,
                     })
@@ -199,7 +183,6 @@ pub fn build_operation<'a>(
                     directives: definition.directives,
                     variable_definitions: definition.variable_definitions,
                     selection_set: definition.selection_set,
-                    root_field: definition.root_field,
                     errors: Default::default(),
                     variables,
                 })
@@ -213,7 +196,6 @@ pub fn build_operation<'a>(
                         directives: definition.directives,
                         variable_definitions: definition.variable_definitions,
                         selection_set: definition.selection_set,
-                        root_field: definition.root_field,
                         errors: Default::default(),
                         variables,
                     })
@@ -222,19 +204,6 @@ pub fn build_operation<'a>(
             },
         },
     }
-}
-
-fn get_root_field<'a>(
-    selection_set: &SelectionSet<'a, String>,
-    fragments: &HashMap<String, FragmentDefinition<'a, String>>,
-) -> Result<Field<'a, String>, GqlError> {
-    let first_item = selection_set.items.first();
-    if let Some(item) = first_item {
-        if let Selection::Field(field) = item {
-            return Ok(field.clone());
-        }
-    }
-    Err(GqlError::new("A query must have root field", None))
 }
 
 #[cfg(test)]

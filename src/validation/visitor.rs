@@ -11,7 +11,7 @@ use graphql_parser::{
 
 use crate::{
     error::Location, operation::Operation, types::schema::ArcSchema, GqlError, GqlTypeDefinition,
-    GqlValueType, OperationType, Variables,
+    GqlValueType, Variables,
 };
 
 use super::utils::get_fragment_definition_on_str;
@@ -54,7 +54,6 @@ pub struct ValidationContext<'a> {
 impl<'a> ValidationContext<'a> {
     pub fn new(
         schema: &'a ArcSchema,
-        doc: &'a Document<'a, String>,
         variables: Option<&'a Variables>,
         operation: &'a Operation<'a>,
     ) -> Self {

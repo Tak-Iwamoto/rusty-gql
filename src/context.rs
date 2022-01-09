@@ -281,20 +281,17 @@ impl<'a> SelectionSetContext<'a> {
 pub(crate) fn build_context<'a>(
     schema: &'a ArcSchema,
     operation: &'a ArcOperation<'a>,
-) -> ExecutionContext<'a, &'a Field<'a, String>> {
+) -> ExecutionContext<'a, &'a SelectionSet<'a, String>> {
     let operation_type = operation.operation_type.to_string();
-    let root_fieldname = operation.root_field.name.to_string();
-    let current_field = &operation.root_field;
 
     let current_path = GraphQLPath::default()
         .prev(None)
-        .current_key(root_fieldname)
         .parent_name(operation_type);
 
     ExecutionContext {
         schema,
         operation,
-        item: current_field,
+        item: &operation.selection_set,
         current_path,
     }
 }

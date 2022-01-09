@@ -41,7 +41,7 @@ impl GqlValueType {
                 base_type_name.eq(&sub_type.name())
             }
             (GqlValueType::NonNullType(base_type), GqlValueType::NamedType(sub_type)) => {
-                if let Some(default) = default_value {
+                if default_value.is_some() {
                     base_type.name().eq(sub_type)
                 } else {
                     false
