@@ -101,12 +101,9 @@ impl<'a> Visitor<'a> for KnownArgumentNames<'a> {
 
 #[cfg(test)]
 mod tests {
-    use crate::validation::test_utils::{
-        assert_fails_rule, assert_passes_rule, check_fails_rule, check_passes_rule,
-        get_query_fragment_definitions, parse_test_query, test_schema,
-    };
+    use crate::{check_fails_rule, check_passes_rule};
 
-    use super::KnownArgumentNames;
+    use super::*;
 
     fn factory<'a>() -> KnownArgumentNames<'a> {
         KnownArgumentNames::default()
@@ -121,9 +118,8 @@ mod tests {
             }
         }
         "#;
-        check_passes_rule(query_doc, factory);
+        check_passes_rule!(query_doc, factory);
     }
-
     #[test]
     fn include_multiple_known_arguments() {
         let query_doc = r#"
@@ -133,7 +129,7 @@ mod tests {
             }
         }
         "#;
-        check_passes_rule(query_doc, factory);
+        check_passes_rule!(query_doc, factory);
     }
 
     #[test]
@@ -145,7 +141,7 @@ mod tests {
             }
         }
         "#;
-        check_passes_rule(query_doc, factory);
+        check_passes_rule!(query_doc, factory);
     }
 
     #[test]
@@ -159,7 +155,7 @@ mod tests {
             }
         }
         "#;
-        check_passes_rule(query_doc, factory);
+        check_passes_rule!(query_doc, factory);
     }
 
     // TODO:
@@ -174,7 +170,7 @@ mod tests {
             }
         }
         "#;
-        check_fails_rule(query_doc, factory);
+        check_fails_rule!(query_doc, factory);
     }
 
     #[test]
@@ -186,7 +182,7 @@ mod tests {
             }
         }
         "#;
-        check_passes_rule(query_doc, factory);
+        check_passes_rule!(query_doc, factory);
     }
 
     #[test]
@@ -198,6 +194,6 @@ mod tests {
             }
         }
         "#;
-        check_fails_rule(query_doc, factory);
+        check_fails_rule!(query_doc, factory);
     }
 }

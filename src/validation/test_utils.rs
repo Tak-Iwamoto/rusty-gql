@@ -33,21 +33,36 @@ where
     }
 }
 
-pub(crate) fn check_passes_rule<'a, V, F>(query_doc: &'static str, factory: F)
-where
-    V: Visitor<'a> + 'a,
-    F: Fn() -> V,
-{
-    let schema = &test_schema();
-    let doc = &parse_test_query(query_doc);
-    let operation = build_test_operation(doc, schema);
-    assert_passes_rule(
-        doc,
-        schema,
-        &operation.fragment_definitions,
-        &operation.root_field,
-        factory,
-    );
+#[macro_export]
+macro_rules! check_passes_rule {
+    ($query_doc: expr, $factory: expr $(,)?) => {
+        let schema = &crate::validation::test_utils::test_schema();
+        let doc = &crate::validation::test_utils::parse_test_query($query_doc);
+        let operation = crate::validation::test_utils::build_test_operation(doc, schema);
+        crate::validation::test_utils::assert_passes_rule(
+            doc,
+            schema,
+            &operation.fragment_definitions,
+            &operation.root_field,
+            $factory,
+        );
+    };
+}
+
+#[macro_export]
+macro_rules! check_fails_rule {
+    ($query_doc: expr, $factory: expr $(,)?) => {
+        let schema = &crate::validation::test_utils::test_schema();
+        let doc = &crate::validation::test_utils::parse_test_query($query_doc);
+        let operation = crate::validation::test_utils::build_test_operation(doc, schema);
+        crate::validation::test_utils::assert_fails_rule(
+            doc,
+            schema,
+            &operation.fragment_definitions,
+            &operation.root_field,
+            $factory,
+        );
+    };
 }
 
 pub(crate) fn assert_passes_rule<'a, V, F>(
@@ -71,22 +86,6 @@ pub(crate) fn assert_passes_rule<'a, V, F>(
     }
 }
 
-pub(crate) fn check_fails_rule<'a, 'b, V, F>(query_doc: &'static str, factory: F)
-where
-    V: Visitor<'b> + 'b,
-    F: Fn() -> V,
-{
-    let schema = &test_schema();
-    let doc = &parse_test_query(query_doc);
-    let operation = build_test_operation(doc, schema);
-    assert_fails_rule(
-        doc,
-        schema,
-        &operation.fragment_definitions,
-        &operation.root_field,
-        factory,
-    );
-}
 pub(crate) fn assert_fails_rule<'a, V, F>(
     doc: &'a Document<'a, String>,
     schema: &'a ArcSchema,

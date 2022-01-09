@@ -53,12 +53,9 @@ fn validate(ctx: &mut ValidationContext, name: &str, position: Pos) {
 
 #[cfg(test)]
 mod tests {
-    use crate::validation::test_utils::{
-        assert_fails_rule, assert_passes_rule, check_fails_rule, check_passes_rule,
-        get_query_fragment_definitions, parse_test_query, test_schema,
-    };
+    use crate::{check_fails_rule, check_passes_rule};
 
-    use super::KnownTypeNames;
+    use super::*;
 
     fn factory() -> KnownTypeNames {
         KnownTypeNames::default()
@@ -79,7 +76,7 @@ mod tests {
             name
         }
         "#;
-        check_passes_rule(query_doc, factory);
+        check_passes_rule!(query_doc, factory);
     }
 
     #[test]
@@ -100,6 +97,6 @@ mod tests {
             name
         }
         "#;
-        check_fails_rule(query_doc, factory);
+        check_fails_rule!(query_doc, factory);
     }
 }

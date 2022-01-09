@@ -28,12 +28,9 @@ impl<'a> Visitor<'a> for DefaultValueOfCorrectType {
 
 #[cfg(test)]
 mod tests {
-    use crate::validation::test_utils::{
-        assert_fails_rule, assert_passes_rule, check_fails_rule, check_passes_rule,
-        get_query_fragment_definitions, parse_test_query, test_schema,
-    };
+    use crate::{check_passes_rule, check_fails_rule};
 
-    use super::DefaultValueOfCorrectType;
+    use super::*;
 
     pub fn factory() -> DefaultValueOfCorrectType {
         DefaultValueOfCorrectType
@@ -48,7 +45,7 @@ mod tests {
             }
         }
         "#;
-        check_passes_rule(query_doc, factory);
+        check_passes_rule!(query_doc, factory);
     }
 
     #[test]
@@ -60,7 +57,7 @@ mod tests {
             }
         }
         "#;
-        check_passes_rule(query_doc, factory);
+        check_passes_rule!(query_doc, factory);
     }
 
     #[test]
@@ -72,7 +69,7 @@ mod tests {
             }
         }
         "#;
-        check_passes_rule(query_doc, factory);
+        check_passes_rule!(query_doc, factory);
     }
 
     #[test]
@@ -84,7 +81,7 @@ mod tests {
             }
         }
         "#;
-        check_fails_rule(query_doc, factory);
+        check_fails_rule!(query_doc, factory);
     }
 
     #[test]
@@ -96,7 +93,7 @@ mod tests {
             }
         }
         "#;
-        check_fails_rule(query_doc, factory);
+        check_fails_rule!(query_doc, factory);
     }
 
     #[test]
@@ -108,7 +105,7 @@ mod tests {
             }
         }
         "#;
-        check_fails_rule(query_doc, factory);
+        check_fails_rule!(query_doc, factory);
     }
 
     #[test]
@@ -120,6 +117,6 @@ mod tests {
             }
         }
         "#;
-        check_fails_rule(query_doc, factory);
+        check_fails_rule!(query_doc, factory);
     }
 }

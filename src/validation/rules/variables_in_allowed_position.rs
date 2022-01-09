@@ -141,12 +141,9 @@ impl<'a> Visitor<'a> for VariablesInAllowedPosition<'a> {
 
 #[cfg(test)]
 mod tests {
-    use crate::validation::test_utils::{
-        assert_fails_rule, assert_passes_rule, build_test_operation, check_fails_rule,
-        check_passes_rule, get_query_fragment_definitions, parse_test_query, test_schema,
-    };
+    use crate::{check_fails_rule, check_passes_rule};
 
-    use super::VariablesInAllowedPosition;
+    use super::*;
 
     fn factory<'a>() -> VariablesInAllowedPosition<'a> {
         VariablesInAllowedPosition::default()
@@ -161,7 +158,7 @@ mod tests {
             }
         }
         "#;
-        check_passes_rule(query_doc, factory);
+        check_passes_rule!(query_doc, factory);
     }
 
     #[test]
@@ -176,7 +173,7 @@ mod tests {
             }
         }
         "#;
-        check_passes_rule(query_doc, factory);
+        check_passes_rule!(query_doc, factory);
     }
 
     #[test]
@@ -188,7 +185,7 @@ mod tests {
             }
         }
         "#;
-        check_passes_rule(query_doc, factory);
+        check_passes_rule!(query_doc, factory);
     }
 
     #[test]
@@ -203,7 +200,7 @@ mod tests {
             }
         }
         "#;
-        check_passes_rule(query_doc, factory);
+        check_passes_rule!(query_doc, factory);
     }
 
     #[test]
@@ -215,7 +212,7 @@ mod tests {
             }
         }
         "#;
-        check_passes_rule(query_doc, factory);
+        check_passes_rule!(query_doc, factory);
     }
 
     #[test]
@@ -227,7 +224,7 @@ mod tests {
             }
         }
         "#;
-        check_fails_rule(query_doc, factory);
+        check_fails_rule!(query_doc, factory);
     }
 
     #[test]
@@ -239,7 +236,7 @@ mod tests {
             }
         }
         "#;
-        check_fails_rule(query_doc, factory);
+        check_fails_rule!(query_doc, factory);
     }
 
     #[test]
@@ -251,7 +248,7 @@ mod tests {
             }
         }
         "#;
-        check_fails_rule(query_doc, factory);
+        check_fails_rule!(query_doc, factory);
     }
 
     #[test]
@@ -263,7 +260,7 @@ mod tests {
             }
         }
         "#;
-        check_passes_rule(query_doc, factory);
+        check_passes_rule!(query_doc, factory);
     }
 
     #[test]
@@ -275,7 +272,7 @@ mod tests {
             }
         }
         "#;
-        check_passes_rule(query_doc, factory);
+        check_passes_rule!(query_doc, factory);
     }
 
     #[test]
@@ -287,7 +284,7 @@ mod tests {
             }
         }
         "#;
-        check_passes_rule(query_doc, factory);
+        check_passes_rule!(query_doc, factory);
     }
 
     #[test]
@@ -299,7 +296,7 @@ mod tests {
             }
         }
         "#;
-        check_passes_rule(query_doc, factory);
+        check_passes_rule!(query_doc, factory);
     }
 
     #[test]
@@ -311,7 +308,7 @@ mod tests {
             }
         }
         "#;
-        check_passes_rule(query_doc, factory);
+        check_passes_rule!(query_doc, factory);
     }
 
     #[test]
@@ -323,7 +320,7 @@ mod tests {
             }
         }
         "#;
-        check_passes_rule(query_doc, factory);
+        check_passes_rule!(query_doc, factory);
     }
 
     #[test]
@@ -333,7 +330,7 @@ mod tests {
             hero @skip(if: $boolVar)
         }
         "#;
-        check_passes_rule(query_doc, factory);
+        check_passes_rule!(query_doc, factory);
     }
 
     #[test]
@@ -343,7 +340,7 @@ mod tests {
             hero @skip(if: $boolVar)
         }
         "#;
-        check_passes_rule(query_doc, factory);
+        check_passes_rule!(query_doc, factory);
     }
 
     #[test]
@@ -353,7 +350,7 @@ mod tests {
             hero @skip(if: $boolVar)
         }
         "#;
-        check_fails_rule(query_doc, factory);
+        check_fails_rule!(query_doc, factory);
     }
 
     #[test]
@@ -363,6 +360,6 @@ mod tests {
             hero @skip(if: $strVar)
         }
         "#;
-        check_fails_rule(query_doc, factory);
+        check_fails_rule!(query_doc, factory);
     }
 }
