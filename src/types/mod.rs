@@ -1,8 +1,7 @@
 mod argument;
 mod directive;
+mod enum_type;
 mod field;
-mod gql_enum;
-mod gql_union;
 mod id;
 mod input_object;
 mod interface;
@@ -10,6 +9,7 @@ mod introspection;
 mod object;
 mod scalar;
 mod type_definition;
+mod union_type;
 pub mod value;
 mod value_type;
 
@@ -26,8 +26,8 @@ pub use value::GqlValue;
 pub use value_type::GqlValueType;
 
 pub use directive::{GqlDirective, GqlDirectiveDefinition};
-pub use gql_enum::{GqlEnum, GqlEnumValue};
-pub use gql_union::GqlUnion;
+pub use enum_type::{GqlEnum, GqlEnumValue};
 pub use input_object::GqlInputObject;
 pub use interface::GqlInterface;
 pub use object::GqlObject;
+pub use union_type::GqlUnion;
