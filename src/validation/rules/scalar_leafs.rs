@@ -1,9 +1,6 @@
 use graphql_parser::query::Field;
 
-use crate::validation::{
-    utils::{is_leaf_type, type_name_from_def},
-    visitor::{ValidationContext, Visitor},
-};
+use crate::validation::visitor::{ValidationContext, Visitor};
 
 #[derive(Default)]
 pub struct ScalarLeafs;
@@ -14,7 +11,7 @@ impl<'a> Visitor<'a> for ScalarLeafs {
             let is_exist = ctx
                 .schema
                 .type_definitions
-                .get(&type_name_from_def(parent_type))
+                .get(parent_type.name())
                 .is_some();
 
             if is_exist {
@@ -22,11 +19,11 @@ impl<'a> Visitor<'a> for ScalarLeafs {
                     let target = ctx.schema.type_definitions.get(&target_field.name);
 
                     if let Some(ty) = target {
-                        if is_leaf_type(ty) && !field.selection_set.items.is_empty() {
+                        if ty.is_leaf_type() && !field.selection_set.items.is_empty() {
                             ctx.add_error(
                         format!("Field {} must not have a selection items because type {} has no subfields", &field.name, ty.to_string()),
                         vec![field.position])
-                        } else if !is_leaf_type(ty) && field.selection_set.items.is_empty() {
+                        } else if !ty.is_leaf_type() && field.selection_set.items.is_empty() {
                             ctx.add_error(
                                 format!("Field {} must have selection items", &field.name),
                                 vec![field.position],

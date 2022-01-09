@@ -1,10 +1,7 @@
 use graphql_parser::query::Field;
 
 use crate::{
-    validation::{
-        utils::type_name_from_def,
-        visitor::{ValidationContext, Visitor},
-    },
+    validation::visitor::{ValidationContext, Visitor},
     GqlTypeDefinition,
 };
 
@@ -29,7 +26,7 @@ impl<'a> Visitor<'a> for FieldsOnCorrectType {
                     format!(
                         "Unknown field \"{}\" on type \"{}\"",
                         field.name,
-                        type_name_from_def(parent_type)
+                        parent_type.name()
                     ),
                     vec![field.position],
                 )
@@ -161,5 +158,4 @@ mod tests {
         let fragments = &get_query_fragment_definitions(doc, schema);
         assert_passes_rule(doc, schema, fragments, factory);
     }
-
 }

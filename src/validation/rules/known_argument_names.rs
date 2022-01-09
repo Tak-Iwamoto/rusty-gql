@@ -3,10 +3,7 @@ use graphql_parser::{
     schema::{Directive, Value},
 };
 
-use crate::validation::{
-    utils::type_name_from_def,
-    visitor::{ValidationContext, Visitor},
-};
+use crate::validation::visitor::{ValidationContext, Visitor};
 
 #[derive(Default)]
 pub struct KnownArgumentNames<'a> {
@@ -58,7 +55,7 @@ impl<'a> Visitor<'a> for KnownArgumentNames<'a> {
                         .collect(),
                     ArgsPosition::Field {
                         field_name: &field.name,
-                        type_name: type_name_from_def(parent_type),
+                        type_name: parent_type.name().to_string(),
                     },
                 ))
             }

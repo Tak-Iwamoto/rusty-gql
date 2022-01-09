@@ -1,9 +1,6 @@
 use graphql_parser::query::{FragmentDefinition, InlineFragment};
 
-use crate::validation::{
-    utils::{is_composite_type, type_name_from_def},
-    visitor::{ValidationContext, Visitor},
-};
+use crate::validation::visitor::{ValidationContext, Visitor};
 
 #[derive(Default)]
 pub struct FragmentsOnCompositeTypes;
@@ -16,11 +13,10 @@ impl<'a> Visitor<'a> for FragmentsOnCompositeTypes {
         fragment_definition: &'a FragmentDefinition<'a, String>,
     ) {
         if let Some(current_type) = ctx.current_type() {
-            let type_name = type_name_from_def(current_type);
-            let target_type = ctx.schema.type_definitions.get(&type_name);
+            let target_type = ctx.schema.type_definitions.get(current_type.name());
 
             if let Some(ty) = target_type {
-                if !is_composite_type(ty) {
+                if !ty.is_composite_type() {
                     ctx.add_error(
                         format!("Fragment {} cannot condition non composite type", name),
                         vec![fragment_definition.position],
@@ -36,13 +32,15 @@ impl<'a> Visitor<'a> for FragmentsOnCompositeTypes {
         inline_fragment: &'a InlineFragment<'a, String>,
     ) {
         if let Some(current_type) = ctx.current_type() {
-            let type_name = type_name_from_def(current_type);
-            let target_type = ctx.schema.type_definitions.get(&type_name);
+            let target_type = ctx.schema.type_definitions.get(current_type.name());
 
             if let Some(ty) = target_type {
-                if !is_composite_type(ty) {
+                if !ty.is_composite_type() {
                     ctx.add_error(
-                        format!("Fragment {} cannot condition non composite type", type_name),
+                        format!(
+                            "Fragment {} cannot condition non composite type",
+                            current_type.name()
+                        ),
                         vec![inline_fragment.position],
                     )
                 }

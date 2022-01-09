@@ -1,8 +1,5 @@
 use crate::{
-    validation::{
-        utils::is_input_type,
-        visitor::{ValidationContext, Visitor},
-    },
+    validation::visitor::{ValidationContext, Visitor},
     GqlValueType,
 };
 
@@ -21,7 +18,7 @@ impl<'a> Visitor<'a> for VariablesAreInputTypes {
             .get(GqlValueType::from(variable_definition.var_type.clone()).name());
 
         if let Some(variable_type) = ty {
-            if !is_input_type(variable_type) {
+            if !variable_type.is_input_type() {
                 ctx.add_error(
                     format!(
                         "Variable {} cannot be non-input type {}",

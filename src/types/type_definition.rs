@@ -80,4 +80,28 @@ impl GqlTypeDefinition {
         self.fields()
             .and_then(|fields| fields.into_iter().find(|f| f.name == name))
     }
+
+    pub fn is_composite_type(&self) -> bool {
+        matches!(
+            self,
+            &GqlTypeDefinition::Object(_)
+                | &GqlTypeDefinition::Interface(_)
+                | &GqlTypeDefinition::Union(_)
+        )
+    }
+
+    pub fn is_input_type(&self) -> bool {
+        matches!(
+            self,
+            &GqlTypeDefinition::Scalar(_)
+                | &GqlTypeDefinition::InputObject(_)
+                | &GqlTypeDefinition::Enum(_)
+        )
+    }
+    pub fn is_leaf_type(&self) -> bool {
+        matches!(
+            self,
+            &GqlTypeDefinition::Enum(_) | &GqlTypeDefinition::Scalar(_)
+        )
+    }
 }

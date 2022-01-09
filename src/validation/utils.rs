@@ -137,24 +137,6 @@ pub fn check_valid_input_value(
     }
 }
 
-pub fn is_sub_type<'a>(base: &GqlValueType, sub: &GqlValueType) -> bool {
-    match (base, sub) {
-        (GqlValueType::NonNullType(base_type), GqlValueType::NonNullType(sub_type)) => {
-            is_sub_type(&*base_type, &*sub_type)
-        }
-        (GqlValueType::NamedType(base_type_name), GqlValueType::NonNullType(sub_type)) => {
-            base_type_name.eq(&sub_type.name())
-        }
-        (GqlValueType::NamedType(base_type_name), GqlValueType::NamedType(sub_type_name)) => {
-            base_type_name.eq(sub_type_name)
-        }
-        (GqlValueType::ListType(base_type), GqlValueType::ListType(sub_type)) => {
-            is_sub_type(&*base_type, &*sub_type)
-        }
-        _ => false,
-    }
-}
-
 pub fn get_type_name(ty: &Type<'_, String>) -> String {
     match ty {
         Type::NamedType(named_type) => named_type.to_string(),
@@ -195,41 +177,6 @@ pub fn get_operation_def_position<'a>(
     }
 }
 
-pub fn is_composite_type(ty: &GqlTypeDefinition) -> bool {
-    matches!(
-        ty,
-        &GqlTypeDefinition::Object(_)
-            | &GqlTypeDefinition::Interface(_)
-            | &GqlTypeDefinition::Union(_)
-    )
-}
-
-pub fn is_input_type(ty: &GqlTypeDefinition) -> bool {
-    matches!(
-        ty,
-        &GqlTypeDefinition::Scalar(_)
-            | &GqlTypeDefinition::InputObject(_)
-            | &GqlTypeDefinition::Enum(_)
-    )
-}
-
-pub fn is_leaf_type(ty: &GqlTypeDefinition) -> bool {
-    matches!(
-        ty,
-        &GqlTypeDefinition::Enum(_) | &GqlTypeDefinition::Scalar(_)
-    )
-}
-
-pub fn type_name_from_def<'a>(type_definition: &GqlTypeDefinition) -> String {
-    match type_definition {
-        GqlTypeDefinition::Scalar(scalar) => scalar.name.clone(),
-        GqlTypeDefinition::Object(obj) => obj.name.clone(),
-        GqlTypeDefinition::Interface(interface) => interface.name.clone(),
-        GqlTypeDefinition::Union(uni) => uni.name.clone(),
-        GqlTypeDefinition::Enum(enu) => enu.name.clone(),
-        GqlTypeDefinition::InputObject(input_obj) => input_obj.name.clone(),
-    }
-}
 pub fn get_fragment_definition_on_str<'a>(
     type_condition: Option<&TypeCondition<'a, String>>,
 ) -> Option<String> {
