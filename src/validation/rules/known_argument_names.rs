@@ -45,6 +45,7 @@ impl<'a> Visitor<'a> for KnownArgumentNames<'a> {
     }
 
     fn enter_field(&mut self, ctx: &mut ValidationContext, field: &'a Field<'a, String>) {
+        println!("{:?}", &ctx.type_stack);
         if let Some(parent_type) = ctx.parent_type() {
             if let Some(target_field) = parent_type.get_field_by_name(&field.name) {
                 self.current_args = Some((
@@ -100,12 +101,9 @@ impl<'a> Visitor<'a> for KnownArgumentNames<'a> {
 
 #[cfg(test)]
 mod tests {
-    use crate::validation::test_utils::{
-        assert_fails_rule, assert_passes_rule, get_query_fragment_definitions, parse_test_query,
-        test_schema,
-    };
+    use crate::{check_fails_rule, check_passes_rule};
 
-    use super::KnownArgumentNames;
+    use super::*;
 
     fn factory<'a>() -> KnownArgumentNames<'a> {
         KnownArgumentNames::default()
@@ -120,12 +118,8 @@ mod tests {
             }
         }
         "#;
-        let schema = &test_schema();
-        let doc = &parse_test_query(query_doc);
-        let fragments = &get_query_fragment_definitions(doc, schema);
-        assert_passes_rule(doc, schema, fragments, factory);
+        check_passes_rule!(query_doc, factory);
     }
-
     #[test]
     fn include_multiple_known_arguments() {
         let query_doc = r#"
@@ -135,10 +129,7 @@ mod tests {
             }
         }
         "#;
-        let schema = &test_schema();
-        let doc = &parse_test_query(query_doc);
-        let fragments = &get_query_fragment_definitions(doc, schema);
-        assert_passes_rule(doc, schema, fragments, factory);
+        check_passes_rule!(query_doc, factory);
     }
 
     #[test]
@@ -150,10 +141,7 @@ mod tests {
             }
         }
         "#;
-        let schema = &test_schema();
-        let doc = &parse_test_query(query_doc);
-        let fragments = &get_query_fragment_definitions(doc, schema);
-        assert_passes_rule(doc, schema, fragments, factory);
+        check_passes_rule!(query_doc, factory);
     }
 
     #[test]
@@ -167,12 +155,10 @@ mod tests {
             }
         }
         "#;
-        let schema = &test_schema();
-        let doc = &parse_test_query(query_doc);
-        let fragments = &get_query_fragment_definitions(doc, schema);
-        assert_passes_rule(doc, schema, fragments, factory);
+        check_passes_rule!(query_doc, factory);
     }
 
+    // TODO:
     #[test]
     fn invalid_argument_name() {
         let query_doc = r#"
@@ -184,10 +170,7 @@ mod tests {
             }
         }
         "#;
-        let schema = &test_schema();
-        let doc = &parse_test_query(query_doc);
-        let fragments = &get_query_fragment_definitions(doc, schema);
-        assert_fails_rule(doc, schema, fragments, factory);
+        check_fails_rule!(query_doc, factory);
     }
 
     #[test]
@@ -199,10 +182,7 @@ mod tests {
             }
         }
         "#;
-        let schema = &test_schema();
-        let doc = &parse_test_query(query_doc);
-        let fragments = &get_query_fragment_definitions(doc, schema);
-        assert_passes_rule(doc, schema, fragments, factory);
+        check_passes_rule!(query_doc, factory);
     }
 
     #[test]
@@ -214,9 +194,6 @@ mod tests {
             }
         }
         "#;
-        let schema = &test_schema();
-        let doc = &parse_test_query(query_doc);
-        let fragments = &get_query_fragment_definitions(doc, schema);
-        assert_fails_rule(doc, schema, fragments, factory);
+        check_fails_rule!(query_doc, factory);
     }
 }

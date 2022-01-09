@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use graphql_parser::query::{Document, FragmentDefinition};
+use graphql_parser::query::{Document, Field, FragmentDefinition};
 
 use crate::{types::schema::ArcSchema, GqlError, Schema, Variables};
 
@@ -16,9 +16,10 @@ pub fn apply_validation<'a>(
     query_doc: &'a Document<'a, String>,
     variables: Option<&'a Variables>,
     fragments: &'a HashMap<String, FragmentDefinition<'a, String>>,
+    root_field: &'a Field<'a, String>,
     operation_name: Option<&'a str>,
 ) -> Result<(), Vec<GqlError>> {
-    let mut ctx = ValidationContext::new(schema, query_doc, variables, fragments);
+    let mut ctx = ValidationContext::new(schema, query_doc, variables, fragments, root_field);
     let mut visitor = NewVisitor
         .with(rules::DefaultValueOfCorrectType::default())
         .with(rules::FieldsOnCorrectType::default())

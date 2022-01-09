@@ -152,11 +152,9 @@ impl<'a> Visitor<'a> for NoUndefinedVariables<'a> {
 
 #[cfg(test)]
 mod tests {
-    use crate::validation::test_utils::{
-        assert_passes_rule, get_query_fragment_definitions, parse_test_query, test_schema,
-    };
+    use crate::check_passes_rule;
 
-    use super::NoUndefinedVariables;
+    use super::*;
 
     fn factory<'a>() -> NoUndefinedVariables<'a> {
         NoUndefinedVariables::default()
@@ -169,10 +167,7 @@ mod tests {
             test_vars(a: $a, b: $b, c: $c)
         }
         "#;
-        let schema = &test_schema();
-        let doc = &parse_test_query(query_doc);
-        let fragments = &get_query_fragment_definitions(doc, schema);
-        assert_passes_rule(doc, schema, fragments, factory)
+        check_passes_rule!(query_doc, factory);
     }
 
     #[test]
@@ -186,10 +181,7 @@ mod tests {
             }
         }
         "#;
-        let schema = &test_schema();
-        let doc = &parse_test_query(query_doc);
-        let fragments = &get_query_fragment_definitions(doc, schema);
-        assert_passes_rule(doc, schema, fragments, factory)
+        check_passes_rule!(query_doc, factory);
     }
 
     #[test]
@@ -207,9 +199,6 @@ mod tests {
             }
         }
         "#;
-        let schema = &test_schema();
-        let doc = &parse_test_query(query_doc);
-        let fragments = &get_query_fragment_definitions(doc, schema);
-        assert_passes_rule(doc, schema, fragments, factory)
+        check_passes_rule!(query_doc, factory);
     }
 }

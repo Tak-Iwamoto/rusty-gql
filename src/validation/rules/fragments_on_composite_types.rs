@@ -51,12 +51,9 @@ impl<'a> Visitor<'a> for FragmentsOnCompositeTypes {
 
 #[cfg(test)]
 mod tests {
-    use crate::validation::test_utils::{
-        assert_fails_rule, assert_passes_rule, get_query_fragment_definitions, parse_test_query,
-        test_schema,
-    };
+    use crate::{check_fails_rule, check_passes_rule};
 
-    use super::FragmentsOnCompositeTypes;
+    use super::*;
 
     fn factory() -> FragmentsOnCompositeTypes {
         FragmentsOnCompositeTypes::default()
@@ -70,10 +67,7 @@ mod tests {
         }
         { __typename }
         "#;
-        let schema = &test_schema();
-        let doc = &parse_test_query(query_doc);
-        let fragments = &get_query_fragment_definitions(doc, schema);
-        assert_passes_rule(doc, schema, fragments, factory);
+        check_passes_rule!(query_doc, factory);
     }
 
     #[test]
@@ -84,10 +78,7 @@ mod tests {
         }
         { __typename }
         "#;
-        let schema = &test_schema();
-        let doc = &parse_test_query(query_doc);
-        let fragments = &get_query_fragment_definitions(doc, schema);
-        assert_passes_rule(doc, schema, fragments, factory);
+        check_passes_rule!(query_doc, factory);
     }
 
     #[test]
@@ -100,10 +91,7 @@ mod tests {
         }
         { __typename }
         "#;
-        let schema = &test_schema();
-        let doc = &parse_test_query(query_doc);
-        let fragments = &get_query_fragment_definitions(doc, schema);
-        assert_passes_rule(doc, schema, fragments, factory);
+        check_passes_rule!(query_doc, factory);
     }
 
     #[test]
@@ -116,10 +104,7 @@ mod tests {
         }
         { __typename }
         "#;
-        let schema = &test_schema();
-        let doc = &parse_test_query(query_doc);
-        let fragments = &get_query_fragment_definitions(doc, schema);
-        assert_passes_rule(doc, schema, fragments, factory);
+        check_passes_rule!(query_doc, factory);
     }
 
     #[test]
@@ -130,10 +115,7 @@ mod tests {
         }
         { __typename }
         "#;
-        let schema = &test_schema();
-        let doc = &parse_test_query(query_doc);
-        let fragments = &get_query_fragment_definitions(doc, schema);
-        assert_passes_rule(doc, schema, fragments, factory);
+        check_passes_rule!(query_doc, factory);
     }
 
     #[test]
@@ -144,10 +126,7 @@ mod tests {
         }
         { __typename }
         "#;
-        let schema = &test_schema();
-        let doc = &parse_test_query(query_doc);
-        let fragments = &get_query_fragment_definitions(doc, schema);
-        assert_fails_rule(doc, schema, fragments, factory);
+        check_fails_rule!(query_doc, factory);
     }
 
     #[test]
@@ -158,10 +137,7 @@ mod tests {
         }
         { __typename }
         "#;
-        let schema = &test_schema();
-        let doc = &parse_test_query(query_doc);
-        let fragments = &get_query_fragment_definitions(doc, schema);
-        assert_fails_rule(doc, schema, fragments, factory);
+        check_fails_rule!(query_doc, factory);
     }
 
     #[test]
@@ -172,10 +148,7 @@ mod tests {
         }
         { __typename }
         "#;
-        let schema = &test_schema();
-        let doc = &parse_test_query(query_doc);
-        let fragments = &get_query_fragment_definitions(doc, schema);
-        assert_fails_rule(doc, schema, fragments, factory);
+        check_fails_rule!(query_doc, factory);
     }
 
     #[test]
@@ -188,9 +161,6 @@ mod tests {
         }
         { __typename }
         "#;
-        let schema = &test_schema();
-        let doc = &parse_test_query(query_doc);
-        let fragments = &get_query_fragment_definitions(doc, schema);
-        assert_fails_rule(doc, schema, fragments, factory);
+        check_fails_rule!(query_doc, factory);
     }
 }
