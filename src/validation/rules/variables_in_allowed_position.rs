@@ -234,6 +234,21 @@ mod tests {
     }
 
     #[test]
+    fn nullable_int_into_non_null_int() {
+        let query_doc = r#"
+        query Test($intVar: Int) {
+            argTest {
+                nonNullIntArgField(intArg: $intVar)
+            }
+        }
+        "#;
+        let schema = &test_schema();
+        let doc = &parse_test_query(query_doc);
+        let fragments = &get_query_fragment_definitions(doc, schema);
+        assert_fails_rule(doc, schema, fragments, factory);
+    }
+
+    #[test]
     fn string_list_into_string_list() {
         let query_doc = r#"
         query Test($stringListVar: [String]) {
