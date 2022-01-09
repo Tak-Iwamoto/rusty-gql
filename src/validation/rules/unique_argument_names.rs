@@ -37,3 +37,107 @@ impl<'a> Visitor<'a> for UniqueArgumentNames<'a> {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::validation::test_utils::{
+        assert_fails_rule, assert_passes_rule, get_query_fragment_definitions, parse_test_query,
+        test_schema,
+    };
+
+    use super::UniqueArgumentNames;
+
+    fn factory<'a>() -> UniqueArgumentNames<'a> {
+        UniqueArgumentNames::default()
+    }
+
+    #[test]
+    fn no_args_on_field() {
+        let query_doc = r#"
+        {
+            human {
+                name
+            }
+        }
+        "#;
+        let schema = &test_schema();
+        let doc = &parse_test_query(query_doc);
+        let fragments = &get_query_fragment_definitions(doc, schema);
+        assert_passes_rule(doc, schema, fragments, factory);
+    }
+
+    #[test]
+    fn no_args_on_directive() {
+        let query_doc = r#"
+        {
+            human {
+                name @deprecated
+            }
+        }
+        "#;
+        let schema = &test_schema();
+        let doc = &parse_test_query(query_doc);
+        let fragments = &get_query_fragment_definitions(doc, schema);
+        assert_passes_rule(doc, schema, fragments, factory);
+    }
+
+    #[test]
+    fn args_on_field() {
+        let query_doc = r#"
+        {
+            droid(id: 1) {
+                name
+            }
+        }
+        "#;
+        let schema = &test_schema();
+        let doc = &parse_test_query(query_doc);
+        let fragments = &get_query_fragment_definitions(doc, schema);
+        assert_passes_rule(doc, schema, fragments, factory);
+    }
+
+    #[test]
+    fn args_on_directive() {
+        let query_doc = r#"
+        {
+            human {
+                name @skip(if: true)
+            }
+        }
+        "#;
+        let schema = &test_schema();
+        let doc = &parse_test_query(query_doc);
+        let fragments = &get_query_fragment_definitions(doc, schema);
+        assert_passes_rule(doc, schema, fragments, factory);
+    }
+
+    #[test]
+    fn duplicate_args_on_field() {
+        let query_doc = r#"
+        {
+            droid(id: 1, id: 2, id: 3) {
+                name
+            }
+        }
+        "#;
+        let schema = &test_schema();
+        let doc = &parse_test_query(query_doc);
+        let fragments = &get_query_fragment_definitions(doc, schema);
+        assert_fails_rule(doc, schema, fragments, factory);
+    }
+
+    #[test]
+    fn duplicate_args_on_directive() {
+        let query_doc = r#"
+        {
+            human {
+                name @skip(if: true, if: false, if: true)
+            }
+        }
+        "#;
+        let schema = &test_schema();
+        let doc = &parse_test_query(query_doc);
+        let fragments = &get_query_fragment_definitions(doc, schema);
+        assert_fails_rule(doc, schema, fragments, factory);
+    }
+}
