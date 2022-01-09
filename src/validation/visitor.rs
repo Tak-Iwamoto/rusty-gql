@@ -10,10 +10,8 @@ use graphql_parser::{
 };
 
 use crate::{
-    error::Location,
-    operation::{get_root_field_ty, Operation},
-    types::schema::ArcSchema,
-    GqlError, GqlTypeDefinition, GqlValueType, Schema, Variables,
+    error::Location, operation::Operation, types::schema::ArcSchema, GqlError, GqlTypeDefinition,
+    GqlValueType, OperationType, Variables,
 };
 
 use super::utils::get_fragment_definition_on_str;
@@ -563,8 +561,12 @@ fn visit_operation_definition<'a, T: Visitor<'a>>(
 
     match operation_definition {
         OperationDefinition::SelectionSet(selection_set) => {
-            let root_ty = get_root_field_ty(&ctx.operation, &ctx.schema);
-            ctx.with_type(ctx.schema.type_definitions.get(root_ty.name()), |ctx| {
+            let root_ty = match ctx.operation.operation_type {
+                OperationType::Query => ctx.schema.query_type_name.to_string(),
+                OperationType::Mutation => ctx.schema.mutation_type_name.to_string(),
+                OperationType::Subscription => ctx.schema.subscription_type_name.to_string(),
+            };
+            ctx.with_type(ctx.schema.type_definitions.get(&root_ty), |ctx| {
                 visit_selection_set(visitor, ctx, selection_set);
             })
         }
@@ -623,7 +625,7 @@ fn visit_selection<'a, T: Visitor<'a>>(
                 ctx.with_type(
                     ctx.current_type()
                         .and_then(|ty| ty.get_field_by_name(&field.name))
-                        .and_then(|f| ctx.schema.type_definitions.get(&f.name)),
+                        .and_then(|f| ctx.schema.type_definitions.get(f.meta_type.name())),
                     |ctx| visit_field(visitor, ctx, field),
                 )
             }
