@@ -6,12 +6,7 @@ use graphql_parser::{
     Pos,
 };
 
-use crate::{
-    types::{GqlScalar, GqlValueType},
-    GqlTypeDefinition, GqlValue, Schema,
-};
-
-use super::visitor::ValidationContext;
+use crate::{types::GqlValueType, GqlTypeDefinition, Schema};
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
 pub enum Scope<'a> {
@@ -30,10 +25,6 @@ pub enum DirectiveLocation {
     InlineFragment,
 }
 
-fn check_arg_uniqueness(ctx: &mut ValidationContext<'_>, args: &Vec<(String, Value<'_, String>)>) {
-    for (arg_name, arg_value) in args {}
-}
-
 pub fn check_valid_input_value(
     schema: &Schema,
     ty: &Type<'_, String>,
@@ -47,8 +38,8 @@ pub fn check_valid_input_value(
             let type_def = schema.type_definitions.get(type_name);
             match type_def {
                 Some(def) => match def {
-                    GqlTypeDefinition::Scalar(_) => {
-                        if GqlScalar::is_valid_value(value) {
+                    GqlTypeDefinition::Scalar(scalar) => {
+                        if scalar.is_valid_value(value) {
                             None
                         } else {
                             Some("Invalid type".to_string())

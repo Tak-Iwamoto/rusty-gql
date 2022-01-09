@@ -28,7 +28,7 @@ impl<'a> Visitor<'a> for DefaultValueOfCorrectType {
 
 #[cfg(test)]
 mod tests {
-    use crate::{check_passes_rule, check_fails_rule};
+    use crate::{check_fails_rule, check_passes_rule};
 
     use super::*;
 

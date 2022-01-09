@@ -26,13 +26,13 @@ impl<'a> From<ScalarType<'a, String>> for GqlScalar {
 }
 
 impl GqlScalar {
-    pub fn is_valid_value(value: &Value<'_, String>) -> bool {
+    pub fn is_valid_value(&self, value: &Value<'_, String>) -> bool {
         match value {
             Value::Variable(_) => false,
-            Value::Int(_) => true,
-            Value::Float(_) => true,
-            Value::String(_) => true,
-            Value::Boolean(_) => true,
+            Value::Int(_) => self.name == "Int".to_string(),
+            Value::Float(_) => self.name == "Float".to_string(),
+            Value::String(_) => self.name == "String".to_string(),
+            Value::Boolean(_) => self.name == "Boolean".to_string(),
             Value::Null => true,
             Value::Enum(_) => false,
             Value::List(_) => false,

@@ -75,7 +75,7 @@ mod tests {
     fn ignore_unknown_args() {
         let query_doc = r#"
         {
-            human {
+            human(id: 1) {
                 friendsConnection(unknown_arg: "value") {
                     name
                 }
@@ -89,7 +89,7 @@ mod tests {
     fn args_on_nullable_arg() {
         let query_doc = r#"
         {
-            human {
+            human(id: 1) {
                 friendsConnection(first: 10) {
                     name
                 }
@@ -103,7 +103,7 @@ mod tests {
     fn no_args_on_nullable_arg() {
         let query_doc = r#"
         {
-            human {
+            human(id: 1) {
                 friendsConnection {
                     name
                 }
@@ -117,7 +117,7 @@ mod tests {
     fn missing_non_null_arg() {
         let query_doc = r#"
         {
-            human {
+            human(id: 1) {
                 non_null_test {
                     name
                 }
@@ -131,7 +131,7 @@ mod tests {
     fn ignore_unknown_directives() {
         let query_doc = r#"
         {
-            human @unknown {
+            human(id: 1) @unknown {
                 name
             }
         }
@@ -143,7 +143,7 @@ mod tests {
     fn valid_directive() {
         let query_doc = r#"
         {
-            human @skip(if: false) {
+            human(id: 1) @skip(if: false) {
                 name
             }
         }
@@ -155,7 +155,7 @@ mod tests {
     fn missing_directive_arg() {
         let query_doc = r#"
         {
-            human @skip {
+            human(id: 1) @skip {
                 name
             }
         }

@@ -61,7 +61,7 @@ mod tests {
     fn missing_interface_field() {
         let query_doc = r#"
         {
-            human {
+            human(id: 1) {
                 friends
             }
         }
