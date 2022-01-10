@@ -12,7 +12,7 @@ pub async fn test_int() {
             10
         }
     }
-    let contents = schema_content("./tests/schemas/simple_dummy.graphql");
+    let contents = schema_content("./tests/schemas/test_schema.graphql");
 
     let container = ArcContainer::new(
         &vec![contents.as_str()],
@@ -70,7 +70,7 @@ pub async fn test_object() {
         }
     }
 
-    let contents = schema_content("./tests/schemas/simple_dummy.graphql");
+    let contents = schema_content("./tests/schemas/test_schema.graphql");
 
     let container = ArcContainer::new(
         &vec![contents.as_str()],

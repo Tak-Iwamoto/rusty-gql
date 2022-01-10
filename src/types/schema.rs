@@ -393,7 +393,7 @@ mod tests {
         assert!(schema.queries.get("repository").is_some());
         assert!(schema.type_definitions.get("AddCommentInput").is_some());
 
-        let base = fs::read_to_string("tests/schemas/pet_schema.graphql").unwrap();
+        let base = fs::read_to_string("tests/schemas/test_schema.graphql").unwrap();
         let extend = fs::read_to_string("tests/schemas/extend.graphql").unwrap();
         let schema = build_schema(&vec![base.as_str(), extend.as_str()]).unwrap();
 

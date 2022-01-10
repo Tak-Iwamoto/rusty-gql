@@ -1,32 +1,6 @@
 use rusty_gql::*;
 
 #[tokio::test]
-async fn test_schema_types() {
-    struct Query;
-
-    #[Resolver]
-    impl Query {
-        async fn value(&self) -> i32 {
-            10
-        }
-    }
-    let contents = schema_content("./tests/schemas/pet_schema.graphql");
-
-    let container = ArcContainer::new(
-        &vec![contents.as_str()],
-        QueryRoot { query: Query },
-        EmptyMutation,
-        EmptySubscription,
-    )
-    .unwrap();
-
-    let query = r#"{ __schema { types { name } } }"#;
-    let req = build_test_request(query, None, Default::default());
-    let expected_response = r#"{"data":{"__schema":{"types":[{"name":"Boolean"},{"name":"Cat"},{"name":"Dog"},{"name":"Float"},{"name":"ID"},{"name":"Int"},{"name":"Pet"},{"name":"Query"},{"name":"String"}]}}}"#;
-    check_gql_response(req, expected_response, &container).await;
-}
-
-#[tokio::test]
 async fn test_object_introspection() {
     struct Query;
 
@@ -36,7 +10,7 @@ async fn test_object_introspection() {
             10
         }
     }
-    let contents = schema_content("./tests/schemas/pet_schema.graphql");
+    let contents = schema_content("./tests/schemas/test_schema.graphql");
 
     let container = ArcContainer::new(
         &vec![contents.as_str()],
@@ -62,7 +36,7 @@ async fn test_interface_introspection() {
             10
         }
     }
-    let contents = schema_content("./tests/schemas/pet_schema.graphql");
+    let contents = schema_content("./tests/schemas/test_schema.graphql");
 
     let container = ArcContainer::new(
         &vec![contents.as_str()],
@@ -88,7 +62,7 @@ async fn test_input_object_introspection() {
             10
         }
     }
-    let contents = schema_content("./tests/schemas/pet_schema.graphql");
+    let contents = schema_content("./tests/schemas/test_schema.graphql");
 
     let container = ArcContainer::new(
         &vec![contents.as_str()],
@@ -114,7 +88,7 @@ async fn test_enum_introspection() {
             10
         }
     }
-    let contents = schema_content("./tests/schemas/pet_schema.graphql");
+    let contents = schema_content("./tests/schemas/test_schema.graphql");
 
     let container = ArcContainer::new(
         &vec![contents.as_str()],
@@ -140,7 +114,7 @@ async fn test_union_introspection() {
             10
         }
     }
-    let contents = schema_content("./tests/schemas/pet_schema.graphql");
+    let contents = schema_content("./tests/schemas/test_schema.graphql");
 
     let container = ArcContainer::new(
         &vec![contents.as_str()],
@@ -166,7 +140,7 @@ async fn test_scalar_introspection() {
             10
         }
     }
-    let contents = schema_content("./tests/schemas/pet_schema.graphql");
+    let contents = schema_content("./tests/schemas/test_schema.graphql");
 
     let container = ArcContainer::new(
         &vec![contents.as_str()],

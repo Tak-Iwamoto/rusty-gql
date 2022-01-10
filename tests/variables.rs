@@ -10,7 +10,7 @@ pub async fn test_variables() {
             value * 2
         }
     }
-    let contents = schema_content("./tests/schemas/pet_schema.graphql");
+    let contents = schema_content("./tests/schemas/test_schema.graphql");
 
     let container = ArcContainer::new(
         &vec![contents.as_str()],
