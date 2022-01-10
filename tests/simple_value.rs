@@ -16,7 +16,7 @@ pub async fn test_int() {
 
     let container = ArcContainer::new(
         &vec![contents.as_str()],
-        Query,
+        QueryRoot { query: Query },
         EmptyMutation,
         EmptySubscription,
     )

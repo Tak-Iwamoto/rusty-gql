@@ -1,9 +1,6 @@
 use graphql_parser::query::Field;
 
-use crate::{
-    validation::visitor::{ValidationContext, Visitor},
-    GqlTypeDefinition,
-};
+use crate::validation::visitor::{ValidationContext, Visitor};
 
 #[derive(Default)]
 pub struct FieldsOnCorrectType;
@@ -11,13 +8,8 @@ pub struct FieldsOnCorrectType;
 impl<'a> Visitor<'a> for FieldsOnCorrectType {
     fn enter_field(&mut self, ctx: &mut ValidationContext, field: &'a Field<'a, String>) {
         if let Some(parent_type) = ctx.parent_type() {
-            if matches!(
-                parent_type,
-                GqlTypeDefinition::Union(_) | GqlTypeDefinition::Interface(_)
-            ) {
-                if field.name == "__typename" {
-                    return;
-                }
+            if field.name == "__typename" || field.name == "__type" || field.name == "__schema" {
+                return;
             }
 
             if parent_type.get_field_by_name(&field.name).is_none() {

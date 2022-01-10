@@ -85,7 +85,7 @@ pub(crate) fn assert_fails_rule<'a, V, F>(
 }
 
 pub(crate) fn test_schema() -> ArcSchema {
-    let contents = std::fs::read_to_string("tests/schemas/starwars.graphql").unwrap();
+    let contents = std::fs::read_to_string("tests/schemas/validation_test.graphql").unwrap();
     let schema = build_schema(&vec![contents.as_str()]).unwrap();
     ArcSchema::new(schema)
 }

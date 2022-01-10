@@ -12,6 +12,9 @@ type Query {
   droid(id: ID!): Droid
   human(id: ID!): Human
   starship(id: ID!): Starship
+  test_vars(a: String, b: String, c: String): Character
+  test_bool(boolArg: Boolean): Character
+  argTest: ArgsTest
 }
 
 type Mutation {
@@ -25,6 +28,28 @@ enum Episode {
   NEWHOPE
   EMPIRE
   JEDI
+}
+
+input ArgTestInput {
+  nonNullBooleanField: Boolean!
+  intField: Int
+  nonNullIntField: Int!
+  stringField: String
+  booleanField: Boolean
+  stringListField: [String]
+}
+
+type ArgsTest {
+  intArgField(intArg: Int): String
+  nonNullIntArgField(intArg: Int!): String
+  stringArgField(stringArg: String): String
+  booleanArgField(booleanArg: Boolean): String
+  enumArgField(enumArg: LengthUnit): String
+  floatArgField(floatArg: Float): String
+  idArgField(idArg: ID): String
+  stringListArgField(stringListArg: [String]): String
+  inputArgField(inputArg: ArgTestInput): String
+  multiIntArgField(intArg1: Int, intArg2: Int): String
 }
 
 interface Character {
@@ -51,6 +76,9 @@ type Human implements Character {
   friendsConnection(first: Int, after: ID): FriendsConnection!
   appearsIn: [Episode]!
   starships: [Starship]
+  isValid: Boolean
+  non_null_test(stringArg: String!, intArg: Int!): Character
+  boolTest(if: Boolean!): Boolean
 }
 
 type Droid implements Character {
@@ -104,6 +132,15 @@ type Starship {
   coordinates: [[Float!]!]
 }
 union SearchResult = Human | Droid | Starship
+
+directive @preview(
+  toggledBy: String!
+) on SCALAR | OBJECT | FIELD_DEFINITION | ARGUMENT_DEFINITION | INTERFACE | UNION | ENUM | ENUM_VALUE | INPUT_OBJECT | INPUT_FIELD_DEFINITION
+
+directive @possibleTypes(
+  abstractType: String
+  concreteTypes: [String!]!
+) on INPUT_FIELD_DEFINITION
 
 scalar Base64String
 scalar Date

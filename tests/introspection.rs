@@ -11,19 +11,12 @@ async fn test_introspection_works() {
         async fn value(&self) -> i32 {
             10
         }
-        async fn obj(&self) -> BTreeMap<String, i32> {
-            let mut map = BTreeMap::new();
-            map.insert("key1".to_string(), 1);
-            map.insert("key2".to_string(), 2);
-            map
-        }
     }
-    let contents = std::fs::read_to_string("./tests/schemas/github.graphql").unwrap();
-    let query_root = QueryRoot { query: Query };
+    let contents = schema_content("./tests/schemas/github.graphql");
 
     let container = ArcContainer::new(
         &vec![contents.as_str()],
-        query_root,
+        QueryRoot { query: Query },
         EmptyMutation,
         EmptySubscription,
     )
@@ -48,6 +41,7 @@ async fn test_introspection_works() {
         variables: Variables(BTreeMap::new()),
     };
     let res = execute(&container, req).await;
+    println!("{:?}", res);
     let res_string = serde_json::to_string(&res.data).unwrap();
     println!("{:?}", res_string);
 
@@ -63,7 +57,4 @@ async fn test_introspection_works() {
         operation_name: None,
         variables: Variables(BTreeMap::new()),
     };
-    let res = execute(&container, req).await;
-    let res_string = serde_json::to_string(&res.data).unwrap();
-    println!("{:?}", res_string);
 }
