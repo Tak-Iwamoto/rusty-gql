@@ -1,5 +1,6 @@
 type Query {
   pets(first: Int): [Pet!]
+  twice_value(value: Int!): Int!
 }
 
 interface Pet {

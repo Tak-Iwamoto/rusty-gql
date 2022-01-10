@@ -1,6 +1,9 @@
 use graphql_parser::Pos;
 
-use crate::validation::visitor::{ValidationContext, Visitor};
+use crate::{
+    validation::visitor::{ValidationContext, Visitor},
+    GqlValueType,
+};
 
 #[derive(Default)]
 pub struct KnownTypeNames;
@@ -25,7 +28,7 @@ impl<'a> Visitor<'a> for KnownTypeNames {
     ) {
         validate(
             ctx,
-            &variable_definition.var_type.to_string(),
+            GqlValueType::from(variable_definition.var_type.clone()).name(),
             variable_definition.position,
         )
     }
