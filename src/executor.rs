@@ -5,6 +5,7 @@ use crate::{
     operation::{build_operation, ArcOperation},
     request::Request,
     response::Response,
+    validation::apply_validation,
     FieldResolver, OperationType,
 };
 
@@ -19,12 +20,26 @@ pub async fn execute<Query: FieldResolver, Mutation: FieldResolver, Subscription
             return Response::from_errors(vec![err]);
         }
     };
-    let operation = build_operation(&query_doc, request.operation_name, request.variables);
+    let operation = build_operation(
+        &query_doc,
+        request.operation_name.clone(),
+        request.variables.clone(),
+    );
 
     let operation = match operation {
         Ok(op) => ArcOperation::new(op),
         Err(error) => return Response::from_errors(vec![error]),
     };
+
+    if let Err(errors) = apply_validation(
+        &container.schema,
+        &query_doc,
+        Some(&request.variables),
+        &operation,
+        request.operation_name.as_deref(),
+    ) {
+        return Response::from_errors(errors);
+    }
 
     let ctx = build_context(&container.schema, &operation);
 
