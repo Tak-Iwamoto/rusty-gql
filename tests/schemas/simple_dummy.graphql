@@ -1,12 +1,12 @@
 type Query {
   value: Int
-  person: Person
+  person(id: ID): Person
   obj: Obj
 }
 
 type Person {
   name: String!
-  description: String!
+  description: String
   age: Int!
 }
 

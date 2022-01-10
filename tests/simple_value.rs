@@ -29,6 +29,25 @@ pub async fn test_int() {
 
 #[tokio::test]
 pub async fn test_object() {
+    struct Person {
+        name: String,
+        description: Option<String>,
+        age: i32,
+    }
+
+    #[Resolver]
+    impl Person {
+        async fn name(&self) -> String {
+            self.name.clone()
+        }
+        async fn description(&self) -> Option<String> {
+            self.description.clone()
+        }
+        async fn age(&self) -> i32 {
+            self.age.clone()
+        }
+    }
+
     struct Query;
 
     #[Resolver]
@@ -38,6 +57,15 @@ pub async fn test_object() {
             map.insert("key1".to_string(), 1);
             map.insert("key2".to_string(), 2);
             map
+        }
+
+        async fn person(&self, id: ID) -> Person {
+            let person = Person {
+                name: "Tom".to_string(),
+                description: Some("description".to_string()),
+                age: 20,
+            };
+            person
         }
     }
 
@@ -50,7 +78,16 @@ pub async fn test_object() {
         EmptySubscription,
     )
     .unwrap();
-    let query_doc = r#"{"query": "{ obj { key1 key2} }"}"#;
-    let expected_response = r#"{"data":{"obj":{"key1":1,"key2":2}}}"#;
-    check_gql_response(query_doc, expected_response, &container).await;
+
+    let obj_query = r#"{"query": "{ obj { key1 key2} }"}"#;
+    let expected = r#"{"data":{"obj":{"key1":1,"key2":2}}}"#;
+    check_gql_response(obj_query, expected, &container).await;
+
+    let person_query = r#"{"query": "{ person(id: 1) { name age description } }"}"#;
+    let expected = r#"{"data":{"person":{"age":20,"description":"description","name":"Tom"}}}"#;
+    check_gql_response(person_query, expected, &container).await;
+
+    let partly_person_query = r#"{"query": "{ person(id: 1) { name age } }"}"#;
+    let expected = r#"{"data":{"person":{"age":20,"name":"Tom"}}}"#;
+    check_gql_response(partly_person_query, expected, &container).await;
 }
