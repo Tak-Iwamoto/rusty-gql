@@ -172,11 +172,11 @@ impl<'a> __Type<'a> {
         }
     }
 
-    async fn enum_values(&self) -> Option<Vec<__EnumValue<'a>>> {
+    async fn enum_values(&self) -> Option<Vec<__EnumValue>> {
         if let TypeDetail::Named(GqlTypeDefinition::Enum(enu)) = &self.detail {
             let mut values = Vec::new();
             for v in &enu.values {
-                let value = __EnumValue::new(self.schema, &v);
+                let value = __EnumValue::new(&v);
                 values.push(value);
             }
             Some(values)

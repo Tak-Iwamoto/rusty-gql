@@ -2,6 +2,7 @@ type Query {
   pets(first: Int): [Pet!]
   twice_value(value: Int!): Int!
   value: Int
+  persons: [Person!]!
   person(id: ID): Person
   obj: Obj
 }

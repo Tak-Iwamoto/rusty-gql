@@ -3,15 +3,13 @@ use crate::{
     SelectionSetResolver,
 };
 
-pub(crate) struct __EnumValue<'a> {
-    schema: &'a Schema,
+pub(crate) struct __EnumValue {
     detail: GqlEnumValue,
 }
 
-impl<'a> __EnumValue<'a> {
-    pub fn new(schema: &'a Schema, value: &'a GqlEnumValue) -> Self {
+impl __EnumValue {
+    pub fn new(value: &GqlEnumValue) -> Self {
         Self {
-            schema,
             detail: value.clone(),
         }
     }
@@ -30,7 +28,7 @@ impl<'a> __EnumValue<'a> {
 }
 
 #[async_trait::async_trait]
-impl<'a> FieldResolver for __EnumValue<'a> {
+impl FieldResolver for __EnumValue {
     async fn resolve_field(&self, ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
         if ctx.item.name == "name" {
             let name = self.name().await;
@@ -69,7 +67,7 @@ impl<'a> FieldResolver for __EnumValue<'a> {
 }
 
 #[async_trait::async_trait]
-impl<'a> SelectionSetResolver for __EnumValue<'a> {
+impl SelectionSetResolver for __EnumValue {
     async fn resolve_selection_set(
         &self,
         ctx: &crate::SelectionSetContext<'_>,

@@ -4,7 +4,6 @@ use std::collections::BTreeMap;
 use crate::{
     error::GqlError, input::GqlInputType, operation::ArcOperation, path::GraphQLPath,
     resolver::ResolverFuture, types::schema::ArcSchema, FieldResolver, GqlValue, ResolverResult,
-    SelectionSetResolver,
 };
 use graphql_parser::{
     query::{Field, Selection, SelectionSet},
@@ -194,19 +193,6 @@ impl<'a> SelectionSetContext<'a> {
         }
 
         Ok(GqlValue::Object(gql_obj_map))
-    }
-
-    async fn resolve_list<'b, T: SelectionSetResolver>(
-        &'b self,
-        parent_type: &'b T,
-        iter: impl IntoIterator<Item = T>,
-    ) -> ResolverResult<GqlValue> {
-        let mut futures = Vec::new();
-        for item in iter.into_iter() {
-            futures.push(async move { item.resolve_selection_set(self).await })
-        }
-        let result = try_join_all(futures).await?;
-        Ok(GqlValue::List(result))
     }
 
     pub fn collect_fields<'b, T: FieldResolver>(

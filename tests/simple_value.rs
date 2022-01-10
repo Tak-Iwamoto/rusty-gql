@@ -95,3 +95,59 @@ pub async fn test_object() {
     let expected = r#"{"data":{"person":{"age":20,"name":"Tom"}}}"#;
     check_gql_response(req, expected, &container).await;
 }
+
+#[tokio::test]
+pub async fn test_list() {
+    struct Query;
+    struct Person {
+        name: String,
+        description: Option<String>,
+        age: i32,
+    }
+
+    #[Resolver]
+    impl Person {
+        async fn name(&self) -> String {
+            self.name.clone()
+        }
+        async fn description(&self) -> Option<String> {
+            self.description.clone()
+        }
+        async fn age(&self) -> i32 {
+            self.age
+        }
+    }
+
+    #[Resolver]
+    impl Query {
+        async fn persons(&self) -> Vec<Person> {
+            vec![
+                Person {
+                    name: "Tom".to_string(),
+                    description: None,
+                    age: 20,
+                },
+                Person {
+                    name: "Mary".to_string(),
+                    description: Some("sample data".to_string()),
+                    age: 10,
+                },
+            ]
+        }
+    }
+    let contents = schema_content("./tests/schemas/test_schema.graphql");
+
+    let container = ArcContainer::new(
+        &vec![contents.as_str()],
+        QueryRoot { query: Query },
+        EmptyMutation,
+        EmptySubscription,
+    )
+    .unwrap();
+
+    let query_doc = r#"{ persons {name age} }"#;
+    let req = build_test_request(query_doc, None, Default::default());
+    let expected_response =
+        r#"{"data":{"persons":[{"age":20,"name":"Tom"},{"age":10,"name":"Mary"}]}}"#;
+    check_gql_response(req, expected_response, &container).await;
+}

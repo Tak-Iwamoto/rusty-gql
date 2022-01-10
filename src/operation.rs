@@ -210,16 +210,10 @@ pub fn build_operation<'a>(
 mod tests {
     use std::fs;
 
-    use crate::{
-        operation::build_operation,
-        types::schema::{build_schema, ArcSchema},
-        Variables,
-    };
+    use crate::{operation::build_operation, Variables};
 
     #[test]
     fn it_works() {
-        let schema_doc = fs::read_to_string("tests/schemas/github.graphql").unwrap();
-        let schema = ArcSchema::new(build_schema(&vec![schema_doc.as_str()]).unwrap());
         let query_doc = fs::read_to_string("tests/schemas/github_query.graphql").unwrap();
         let parsed_query = graphql_parser::parse_query::<String>(&query_doc).unwrap();
 
