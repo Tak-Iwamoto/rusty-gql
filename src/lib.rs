@@ -28,7 +28,7 @@ pub use query_root::QueryRoot;
 pub use request::{receive_http_request, HttpRequestError, Request};
 pub use resolver::{FieldResolver, SelectionSetResolver};
 pub use response::Response;
-pub use test_utils::{check_gql_response, schema_content};
+pub use test_utils::{build_test_request, check_gql_response, schema_content};
 pub use types::schema::build_schema;
 pub use types::{
     GqlArgument, GqlDirective, GqlDirectiveDefinition, GqlEnum, GqlField, GqlInputObject,

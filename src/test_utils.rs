@@ -1,7 +1,19 @@
-use crate::{execute, ArcContainer, FieldResolver, Request};
+use crate::{execute, ArcContainer, FieldResolver, Request, Variables};
 
 pub fn schema_content(path: &str) -> String {
     std::fs::read_to_string(path).unwrap()
+}
+
+pub fn build_test_request(
+    query: &str,
+    operation_name: Option<String>,
+    variables: Variables,
+) -> Request {
+    Request {
+        query: query.to_string(),
+        operation_name,
+        variables,
+    }
 }
 
 pub async fn check_gql_response<
@@ -9,11 +21,10 @@ pub async fn check_gql_response<
     Mutation: FieldResolver,
     Subscription: FieldResolver,
 >(
-    query_doc: &str,
+    request: Request,
     expected_response: &str,
     container: &ArcContainer<Query, Mutation, Subscription>,
 ) {
-    let req = serde_json::from_str::<Request>(query_doc).unwrap();
-    let res = execute(&container, req).await;
+    let res = execute(&container, request).await;
     assert_eq!(serde_json::to_string(&res).unwrap(), expected_response);
 }

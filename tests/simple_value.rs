@@ -22,9 +22,10 @@ pub async fn test_int() {
     )
     .unwrap();
 
-    let query_doc = r#"{"query": "{ value }"}"#;
+    let query_doc = r#"{ value }"#;
+    let req = build_test_request(query_doc, None, Default::default());
     let expected_response = r#"{"data":{"value":10}}"#;
-    check_gql_response(query_doc, expected_response, &container).await;
+    check_gql_response(req, expected_response, &container).await;
 }
 
 #[tokio::test]
@@ -79,15 +80,18 @@ pub async fn test_object() {
     )
     .unwrap();
 
-    let obj_query = r#"{"query": "{ obj { key1 key2} }"}"#;
+    let obj_query = r#"{ obj { key1 key2 } }"#;
+    let req = build_test_request(obj_query, None, Default::default());
     let expected = r#"{"data":{"obj":{"key1":1,"key2":2}}}"#;
-    check_gql_response(obj_query, expected, &container).await;
+    check_gql_response(req, expected, &container).await;
 
-    let person_query = r#"{"query": "{ person(id: 1) { name age description } }"}"#;
+    let person_query = r#"{ person(id: 1) { name age description } }"#;
+    let req = build_test_request(person_query, None, Default::default());
     let expected = r#"{"data":{"person":{"age":20,"description":"description","name":"Tom"}}}"#;
-    check_gql_response(person_query, expected, &container).await;
+    check_gql_response(req, expected, &container).await;
 
-    let partly_person_query = r#"{"query": "{ person(id: 1) { name age } }"}"#;
+    let partly_person_query = r#"{ person(id: 1) { name age } }"#;
+    let req = build_test_request(partly_person_query, None, Default::default());
     let expected = r#"{"data":{"person":{"age":20,"name":"Tom"}}}"#;
-    check_gql_response(partly_person_query, expected, &container).await;
+    check_gql_response(req, expected, &container).await;
 }
