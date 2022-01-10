@@ -15,3 +15,18 @@ type Dog implements Pet {
   name: String
   woofs: Boolean
 }
+
+input TestInput {
+  int_field: Int!
+  str_field: String
+}
+
+enum Country {
+  JAPAN
+  AMERICA
+  CHINA
+}
+
+union Animal = Dog | Cat
+
+scalar DateTime

@@ -145,9 +145,13 @@ impl<'a> __Type<'a> {
             match def {
                 GqlTypeDefinition::Interface(interface) => {
                     let mut types = Vec::new();
-                    for field in &interface.fields {
-                        let ty = __Type::from_value_type(self.schema, &field.meta_type);
-                        types.push(ty);
+                    for (_, ty) in &self.schema.type_definitions {
+                        if let GqlTypeDefinition::Object(obj) = ty {
+                            if obj.implements_interfaces.contains(&interface.name) {
+                                let ty = __Type::from_type_definition(self.schema, ty);
+                                types.push(ty);
+                            }
+                        }
                     }
                     Some(types)
                 }
