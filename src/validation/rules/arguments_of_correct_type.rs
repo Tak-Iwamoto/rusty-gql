@@ -1,9 +1,6 @@
 use graphql_parser::schema::Value;
 
-use crate::validation::{
-    utils::check_valid_input_value,
-    visitor::{ValidationContext, Visitor},
-};
+use crate::validation::visitor::{ValidationContext, Visitor};
 
 #[derive(Default)]
 pub struct ArgumentsOfCorrectType<'a> {

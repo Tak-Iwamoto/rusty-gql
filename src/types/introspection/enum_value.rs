@@ -1,5 +1,5 @@
 use crate::{
-    types::GqlEnumValue, FieldContext, FieldResolver, GqlValue, ResolverResult, Schema,
+    types::GqlEnumValue, FieldContext, FieldResolver, GqlValue, ResolverResult,
     SelectionSetResolver,
 };
 

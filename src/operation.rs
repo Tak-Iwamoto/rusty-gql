@@ -208,34 +208,43 @@ pub fn build_operation<'a>(
 
 #[cfg(test)]
 mod tests {
-    use std::fs;
-
-    use crate::{operation::build_operation, Variables};
+    use crate::operation::build_operation;
 
     #[test]
-    fn it_works() {
-        let query_doc = fs::read_to_string("tests/schemas/github_query.graphql").unwrap();
-        let parsed_query = graphql_parser::parse_query::<String>(&query_doc).unwrap();
+    fn build_single_operation() {
+        let parsed_query =
+            graphql_parser::parse_query::<String>(r#"query GetPerson { persons { name age } }"#)
+                .unwrap();
 
-        let query = build_operation(&parsed_query, None, Variables::default()).unwrap();
-        println!("{:?}", &query);
-        println!("{:?}", &query.selection_set.items.len());
-        // for item in query.selection_set.items {
-        //     match item {
-        //         graphql_parser::query::Selection::Field(field) => {
-        //             println!("parent: {:?}", field);
+        let operation = build_operation(&parsed_query, None, Default::default());
+        assert!(operation.is_ok());
+        assert_eq!(operation.unwrap().operation_type.to_string(), "Query");
+    }
 
-        //             for it in field.selection_set.items {
-        //                 println!("child: {:?}", it);
-        //             }
-        //         }
-        //         graphql_parser::query::Selection::FragmentSpread(fragment_sp) => {
-        //             println!("{}", fragment_sp.position);
-        //         }
-        //         graphql_parser::query::Selection::InlineFragment(inline_frg) => {
-        //             println!("{}", inline_frg.position);
-        //         }
-        //     }
-        // }
+    #[test]
+    fn build_multiple_operation() {
+        let parsed_query = graphql_parser::parse_query::<String>(
+            r#"query GetPerson { persons { name age } } query GetPet { pets { name kind } }"#,
+        )
+        .unwrap();
+
+        let operation = build_operation(
+            &parsed_query,
+            Some("GetPerson".to_string()),
+            Default::default(),
+        );
+        assert!(operation.is_ok());
+        assert_eq!(operation.unwrap().operation_type.to_string(), "Query");
+    }
+
+    #[test]
+    fn fails_build_multiple_operation_without_operation_name() {
+        let parsed_query = graphql_parser::parse_query::<String>(
+            r#"query GetPerson { persons { name age } } query GetPet { pets { name kind } }"#,
+        )
+        .unwrap();
+
+        let operation = build_operation(&parsed_query, None, Default::default());
+        assert!(operation.is_err());
     }
 }
