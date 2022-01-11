@@ -3,7 +3,8 @@ use std::collections::BTreeMap;
 
 use crate::{
     error::GqlError, input::GqlInputType, operation::ArcOperation, path::GraphQLPath,
-    resolver::ResolverFuture, types::schema::ArcSchema, FieldResolver, GqlValue, ResolverResult,
+    resolver::ResolverFuture, types::schema::ArcSchema, FieldResolver, GqlTypeDefinition, GqlValue,
+    ResolverResult,
 };
 use graphql_parser::{
     query::{Field, Selection, SelectionSet},
@@ -248,11 +249,27 @@ impl<'a> SelectionSetContext<'a> {
                             ))
                         }
                     };
-                    let on_type_str = match &fragment_def.type_condition {
+                    let on_type = match &fragment_def.type_condition {
                         graphql_parser::query::TypeCondition::On(ty) => ty,
                     };
-                    self.with_selection_set(&fragment_def.selection_set)
-                        .collect_fields(parent_type)?;
+                    let type_name = T::type_name();
+
+                    let is_on_type_name = on_type == &type_name;
+                    let is_impl_interface =
+                        self.schema
+                            .type_definitions
+                            .get(&type_name)
+                            .map_or(false, |ty_def| {
+                                if let GqlTypeDefinition::Object(obj) = ty_def {
+                                    obj.implements_interfaces.contains(on_type)
+                                } else {
+                                    false
+                                }
+                            });
+                    if is_on_type_name || is_impl_interface {
+                        self.with_selection_set(&fragment_def.selection_set)
+                            .collect_fields(parent_type)?;
+                    }
                 }
                 Selection::InlineFragment(inline_fragment) => {
                     if self.is_skip(&inline_fragment.directives) {
@@ -264,8 +281,32 @@ impl<'a> SelectionSetContext<'a> {
                         },
                         None => None,
                     };
-                    self.with_selection_set(&inline_fragment.selection_set)
-                        .collect_fields(parent_type)?;
+                    match on_type_str {
+                        Some(on_type) => {
+                            let type_name = T::type_name();
+
+                            let is_on_type_name = on_type == &type_name;
+                            let is_impl_interface = self
+                                .schema
+                                .type_definitions
+                                .get(&type_name)
+                                .map_or(false, |ty_def| {
+                                    if let GqlTypeDefinition::Object(obj) = ty_def {
+                                        obj.implements_interfaces.contains(on_type)
+                                    } else {
+                                        false
+                                    }
+                                });
+                            if is_on_type_name || is_impl_interface {
+                                self.with_selection_set(&inline_fragment.selection_set)
+                                    .collect_fields(parent_type)?;
+                            }
+                        }
+                        None => {
+                            self.with_selection_set(&inline_fragment.selection_set)
+                                .collect_fields(parent_type)?;
+                        }
+                    }
                 }
             }
         }
