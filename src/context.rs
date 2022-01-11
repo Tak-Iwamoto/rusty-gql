@@ -248,6 +248,9 @@ impl<'a> SelectionSetContext<'a> {
                             ))
                         }
                     };
+                    let on_type_str = match &fragment_def.type_condition {
+                        graphql_parser::query::TypeCondition::On(ty) => ty,
+                    };
                     self.with_selection_set(&fragment_def.selection_set)
                         .collect_fields(parent_type)?;
                 }
@@ -255,6 +258,12 @@ impl<'a> SelectionSetContext<'a> {
                     if self.is_skip(&inline_fragment.directives) {
                         continue;
                     }
+                    let on_type_str = match &inline_fragment.type_condition {
+                        Some(ty) => match ty {
+                            graphql_parser::query::TypeCondition::On(on_ty) => Some(on_ty),
+                        },
+                        None => None,
+                    };
                     self.with_selection_set(&inline_fragment.selection_set)
                         .collect_fields(parent_type)?;
                 }
