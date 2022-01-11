@@ -6,14 +6,11 @@ mod optional;
 mod string;
 
 use async_trait::async_trait;
-use futures_util::future::BoxFuture;
 
 use crate::{
     context::{FieldContext, SelectionSetContext},
     GqlValue, ResolverResult,
 };
-
-pub type ResolverFuture<'a> = BoxFuture<'a, ResolverResult<(String, GqlValue)>>;
 
 #[async_trait]
 pub trait SelectionSetResolver: FieldResolver {

@@ -1,15 +1,16 @@
-use futures_util::future::try_join_all;
+use futures_util::future::{try_join_all, BoxFuture};
 use std::collections::BTreeMap;
 
 use crate::{
     error::GqlError, input::GqlInputType, operation::ArcOperation, path::GraphQLPath,
-    resolver::ResolverFuture, types::schema::ArcSchema, FieldResolver, GqlTypeDefinition, GqlValue,
-    ResolverResult,
+    types::schema::ArcSchema, FieldResolver, GqlTypeDefinition, GqlValue, ResolverResult,
 };
 use graphql_parser::{
     query::{Field, Selection, SelectionSet},
     schema::{Directive, Value},
 };
+
+pub type ResolverFuture<'a> = BoxFuture<'a, ResolverResult<(String, GqlValue)>>;
 
 #[derive(Debug, Clone)]
 pub struct ExecutionContext<'a, T> {
