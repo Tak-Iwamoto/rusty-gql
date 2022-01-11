@@ -122,6 +122,9 @@ impl<'a> FieldResolver for __Schema<'a> {
 
         Ok(None)
     }
+    fn type_name() -> String {
+        "__Schema".to_string()
+    }
 }
 
 #[async_trait::async_trait]

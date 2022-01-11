@@ -8,6 +8,9 @@ impl FieldResolver for bool {
     async fn resolve_field(&self, _ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
         Ok(Some(GqlValue::Boolean(*self)))
     }
+    fn type_name() -> String {
+        "Boolean".to_string()
+    }
 }
 
 #[async_trait::async_trait]

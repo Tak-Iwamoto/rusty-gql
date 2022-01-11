@@ -23,6 +23,9 @@ where
         }
         Ok(Some(GqlValue::Object(map)))
     }
+    fn type_name() -> String {
+        "Object".to_string()
+    }
 }
 
 #[async_trait::async_trait]
@@ -61,6 +64,9 @@ where
             );
         }
         Ok(Some(GqlValue::Object(map)))
+    }
+    fn type_name() -> String {
+        "Object".to_string()
     }
 }
 

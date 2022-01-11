@@ -11,6 +11,9 @@ impl<T: FieldResolver> FieldResolver for Option<T> {
             None => Ok(Some(GqlValue::Null)),
         }
     }
+    fn type_name() -> String {
+        T::type_name()
+    }
 }
 
 #[async_trait::async_trait]

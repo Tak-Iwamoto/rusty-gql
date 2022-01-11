@@ -49,6 +49,9 @@ impl FieldResolver for EmptyMutation {
     async fn resolve_field(&self, _ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
         Ok(None)
     }
+    fn type_name() -> String {
+        "Mutation".to_string()
+    }
 }
 
 #[derive(Clone)]
@@ -58,5 +61,8 @@ pub struct EmptySubscription;
 impl FieldResolver for EmptySubscription {
     async fn resolve_field(&self, _ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
         Ok(None)
+    }
+    fn type_name() -> String {
+        "Subscription".to_string()
     }
 }

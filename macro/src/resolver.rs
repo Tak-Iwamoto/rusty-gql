@@ -6,6 +6,12 @@ use crate::utils::{get_method_args_without_context, is_context_type, is_result_t
 
 pub fn generate_gql_resolver(item_impl: &mut ItemImpl) -> Result<TokenStream, syn::Error> {
     let self_name = &item_impl.self_ty;
+    let type_name = match self_name.as_ref() {
+        syn::Type::Path(path) => path.path.segments.last().unwrap().ident.unraw().to_string(),
+        _ => {
+            return Err(syn::Error::new_spanned(&self_name, "Invalid struct").into());
+        }
+    };
 
     let generics = &item_impl.generics;
     let generics_params = &generics.params;
@@ -102,6 +108,9 @@ pub fn generate_gql_resolver(item_impl: &mut ItemImpl) -> Result<TokenStream, sy
             async fn resolve_field(&self, ctx: &rusty_gql::FieldContext<'_>) -> rusty_gql::ResolverResult<::std::option::Option<rusty_gql::GqlValue>> {
                 #(#resolvers)*
                 Ok(::std::option::Option::None)
+            }
+            fn type_name() -> String {
+                #type_name.to_string()
             }
         }
 

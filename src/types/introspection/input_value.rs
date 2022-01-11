@@ -88,6 +88,9 @@ impl<'a> FieldResolver for __InputValue<'a> {
         }
         Ok(None)
     }
+    fn type_name() -> String {
+        "__InputValue".to_string()
+    }
 }
 
 #[async_trait::async_trait]

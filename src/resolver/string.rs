@@ -8,6 +8,9 @@ impl FieldResolver for str {
     async fn resolve_field(&self, _ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
         Ok(Some(GqlValue::String(self.to_string())))
     }
+    fn type_name() -> String {
+        "String".to_string()
+    }
 }
 
 #[async_trait::async_trait]
@@ -24,6 +27,9 @@ impl SelectionSetResolver for str {
 impl FieldResolver for String {
     async fn resolve_field(&self, _ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
         Ok(Some(GqlValue::String(self.clone())))
+    }
+    fn type_name() -> String {
+        "String".to_string()
     }
 }
 

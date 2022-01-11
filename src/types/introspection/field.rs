@@ -102,6 +102,9 @@ impl<'a> FieldResolver for __Field<'a> {
         }
         Ok(None)
     }
+    fn type_name() -> String {
+        "__Field".to_string()
+    }
 }
 
 #[async_trait::async_trait]

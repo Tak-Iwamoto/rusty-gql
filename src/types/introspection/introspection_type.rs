@@ -345,6 +345,9 @@ impl<'a> FieldResolver for __Type<'a> {
         }
         Ok(None)
     }
+    fn type_name() -> String {
+        "__Type".to_string()
+    }
 }
 
 #[async_trait::async_trait]

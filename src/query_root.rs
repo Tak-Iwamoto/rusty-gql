@@ -37,4 +37,7 @@ impl<T: FieldResolver> FieldResolver for QueryRoot<T> {
             self.query.resolve_field(ctx).await
         }
     }
+    fn type_name() -> String {
+        "Query".to_string()
+    }
 }

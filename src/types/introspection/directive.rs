@@ -112,6 +112,9 @@ impl<'a> FieldResolver for __Directive<'a> {
 
         Ok(None)
     }
+    fn type_name() -> String {
+        "__Directive".to_string()
+    }
 }
 
 #[async_trait::async_trait]

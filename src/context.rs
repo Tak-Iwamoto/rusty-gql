@@ -243,7 +243,7 @@ impl<'a> SelectionSetContext<'a> {
                         Some(fragment) => fragment,
                         None => {
                             return Err(GqlError::new(
-                                format!("{:?} is not found in operation", fragment_spread),
+                                format!("{:?} is not defined in query", fragment_spread),
                                 Some(fragment_spread.position),
                             ))
                         }

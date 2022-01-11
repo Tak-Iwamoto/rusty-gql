@@ -16,6 +16,10 @@ impl<T: FieldResolver, const N: usize> FieldResolver for [T; N] {
         }
         Ok(Some(GqlValue::List(result)))
     }
+
+    fn type_name() -> String {
+        format!("[{}]!", T::type_name())
+    }
 }
 
 #[async_trait::async_trait]
@@ -43,6 +47,9 @@ impl<T: FieldResolver> FieldResolver for HashSet<T> {
             }
         }
         Ok(Some(GqlValue::List(result)))
+    }
+    fn type_name() -> String {
+        format!("[{}]!", T::type_name())
     }
 }
 
@@ -72,6 +79,9 @@ impl<'a, T: FieldResolver + 'a> FieldResolver for &'a [T] {
         }
         Ok(Some(GqlValue::List(result)))
     }
+    fn type_name() -> String {
+        format!("[{}]!", T::type_name())
+    }
 }
 
 #[async_trait::async_trait]
@@ -99,6 +109,9 @@ impl<T: FieldResolver> FieldResolver for VecDeque<T> {
             }
         }
         Ok(Some(GqlValue::List(result)))
+    }
+    fn type_name() -> String {
+        format!("[{}]!", T::type_name())
     }
 }
 
@@ -128,6 +141,9 @@ impl<T: FieldResolver> FieldResolver for LinkedList<T> {
         }
         Ok(Some(GqlValue::List(result)))
     }
+    fn type_name() -> String {
+        format!("[{}]!", T::type_name())
+    }
 }
 
 #[async_trait::async_trait]
@@ -155,6 +171,9 @@ impl<T: FieldResolver> FieldResolver for Vec<T> {
             }
         }
         Ok(Some(GqlValue::List(result)))
+    }
+    fn type_name() -> String {
+        format!("[{}]!", T::type_name())
     }
 }
 

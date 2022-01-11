@@ -10,6 +10,9 @@ impl FieldResolver for i8 {
     async fn resolve_field(&self, _ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
         Ok(Some(GqlValue::Number(Number::from(*self))))
     }
+    fn type_name() -> String {
+        "Int".to_string()
+    }
 }
 
 #[async_trait::async_trait]
@@ -26,6 +29,9 @@ impl SelectionSetResolver for i8 {
 impl FieldResolver for i16 {
     async fn resolve_field(&self, _ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
         Ok(Some(GqlValue::Number(Number::from(*self))))
+    }
+    fn type_name() -> String {
+        "Int".to_string()
     }
 }
 
@@ -44,6 +50,9 @@ impl FieldResolver for i32 {
     async fn resolve_field(&self, _ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
         Ok(Some(GqlValue::Number(Number::from(*self))))
     }
+    fn type_name() -> String {
+        "Int".to_string()
+    }
 }
 
 #[async_trait::async_trait]
@@ -60,6 +69,9 @@ impl SelectionSetResolver for i32 {
 impl FieldResolver for i64 {
     async fn resolve_field(&self, _ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
         Ok(Some(GqlValue::Number(Number::from(*self))))
+    }
+    fn type_name() -> String {
+        "Int".to_string()
     }
 }
 
@@ -78,6 +90,9 @@ impl FieldResolver for u8 {
     async fn resolve_field(&self, _ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
         Ok(Some(GqlValue::Number(Number::from(*self))))
     }
+    fn type_name() -> String {
+        "Int".to_string()
+    }
 }
 
 #[async_trait::async_trait]
@@ -93,6 +108,9 @@ impl SelectionSetResolver for u8 {
 impl FieldResolver for u16 {
     async fn resolve_field(&self, _ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
         Ok(Some(GqlValue::Number(Number::from(*self))))
+    }
+    fn type_name() -> String {
+        "Int".to_string()
     }
 }
 
@@ -111,6 +129,9 @@ impl FieldResolver for u32 {
     async fn resolve_field(&self, _ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
         Ok(Some(GqlValue::Number(Number::from(*self))))
     }
+    fn type_name() -> String {
+        "Int".to_string()
+    }
 }
 
 #[async_trait::async_trait]
@@ -127,6 +148,9 @@ impl SelectionSetResolver for u32 {
 impl FieldResolver for u64 {
     async fn resolve_field(&self, _ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
         Ok(Some(GqlValue::Number(Number::from(*self))))
+    }
+    fn type_name() -> String {
+        "Int".to_string()
     }
 }
 
@@ -145,6 +169,9 @@ impl FieldResolver for usize {
     async fn resolve_field(&self, _ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
         Ok(Some(GqlValue::Number(Number::from(*self))))
     }
+    fn type_name() -> String {
+        "Int".to_string()
+    }
 }
 
 #[async_trait::async_trait]
@@ -161,6 +188,9 @@ impl SelectionSetResolver for usize {
 impl FieldResolver for isize {
     async fn resolve_field(&self, _ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
         Ok(Some(GqlValue::Number(Number::from(*self))))
+    }
+    fn type_name() -> String {
+        "Int".to_string()
     }
 }
 
@@ -181,6 +211,9 @@ impl FieldResolver for f32 {
             Some(n) => Ok(Some(GqlValue::Number(n))),
             None => Ok(Some(GqlValue::Null)),
         }
+    }
+    fn type_name() -> String {
+        "Float".to_string()
     }
 }
 
@@ -204,6 +237,9 @@ impl FieldResolver for f64 {
             Some(n) => Ok(Some(GqlValue::Number(n))),
             None => Ok(Some(GqlValue::Null)),
         }
+    }
+    fn type_name() -> String {
+        "Float".to_string()
     }
 }
 

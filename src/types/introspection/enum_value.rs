@@ -64,6 +64,9 @@ impl FieldResolver for __EnumValue {
 
         Ok(None)
     }
+    fn type_name() -> String {
+        "__EnumValue".to_string()
+    }
 }
 
 #[async_trait::async_trait]
