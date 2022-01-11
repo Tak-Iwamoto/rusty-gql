@@ -4,6 +4,7 @@ use std::collections::BTreeMap;
 use crate::{
     error::GqlError, input::GqlInputType, operation::ArcOperation, path::GraphQLPath,
     types::schema::ArcSchema, FieldResolver, GqlTypeDefinition, GqlValue, ResolverResult,
+    SelectionSetResolver,
 };
 use graphql_parser::{
     query::{Field, Selection, SelectionSet},
@@ -154,21 +155,21 @@ fn build_gql_object(target_obj: &mut BTreeMap<String, GqlValue>, gql_value: (Str
 }
 
 impl<'a> SelectionSetContext<'a> {
-    pub async fn resolve_selection_parallelly<'b, T: FieldResolver>(
+    pub async fn resolve_selection_parallelly<'b, T: FieldResolver + SelectionSetResolver>(
         &'b self,
         parent_type: &'b T,
     ) -> ResolverResult<GqlValue> {
         self.resolve_selection(parent_type, true).await
     }
 
-    pub async fn resolve_selection_serially<'b, T: FieldResolver>(
+    pub async fn resolve_selection_serially<'b, T: FieldResolver + SelectionSetResolver>(
         &'b self,
         parent_type: &'b T,
     ) -> ResolverResult<GqlValue> {
         self.resolve_selection(parent_type, false).await
     }
 
-    async fn resolve_selection<'b, T: FieldResolver>(
+    async fn resolve_selection<'b, T: FieldResolver + SelectionSetResolver>(
         &'b self,
         parent_type: &'b T,
         parallel: bool,
@@ -194,7 +195,7 @@ impl<'a> SelectionSetContext<'a> {
         Ok(GqlValue::Object(gql_obj_map))
     }
 
-    pub fn collect_fields<'b, T: FieldResolver>(
+    pub fn collect_fields<'b, T: FieldResolver + SelectionSetResolver>(
         &'b self,
         parent_type: &'b T,
     ) -> ResolverResult<Vec<ResolverFuture<'b>>> {
