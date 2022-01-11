@@ -127,17 +127,14 @@ fn build_gql_object(target_obj: &mut BTreeMap<String, GqlValue>, gql_value: (Str
             GqlValue::List(target_list) => {
                 if let GqlValue::List(list) = value {
                     for (index, v) in list.into_iter().enumerate() {
-                        match target_list.get_mut(index) {
-                            Some(prev_value) => {
-                                if let GqlValue::Object(prev_obj) = prev_value {
-                                    if let GqlValue::Object(new_obj) = v {
-                                        for (key, value) in new_obj.into_iter() {
-                                            build_gql_object(prev_obj, (key, value))
-                                        }
+                        if let Some(prev_value) = target_list.get_mut(index) {
+                            if let GqlValue::Object(prev_obj) = prev_value {
+                                if let GqlValue::Object(new_obj) = v {
+                                    for (key, value) in new_obj.into_iter() {
+                                        build_gql_object(prev_obj, (key, value))
                                     }
                                 }
                             }
-                            None => todo!(),
                         }
                     }
                 }
