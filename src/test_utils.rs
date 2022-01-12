@@ -1,4 +1,4 @@
-use crate::{execute, ArcContainer, FieldResolver, Request, Variables};
+use crate::{execute, ArcContainer, FieldResolver, Request, SelectionSetResolver, Variables};
 
 pub fn schema_content(path: &str) -> String {
     std::fs::read_to_string(path).unwrap()
@@ -17,9 +17,9 @@ pub fn build_test_request(
 }
 
 pub async fn check_gql_response<
-    Query: FieldResolver,
-    Mutation: FieldResolver,
-    Subscription: FieldResolver,
+    Query: FieldResolver + SelectionSetResolver,
+    Mutation: FieldResolver + SelectionSetResolver,
+    Subscription: FieldResolver + SelectionSetResolver,
 >(
     request: Request,
     expected_response: &str,

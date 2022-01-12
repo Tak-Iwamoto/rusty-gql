@@ -6,10 +6,14 @@ use crate::{
     request::Request,
     response::Response,
     validation::apply_validation,
-    FieldResolver, OperationType,
+    FieldResolver, OperationType, SelectionSetResolver,
 };
 
-pub async fn execute<Query: FieldResolver, Mutation: FieldResolver, Subscription: FieldResolver>(
+pub async fn execute<
+    Query: FieldResolver + SelectionSetResolver,
+    Mutation: FieldResolver + SelectionSetResolver,
+    Subscription: FieldResolver + SelectionSetResolver,
+>(
     container: &ArcContainer<Query, Mutation, Subscription>,
     request: Request,
 ) -> Response {

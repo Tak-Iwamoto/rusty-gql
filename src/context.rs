@@ -7,7 +7,7 @@ use crate::{
     SelectionSetResolver,
 };
 use graphql_parser::{
-    query::{Field, Selection, SelectionSet},
+    query::{Field, Selection, SelectionSet, TypeCondition},
     schema::{Directive, Value},
 };
 
@@ -157,24 +157,24 @@ fn build_gql_object(target_obj: &mut BTreeMap<String, GqlValue>, gql_value: (Str
 impl<'a> SelectionSetContext<'a> {
     pub async fn resolve_selection_parallelly<'b, T: FieldResolver + SelectionSetResolver>(
         &'b self,
-        parent_type: &'b T,
+        root_type: &'b T,
     ) -> ResolverResult<GqlValue> {
-        self.resolve_selection(parent_type, true).await
+        self.resolve_selection(root_type, true).await
     }
 
     pub async fn resolve_selection_serially<'b, T: FieldResolver + SelectionSetResolver>(
         &'b self,
-        parent_type: &'b T,
+        root_type: &'b T,
     ) -> ResolverResult<GqlValue> {
-        self.resolve_selection(parent_type, false).await
+        self.resolve_selection(root_type, false).await
     }
 
     async fn resolve_selection<'b, T: FieldResolver + SelectionSetResolver>(
         &'b self,
-        parent_type: &'b T,
+        root_type: &'b T,
         parallel: bool,
     ) -> ResolverResult<GqlValue> {
-        let resolvers = self.collect_fields(parent_type)?;
+        let resolvers = self.collect_fields(root_type)?;
 
         let res = if parallel {
             try_join_all(resolvers).await?
@@ -197,7 +197,7 @@ impl<'a> SelectionSetContext<'a> {
 
     pub fn collect_fields<'b, T: FieldResolver + SelectionSetResolver>(
         &'b self,
-        parent_type: &'b T,
+        root_type: &'b T,
     ) -> ResolverResult<Vec<ResolverFuture<'b>>> {
         let mut resolvers: Vec<ResolverFuture<'b>> = Vec::new();
         for item in &self.item.items {
@@ -226,7 +226,7 @@ impl<'a> SelectionSetContext<'a> {
                             let field_name = ctx_field.item.name.clone();
                             Ok((
                                 field_name,
-                                parent_type
+                                root_type
                                     .resolve_field(&ctx_field)
                                     .await?
                                     .unwrap_or_default(),
@@ -249,7 +249,7 @@ impl<'a> SelectionSetContext<'a> {
                         }
                     };
                     let on_type = match &fragment_def.type_condition {
-                        graphql_parser::query::TypeCondition::On(ty) => ty,
+                        TypeCondition::On(ty) => ty,
                     };
                     let type_name = T::type_name();
 
@@ -267,7 +267,7 @@ impl<'a> SelectionSetContext<'a> {
                             });
                     if is_on_type_name || is_impl_interface {
                         self.with_selection_set(&fragment_def.selection_set)
-                            .collect_fields(parent_type)?;
+                            .collect_fields(root_type)?;
                     }
                 }
                 Selection::InlineFragment(inline_fragment) => {
@@ -276,7 +276,7 @@ impl<'a> SelectionSetContext<'a> {
                     }
                     let on_type_str = match &inline_fragment.type_condition {
                         Some(ty) => match ty {
-                            graphql_parser::query::TypeCondition::On(on_ty) => Some(on_ty),
+                            TypeCondition::On(on_ty) => Some(on_ty),
                         },
                         None => None,
                     };
@@ -298,12 +298,12 @@ impl<'a> SelectionSetContext<'a> {
                                 });
                             if is_on_type_name || is_impl_interface {
                                 self.with_selection_set(&inline_fragment.selection_set)
-                                    .collect_fields(parent_type)?;
+                                    .collect_fields(root_type)?;
                             }
                         }
                         None => {
                             self.with_selection_set(&inline_fragment.selection_set)
-                                .collect_fields(parent_type)?;
+                                .collect_fields(root_type)?;
                         }
                     }
                 }
