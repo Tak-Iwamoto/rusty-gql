@@ -266,8 +266,6 @@ impl<'a> SelectionSetContext<'a> {
                                 }
                             });
                     if is_on_type_name || is_impl_interface {
-                        self.with_selection_set(&fragment_def.selection_set)
-                            .collect_fields(root_type)?;
                     }
                 }
                 Selection::InlineFragment(inline_fragment) => {
@@ -283,7 +281,6 @@ impl<'a> SelectionSetContext<'a> {
                     match on_type_str {
                         Some(on_type) => {
                             let type_name = T::type_name();
-
                             let is_on_type_name = on_type == &type_name;
                             let is_impl_interface = self
                                 .schema

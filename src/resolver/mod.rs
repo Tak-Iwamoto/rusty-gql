@@ -213,6 +213,7 @@ impl<'a> Fields<'a> {
                         },
                         None => None,
                     };
+                    println!("{:?}", &on_type_str);
                     match on_type_str {
                         Some(on_type) => {
                             let type_name = T::type_name();

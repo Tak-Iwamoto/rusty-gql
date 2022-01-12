@@ -42,9 +42,9 @@ impl<'a> Visitor<'a> for ArgumentsOfCorrectType<'a> {
 
     fn enter_argument(
         &mut self,
-        ctx: &mut ValidationContext,
+        _ctx: &mut ValidationContext,
         arg_name: &'a str,
-        arg_value: &'a Value<'a, String>,
+        _arg_value: &'a Value<'a, String>,
     ) {
         match &self.current_args {
             Some(args) => {

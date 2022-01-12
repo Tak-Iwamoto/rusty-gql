@@ -47,19 +47,19 @@ pub struct ValidationContext<'a> {
     pub(crate) schema: &'a ArcSchema,
     pub(crate) errors: Vec<ValidationError>,
     pub(crate) fragments: &'a HashMap<String, FragmentDefinition<'a, String>>,
-    pub(crate) variables: Option<&'a Variables>,
+    // pub(crate) variables: Option<&'a Variables>,
     pub type_stack: Vec<Option<&'a GqlTypeDefinition>>,
     pub input_type: Vec<Option<GqlValueType>>,
 }
 impl<'a> ValidationContext<'a> {
     pub fn new(
         schema: &'a ArcSchema,
-        variables: Option<&'a Variables>,
+        _variables: Option<&'a Variables>,
         operation: &'a Operation<'a>,
     ) -> Self {
         ValidationContext {
             schema,
-            variables,
+            // variables,
             fragments: &operation.fragment_definitions,
             errors: Default::default(),
             type_stack: Default::default(),
