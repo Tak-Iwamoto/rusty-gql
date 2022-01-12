@@ -4,6 +4,7 @@ use crate::{
     error::GqlError,
     operation::{build_operation, ArcOperation},
     request::Request,
+    resolve_selection_parallelly, resolve_selection_serially,
     response::Response,
     validation::apply_validation,
     FieldResolver, OperationType, SelectionSetResolver,
@@ -49,12 +50,10 @@ pub async fn execute<
 
     let result = match operation.operation_type {
         OperationType::Query => {
-            ctx.resolve_selection_parallelly(&container.query_resolvers)
-                .await
+            resolve_selection_parallelly(&ctx, &container.query_resolvers).await
         }
         OperationType::Mutation => {
-            ctx.resolve_selection_serially(&container.mutation_resolvers)
-                .await
+            resolve_selection_serially(&ctx, &container.mutation_resolvers).await
         }
         OperationType::Subscription => {
             let error = GqlError::new("subscription cannot execute from this path", None);
