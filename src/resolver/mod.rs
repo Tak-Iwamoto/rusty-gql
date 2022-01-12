@@ -28,6 +28,14 @@ pub trait SelectionSetResolver: FieldResolver {
 pub trait FieldResolver: Send + Sync {
     async fn resolve_field(&self, ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>>;
     fn type_name() -> String;
+
+    fn collect_all_fields<'a>(
+        &'a self,
+        ctx: &SelectionSetContext<'a>,
+        fields: &mut Fields<'a>,
+    ) -> ResolverResult<()> {
+        fields.collect_fields(ctx, self)
+    }
 }
 
 #[async_trait::async_trait]
@@ -36,7 +44,6 @@ impl<T: FieldResolver> FieldResolver for &T {
     async fn resolve_field(&self, ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
         T::resolve_field(*self, ctx).await
     }
-
     fn type_name() -> String {
         T::type_name()
     }
@@ -119,7 +126,7 @@ pub type ResolverFuture<'a> = BoxFuture<'a, ResolverResult<(String, GqlValue)>>;
 pub struct Fields<'a>(Vec<ResolverFuture<'a>>);
 
 impl<'a> Fields<'a> {
-    pub fn collect_fields<T: FieldResolver + SelectionSetResolver>(
+    pub fn collect_fields<T: FieldResolver + ?Sized>(
         &mut self,
         ctx: &SelectionSetContext<'a>,
         root_type: &'a T,
@@ -190,8 +197,10 @@ impl<'a> Fields<'a> {
                                 }
                             });
                     if is_on_type_name || is_impl_interface {
-                        // ctx.with_selection_set(&fragment_def.selection_set)
-                        //     .collect_fields(root_type)?;
+                        root_type.collect_all_fields(
+                            &ctx.with_selection_set(&fragment_def.selection_set),
+                            self,
+                        )?;
                     }
                 }
                 Selection::InlineFragment(inline_fragment) => {
@@ -221,8 +230,10 @@ impl<'a> Fields<'a> {
                                     }
                                 });
                             if is_on_type_name || is_impl_interface {
-                                // self.with_selection_set(&inline_fragment.selection_set)
-                                //     .collect_fields(root_type)?;
+                                root_type.collect_all_fields(
+                                    &ctx.with_selection_set(&inline_fragment.selection_set),
+                                    self,
+                                )?;
                             }
                         }
                         None => {
