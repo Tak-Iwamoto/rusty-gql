@@ -8,35 +8,35 @@ use serde::ser::Error as SerError;
 use serde::{de::Visitor, Deserialize, Serialize, Serializer};
 use serde_json::Number;
 
-#[derive(Debug, Clone, Eq)]
-pub enum GqlConstValue {
-    Number(Number),
-    String(String),
-    Boolean(bool),
-    Null,
-    Enum(String),
-    List(Vec<GqlValue>),
-    Object(BTreeMap<String, GqlValue>),
-}
+// #[derive(Debug, Clone, Eq)]
+// pub enum GqlConstValue {
+//     Number(Number),
+//     String(String),
+//     Boolean(bool),
+//     Null,
+//     Enum(String),
+//     List(Vec<GqlValue>),
+//     Object(BTreeMap<String, GqlValue>),
+// }
 
-impl PartialEq for GqlConstValue {
-    fn eq(&self, other: &Self) -> bool {
-        match (self, other) {
-            (Self::Number(l0), Self::Number(r0)) => l0 == r0,
-            (Self::String(l0), Self::String(r0)) => l0 == r0,
-            (Self::Boolean(l0), Self::Boolean(r0)) => l0 == r0,
-            (Self::Enum(l0), Self::Enum(r0)) => l0 == r0,
-            (Self::List(l0), Self::List(r0)) => {
-                if l0.len() != r0.len() {
-                    return false;
-                }
-                l0.iter().zip(r0.iter()).all(|(l, r)| l == r)
-            }
-            (Self::Object(l0), Self::Object(r0)) => l0 == r0,
-            _ => false,
-        }
-    }
-}
+// impl PartialEq for GqlConstValue {
+//     fn eq(&self, other: &Self) -> bool {
+//         match (self, other) {
+//             (Self::Number(l0), Self::Number(r0)) => l0 == r0,
+//             (Self::String(l0), Self::String(r0)) => l0 == r0,
+//             (Self::Boolean(l0), Self::Boolean(r0)) => l0 == r0,
+//             (Self::Enum(l0), Self::Enum(r0)) => l0 == r0,
+//             (Self::List(l0), Self::List(r0)) => {
+//                 if l0.len() != r0.len() {
+//                     return false;
+//                 }
+//                 l0.iter().zip(r0.iter()).all(|(l, r)| l == r)
+//             }
+//             (Self::Object(l0), Self::Object(r0)) => l0 == r0,
+//             _ => false,
+//         }
+//     }
+// }
 
 #[derive(Debug, Clone, Eq)]
 pub enum GqlValue {
@@ -48,21 +48,6 @@ pub enum GqlValue {
     Enum(String),
     List(Vec<GqlValue>),
     Object(BTreeMap<String, GqlValue>),
-}
-
-impl GqlValue {
-    fn into_const_value(&self) -> GqlConstValue {
-        match self {
-            GqlValue::Variable(_) => todo!(),
-            GqlValue::Number(v) => GqlConstValue::Number(v.clone()),
-            GqlValue::String(v) => GqlConstValue::String(v.clone()),
-            GqlValue::Boolean(v) => GqlConstValue::Boolean(*v),
-            GqlValue::Null => GqlConstValue::Null,
-            GqlValue::Enum(v) => GqlConstValue::Enum(v.clone()),
-            GqlValue::List(v) => GqlConstValue::List(v.clone()),
-            GqlValue::Object(v) => GqlConstValue::Object(v.clone()),
-        }
-    }
 }
 
 impl ToString for GqlValue {

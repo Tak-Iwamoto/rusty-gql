@@ -28,9 +28,9 @@ impl<'a> Visitor<'a> for PossibleFragmentSpreads<'a> {
             .fragment_types
             .get(&fragment_spread.fragment_name.as_str())
         {
-            if let Some(current_type) = ctx.current_type() {
-                if let TypeCondition::On(on_type) = fragment_type {
-                    if let Some(schema_on_type) = ctx.schema.type_definitions.get(on_type) {}
+            if let Some(_current_type) = ctx.current_type() {
+                match fragment_type {
+                    TypeCondition::On(on_type) => if let Some(_schema_on_type) = ctx.schema.type_definitions.get(on_type) {}
                 }
             }
         }
