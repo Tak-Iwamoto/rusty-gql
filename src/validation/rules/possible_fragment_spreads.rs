@@ -30,7 +30,9 @@ impl<'a> Visitor<'a> for PossibleFragmentSpreads<'a> {
         {
             if let Some(_current_type) = ctx.current_type() {
                 match fragment_type {
-                    TypeCondition::On(on_type) => if let Some(_schema_on_type) = ctx.schema.type_definitions.get(on_type) {}
+                    TypeCondition::On(on_type) => {
+                        if let Some(_schema_on_type) = ctx.schema.type_definitions.get(on_type) {}
+                    }
                 }
             }
         }

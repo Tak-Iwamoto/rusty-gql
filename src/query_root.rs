@@ -9,7 +9,7 @@ pub struct QueryRoot<T> {
 }
 
 #[async_trait::async_trait]
-impl<T: FieldResolver> FieldResolver for QueryRoot<T> {
+impl<T: FieldResolver + SelectionSetResolver> FieldResolver for QueryRoot<T> {
     async fn resolve_field(&self, ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
         if ctx.item.name == "__schema" {
             let ctx_selection_set = ctx.with_selection_set(&ctx.item.selection_set);
@@ -39,5 +39,15 @@ impl<T: FieldResolver> FieldResolver for QueryRoot<T> {
     }
     fn type_name() -> String {
         "Query".to_string()
+    }
+}
+
+#[async_trait::async_trait]
+impl<T: FieldResolver + SelectionSetResolver> SelectionSetResolver for QueryRoot<T> {
+    async fn resolve_selection_set(
+        &self,
+        ctx: &crate::SelectionSetContext<'_>,
+    ) -> ResolverResult<GqlValue> {
+        self.query.resolve_selection_set(ctx).await
     }
 }

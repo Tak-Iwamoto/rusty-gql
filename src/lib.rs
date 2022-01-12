@@ -26,7 +26,9 @@ pub use graphiql_html::playground_html;
 pub use operation::OperationType;
 pub use query_root::QueryRoot;
 pub use request::{receive_http_request, HttpRequestError, Request};
-pub use resolver::{FieldResolver, SelectionSetResolver};
+pub use resolver::{
+    resolve_selection_parallelly, resolve_selection_serially, FieldResolver, SelectionSetResolver,
+};
 pub use response::Response;
 pub use test_utils::{build_test_request, check_gql_response, schema_content};
 pub use types::schema::build_schema;
@@ -54,6 +56,16 @@ impl FieldResolver for EmptyMutation {
     }
 }
 
+#[async_trait::async_trait]
+impl SelectionSetResolver for EmptyMutation {
+    async fn resolve_selection_set(
+        &self,
+        _ctx: &SelectionSetContext<'_>,
+    ) -> ResolverResult<GqlValue> {
+        Ok(GqlValue::Null)
+    }
+}
+
 #[derive(Clone)]
 pub struct EmptySubscription;
 
@@ -64,5 +76,15 @@ impl FieldResolver for EmptySubscription {
     }
     fn type_name() -> String {
         "Subscription".to_string()
+    }
+}
+
+#[async_trait::async_trait]
+impl SelectionSetResolver for EmptySubscription {
+    async fn resolve_selection_set(
+        &self,
+        _ctx: &SelectionSetContext<'_>,
+    ) -> ResolverResult<GqlValue> {
+        Ok(GqlValue::Null)
     }
 }

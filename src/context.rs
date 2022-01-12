@@ -4,9 +4,10 @@ use std::collections::BTreeMap;
 use crate::{
     error::GqlError, input::GqlInputType, operation::ArcOperation, path::GraphQLPath,
     types::schema::ArcSchema, FieldResolver, GqlTypeDefinition, GqlValue, ResolverResult,
+    SelectionSetResolver,
 };
 use graphql_parser::{
-    query::{Field, Selection, SelectionSet},
+    query::{Field, Selection, SelectionSet, TypeCondition},
     schema::{Directive, Value},
 };
 
@@ -154,21 +155,21 @@ fn build_gql_object(target_obj: &mut BTreeMap<String, GqlValue>, gql_value: (Str
 }
 
 impl<'a> SelectionSetContext<'a> {
-    pub async fn resolve_selection_parallelly<'b, T: FieldResolver>(
+    pub async fn resolve_selection_parallelly<'b, T: FieldResolver + SelectionSetResolver>(
         &'b self,
         root_type: &'b T,
     ) -> ResolverResult<GqlValue> {
         self.resolve_selection(root_type, true).await
     }
 
-    pub async fn resolve_selection_serially<'b, T: FieldResolver>(
+    pub async fn resolve_selection_serially<'b, T: FieldResolver + SelectionSetResolver>(
         &'b self,
         root_type: &'b T,
     ) -> ResolverResult<GqlValue> {
         self.resolve_selection(root_type, false).await
     }
 
-    async fn resolve_selection<'b, T: FieldResolver>(
+    async fn resolve_selection<'b, T: FieldResolver + SelectionSetResolver>(
         &'b self,
         root_type: &'b T,
         parallel: bool,
@@ -194,7 +195,7 @@ impl<'a> SelectionSetContext<'a> {
         Ok(GqlValue::Object(gql_obj_map))
     }
 
-    pub fn collect_fields<'b, T: FieldResolver>(
+    pub fn collect_fields<'b, T: FieldResolver + SelectionSetResolver>(
         &'b self,
         root_type: &'b T,
     ) -> ResolverResult<Vec<ResolverFuture<'b>>> {
@@ -248,7 +249,7 @@ impl<'a> SelectionSetContext<'a> {
                         }
                     };
                     let on_type = match &fragment_def.type_condition {
-                        graphql_parser::query::TypeCondition::On(ty) => ty,
+                        TypeCondition::On(ty) => ty,
                     };
                     let type_name = T::type_name();
 
@@ -265,8 +266,6 @@ impl<'a> SelectionSetContext<'a> {
                                 }
                             });
                     if is_on_type_name || is_impl_interface {
-                        self.with_selection_set(&fragment_def.selection_set)
-                            .collect_fields(root_type)?;
                     }
                 }
                 Selection::InlineFragment(inline_fragment) => {
@@ -275,14 +274,13 @@ impl<'a> SelectionSetContext<'a> {
                     }
                     let on_type_str = match &inline_fragment.type_condition {
                         Some(ty) => match ty {
-                            graphql_parser::query::TypeCondition::On(on_ty) => Some(on_ty),
+                            TypeCondition::On(on_ty) => Some(on_ty),
                         },
                         None => None,
                     };
                     match on_type_str {
                         Some(on_type) => {
                             let type_name = T::type_name();
-
                             let is_on_type_name = on_type == &type_name;
                             let is_impl_interface = self
                                 .schema
