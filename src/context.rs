@@ -174,13 +174,14 @@ impl<'a> SelectionSetContext<'a> {
         root_type: &'b T,
         parallel: bool,
     ) -> ResolverResult<GqlValue> {
-        let resolvers = self.collect_fields(root_type)?;
+        let mut fields = Vec::new();
+        self.collect_fields(root_type, &mut fields)?;
 
         let res = if parallel {
-            try_join_all(resolvers).await?
+            try_join_all(fields).await?
         } else {
             let mut results = Vec::new();
-            for resolver in resolvers {
+            for resolver in fields {
                 results.push(resolver.await?);
             }
             results
@@ -198,8 +199,8 @@ impl<'a> SelectionSetContext<'a> {
     pub fn collect_fields<'b, T: FieldResolver + SelectionSetResolver>(
         &'b self,
         root_type: &'b T,
-    ) -> ResolverResult<Vec<ResolverFuture<'b>>> {
-        let mut resolvers: Vec<ResolverFuture<'b>> = Vec::new();
+        fields: &mut Vec<ResolverFuture<'b>>,
+    ) -> ResolverResult<()> {
         for item in &self.item.items {
             match &item {
                 Selection::Field(field) => {
@@ -212,14 +213,13 @@ impl<'a> SelectionSetContext<'a> {
                             Some(type_def) => type_def.name(),
                             None => "Null",
                         };
-
-                        resolvers.push(Box::pin(async move {
+                        fields.push(Box::pin(async move {
                             Ok((field_name, GqlValue::String(type_name.to_string())))
                         }));
                         continue;
                     }
 
-                    resolvers.push(Box::pin({
+                    fields.push(Box::pin({
                         let ctx = self.clone();
                         async move {
                             let ctx_field = &ctx.with_field(field);
@@ -265,8 +265,7 @@ impl<'a> SelectionSetContext<'a> {
                                     false
                                 }
                             });
-                    if is_on_type_name || is_impl_interface {
-                    }
+                    if is_on_type_name || is_impl_interface {}
                 }
                 Selection::InlineFragment(inline_fragment) => {
                     if self.is_skip(&inline_fragment.directives) {
@@ -295,18 +294,17 @@ impl<'a> SelectionSetContext<'a> {
                                 });
                             if is_on_type_name || is_impl_interface {
                                 self.with_selection_set(&inline_fragment.selection_set)
-                                    .collect_fields(root_type)?;
+                                    .collect_fields(root_type, fields)?
                             }
                         }
-                        None => {
-                            self.with_selection_set(&inline_fragment.selection_set)
-                                .collect_fields(root_type)?;
-                        }
+                        None => self
+                            .with_selection_set(&inline_fragment.selection_set)
+                            .collect_fields(root_type, fields)?,
                     }
                 }
             }
         }
-        Ok(resolvers)
+        Ok(())
     }
 }
 
