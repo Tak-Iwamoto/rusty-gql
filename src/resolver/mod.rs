@@ -49,20 +49,20 @@ impl<T: FieldResolver> FieldResolver for &T {
     }
 }
 
-pub async fn resolve_selection_parallelly<'a, T: FieldResolver + SelectionSetResolver>(
+pub async fn resolve_selection_parallelly<'a, T: SelectionSetResolver>(
     ctx: &SelectionSetContext<'a>,
     root_type: &'a T,
 ) -> ResolverResult<GqlValue> {
     resolve_selection(ctx, root_type, true).await
 }
 
-pub async fn resolve_selection_serially<'a, T: FieldResolver + SelectionSetResolver>(
+pub async fn resolve_selection_serially<'a, T: SelectionSetResolver>(
     ctx: &SelectionSetContext<'a>,
     root_type: &'a T,
 ) -> ResolverResult<GqlValue> {
     resolve_selection(ctx, root_type, false).await
 }
-async fn resolve_selection<'a, T: FieldResolver + SelectionSetResolver>(
+async fn resolve_selection<'a, T: SelectionSetResolver>(
     ctx: &SelectionSetContext<'a>,
     root_type: &'a T,
     parallel: bool,

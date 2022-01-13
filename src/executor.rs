@@ -7,13 +7,13 @@ use crate::{
     resolve_selection_parallelly, resolve_selection_serially,
     response::Response,
     validation::apply_validation,
-    FieldResolver, OperationType, SelectionSetResolver,
+    OperationType, SelectionSetResolver,
 };
 
 pub async fn execute<
-    Query: FieldResolver + SelectionSetResolver,
-    Mutation: FieldResolver + SelectionSetResolver,
-    Subscription: FieldResolver + SelectionSetResolver,
+    Query: SelectionSetResolver,
+    Mutation: SelectionSetResolver,
+    Subscription: SelectionSetResolver,
 >(
     container: &ArcContainer<Query, Mutation, Subscription>,
     request: Request,

@@ -3,8 +3,7 @@ use std::collections::BTreeMap;
 
 use crate::{
     error::GqlError, input::GqlInputType, operation::ArcOperation, path::GraphQLPath,
-    types::schema::ArcSchema, FieldResolver, GqlTypeDefinition, GqlValue, ResolverResult,
-    SelectionSetResolver,
+    types::schema::ArcSchema, GqlTypeDefinition, GqlValue, ResolverResult, SelectionSetResolver,
 };
 use graphql_parser::{
     query::{Field, Selection, SelectionSet, TypeCondition},
@@ -155,21 +154,21 @@ fn build_gql_object(target_obj: &mut BTreeMap<String, GqlValue>, gql_value: (Str
 }
 
 impl<'a> SelectionSetContext<'a> {
-    pub async fn resolve_selection_parallelly<'b, T: FieldResolver + SelectionSetResolver>(
+    pub async fn resolve_selection_parallelly<'b, T: SelectionSetResolver>(
         &'b self,
         root_type: &'b T,
     ) -> ResolverResult<GqlValue> {
         self.resolve_selection(root_type, true).await
     }
 
-    pub async fn resolve_selection_serially<'b, T: FieldResolver + SelectionSetResolver>(
+    pub async fn resolve_selection_serially<'b, T: SelectionSetResolver>(
         &'b self,
         root_type: &'b T,
     ) -> ResolverResult<GqlValue> {
         self.resolve_selection(root_type, false).await
     }
 
-    async fn resolve_selection<'b, T: FieldResolver + SelectionSetResolver>(
+    async fn resolve_selection<'b, T: SelectionSetResolver>(
         &'b self,
         root_type: &'b T,
         parallel: bool,
@@ -195,7 +194,7 @@ impl<'a> SelectionSetContext<'a> {
         Ok(GqlValue::Object(gql_obj_map))
     }
 
-    pub fn collect_fields<'b, T: FieldResolver + SelectionSetResolver>(
+    pub fn collect_fields<'b, T: SelectionSetResolver>(
         &'b self,
         root_type: &'b T,
     ) -> ResolverResult<Vec<ResolverFuture<'b>>> {
@@ -265,8 +264,7 @@ impl<'a> SelectionSetContext<'a> {
                                     false
                                 }
                             });
-                    if is_on_type_name || is_impl_interface {
-                    }
+                    if is_on_type_name || is_impl_interface {}
                 }
                 Selection::InlineFragment(inline_fragment) => {
                     if self.is_skip(&inline_fragment.directives) {
