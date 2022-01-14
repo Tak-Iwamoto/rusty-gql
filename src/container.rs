@@ -3,13 +3,13 @@ use std::{ops::Deref, sync::Arc};
 use crate::{
     error::GqlError,
     types::schema::{build_schema, ArcSchema},
-    FieldResolver, SelectionSetResolver,
+    SelectionSetResolver,
 };
 
 pub struct Container<
-    Query: FieldResolver + SelectionSetResolver,
-    Mutation: FieldResolver + SelectionSetResolver,
-    Subscription: FieldResolver + SelectionSetResolver,
+    Query: SelectionSetResolver,
+    Mutation: SelectionSetResolver,
+    Subscription: SelectionSetResolver,
 > {
     pub query_resolvers: Query,
     pub mutation_resolvers: Mutation,
@@ -19,16 +19,16 @@ pub struct Container<
 
 #[derive(Clone)]
 pub struct ArcContainer<
-    Query: FieldResolver + SelectionSetResolver,
-    Mutation: FieldResolver + SelectionSetResolver,
-    Subscription: FieldResolver + SelectionSetResolver,
+    Query: SelectionSetResolver,
+    Mutation: SelectionSetResolver,
+    Subscription: SelectionSetResolver,
 >(Arc<Container<Query, Mutation, Subscription>>);
 
 impl<Query, Mutation, Subscription> Deref for ArcContainer<Query, Mutation, Subscription>
 where
-    Query: FieldResolver + SelectionSetResolver,
-    Mutation: FieldResolver + SelectionSetResolver,
-    Subscription: FieldResolver + SelectionSetResolver,
+    Query: SelectionSetResolver,
+    Mutation: SelectionSetResolver,
+    Subscription: SelectionSetResolver,
 {
     type Target = Container<Query, Mutation, Subscription>;
 
@@ -39,9 +39,9 @@ where
 
 impl<Query, Mutation, Subscription> ArcContainer<Query, Mutation, Subscription>
 where
-    Query: FieldResolver + SelectionSetResolver,
-    Mutation: FieldResolver + SelectionSetResolver,
-    Subscription: FieldResolver + SelectionSetResolver,
+    Query: SelectionSetResolver,
+    Mutation: SelectionSetResolver,
+    Subscription: SelectionSetResolver,
 {
     pub fn new(
         schema_doc: &[&str],

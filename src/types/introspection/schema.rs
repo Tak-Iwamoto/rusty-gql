@@ -25,21 +25,33 @@ impl<'a> __Schema<'a> {
     }
 
     async fn query_type(&self) -> __Type<'a> {
-        match self.detail.type_definitions.get("Query") {
+        match self
+            .detail
+            .type_definitions
+            .get(&self.detail.query_type_name)
+        {
             Some(query) => __Type::from_type_definition(self.detail, query),
             None => panic!("Query is not defined."),
         }
     }
 
     async fn mutation_type(&self) -> Option<__Type<'a>> {
-        match self.detail.type_definitions.get("Mutation") {
+        match self
+            .detail
+            .type_definitions
+            .get(&self.detail.mutation_type_name)
+        {
             Some(mutation) => Some(__Type::from_type_definition(self.detail, mutation)),
             None => None,
         }
     }
 
     async fn subscription_type(&self) -> Option<__Type<'a>> {
-        match self.detail.type_definitions.get("Subscription") {
+        match self
+            .detail
+            .type_definitions
+            .get(&self.detail.subscription_type_name)
+        {
             Some(subscription) => Some(__Type::from_type_definition(self.detail, subscription)),
             None => None,
         }
