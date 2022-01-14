@@ -1,6 +1,6 @@
 use crate::{
-    FieldContext, FieldResolver, GqlValue, ResolverResult, Schema, SelectionSetContext,
-    SelectionSetResolver,
+    resolve_selection_parallelly, FieldContext, FieldResolver, GqlValue, ResolverResult, Schema,
+    SelectionSetContext, SelectionSetResolver,
 };
 
 use super::{directive::__Directive, introspection_type::__Type};
@@ -145,6 +145,6 @@ impl<'a> SelectionSetResolver for __Schema<'a> {
         &self,
         ctx: &SelectionSetContext<'_>,
     ) -> ResolverResult<GqlValue> {
-        ctx.resolve_selection_parallelly(self).await
+        resolve_selection_parallelly(ctx, self).await
     }
 }

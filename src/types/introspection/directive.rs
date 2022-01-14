@@ -1,8 +1,8 @@
 use graphql_parser::schema::DirectiveLocation;
 
 use crate::{
-    types::GqlDirectiveDefinition, FieldContext, FieldResolver, GqlValue, ResolverResult, Schema,
-    SelectionSetContext, SelectionSetResolver,
+    resolve_selection_parallelly, types::GqlDirectiveDefinition, FieldContext, FieldResolver,
+    GqlValue, ResolverResult, Schema, SelectionSetContext, SelectionSetResolver,
 };
 
 use super::input_value::__InputValue;
@@ -123,6 +123,6 @@ impl<'a> SelectionSetResolver for __Directive<'a> {
         &self,
         ctx: &SelectionSetContext<'_>,
     ) -> ResolverResult<GqlValue> {
-        ctx.resolve_selection_parallelly(self).await
+        resolve_selection_parallelly(ctx, self).await
     }
 }

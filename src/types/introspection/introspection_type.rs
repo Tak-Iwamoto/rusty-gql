@@ -1,6 +1,6 @@
 use crate::{
     types::GqlValueType, FieldContext, FieldResolver, GqlTypeDefinition, GqlValue, ResolverResult,
-    Schema, SelectionSetContext, SelectionSetResolver,
+    Schema, SelectionSetContext, SelectionSetResolver, resolve_selection_parallelly,
 };
 
 use super::{enum_value::__EnumValue, field::__Field, input_value::__InputValue};
@@ -356,6 +356,6 @@ impl<'a> SelectionSetResolver for __Type<'a> {
         &self,
         ctx: &SelectionSetContext<'_>,
     ) -> ResolverResult<GqlValue> {
-        ctx.resolve_selection_parallelly(self).await
+        resolve_selection_parallelly(ctx, self).await
     }
 }

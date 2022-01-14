@@ -117,7 +117,7 @@ pub fn generate_gql_resolver(item_impl: &mut ItemImpl) -> Result<TokenStream, sy
         #[rusty_gql::async_trait::async_trait]
         impl #generics rusty_gql::SelectionSetResolver for #self_name #generics_params #where_clause {
             async fn resolve_selection_set(&self, ctx: &rusty_gql::SelectionSetContext<'_>) -> rusty_gql::ResolverResult<rusty_gql::GqlValue> {
-                ctx.resolve_selection_parallelly(self).await
+                rusty_gql::resolve_selection_parallelly(ctx, self).await
             }
         }
     };
