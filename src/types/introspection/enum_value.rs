@@ -1,6 +1,6 @@
 use crate::{
-    types::GqlEnumValue, FieldContext, FieldResolver, GqlValue, ResolverResult,
-    SelectionSetResolver,
+    resolve_selection_parallelly, types::GqlEnumValue, FieldContext, FieldResolver, GqlValue,
+    ResolverResult, SelectionSetResolver,
 };
 
 pub(crate) struct __EnumValue {
@@ -75,6 +75,6 @@ impl SelectionSetResolver for __EnumValue {
         &self,
         ctx: &crate::SelectionSetContext<'_>,
     ) -> crate::ResolverResult<crate::GqlValue> {
-        ctx.resolve_selection_parallelly(self).await
+        resolve_selection_parallelly(ctx, self).await
     }
 }

@@ -1,6 +1,6 @@
 use crate::{
-    FieldContext, FieldResolver, GqlArgument, GqlValue, ResolverResult, Schema,
-    SelectionSetResolver,
+    resolve_selection_parallelly, FieldContext, FieldResolver, GqlArgument, GqlValue,
+    ResolverResult, Schema, SelectionSetResolver,
 };
 
 use super::introspection_type::__Type;
@@ -99,6 +99,6 @@ impl<'a> SelectionSetResolver for __InputValue<'a> {
         &self,
         ctx: &crate::SelectionSetContext<'_>,
     ) -> crate::ResolverResult<crate::GqlValue> {
-        ctx.resolve_selection_parallelly(self).await
+        resolve_selection_parallelly(ctx, self).await
     }
 }
