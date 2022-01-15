@@ -3,7 +3,10 @@ use crate::{
     SelectionSetContext, SelectionSetResolver,
 };
 
-use super::{input_value::__InputValue, introspection_type::__Type};
+use super::{
+    input_value::{__InputValue, build_input_value_introspection},
+    introspection_type::__Type,
+};
 
 pub(crate) struct __Field<'a> {
     schema: &'a Schema,
@@ -30,7 +33,7 @@ impl<'a> __Field<'a> {
         let mut result = Vec::new();
 
         for arg in &self.detail.arguments {
-            let value = __InputValue::new(self.schema, arg);
+            let value = build_input_value_introspection(self.schema, arg);
             result.push(value);
         }
         result

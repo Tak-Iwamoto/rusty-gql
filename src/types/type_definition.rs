@@ -3,8 +3,8 @@ use graphql_parser::schema::TypeDefinition;
 use crate::GqlField;
 
 use super::{
-    enum_type::GqlEnum, union_type::GqlUnion, input_object::GqlInputObject, interface::GqlInterface,
-    object::GqlObject, scalar::GqlScalar,
+    enum_type::GqlEnum, input_object::GqlInputObject, interface::GqlInterface, object::GqlObject,
+    scalar::GqlScalar, union_type::GqlUnion,
 };
 
 #[derive(Debug, Clone)]

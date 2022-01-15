@@ -152,6 +152,7 @@ async fn test_scalar_introspection() {
 
     let query = r#"{ __type(name: "DateTime") { kind name description } }"#;
     let req = build_test_request(query, None, Default::default());
-    let expected_response = r#"{"data":{"__type":{"description":null,"kind":"SCALAR","name":"DateTime"}}}"#;
+    let expected_response =
+        r#"{"data":{"__type":{"description":null,"kind":"SCALAR","name":"DateTime"}}}"#;
     check_gql_response(req, expected_response, &container).await;
 }

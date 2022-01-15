@@ -1,29 +1,31 @@
-use crate::{
-    resolve_selection_parallelly, FieldContext, FieldResolver, GqlArgument, GqlValue,
-    ResolverResult, Schema, SelectionSetResolver,
-};
+use rusty_gql_macro::Resolver;
+
+use crate::{GqlArgument, Schema, SelectionSetResolver};
 
 use super::introspection_type::__Type;
 
-pub(crate) struct __InputValue<'a> {
+pub struct __InputValue<'a> {
     schema: &'a Schema,
     detail: GqlArgument,
 }
-
-impl<'a> __InputValue<'a> {
-    pub fn new(schema: &'a Schema, value: &'a GqlArgument) -> Self {
-        Self {
-            schema,
-            detail: value.clone(),
-        }
+pub fn build_input_value_introspection<'a>(
+    schema: &'a Schema,
+    value: &'a GqlArgument,
+) -> __InputValue<'a> {
+    __InputValue {
+        schema,
+        detail: value.clone(),
     }
+}
 
+#[Resolver(internal)]
+impl<'a> __InputValue<'a> {
     async fn name(&self) -> &str {
         self.detail.name.as_str()
     }
 
-    async fn description(&self) -> Option<&String> {
-        self.detail.description.as_ref()
+    async fn description(&self) -> Option<&str> {
+        self.detail.description.as_deref()
     }
 
     async fn ty(&'a self) -> __Type<'a> {
@@ -35,70 +37,5 @@ impl<'a> __InputValue<'a> {
             Some(v) => Some(v.to_string()),
             None => None,
         }
-    }
-}
-
-#[async_trait::async_trait]
-impl<'a> FieldResolver for __InputValue<'a> {
-    async fn resolve_field(&self, ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
-        if ctx.item.name == "name" {
-            let name = self.name().await;
-            let ctx_selection_set = ctx.with_selection_set(&ctx.item.selection_set);
-
-            return SelectionSetResolver::resolve_selection_set(name, &ctx_selection_set)
-                .await
-                .map(Some);
-        }
-
-        if ctx.item.name == "description" {
-            let desc = self.description().await;
-            let ctx_selection_set = ctx.with_selection_set(&ctx.item.selection_set);
-
-            match desc {
-                Some(v) => {
-                    return SelectionSetResolver::resolve_selection_set(v, &ctx_selection_set)
-                        .await
-                        .map(Some);
-                }
-                None => return Ok(None),
-            }
-        }
-
-        if ctx.item.name == "type" {
-            let ty = self.ty().await;
-            let ctx_selection_set = ctx.with_selection_set(&ctx.item.selection_set);
-
-            return SelectionSetResolver::resolve_selection_set(&ty, &ctx_selection_set)
-                .await
-                .map(Some);
-        }
-
-        if ctx.item.name == "defaultValue" {
-            let value = self.default_value().await;
-            let ctx_selection_set = ctx.with_selection_set(&ctx.item.selection_set);
-
-            match value {
-                Some(v) => {
-                    return SelectionSetResolver::resolve_selection_set(&v, &ctx_selection_set)
-                        .await
-                        .map(Some);
-                }
-                None => return Ok(None),
-            }
-        }
-        Ok(None)
-    }
-    fn type_name() -> String {
-        "__InputValue".to_string()
-    }
-}
-
-#[async_trait::async_trait]
-impl<'a> SelectionSetResolver for __InputValue<'a> {
-    async fn resolve_selection_set(
-        &self,
-        ctx: &crate::SelectionSetContext<'_>,
-    ) -> crate::ResolverResult<crate::GqlValue> {
-        resolve_selection_parallelly(ctx, self).await
     }
 }

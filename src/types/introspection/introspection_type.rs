@@ -1,9 +1,13 @@
 use crate::{
-    types::GqlValueType, FieldContext, FieldResolver, GqlTypeDefinition, GqlValue, ResolverResult,
-    Schema, SelectionSetContext, SelectionSetResolver, resolve_selection_parallelly,
+    resolve_selection_parallelly, types::GqlValueType, FieldContext, FieldResolver,
+    GqlTypeDefinition, GqlValue, ResolverResult, Schema, SelectionSetContext, SelectionSetResolver,
 };
 
-use super::{enum_value::__EnumValue, field::__Field, input_value::__InputValue};
+use super::{
+    enum_value::__EnumValue,
+    field::__Field,
+    input_value::{__InputValue, build_input_value_introspection},
+};
 
 enum TypeDetail<'a> {
     Named(&'a GqlTypeDefinition),
@@ -189,7 +193,7 @@ impl<'a> __Type<'a> {
         if let TypeDetail::Named(GqlTypeDefinition::InputObject(input_obj)) = &self.detail {
             let mut values = Vec::new();
             for v in &input_obj.fields {
-                let value = __InputValue::new(self.schema, &v);
+                let value = build_input_value_introspection(self.schema, &v);
                 values.push(value);
             }
             Some(values)

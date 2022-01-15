@@ -5,7 +5,7 @@ use crate::{
     GqlValue, ResolverResult, Schema, SelectionSetContext, SelectionSetResolver,
 };
 
-use super::input_value::__InputValue;
+use super::input_value::{__InputValue, build_input_value_introspection};
 
 pub(crate) struct __Directive<'a> {
     pub schema: &'a Schema,
@@ -58,7 +58,7 @@ impl<'a> __Directive<'a> {
         let mut result = Vec::new();
 
         for arg in &self.detail.arguments {
-            let value = __InputValue::new(self.schema, arg);
+            let value = build_input_value_introspection(self.schema, arg);
             result.push(value);
         }
         result

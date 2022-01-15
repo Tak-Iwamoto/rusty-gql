@@ -1,5 +1,4 @@
 #[allow(dead_code)]
-
 use rusty_gql::*;
 
 #[tokio::test]
