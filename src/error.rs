@@ -22,7 +22,7 @@ pub enum GqlErrorType {
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize, PartialEq)]
-pub struct GraphQLTypedError {
+pub struct GqlTypedError {
     pub error_type: GqlErrorType,
     pub error_detail: Option<String>,
     pub origin: String,
@@ -35,7 +35,7 @@ pub struct GqlError {
     pub message: String,
     pub locations: Vec<Location>,
     pub path: Vec<String>,
-    pub extensions: Option<GraphQLTypedError>,
+    pub extensions: Option<GqlTypedError>,
 }
 
 impl GqlError {
@@ -69,7 +69,7 @@ impl Display for GqlError {
 
 pub struct ErrorWrapper {
     pub message: String,
-    pub extensions: Option<GraphQLTypedError>,
+    pub extensions: Option<GqlTypedError>,
 }
 
 impl ErrorWrapper {

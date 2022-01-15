@@ -1,11 +1,11 @@
 #[derive(Clone, Debug)]
-pub struct GraphQLPath {
-    pub prev: Option<Box<GraphQLPath>>,
+pub struct GqlPath {
+    pub prev: Option<Box<GqlPath>>,
     pub current_key: String,
     pub parent_name: String,
 }
 
-impl Default for GraphQLPath {
+impl Default for GqlPath {
     fn default() -> Self {
         Self {
             prev: None,
@@ -15,8 +15,8 @@ impl Default for GraphQLPath {
     }
 }
 
-impl GraphQLPath {
-    pub fn prev(mut self, prev: Option<GraphQLPath>) -> Self {
+impl GqlPath {
+    pub fn prev(mut self, prev: Option<GqlPath>) -> Self {
         self.prev = prev.map_or(None, |p| Some(Box::new(p)));
         self
     }
@@ -33,13 +33,13 @@ impl GraphQLPath {
 
     // pub fn add_path<'a>(
     //     &self,
-    //     prev_path: Option<GraphQLPath>,
+    //     prev_path: Option<GqlPath>,
     //     schema: &'a Schema<'a>,
     //     operation: &'a Operation<'a>,
-    // ) -> GraphQLPath {
+    // ) -> GqlPath {
     //     match prev_path {
     //         Some(prev) => {
-    //             GraphQLPath {
+    //             GqlPath {
     //                 prev: Some(Box::new(prev)),
     //                 key: self.key,
     //                 parent_name:
@@ -51,7 +51,7 @@ impl GraphQLPath {
 
     // fn get_parent_name<'a>(
     //     &self,
-    //     prev_path: Option<GraphQLPath>,
+    //     prev_path: Option<GqlPath>,
     //     schema: &'a Schema<'a>,
     //     operation: &'a Operation<'a>,
     // ) -> &str {
