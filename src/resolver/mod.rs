@@ -180,38 +180,35 @@ impl<'a> Fields<'a> {
                                 let mut resolve_fut = resolve_fut.boxed();
 
                                 for directive in query_directives {
-                                    if let Some(custom_dir) = ctx
-                                        .schema
-                                        .custom_directives
-                                        .get(directive.name.as_str())
+                                    if let Some(custom_dir) =
+                                        ctx.schema.custom_directives.get(directive.name.as_str())
                                     {
                                         resolve_fut = Box::pin({
                                             let ctx = ctx_field.clone();
                                             async move {
-                                                custom_dir.call(&ctx, &mut resolve_fut).await
+                                                custom_dir
+                                                    .resolve_field(&ctx, &mut resolve_fut)
+                                                    .await
                                             }
                                         })
                                     }
                                 }
 
                                 for directive in schema_directives {
-                                    if let Some(custom_dir) = ctx
-                                        .schema
-                                        .custom_directives
-                                        .get(directive.name.as_str())
+                                    if let Some(custom_dir) =
+                                        ctx.schema.custom_directives.get(directive.name.as_str())
                                     {
                                         resolve_fut = Box::pin({
                                             let ctx = ctx_field.clone();
                                             async move {
-                                                custom_dir.call(&ctx, &mut resolve_fut).await
+                                                custom_dir
+                                                    .resolve_field(&ctx, &mut resolve_fut)
+                                                    .await
                                             }
                                         })
                                     }
                                 }
-                                Ok((
-                                    field_name,
-                                    resolve_fut.await?.unwrap_or_default()
-                                ))
+                                Ok((field_name, resolve_fut.await?.unwrap_or_default()))
                             }
                         }
                     }))
