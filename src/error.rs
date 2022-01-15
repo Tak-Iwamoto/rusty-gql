@@ -54,6 +54,11 @@ impl GqlError {
             extensions: None,
         }
     }
+
+    pub fn set_extentions(&mut self, typed_error: GqlTypedError) -> Self {
+        self.extensions = Some(typed_error);
+        self.clone()
+    }
 }
 
 impl Display for GqlError {
