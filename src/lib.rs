@@ -25,6 +25,7 @@ pub use context::{ExecutionContext, FieldContext, SelectionSetContext};
 pub use custom_directive::CustomDirective;
 pub use error::{ErrorWrapper, GqlError};
 pub use executor::execute;
+use futures_util::Future;
 pub use graphiql_html::playground_html;
 pub use operation::OperationType;
 pub use query_root::QueryRoot;
@@ -91,3 +92,6 @@ impl SelectionSetResolver for EmptySubscription {
         Ok(GqlValue::Null)
     }
 }
+
+pub type ResolveFut<'a> =
+    &'a mut (dyn Future<Output = ResolverResult<Option<GqlValue>>> + Send + Unpin);

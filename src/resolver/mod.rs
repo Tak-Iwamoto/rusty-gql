@@ -8,7 +8,10 @@ mod string;
 use std::collections::BTreeMap;
 
 use async_trait::async_trait;
-use futures_util::{future::{try_join_all, BoxFuture}, FutureExt};
+use futures_util::{
+    future::{try_join_all, BoxFuture},
+    FutureExt,
+};
 use graphql_parser::query::{Selection, TypeCondition};
 
 use crate::{
@@ -176,19 +179,38 @@ impl<'a> Fields<'a> {
                             } else {
                                 let mut resolve_fut = resolve_fut.boxed();
 
-                                for query_directive in query_directives {
-
+                                for directive in query_directives {
+                                    if let Some(custom_dir) = ctx
+                                        .schema
+                                        .custom_directives
+                                        .get(directive.name.as_str())
+                                    {
+                                        resolve_fut = Box::pin({
+                                            let ctx = ctx_field.clone();
+                                            async move {
+                                                custom_dir.call(&ctx, &mut resolve_fut).await
+                                            }
+                                        })
+                                    }
                                 }
 
-                                for schema_directive in schema_directives {
-
+                                for directive in schema_directives {
+                                    if let Some(custom_dir) = ctx
+                                        .schema
+                                        .custom_directives
+                                        .get(directive.name.as_str())
+                                    {
+                                        resolve_fut = Box::pin({
+                                            let ctx = ctx_field.clone();
+                                            async move {
+                                                custom_dir.call(&ctx, &mut resolve_fut).await
+                                            }
+                                        })
+                                    }
                                 }
                                 Ok((
                                     field_name,
-                                    root_type
-                                        .resolve_field(&ctx_field)
-                                        .await?
-                                        .unwrap_or_default(),
+                                    resolve_fut.await?.unwrap_or_default()
                                 ))
                             }
                         }
