@@ -5,17 +5,16 @@ use syn::{ext::IdentExt, Block, FnArg, ImplItem, ItemImpl, ReturnType};
 use crate::utils::{get_method_args_without_context, is_context_type, is_result_type};
 
 pub fn generate_gql_resolver(item_impl: &mut ItemImpl) -> Result<TokenStream, syn::Error> {
-    let self_name = &item_impl.self_ty;
-    let type_name = match self_name.as_ref() {
+    let self_ty = &item_impl.self_ty;
+    let type_name = match self_ty.as_ref() {
         syn::Type::Path(path) => path.path.segments.last().unwrap().ident.unraw().to_string(),
         _ => {
-            return Err(syn::Error::new_spanned(&self_name, "Invalid struct").into());
+            return Err(syn::Error::new_spanned(&self_ty, "Invalid struct").into());
         }
     };
 
-    let generics = &item_impl.generics;
-    let generics_params = &generics.params;
-    let where_clause = &generics.where_clause;
+    let (impl_generics, _, where_clause) = &item_impl.generics.split_for_impl();
+
     let mut resolvers = Vec::new();
     for item in &mut item_impl.items {
         if let ImplItem::Method(method) = item {
@@ -104,7 +103,7 @@ pub fn generate_gql_resolver(item_impl: &mut ItemImpl) -> Result<TokenStream, sy
         #item_impl
 
         #[rusty_gql::async_trait::async_trait]
-        impl #generics rusty_gql::FieldResolver for #self_name #generics_params #where_clause {
+        impl #impl_generics rusty_gql::FieldResolver for #self_ty #where_clause {
             async fn resolve_field(&self, ctx: &rusty_gql::FieldContext<'_>) -> rusty_gql::ResolverResult<::std::option::Option<rusty_gql::GqlValue>> {
                 #(#resolvers)*
                 Ok(::std::option::Option::None)
@@ -115,7 +114,7 @@ pub fn generate_gql_resolver(item_impl: &mut ItemImpl) -> Result<TokenStream, sy
         }
 
         #[rusty_gql::async_trait::async_trait]
-        impl #generics rusty_gql::SelectionSetResolver for #self_name #generics_params #where_clause {
+        impl #impl_generics rusty_gql::SelectionSetResolver for #self_ty #where_clause {
             async fn resolve_selection_set(&self, ctx: &rusty_gql::SelectionSetContext<'_>) -> rusty_gql::ResolverResult<rusty_gql::GqlValue> {
                 rusty_gql::resolve_selection_parallelly(ctx, self).await
             }
