@@ -60,6 +60,7 @@ pub async fn test_object() {
             map
         }
 
+        #[allow(unused)]
         async fn person(&self, id: ID) -> Person {
             let person = Person {
                 name: "Tom".to_string(),

@@ -107,6 +107,7 @@ impl<'a> FindConflicts<'a> {
 mod tests {
     use super::OverlappingFieldsCanBeMerged;
 
+    #[allow(unused)]
     fn factory() -> OverlappingFieldsCanBeMerged {
         OverlappingFieldsCanBeMerged
     }

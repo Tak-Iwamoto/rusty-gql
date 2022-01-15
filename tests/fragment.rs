@@ -1,3 +1,5 @@
+#[allow(dead_code)]
+
 use rusty_gql::*;
 
 #[tokio::test]
@@ -25,6 +27,7 @@ async fn test_inline_framgnet() {
 
     #[Resolver]
     impl Query {
+        #[allow(unused)]
         async fn person(&self, id: ID) -> Person {
             let person = Person {
                 name: "Tom".to_string(),
@@ -76,6 +79,7 @@ async fn test_framgnet_spread() {
 
     #[Resolver]
     impl Query {
+        #[allow(unused)]
         async fn person(&self, id: ID) -> Person {
             let person = Person {
                 name: "Tom".to_string(),
