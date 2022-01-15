@@ -1,4 +1,7 @@
-use std::fmt::{self, Debug, Display, Formatter};
+use std::{
+    collections::BTreeMap,
+    fmt::{self, Debug, Display, Formatter},
+};
 
 use graphql_parser::Pos;
 use serde::{Deserialize, Serialize};
@@ -25,8 +28,8 @@ pub enum GqlErrorType {
 pub struct GqlTypedError {
     pub error_type: GqlErrorType,
     pub error_detail: Option<String>,
-    pub origin: String,
-    pub debug_info: String,
+    pub origin: Option<String>,
+    pub debug_info: Option<BTreeMap<String, String>>,
     pub debug_uri: Option<String>,
 }
 
