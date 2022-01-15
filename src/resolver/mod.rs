@@ -126,8 +126,8 @@ fn build_gql_object(target_obj: &mut BTreeMap<String, GqlValue>, gql_value: (Str
     }
 }
 
-pub type ResolverFuture<'a> = BoxFuture<'a, ResolverResult<(String, GqlValue)>>;
-pub struct Fields<'a>(Vec<ResolverFuture<'a>>);
+pub type ResolveFieldFuture<'a> = BoxFuture<'a, ResolverResult<(String, GqlValue)>>;
+pub struct Fields<'a>(Vec<ResolveFieldFuture<'a>>);
 
 impl<'a> Fields<'a> {
     pub fn collect_fields<'ctx: 'a, T: FieldResolver + ?Sized>(
