@@ -179,24 +179,9 @@ impl<'a> Fields<'a> {
                             ))
                         }
                     };
-                    let on_type = match &fragment_def.type_condition {
-                        TypeCondition::On(ty) => ty,
-                    };
                     let type_name = T::type_name();
 
-                    let is_on_type_name = on_type == &type_name;
-                    let is_impl_interface =
-                        ctx.schema
-                            .type_definitions
-                            .get(&type_name)
-                            .map_or(false, |ty_def| {
-                                if let GqlTypeDefinition::Object(obj) = ty_def {
-                                    obj.implements_interfaces.contains(on_type)
-                                } else {
-                                    false
-                                }
-                            });
-                    if is_on_type_name || is_impl_interface {
+                    if is_fragment_condition(ctx, &type_name, Some(&fragment_def.type_condition)) {
                         root_type.collect_all_fields(
                             &ctx.with_selection_set(&fragment_def.selection_set),
                             self,
@@ -207,45 +192,54 @@ impl<'a> Fields<'a> {
                     if ctx.is_skip(&inline_fragment.directives) {
                         continue;
                     }
-                    let on_type_str = match &inline_fragment.type_condition {
-                        Some(ty) => match ty {
-                            TypeCondition::On(on_ty) => Some(on_ty),
-                        },
-                        None => None,
-                    };
-                    match on_type_str {
-                        Some(on_type) => {
-                            let type_name = T::type_name();
+                    let type_name = T::type_name();
 
-                            let is_on_type_name = on_type == &type_name;
-                            let is_impl_interface = ctx
-                                .schema
-                                .type_definitions
-                                .get(&type_name)
-                                .map_or(false, |ty_def| {
-                                    if let GqlTypeDefinition::Object(obj) = ty_def {
-                                        obj.implements_interfaces.contains(on_type)
-                                    } else {
-                                        false
-                                    }
-                                });
-                            if is_on_type_name || is_impl_interface {
-                                root_type.collect_all_fields(
-                                    &ctx.with_selection_set(&inline_fragment.selection_set),
-                                    self,
-                                )?;
-                            }
-                        }
-                        None => {
-                            self.collect_fields(
-                                &ctx.with_selection_set(&inline_fragment.selection_set),
-                                root_type,
-                            )?;
-                        }
+                    if is_fragment_condition(
+                        ctx,
+                        &type_name,
+                        inline_fragment.type_condition.as_ref(),
+                    ) {
+                        root_type.collect_all_fields(
+                            &ctx.with_selection_set(&inline_fragment.selection_set),
+                            self,
+                        )?;
+                    } else {
+                        self.collect_fields(
+                            &ctx.with_selection_set(&inline_fragment.selection_set),
+                            root_type,
+                        )?;
                     }
                 }
             }
         }
         Ok(())
+    }
+}
+
+fn is_fragment_condition<'a, 'ctx: 'a>(
+    ctx: &SelectionSetContext<'ctx>,
+    type_name: &String,
+    ty_cond: Option<&TypeCondition<'a, String>>,
+) -> bool {
+    match ty_cond {
+        Some(cond) => {
+            let on_type = match cond {
+                TypeCondition::On(ty) => ty,
+            };
+            let is_on_type_name = on_type == type_name;
+            let is_impl_interface =
+                ctx.schema
+                    .type_definitions
+                    .get(type_name)
+                    .map_or(false, |ty_def| {
+                        if let GqlTypeDefinition::Object(obj) = ty_def {
+                            obj.implements_interfaces.contains(on_type)
+                        } else {
+                            false
+                        }
+                    });
+            is_on_type_name || is_impl_interface
+        }
+        None => false,
     }
 }
