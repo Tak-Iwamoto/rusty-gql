@@ -1,5 +1,6 @@
 mod container;
 mod context;
+mod custom_directive;
 mod error;
 mod executor;
 mod graphiql_html;
