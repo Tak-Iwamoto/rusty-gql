@@ -4,7 +4,7 @@ use crate::{
 };
 
 use super::{
-    enum_value::__EnumValue,
+    enum_value::{__EnumValue, build_enum_value_introspection},
     field::__Field,
     input_value::{__InputValue, build_input_value_introspection},
 };
@@ -180,7 +180,7 @@ impl<'a> __Type<'a> {
         if let TypeDetail::Named(GqlTypeDefinition::Enum(enu)) = &self.detail {
             let mut values = Vec::new();
             for v in &enu.values {
-                let value = __EnumValue::new(&v);
+                let value = build_enum_value_introspection(&v);
                 values.push(value);
             }
             Some(values)
