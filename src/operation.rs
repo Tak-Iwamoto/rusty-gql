@@ -12,7 +12,7 @@ use graphql_parser::{
 use crate::{error::GqlError, Variables};
 
 #[derive(Debug)]
-pub struct Operation<'a> {
+pub struct OperationInner<'a> {
     pub operation_type: OperationType,
     pub directives: Vec<Directive<'a, String>>,
     pub variable_definitions: Vec<VariableDefinition<'a, String>>,
@@ -23,16 +23,16 @@ pub struct Operation<'a> {
 }
 
 #[derive(Debug)]
-pub struct ArcOperation<'a>(Arc<Operation<'a>>);
+pub struct Operation<'a>(Arc<OperationInner<'a>>);
 
-impl<'a> ArcOperation<'a> {
-    pub fn new(operation: Operation<'a>) -> ArcOperation<'a> {
-        ArcOperation(Arc::new(operation))
+impl<'a> Operation<'a> {
+    pub fn new(operation: OperationInner<'a>) -> Operation<'a> {
+        Operation(Arc::new(operation))
     }
 }
 
-impl<'a> Deref for ArcOperation<'a> {
-    type Target = Operation<'a>;
+impl<'a> Deref for Operation<'a> {
+    type Target = OperationInner<'a>;
 
     fn deref(&self) -> &Self::Target {
         &self.0
@@ -158,7 +158,7 @@ pub fn build_operation<'a>(
             match target_def {
                 Some(definition) => {
                     let definition = definition.clone();
-                    Ok(Operation {
+                    Ok(Operation(Arc::new(OperationInner {
                         operation_type: definition.operation_type,
                         fragment_definitions,
                         directives: definition.directives,
@@ -166,7 +166,7 @@ pub fn build_operation<'a>(
                         selection_set: definition.selection_set,
                         errors: Default::default(),
                         variables,
-                    })
+                    })))
                 }
                 None => Err(GqlError::new(
                     format!("operationName: {} is not contained in query", name),
@@ -177,7 +177,7 @@ pub fn build_operation<'a>(
         None => match operation_definitions.get(&no_name_key.to_string()) {
             Some(definition) => {
                 let definition = definition.clone();
-                Ok(Operation {
+                Ok(Operation(Arc::new(OperationInner {
                     operation_type: definition.operation_type,
                     fragment_definitions,
                     directives: definition.directives,
@@ -185,12 +185,12 @@ pub fn build_operation<'a>(
                     selection_set: definition.selection_set,
                     errors: Default::default(),
                     variables,
-                })
+                })))
             }
             None => match operation_definitions.values().next() {
                 Some(definition) => {
                     let definition = definition.clone();
-                    Ok(Operation {
+                    Ok(Operation(Arc::new(OperationInner {
                         operation_type: definition.operation_type,
                         fragment_definitions,
                         directives: definition.directives,
@@ -198,7 +198,7 @@ pub fn build_operation<'a>(
                         selection_set: definition.selection_set,
                         errors: Default::default(),
                         variables,
-                    })
+                    })))
                 }
                 None => Err(GqlError::new("operation does not exist", None)),
             },

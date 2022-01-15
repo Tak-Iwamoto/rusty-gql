@@ -1,13 +1,7 @@
 use crate::{
-    container::Container,
-    context::build_context,
-    error::GqlError,
-    operation::{build_operation, ArcOperation},
-    request::Request,
-    resolve_selection_parallelly, resolve_selection_serially,
-    response::Response,
-    validation::apply_validation,
-    OperationType, SelectionSetResolver,
+    container::Container, context::build_context, error::GqlError, operation::build_operation,
+    request::Request, resolve_selection_parallelly, resolve_selection_serially, response::Response,
+    validation::apply_validation, OperationType, SelectionSetResolver,
 };
 
 pub async fn execute<
@@ -32,7 +26,7 @@ pub async fn execute<
     );
 
     let operation = match operation {
-        Ok(op) => ArcOperation::new(op),
+        Ok(op) => op,
         Err(error) => return Response::from_errors(vec![error]),
     };
 

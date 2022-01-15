@@ -1,5 +1,5 @@
 use crate::{
-    error::GqlError, input::GqlInputType, operation::ArcOperation, path::GqlPath,
+    error::GqlError, input::GqlInputType, operation::Operation, path::GqlPath,
     types::schema::Schema, GqlValue, ResolverResult,
 };
 use graphql_parser::{
@@ -10,7 +10,7 @@ use graphql_parser::{
 #[derive(Debug, Clone)]
 pub struct ExecutionContext<'a, T> {
     pub schema: &'a Schema,
-    pub operation: &'a ArcOperation<'a>,
+    pub operation: &'a Operation<'a>,
     pub item: T,
     pub current_path: GqlPath,
 }
@@ -117,7 +117,7 @@ impl<'a, T> ExecutionContext<'a, T> {
 
 pub(crate) fn build_context<'a>(
     schema: &'a Schema,
-    operation: &'a ArcOperation<'a>,
+    operation: &'a Operation<'a>,
 ) -> ExecutionContext<'a, &'a SelectionSet<'a, String>> {
     let operation_type = operation.operation_type.to_string();
 
