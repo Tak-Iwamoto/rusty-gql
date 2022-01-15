@@ -29,9 +29,9 @@ pub trait FieldResolver: Send + Sync {
     async fn resolve_field(&self, ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>>;
     fn type_name() -> String;
 
-    fn collect_all_fields<'a, 'b: 'a>(
+    fn collect_all_fields<'a, 'ctx: 'a>(
         &'a self,
-        ctx: &SelectionSetContext<'b>,
+        ctx: &SelectionSetContext<'ctx>,
         fields: &mut Fields<'a>,
     ) -> ResolverResult<()> {
         fields.collect_fields(ctx, self)
@@ -49,21 +49,21 @@ impl<T: FieldResolver> FieldResolver for &T {
     }
 }
 
-pub async fn resolve_selection_parallelly<'a, 'b: 'a, T: FieldResolver + SelectionSetResolver>(
-    ctx: &SelectionSetContext<'b>,
+pub async fn resolve_selection_parallelly<'a, 'ctx: 'a, T: FieldResolver + SelectionSetResolver>(
+    ctx: &SelectionSetContext<'ctx>,
     root_type: &'a T,
 ) -> ResolverResult<GqlValue> {
     resolve_selection(ctx, root_type, true).await
 }
 
-pub async fn resolve_selection_serially<'a, 'b: 'a, T: FieldResolver + SelectionSetResolver>(
-    ctx: &SelectionSetContext<'b>,
+pub async fn resolve_selection_serially<'a, 'ctx: 'a, T: FieldResolver + SelectionSetResolver>(
+    ctx: &SelectionSetContext<'ctx>,
     root_type: &'a T,
 ) -> ResolverResult<GqlValue> {
     resolve_selection(ctx, root_type, false).await
 }
-async fn resolve_selection<'a, 'b: 'a, T: FieldResolver + SelectionSetResolver>(
-    ctx: &SelectionSetContext<'b>,
+async fn resolve_selection<'a, 'ctx: 'a, T: FieldResolver + SelectionSetResolver>(
+    ctx: &SelectionSetContext<'ctx>,
     root_type: &'a T,
     parallel: bool,
 ) -> ResolverResult<GqlValue> {
@@ -126,9 +126,9 @@ pub type ResolverFuture<'a> = BoxFuture<'a, ResolverResult<(String, GqlValue)>>;
 pub struct Fields<'a>(Vec<ResolverFuture<'a>>);
 
 impl<'a> Fields<'a> {
-    pub fn collect_fields<'b: 'a, T: FieldResolver + ?Sized>(
+    pub fn collect_fields<'ctx: 'a, T: FieldResolver + ?Sized>(
         &mut self,
-        ctx: &SelectionSetContext<'b>,
+        ctx: &SelectionSetContext<'ctx>,
         root_type: &'a T,
     ) -> ResolverResult<()> {
         for item in &ctx.item.items {
