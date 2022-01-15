@@ -50,8 +50,7 @@ impl<'a> Visitor<'a> for KnownDirectives {
         _name: &'a str,
         _fragment_definition: &'a graphql_parser::query::FragmentDefinition<'a, String>,
     ) {
-        let top = self.location_stack.pop();
-        assert_eq!(top, Some(DirectiveLocation::FragmentDefinition));
+        self.location_stack.pop();
     }
 
     fn enter_directive(
@@ -81,8 +80,7 @@ impl<'a> Visitor<'a> for KnownDirectives {
         _ctx: &mut ValidationContext,
         _field: &'a graphql_parser::query::Field<'a, String>,
     ) {
-        let top = self.location_stack.pop();
-        assert_eq!(top, Some(DirectiveLocation::Field));
+        self.location_stack.pop();
     }
 
     fn enter_fragment_spread(
@@ -98,8 +96,7 @@ impl<'a> Visitor<'a> for KnownDirectives {
         _ctx: &mut ValidationContext,
         _fragment_spread: &'a graphql_parser::query::FragmentSpread<'a, String>,
     ) {
-        let top = self.location_stack.pop();
-        assert_eq!(top, Some(DirectiveLocation::FragmentSpread));
+        self.location_stack.pop();
     }
 
     fn enter_inline_fragment(
@@ -115,8 +112,7 @@ impl<'a> Visitor<'a> for KnownDirectives {
         _ctx: &mut ValidationContext,
         _inline_fragment: &'a graphql_parser::query::InlineFragment<'a, String>,
     ) {
-        let top = self.location_stack.pop();
-        assert_eq!(top, Some(DirectiveLocation::InlineFragment));
+        self.location_stack.pop();
     }
 }
 
