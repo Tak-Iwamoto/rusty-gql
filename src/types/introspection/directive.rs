@@ -46,8 +46,8 @@ impl<'a> __Directive<'a> {
         self.detail.name.as_str()
     }
 
-    async fn description(&self) -> Option<&String> {
-        self.detail.description.as_ref()
+    async fn description(&self) -> Option<&str> {
+        self.detail.description.as_deref()
     }
 
     async fn locations(&self) -> &Vec<DirectiveLocation> {

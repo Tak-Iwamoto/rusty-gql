@@ -96,9 +96,9 @@ impl<'a> __Type<'a> {
         }
     }
 
-    async fn description(&self) -> Option<&String> {
+    async fn description(&self) -> Option<&str> {
         match self.detail {
-            TypeDetail::Named(def) => def.description().as_ref(),
+            TypeDetail::Named(def) => def.description().as_deref(),
             TypeDetail::NonNull(_) => None,
             TypeDetail::List(_) => None,
         }

@@ -25,8 +25,8 @@ impl<'a> __Field<'a> {
         self.detail.name.as_str()
     }
 
-    async fn description(&self) -> Option<&String> {
-        self.detail.description.as_ref()
+    async fn description(&self) -> Option<&str> {
+        self.detail.description.as_deref()
     }
 
     async fn args(&'a self) -> Vec<__InputValue<'a>> {
