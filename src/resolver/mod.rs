@@ -27,6 +27,7 @@ pub trait SelectionSetResolver: FieldResolver {
 #[async_trait]
 pub trait FieldResolver: Send + Sync {
     async fn resolve_field(&self, ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>>;
+
     fn type_name() -> String;
 
     fn collect_all_fields<'a, 'ctx: 'a>(

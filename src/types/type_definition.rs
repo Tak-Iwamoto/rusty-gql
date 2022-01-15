@@ -1,6 +1,6 @@
 use graphql_parser::schema::TypeDefinition;
 
-use crate::GqlField;
+use crate::{GqlDirective, GqlField};
 
 use super::{
     enum_type::GqlEnum, input_object::GqlInputObject, interface::GqlInterface, object::GqlObject,
@@ -103,5 +103,16 @@ impl GqlTypeDefinition {
             self,
             &GqlTypeDefinition::Enum(_) | &GqlTypeDefinition::Scalar(_)
         )
+    }
+
+    pub fn directives(&self) -> &[GqlDirective] {
+        match self {
+            GqlTypeDefinition::Scalar(ty) => &ty.directives,
+            GqlTypeDefinition::Object(ty) => &ty.directives,
+            GqlTypeDefinition::Interface(ty) => &ty.directives,
+            GqlTypeDefinition::Union(ty) => &ty.directives,
+            GqlTypeDefinition::Enum(ty) => &ty.directives,
+            GqlTypeDefinition::InputObject(ty) => &ty.directives,
+        }
     }
 }
