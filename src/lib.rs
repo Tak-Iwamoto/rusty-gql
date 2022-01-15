@@ -1,6 +1,7 @@
 mod container;
 mod context;
 mod custom_directive;
+mod custom_scalar;
 mod error;
 mod executor;
 mod graphiql_html;
@@ -34,9 +35,9 @@ pub use response::Response;
 pub use test_utils::{build_test_request, check_gql_response, schema_content};
 pub use types::schema::build_schema;
 pub use types::{
-    GqlArgument, GqlDirective, GqlDirectiveDefinition, GqlEnum, GqlField, GqlInputObject,
-    GqlInterface, GqlObject, GqlScalar, GqlTypeDefinition, GqlUnion, GqlValue, GqlValueType,
-    Schema, ID,
+    GqlArgument, GqlConstValue as Value, GqlDirective, GqlDirectiveDefinition, GqlEnum, GqlField,
+    GqlInputObject, GqlInterface, GqlObject, GqlScalar, GqlTypeDefinition, GqlUnion, GqlValue,
+    GqlValueType, Schema, ID,
 };
 pub use variables::Variables;
 

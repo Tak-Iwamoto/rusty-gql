@@ -23,7 +23,7 @@ pub use introspection::build_schema_introspection;
 pub use scalar::GqlScalar;
 pub use schema::Schema;
 pub use type_definition::GqlTypeDefinition;
-pub use value::GqlValue;
+pub use value::{GqlConstValue, GqlValue};
 pub use value_type::GqlValueType;
 
 pub use directive::{GqlDirective, GqlDirectiveDefinition};

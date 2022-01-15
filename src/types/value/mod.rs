@@ -9,6 +9,36 @@ use serde::{de::Visitor, Deserialize, Serialize, Serializer};
 use serde_json::Number;
 
 #[derive(Debug, Clone, Eq)]
+pub enum GqlConstValue {
+    Number(Number),
+    String(String),
+    Boolean(bool),
+    Null,
+    Enum(String),
+    List(Vec<GqlValue>),
+    Object(BTreeMap<String, GqlValue>),
+}
+
+impl PartialEq for GqlConstValue {
+    fn eq(&self, other: &Self) -> bool {
+        match (self, other) {
+            (Self::Number(l0), Self::Number(r0)) => l0 == r0,
+            (Self::String(l0), Self::String(r0)) => l0 == r0,
+            (Self::Boolean(l0), Self::Boolean(r0)) => l0 == r0,
+            (Self::Enum(l0), Self::Enum(r0)) => l0 == r0,
+            (Self::List(l0), Self::List(r0)) => {
+                if l0.len() != r0.len() {
+                    return false;
+                }
+                l0.iter().zip(r0.iter()).all(|(l, r)| l == r)
+            }
+            (Self::Object(l0), Self::Object(r0)) => l0 == r0,
+            _ => false,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Eq)]
 pub enum GqlValue {
     Variable(String),
     Number(Number),
