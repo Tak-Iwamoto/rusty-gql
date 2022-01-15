@@ -1,4 +1,4 @@
-use crate::{execute, ArcContainer, Request, SelectionSetResolver, Variables};
+use crate::{execute, Container, Request, SelectionSetResolver, Variables};
 
 pub fn schema_content(path: &str) -> String {
     std::fs::read_to_string(path).unwrap()
@@ -23,7 +23,7 @@ pub async fn check_gql_response<
 >(
     request: Request,
     expected_response: &str,
-    container: &ArcContainer<Query, Mutation, Subscription>,
+    container: &Container<Query, Mutation, Subscription>,
 ) {
     let res = execute(&container, request).await;
     assert_eq!(serde_json::to_string(&res).unwrap(), expected_response);

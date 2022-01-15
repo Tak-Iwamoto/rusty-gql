@@ -1,4 +1,4 @@
-use rusty_gql::{execute, playground_html, ArcContainer, FieldResolver, Resolver};
+use rusty_gql::{execute, playground_html, Container, FieldResolver, Resolver};
 use rusty_gql_axum::{GqlRequest, GqlResponse};
 use std::net::SocketAddr;
 
@@ -48,7 +48,7 @@ impl FieldResolver for Subscription {
     }
 }
 
-type Container = ArcContainer<Query, Mutation, Subscription>;
+type Container = Container<Query, Mutation, Subscription>;
 
 async fn graphql_handler(container: Extension<Container>, req: GqlRequest) -> GqlResponse {
     let result = execute(&container, req.0).await;
@@ -62,7 +62,7 @@ async fn gql_playground() -> impl IntoResponse {
 #[tokio::main]
 async fn main() {
     let schema_doc = std::fs::read_to_string("./src/tests/starwars.graphql").unwrap();
-    let container = ArcContainer::new(schema_doc.as_str(), Query, Mutation, Subscription);
+    let container = Container::new(schema_doc.as_str(), Query, Mutation, Subscription);
     let app = Router::new()
         .route("/graphql", get(gql_playground).post(graphql_handler))
         // .route("/graphql", get(test))

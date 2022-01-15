@@ -12,7 +12,7 @@ async fn test_object_introspection() {
     }
     let contents = schema_content("./tests/schemas/test_schema.graphql");
 
-    let container = ArcContainer::new(
+    let container = Container::new(
         &vec![contents.as_str()],
         QueryRoot { query: Query },
         EmptyMutation,
@@ -38,7 +38,7 @@ async fn test_interface_introspection() {
     }
     let contents = schema_content("./tests/schemas/test_schema.graphql");
 
-    let container = ArcContainer::new(
+    let container = Container::new(
         &vec![contents.as_str()],
         QueryRoot { query: Query },
         EmptyMutation,
@@ -64,7 +64,7 @@ async fn test_input_object_introspection() {
     }
     let contents = schema_content("./tests/schemas/test_schema.graphql");
 
-    let container = ArcContainer::new(
+    let container = Container::new(
         &vec![contents.as_str()],
         QueryRoot { query: Query },
         EmptyMutation,
@@ -90,7 +90,7 @@ async fn test_enum_introspection() {
     }
     let contents = schema_content("./tests/schemas/test_schema.graphql");
 
-    let container = ArcContainer::new(
+    let container = Container::new(
         &vec![contents.as_str()],
         QueryRoot { query: Query },
         EmptyMutation,
@@ -116,7 +116,7 @@ async fn test_union_introspection() {
     }
     let contents = schema_content("./tests/schemas/test_schema.graphql");
 
-    let container = ArcContainer::new(
+    let container = Container::new(
         &vec![contents.as_str()],
         QueryRoot { query: Query },
         EmptyMutation,
@@ -142,7 +142,7 @@ async fn test_scalar_introspection() {
     }
     let contents = schema_content("./tests/schemas/test_schema.graphql");
 
-    let container = ArcContainer::new(
+    let container = Container::new(
         &vec![contents.as_str()],
         QueryRoot { query: Query },
         EmptyMutation,

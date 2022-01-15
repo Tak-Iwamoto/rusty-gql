@@ -39,7 +39,7 @@ async fn test_inline_framgnet() {
 
     let contents = schema_content("./tests/schemas/test_schema.graphql");
 
-    let container = ArcContainer::new(
+    let container = Container::new(
         &vec![contents.as_str()],
         Query,
         EmptyMutation,
@@ -91,7 +91,7 @@ async fn test_framgnet_spread() {
 
     let contents = schema_content("./tests/schemas/test_schema.graphql");
 
-    let container = ArcContainer::new(
+    let container = Container::new(
         &vec![contents.as_str()],
         Query,
         EmptyMutation,

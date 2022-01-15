@@ -1,5 +1,5 @@
 use crate::{
-    container::ArcContainer,
+    container::Container,
     context::build_context,
     error::GqlError,
     operation::{build_operation, ArcOperation},
@@ -15,7 +15,7 @@ pub async fn execute<
     Mutation: SelectionSetResolver,
     Subscription: SelectionSetResolver,
 >(
-    container: &ArcContainer<Query, Mutation, Subscription>,
+    container: &Container<Query, Mutation, Subscription>,
     request: Request,
 ) -> Response {
     let query_doc = match graphql_parser::parse_query::<String>(&request.query) {
@@ -56,7 +56,7 @@ pub async fn execute<
             resolve_selection_serially(&ctx, &container.mutation_resolvers).await
         }
         OperationType::Subscription => {
-            let error = GqlError::new("subscription cannot execute from this path", None);
+            let error = GqlError::new("Subscription cannot execute from this path", None);
             return Response::from_errors(vec![error]);
         }
     };

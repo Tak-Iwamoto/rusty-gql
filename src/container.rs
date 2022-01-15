@@ -6,7 +6,7 @@ use crate::{
     SelectionSetResolver,
 };
 
-pub struct Container<
+pub struct ContainerInner<
     Query: SelectionSetResolver,
     Mutation: SelectionSetResolver,
     Subscription: SelectionSetResolver,
@@ -18,26 +18,26 @@ pub struct Container<
 }
 
 #[derive(Clone)]
-pub struct ArcContainer<
+pub struct Container<
     Query: SelectionSetResolver,
     Mutation: SelectionSetResolver,
     Subscription: SelectionSetResolver,
->(Arc<Container<Query, Mutation, Subscription>>);
+>(Arc<ContainerInner<Query, Mutation, Subscription>>);
 
-impl<Query, Mutation, Subscription> Deref for ArcContainer<Query, Mutation, Subscription>
+impl<Query, Mutation, Subscription> Deref for Container<Query, Mutation, Subscription>
 where
     Query: SelectionSetResolver,
     Mutation: SelectionSetResolver,
     Subscription: SelectionSetResolver,
 {
-    type Target = Container<Query, Mutation, Subscription>;
+    type Target = ContainerInner<Query, Mutation, Subscription>;
 
     fn deref(&self) -> &Self::Target {
         &self.0
     }
 }
 
-impl<Query, Mutation, Subscription> ArcContainer<Query, Mutation, Subscription>
+impl<Query, Mutation, Subscription> Container<Query, Mutation, Subscription>
 where
     Query: SelectionSetResolver,
     Mutation: SelectionSetResolver,
@@ -50,7 +50,7 @@ where
         subscription: Subscription,
     ) -> Result<Self, GqlError> {
         let schema = build_schema(schema_doc)?;
-        Ok(ArcContainer(Arc::new(Container {
+        Ok(Container(Arc::new(ContainerInner {
             query_resolvers: query,
             mutation_resolvers: mutation,
             subscription_resolvers: subscription,

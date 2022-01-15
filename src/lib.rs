@@ -19,7 +19,7 @@ mod variables;
 #[doc(hidden)]
 pub use async_trait;
 
-pub use container::ArcContainer;
+pub use container::Container;
 pub use context::{ExecutionContext, FieldContext, SelectionSetContext};
 pub use error::{ErrorWrapper, GqlError};
 pub use executor::execute;

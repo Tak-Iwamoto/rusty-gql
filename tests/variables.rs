@@ -12,7 +12,7 @@ pub async fn test_variables() {
     }
     let contents = schema_content("./tests/schemas/test_schema.graphql");
 
-    let container = ArcContainer::new(
+    let container = Container::new(
         &vec![contents.as_str()],
         QueryRoot { query: Query },
         EmptyMutation,

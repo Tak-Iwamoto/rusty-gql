@@ -14,7 +14,7 @@ pub async fn test_int() {
     }
     let contents = schema_content("./tests/schemas/test_schema.graphql");
 
-    let container = ArcContainer::new(
+    let container = Container::new(
         &vec![contents.as_str()],
         QueryRoot { query: Query },
         EmptyMutation,
@@ -73,7 +73,7 @@ pub async fn test_object() {
 
     let contents = schema_content("./tests/schemas/test_schema.graphql");
 
-    let container = ArcContainer::new(
+    let container = Container::new(
         &vec![contents.as_str()],
         Query,
         EmptyMutation,
@@ -138,7 +138,7 @@ pub async fn test_list() {
     }
     let contents = schema_content("./tests/schemas/test_schema.graphql");
 
-    let container = ArcContainer::new(
+    let container = Container::new(
         &vec![contents.as_str()],
         QueryRoot { query: Query },
         EmptyMutation,
