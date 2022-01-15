@@ -5,7 +5,7 @@ use graphql_parser::query::Document;
 use crate::{
     build_schema,
     operation::{build_operation, Operation},
-    types::schema::ArcSchema,
+    types::schema::Schema,
 };
 
 use super::visitor::{visit, ValidationContext, ValidationError, Visitor};
@@ -13,7 +13,7 @@ use super::visitor::{visit, ValidationContext, ValidationError, Visitor};
 #[allow(dead_code)]
 pub(crate) fn validate<'a, V, F>(
     doc: &'a Document<'a, String>,
-    schema: &'a ArcSchema,
+    schema: &'a Schema,
     operation: &'a Operation<'a>,
     factory: F,
 ) -> Result<(), Vec<ValidationError>>
@@ -54,7 +54,7 @@ macro_rules! check_fails_rule {
 #[allow(dead_code)]
 pub(crate) fn assert_passes_rule<'a, V, F>(
     doc: &'a Document<'a, String>,
-    schema: &'a ArcSchema,
+    schema: &'a Schema,
     operation: &'a Operation<'a>,
     factory: F,
 ) where
@@ -75,7 +75,7 @@ pub(crate) fn assert_passes_rule<'a, V, F>(
 #[allow(dead_code)]
 pub(crate) fn assert_fails_rule<'a, V, F>(
     doc: &'a Document<'a, String>,
-    schema: &'a ArcSchema,
+    schema: &'a Schema,
     operation: &'a Operation<'a>,
     factory: F,
 ) where
@@ -88,10 +88,9 @@ pub(crate) fn assert_fails_rule<'a, V, F>(
 }
 
 #[allow(dead_code)]
-pub(crate) fn test_schema() -> ArcSchema {
+pub(crate) fn test_schema() -> Schema {
     let contents = std::fs::read_to_string("tests/schemas/validation_test.graphql").unwrap();
-    let schema = build_schema(&vec![contents.as_str()]).unwrap();
-    ArcSchema::new(schema)
+    build_schema(&vec![contents.as_str()]).unwrap()
 }
 
 #[allow(dead_code)]

@@ -10,7 +10,7 @@ use super::{
 };
 
 #[derive(Debug)]
-pub struct Schema {
+pub struct SchemaInner {
     pub queries: BTreeMap<String, GqlField>,
     pub mutations: BTreeMap<String, GqlField>,
     pub subscriptions: BTreeMap<String, GqlField>,
@@ -22,16 +22,16 @@ pub struct Schema {
 }
 
 #[derive(Debug)]
-pub struct ArcSchema(Arc<Schema>);
+pub struct Schema(Arc<SchemaInner>);
 
-impl ArcSchema {
-    pub fn new(schema: Schema) -> Self {
-        ArcSchema(Arc::new(schema))
+impl Schema {
+    pub fn new(schema: SchemaInner) -> Self {
+        Schema(Arc::new(schema))
     }
 }
 
-impl Deref for ArcSchema {
-    type Target = Schema;
+impl Deref for Schema {
+    type Target = SchemaInner;
 
     fn deref(&self) -> &Self::Target {
         &self.0
@@ -367,7 +367,7 @@ pub fn build_schema(schema_documents: &[&str]) -> Result<Schema, GqlError> {
         }
     }
 
-    Ok(Schema {
+    Ok(Schema(Arc::new(SchemaInner {
         queries,
         mutations,
         subscriptions,
@@ -376,7 +376,7 @@ pub fn build_schema(schema_documents: &[&str]) -> Result<Schema, GqlError> {
         query_type_name,
         mutation_type_name,
         subscription_type_name,
-    })
+    })))
 }
 
 #[cfg(test)]

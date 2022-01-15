@@ -1,6 +1,6 @@
 use graphql_parser::query::Document;
 
-use crate::{operation::Operation, types::schema::ArcSchema, GqlError, Variables};
+use crate::{operation::Operation, types::schema::Schema, GqlError, Variables};
 
 use self::visitor::{visit, NewVisitor, ValidationContext};
 
@@ -10,7 +10,7 @@ mod utils;
 mod visitor;
 
 pub fn apply_validation<'a>(
-    schema: &'a ArcSchema,
+    schema: &'a Schema,
     query_doc: &'a Document<'a, String>,
     variables: Option<&'a Variables>,
     operation: &'a Operation<'a>,

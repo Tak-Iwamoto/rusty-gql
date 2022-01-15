@@ -2,7 +2,7 @@ use std::{ops::Deref, sync::Arc};
 
 use crate::{
     error::GqlError,
-    types::schema::{build_schema, ArcSchema},
+    types::schema::{build_schema, Schema},
     SelectionSetResolver,
 };
 
@@ -14,7 +14,7 @@ pub struct ContainerInner<
     pub query_resolvers: Query,
     pub mutation_resolvers: Mutation,
     pub subscription_resolvers: Subscription,
-    pub schema: ArcSchema,
+    pub schema: Schema,
 }
 
 #[derive(Clone)]
@@ -54,7 +54,7 @@ where
             query_resolvers: query,
             mutation_resolvers: mutation,
             subscription_resolvers: subscription,
-            schema: ArcSchema::new(schema),
+            schema,
         })))
     }
 }
