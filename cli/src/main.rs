@@ -33,7 +33,7 @@ fn gql_files_path(app_name: Option<&str>) -> String {
     }
 }
 
-async fn generate_gql_files(app_name: Option<&str>) -> Result<(), std::io::Error> {
+async fn create_graphql_files(app_name: Option<&str>) -> Result<(), std::io::Error> {
     let path = app_name
         .map(|name| format!("{}/schemas", name))
         .unwrap_or("schemas".to_string());
@@ -48,14 +48,14 @@ async fn generate_gql_files(app_name: Option<&str>) -> Result<(), std::io::Error
 async fn run() -> Result<ExitCode> {
     let matches = build_app().get_matches();
     if matches.subcommand_matches("generate").is_some() {
-        generate_gql_files(None).await?;
+        create_graphql_files(None).await?;
         return Ok(ExitCode::Success);
     }
 
     if let Some(new_matches) = matches.subcommand_matches("new") {
         if let Some(app_name) = new_matches.value_of("name") {
             create_project_files(app_name).await?;
-            generate_gql_files(Some(app_name)).await?;
+            create_graphql_files(Some(app_name)).await?;
             println!("Successfully created the rusty-gql project!");
             return Ok(ExitCode::Success);
             // if let Some(server_lib) = new_matches.value_of("lib") {
