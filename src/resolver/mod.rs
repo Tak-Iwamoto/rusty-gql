@@ -8,7 +8,7 @@ mod string;
 use std::collections::BTreeMap;
 
 use async_trait::async_trait;
-use futures_util::future::{try_join_all, BoxFuture};
+use futures_util::{future::{try_join_all, BoxFuture}, FutureExt};
 use graphql_parser::query::{Selection, TypeCondition};
 
 use crate::{
@@ -139,14 +139,12 @@ impl<'a> Fields<'a> {
                         continue;
                     }
                     if field.name == "__typename" {
+                        ctx.with_field(field);
                         let field_name = field.name.clone();
-                        let type_name = match ctx.schema.type_definitions.get(&field_name) {
-                            Some(type_def) => type_def.name(),
-                            None => "Null",
-                        };
+                        let type_name = T::type_name();
 
                         self.0.push(Box::pin(async move {
-                            Ok((field_name, GqlValue::String(type_name.to_string())))
+                            Ok((field_name, GqlValue::String(type_name)))
                         }));
                         continue;
                     }
@@ -156,13 +154,43 @@ impl<'a> Fields<'a> {
                         async move {
                             let ctx_field = &ctx.with_field(field);
                             let field_name = ctx_field.item.name.clone();
-                            Ok((
-                                field_name,
-                                root_type
-                                    .resolve_field(&ctx_field)
-                                    .await?
-                                    .unwrap_or_default(),
-                            ))
+                            let type_name = T::type_name();
+                            let empty_vec = vec![];
+
+                            let query_directives = &field.directives;
+                            let schema_directives = ctx
+                                .schema
+                                .type_definitions
+                                .get(&type_name)
+                                .map(|ty_def| ty_def.directives())
+                                .unwrap_or(empty_vec.as_slice());
+                            let resolve_fut = root_type.resolve_field(&ctx_field);
+                            if schema_directives.is_empty() && query_directives.is_empty() {
+                                Ok((
+                                    field_name,
+                                    root_type
+                                        .resolve_field(&ctx_field)
+                                        .await?
+                                        .unwrap_or_default(),
+                                ))
+                            } else {
+                                let mut resolve_fut = resolve_fut.boxed();
+
+                                for query_directive in query_directives {
+
+                                }
+
+                                for schema_directive in schema_directives {
+
+                                }
+                                Ok((
+                                    field_name,
+                                    root_type
+                                        .resolve_field(&ctx_field)
+                                        .await?
+                                        .unwrap_or_default(),
+                                ))
+                            }
                         }
                     }))
                 }

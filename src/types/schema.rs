@@ -1,7 +1,12 @@
-use std::{collections::BTreeMap, ops::Deref, sync::Arc};
+use std::{
+    collections::{BTreeMap, HashMap},
+    ops::Deref,
+    sync::Arc,
+};
 
 use crate::{
-    error::GqlError, GqlDirective, GqlEnum, GqlInputObject, GqlInterface, GqlObject, GqlUnion,
+    error::GqlError, CustomDirective, GqlDirective, GqlEnum, GqlInputObject, GqlInterface,
+    GqlObject, GqlUnion,
 };
 
 use super::{
@@ -9,7 +14,6 @@ use super::{
     type_definition::GqlTypeDefinition, GqlEnumValue,
 };
 
-#[derive(Debug)]
 pub struct SchemaInner {
     pub queries: BTreeMap<String, GqlField>,
     pub mutations: BTreeMap<String, GqlField>,
@@ -19,9 +23,9 @@ pub struct SchemaInner {
     pub query_type_name: String,
     pub mutation_type_name: String,
     pub subscription_type_name: String,
+    pub custom_directives: HashMap<&'static str, Box<dyn CustomDirective>>,
 }
 
-#[derive(Debug)]
 pub struct Schema(Arc<SchemaInner>);
 
 impl Schema {
@@ -376,6 +380,7 @@ pub fn build_schema(schema_documents: &[&str]) -> Result<Schema, GqlError> {
         query_type_name,
         mutation_type_name,
         subscription_type_name,
+        custom_directives: Default::default(),
     })))
 }
 

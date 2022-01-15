@@ -22,6 +22,7 @@ pub use async_trait;
 
 pub use container::Container;
 pub use context::{ExecutionContext, FieldContext, SelectionSetContext};
+pub use custom_directive::CustomDirective;
 pub use error::{ErrorWrapper, GqlError};
 pub use executor::execute;
 pub use graphiql_html::playground_html;

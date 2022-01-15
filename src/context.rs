@@ -7,7 +7,7 @@ use graphql_parser::{
     schema::{Directive, Value},
 };
 
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct ExecutionContext<'a, T> {
     pub schema: &'a Schema,
     pub operation: &'a Operation<'a>,
@@ -121,9 +121,7 @@ pub(crate) fn build_context<'a>(
 ) -> ExecutionContext<'a, &'a SelectionSet<'a, String>> {
     let operation_type = operation.operation_type.to_string();
 
-    let current_path = GqlPath::default()
-        .prev(None)
-        .parent_name(operation_type);
+    let current_path = GqlPath::default().prev(None).parent_name(operation_type);
 
     ExecutionContext {
         schema,
