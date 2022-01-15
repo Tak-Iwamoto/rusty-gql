@@ -9,5 +9,5 @@ pub fn build_app() -> App<'static> {
                 .arg(Arg::new("name").required(true).index(1))
                 .arg(Arg::new("lib").long("lib").takes_value(true)),
         )
-        .subcommand(App::new("generate"))
+        .subcommand(App::new("generate").alias("g"))
 }
