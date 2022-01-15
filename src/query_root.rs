@@ -1,6 +1,6 @@
 use crate::{
     error::GqlError,
-    types::{__Schema, __Type},
+    types::{__Type, build_schema_introspection},
     FieldContext, FieldResolver, GqlValue, ResolverResult, SelectionSetResolver,
 };
 
@@ -13,7 +13,7 @@ impl<T: SelectionSetResolver> FieldResolver for QueryRoot<T> {
     async fn resolve_field(&self, ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
         if ctx.item.name == "__schema" {
             let ctx_selection_set = ctx.with_selection_set(&ctx.item.selection_set);
-            let schema_intro = __Schema::new(ctx.schema);
+            let schema_intro = build_schema_introspection(ctx.schema);
             return schema_intro
                 .resolve_selection_set(&ctx_selection_set)
                 .await

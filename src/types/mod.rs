@@ -19,6 +19,7 @@ pub use field::GqlField;
 pub use id::ID;
 pub use introspection::__Schema;
 pub use introspection::__Type;
+pub use introspection::build_schema_introspection;
 pub use scalar::GqlScalar;
 pub use schema::Schema;
 pub use type_definition::GqlTypeDefinition;

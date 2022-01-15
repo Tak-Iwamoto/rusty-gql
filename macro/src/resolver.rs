@@ -1,11 +1,20 @@
 use proc_macro::{self, TokenStream};
 use quote::quote;
-use syn::{ext::IdentExt, Block, FnArg, ImplItem, ItemImpl, ReturnType};
+use syn::{ext::IdentExt, Block, FnArg, ImplItem, ItemImpl, NestedMeta, ReturnType};
 
-use crate::utils::{get_method_args_without_context, is_context_type, is_result_type};
+use crate::utils::{get_method_args_without_context, is_context_type, is_internal, is_result_type};
 
-pub fn generate_gql_resolver(item_impl: &mut ItemImpl) -> Result<TokenStream, syn::Error> {
+pub fn generate_gql_resolver(
+    item_impl: &mut ItemImpl,
+    args: &[NestedMeta],
+) -> Result<TokenStream, syn::Error> {
     let self_ty = &item_impl.self_ty;
+    let crate_name = if is_internal(&args) {
+        quote! { crate }
+    } else {
+        quote! { rusty_gql }
+    };
+
     let type_name = match self_ty.as_ref() {
         syn::Type::Path(path) => path.path.segments.last().unwrap().ident.unraw().to_string(),
         _ => {
@@ -50,7 +59,7 @@ pub fn generate_gql_resolver(item_impl: &mut ItemImpl) -> Result<TokenStream, sy
                 method.block =
                     syn::parse2::<Block>(result_block).expect("ItemImpl method is invalid.");
                 method.sig.output = syn::parse2::<ReturnType>(
-                    quote! { -> ::std::result::Result<#return_type, rusty_gql::ErrorWrapper>},
+                    quote! { -> ::std::result::Result<#return_type, #crate_name::ErrorWrapper>},
                 )
                 .expect("ItemImpl return type is invalid.");
             }
@@ -63,7 +72,7 @@ pub fn generate_gql_resolver(item_impl: &mut ItemImpl) -> Result<TokenStream, sy
                 .is_some();
 
             if !*is_contain_context {
-                let arg_ctx = syn::parse2::<FnArg>(quote! { ctx: &rusty_gql::FieldContext<'_> })
+                let arg_ctx = syn::parse2::<FnArg>(quote! { ctx: &#crate_name::FieldContext<'_> })
                     .expect("invalid arg type");
                 method.sig.inputs.insert(1, arg_ctx);
             }
@@ -88,7 +97,7 @@ pub fn generate_gql_resolver(item_impl: &mut ItemImpl) -> Result<TokenStream, sy
                     let resolve_fn = async move {
                         #(#gql_arg_values)*
                         let res = self.#method_name(ctx, #(#args),*).await;
-                        res.map_err(|err| rusty_gql::ErrorWrapper::from(err).into_gql_error(ctx.item.position))
+                        res.map_err(|err| #crate_name::ErrorWrapper::from(err).into_gql_error(ctx.item.position))
                     };
 
                     let obj = resolve_fn.await?;
@@ -102,9 +111,9 @@ pub fn generate_gql_resolver(item_impl: &mut ItemImpl) -> Result<TokenStream, sy
     let expanded = quote! {
         #item_impl
 
-        #[rusty_gql::async_trait::async_trait]
-        impl #impl_generics rusty_gql::FieldResolver for #self_ty #where_clause {
-            async fn resolve_field(&self, ctx: &rusty_gql::FieldContext<'_>) -> rusty_gql::ResolverResult<::std::option::Option<rusty_gql::GqlValue>> {
+        #[#crate_name::async_trait::async_trait]
+        impl #impl_generics #crate_name::FieldResolver for #self_ty #where_clause {
+            async fn resolve_field(&self, ctx: &#crate_name::FieldContext<'_>) -> #crate_name::ResolverResult<::std::option::Option<#crate_name::GqlValue>> {
                 #(#resolvers)*
                 Ok(::std::option::Option::None)
             }
@@ -113,10 +122,10 @@ pub fn generate_gql_resolver(item_impl: &mut ItemImpl) -> Result<TokenStream, sy
             }
         }
 
-        #[rusty_gql::async_trait::async_trait]
-        impl #impl_generics rusty_gql::SelectionSetResolver for #self_ty #where_clause {
-            async fn resolve_selection_set(&self, ctx: &rusty_gql::SelectionSetContext<'_>) -> rusty_gql::ResolverResult<rusty_gql::GqlValue> {
-                rusty_gql::resolve_selection_parallelly(ctx, self).await
+        #[#crate_name::async_trait::async_trait]
+        impl #impl_generics #crate_name::SelectionSetResolver for #self_ty #where_clause {
+            async fn resolve_selection_set(&self, ctx: &#crate_name::SelectionSetContext<'_>) -> #crate_name::ResolverResult<#crate_name::GqlValue> {
+                #crate_name::resolve_selection_parallelly(ctx, self).await
             }
         }
     };

@@ -5,4 +5,4 @@ mod input_value;
 mod introspection_type;
 mod schema;
 pub use introspection_type::__Type;
-pub use schema::__Schema;
+pub use schema::{__Schema, build_schema_introspection};

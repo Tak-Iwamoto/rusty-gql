@@ -1,4 +1,18 @@
-use syn::{FnArg, ImplItemMethod, Pat, PatIdent, Type, TypeReference};
+use syn::{FnArg, ImplItemMethod, Meta, NestedMeta, Pat, PatIdent, Type, TypeReference};
+
+pub fn is_internal(args: &[NestedMeta]) -> bool {
+    for arg in args {
+        if let NestedMeta::Meta(meta) = arg {
+            if let Meta::Path(path) = meta {
+                let ident = &path.segments.last().unwrap().ident;
+                if ident == "internal" {
+                    return true;
+                }
+            }
+        }
+    }
+    false
+}
 
 pub fn get_method_args_without_context(
     method: &ImplItemMethod,

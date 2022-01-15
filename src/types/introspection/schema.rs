@@ -1,7 +1,7 @@
-use crate::{
-    resolve_selection_parallelly, FieldContext, FieldResolver, GqlValue, ResolverResult, Schema,
-    SelectionSetContext, SelectionSetResolver,
-};
+use crate::*;
+use rusty_gql_macro::Resolver;
+
+use crate::Schema;
 
 use super::{directive::__Directive, introspection_type::__Type};
 
@@ -9,11 +9,12 @@ pub struct __Schema<'a> {
     detail: &'a Schema,
 }
 
-impl<'a> __Schema<'a> {
-    pub fn new(schema: &'a Schema) -> Self {
-        __Schema { detail: schema }
-    }
+pub fn build_schema_introspection<'a>(schema: &'a Schema) -> __Schema<'a> {
+    __Schema { detail: schema }
+}
 
+#[Resolver(internal)]
+impl<'a> __Schema<'a> {
     async fn types(&self) -> Vec<__Type<'a>> {
         let mut result = Vec::new();
         for (_, def) in &self.detail.type_definitions {
@@ -65,86 +66,5 @@ impl<'a> __Schema<'a> {
             result.push(directive);
         }
         result
-    }
-}
-
-#[async_trait::async_trait]
-impl<'a> FieldResolver for __Schema<'a> {
-    async fn resolve_field(&self, ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
-        if ctx.item.name == "types" {
-            let types = self.types().await;
-            let ctx_selection_set = ctx.with_selection_set(&ctx.item.selection_set);
-
-            return SelectionSetResolver::resolve_selection_set(&types, &ctx_selection_set)
-                .await
-                .map(Some);
-        }
-        if ctx.item.name == "queryType" {
-            let ty = self.query_type().await;
-            let ctx_selection_set = ctx.with_selection_set(&ctx.item.selection_set);
-
-            return SelectionSetResolver::resolve_selection_set(&ty, &ctx_selection_set)
-                .await
-                .map(Some);
-        }
-        if ctx.item.name == "mutationType" {
-            let ty = self.mutation_type().await;
-            let ctx_selection_set = ctx.with_selection_set(&ctx.item.selection_set);
-
-            match ty {
-                Some(mutation_ty) => {
-                    return SelectionSetResolver::resolve_selection_set(
-                        &mutation_ty,
-                        &ctx_selection_set,
-                    )
-                    .await
-                    .map(Some);
-                }
-                None => {
-                    return Ok(None);
-                }
-            }
-        }
-        if ctx.item.name == "subscriptionType" {
-            let ty = self.subscription_type().await;
-            let ctx_selection_set = ctx.with_selection_set(&ctx.item.selection_set);
-
-            match ty {
-                Some(subscription_ty) => {
-                    return SelectionSetResolver::resolve_selection_set(
-                        &subscription_ty,
-                        &ctx_selection_set,
-                    )
-                    .await
-                    .map(Some);
-                }
-                None => {
-                    return Ok(None);
-                }
-            }
-        }
-        if ctx.item.name == "directives" {
-            let directives = self.directives().await;
-            let ctx_selection_set = ctx.with_selection_set(&ctx.item.selection_set);
-
-            return SelectionSetResolver::resolve_selection_set(&directives, &ctx_selection_set)
-                .await
-                .map(Some);
-        }
-
-        Ok(None)
-    }
-    fn type_name() -> String {
-        "__Schema".to_string()
-    }
-}
-
-#[async_trait::async_trait]
-impl<'a> SelectionSetResolver for __Schema<'a> {
-    async fn resolve_selection_set(
-        &self,
-        ctx: &SelectionSetContext<'_>,
-    ) -> ResolverResult<GqlValue> {
-        resolve_selection_parallelly(ctx, self).await
     }
 }
