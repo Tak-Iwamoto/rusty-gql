@@ -1,19 +1,15 @@
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
 
 use rusty_gql::*;
 
 #[tokio::test]
 pub async fn test_directive() {
     #[derive(Clone, Debug)]
-    struct AuthDirective {
-        requires: String,
-    }
+    struct AuthDirective;
 
     impl AuthDirective {
         fn new() -> Box<dyn CustomDirective> {
-            Box::new(AuthDirective {
-                requires: "ADMIN".to_string(),
-            })
+            Box::new(AuthDirective {})
         }
     }
 
@@ -21,16 +17,20 @@ pub async fn test_directive() {
     impl CustomDirective for AuthDirective {
         async fn resolve_field(
             &self,
-            ctx: &FieldContext<'_>,
+            _ctx: &FieldContext<'_>,
+            directive_args: &BTreeMap<String, GqlValue>,
             resolve_fut: ResolveFut<'_>,
         ) -> ResolverResult<Option<GqlValue>> {
-            println!("call custom directive");
             resolve_fut.await.map(|v| {
-                if let Some(v) = v {
-                    if self.requires == "ADMIN".to_string() {
-                        None
+                if let Some(requires) = directive_args.get("requires") {
+                    if let GqlValue::Enum(arg_value) = requires {
+                        if arg_value == "ADMIN" {
+                            return None;
+                        } else {
+                            v
+                        }
                     } else {
-                        Some(v)
+                        v
                     }
                 } else {
                     v
@@ -76,6 +76,7 @@ pub async fn test_directive() {
             ]
         }
 
+        #[allow(unused)]
         async fn person(&self, id: ID) -> Person {
             Person {
                 name: "Tom".to_string(),
@@ -100,6 +101,6 @@ pub async fn test_directive() {
 
     let query_doc = r#"{ person(id: 1) {name age} }"#;
     let req = build_test_request(query_doc, None, Default::default());
-    let expected_response = r#"{"data":{"person":{"age":null,"name":null}}}"#;
+    let expected_response = r#"{"data":{"person":{"age":20,"name":null}}}"#;
     check_gql_response(req, expected_response, &container).await;
 }

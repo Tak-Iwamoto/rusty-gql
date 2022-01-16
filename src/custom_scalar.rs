@@ -1,6 +1,6 @@
-use crate::{ResolverResult, Value};
+use crate::{GqlValue, ResolverResult};
 
-pub trait CustomScalar: Sized {
-    fn from_gql_value(value: &Value) -> ResolverResult<Self>;
-    fn to_gql_value(&self) -> Value;
+pub trait CustomScalar: Send + Sized {
+    fn from_gql_value(value: &GqlValue) -> Self;
+    fn to_gql_value(&self) -> GqlValue;
 }

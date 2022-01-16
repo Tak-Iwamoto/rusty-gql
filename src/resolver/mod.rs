@@ -16,7 +16,7 @@ use graphql_parser::query::{Selection, TypeCondition};
 
 use crate::{
     context::{FieldContext, SelectionSetContext},
-    GqlError, GqlTypeDefinition, GqlValue, ResolverResult,
+    GqlDirective, GqlError, GqlTypeDefinition, GqlValue, ResolverResult,
 };
 
 #[async_trait]
@@ -201,10 +201,15 @@ impl<'a> Fields<'a> {
                                         ctx.schema.custom_directives.get(directive.name.as_str())
                                     {
                                         resolve_fut = Box::pin({
+                                            let directive = GqlDirective::from(directive.clone());
                                             let ctx = ctx_field.clone();
                                             async move {
                                                 custom_dir
-                                                    .resolve_field(&ctx, &mut resolve_fut)
+                                                    .resolve_field(
+                                                        &ctx,
+                                                        &directive.arguments,
+                                                        &mut resolve_fut,
+                                                    )
                                                     .await
                                             }
                                         })
@@ -219,7 +224,11 @@ impl<'a> Fields<'a> {
                                             let ctx = ctx_field.clone();
                                             async move {
                                                 custom_dir
-                                                    .resolve_field(&ctx, &mut resolve_fut)
+                                                    .resolve_field(
+                                                        &ctx,
+                                                        &directive.arguments,
+                                                        &mut resolve_fut,
+                                                    )
                                                     .await
                                             }
                                         })
@@ -234,7 +243,11 @@ impl<'a> Fields<'a> {
                                             let ctx = ctx_field.clone();
                                             async move {
                                                 custom_dir
-                                                    .resolve_field(&ctx, &mut resolve_fut)
+                                                    .resolve_field(
+                                                        &ctx,
+                                                        &directive.arguments,
+                                                        &mut resolve_fut,
+                                                    )
                                                     .await
                                             }
                                         })
@@ -249,7 +262,11 @@ impl<'a> Fields<'a> {
                                             let ctx = ctx_field.clone();
                                             async move {
                                                 custom_dir
-                                                    .resolve_field(&ctx, &mut resolve_fut)
+                                                    .resolve_field(
+                                                        &ctx,
+                                                        &directive.arguments,
+                                                        &mut resolve_fut,
+                                                    )
                                                     .await
                                             }
                                         })
