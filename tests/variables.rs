@@ -17,6 +17,7 @@ pub async fn test_variables() {
         QueryRoot { query: Query },
         EmptyMutation,
         EmptySubscription,
+        Default::default(),
     )
     .unwrap();
 

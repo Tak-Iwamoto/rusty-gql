@@ -3,14 +3,14 @@ mod operation_mod_file;
 
 use futures_util::future::try_join_all;
 use rusty_gql::{self, GqlField, OperationType};
-use std::{collections::BTreeMap, io::Error};
+use std::{collections::HashMap, io::Error};
 
 use self::{field_file::FieldFile, operation_mod_file::OperationModFile};
 
 use super::{create_file, path_str};
 
 pub async fn create_operation_files(
-    operations: &BTreeMap<String, GqlField>,
+    operations: &HashMap<String, GqlField>,
     operation_type: OperationType,
     base_path: &str,
     interface_names: &Vec<String>,

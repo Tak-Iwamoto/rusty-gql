@@ -1,4 +1,4 @@
-use std::collections::BTreeMap;
+use std::collections::HashMap;
 
 use codegen::{Scope, Type};
 use rusty_gql::{GqlField, OperationType};
@@ -6,7 +6,7 @@ use rusty_gql::{GqlField, OperationType};
 use crate::code_generate::{use_gql_definitions, util::gql_value_ty_to_rust_ty, FileDefinition};
 
 pub struct OperationModFile<'a> {
-    pub operations: &'a BTreeMap<String, GqlField>,
+    pub operations: &'a HashMap<String, GqlField>,
     pub operation_type: OperationType,
     pub path: String,
     pub interface_names: &'a Vec<String>,

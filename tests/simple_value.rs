@@ -19,6 +19,7 @@ pub async fn test_int() {
         QueryRoot { query: Query },
         EmptyMutation,
         EmptySubscription,
+        Default::default(),
     )
     .unwrap();
 
@@ -78,6 +79,7 @@ pub async fn test_object() {
         Query,
         EmptyMutation,
         EmptySubscription,
+        Default::default(),
     )
     .unwrap();
 
@@ -143,6 +145,7 @@ pub async fn test_list() {
         QueryRoot { query: Query },
         EmptyMutation,
         EmptySubscription,
+        Default::default()
     )
     .unwrap();
 

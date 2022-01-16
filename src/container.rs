@@ -1,9 +1,9 @@
-use std::{ops::Deref, sync::Arc};
+use std::{collections::HashMap, ops::Deref, sync::Arc};
 
 use crate::{
     error::GqlError,
     types::schema::{build_schema, Schema},
-    SelectionSetResolver,
+    CustomDirective, SelectionSetResolver,
 };
 
 pub struct ContainerInner<
@@ -48,8 +48,9 @@ where
         query: Query,
         mutation: Mutation,
         subscription: Subscription,
+        custom_directives: HashMap<&'static str, Box<dyn CustomDirective>>,
     ) -> Result<Self, GqlError> {
-        let schema = build_schema(schema_doc)?;
+        let schema = build_schema(schema_doc, custom_directives)?;
         Ok(Container(Arc::new(ContainerInner {
             query_resolvers: query,
             mutation_resolvers: mutation,

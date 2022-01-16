@@ -44,6 +44,7 @@ async fn test_inline_framgnet() {
         Query,
         EmptyMutation,
         EmptySubscription,
+        Default::default(),
     )
     .unwrap();
 
@@ -96,6 +97,7 @@ async fn test_framgnet_spread() {
         Query,
         EmptyMutation,
         EmptySubscription,
+        Default::default(),
     )
     .unwrap();
 

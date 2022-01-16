@@ -54,7 +54,7 @@ pub(crate) fn path_str(paths: Vec<&str>, is_file: bool) -> String {
 }
 
 pub(crate) async fn create_gql_files(schema_documents: &[&str], path: &str) -> Result<(), Error> {
-    let schema = match build_schema(schema_documents) {
+    let schema = match build_schema(schema_documents, Default::default()) {
         Ok(v) => v,
         Err(err) => return Err(Error::new(std::io::ErrorKind::InvalidInput, err.message)),
     };

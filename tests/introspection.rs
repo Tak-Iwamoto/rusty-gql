@@ -17,6 +17,7 @@ async fn test_object_introspection() {
         QueryRoot { query: Query },
         EmptyMutation,
         EmptySubscription,
+        Default::default(),
     )
     .unwrap();
 
@@ -43,6 +44,7 @@ async fn test_interface_introspection() {
         QueryRoot { query: Query },
         EmptyMutation,
         EmptySubscription,
+        Default::default(),
     )
     .unwrap();
 
@@ -69,6 +71,7 @@ async fn test_input_object_introspection() {
         QueryRoot { query: Query },
         EmptyMutation,
         EmptySubscription,
+        Default::default(),
     )
     .unwrap();
 
@@ -95,6 +98,7 @@ async fn test_enum_introspection() {
         QueryRoot { query: Query },
         EmptyMutation,
         EmptySubscription,
+        Default::default(),
     )
     .unwrap();
 
@@ -121,6 +125,7 @@ async fn test_union_introspection() {
         QueryRoot { query: Query },
         EmptyMutation,
         EmptySubscription,
+        Default::default(),
     )
     .unwrap();
 
@@ -147,6 +152,7 @@ async fn test_scalar_introspection() {
         QueryRoot { query: Query },
         EmptyMutation,
         EmptySubscription,
+        Default::default(),
     )
     .unwrap();
 

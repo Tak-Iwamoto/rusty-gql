@@ -90,7 +90,7 @@ pub(crate) fn assert_fails_rule<'a, V, F>(
 #[allow(dead_code)]
 pub(crate) fn test_schema() -> Schema {
     let contents = std::fs::read_to_string("tests/schemas/validation_test.graphql").unwrap();
-    build_schema(&vec![contents.as_str()]).unwrap()
+    build_schema(&vec![contents.as_str()], Default::default()).unwrap()
 }
 
 #[allow(dead_code)]

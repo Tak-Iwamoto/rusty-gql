@@ -1,4 +1,4 @@
-use std::{collections::BTreeMap, io::Error};
+use std::{collections::HashMap, io::Error};
 
 use codegen::Scope;
 use futures_util::future::try_join_all;
@@ -36,7 +36,7 @@ impl<'a> FileDefinition for DirectiveFile<'a> {
 }
 
 pub async fn create_directive_files(
-    directives: &BTreeMap<String, GqlDirectiveDefinition>,
+    directives: &HashMap<String, GqlDirectiveDefinition>,
     base_path: &str,
 ) -> Result<Vec<()>, Error> {
     let mut futures = Vec::new();

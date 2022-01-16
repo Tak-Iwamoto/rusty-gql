@@ -1,4 +1,8 @@
-use std::{collections::HashMap, ops::Deref, sync::Arc};
+use std::{
+    collections::{BTreeMap, HashMap},
+    ops::Deref,
+    sync::Arc,
+};
 
 use graphql_parser::schema::TypeDefinition;
 
@@ -17,7 +21,7 @@ pub struct SchemaInner {
     pub mutations: HashMap<String, GqlField>,
     pub subscriptions: HashMap<String, GqlField>,
     pub directives: HashMap<String, GqlDirectiveDefinition>,
-    pub type_definitions: HashMap<String, GqlTypeDefinition>,
+    pub type_definitions: BTreeMap<String, GqlTypeDefinition>,
     pub interfaces: HashMap<String, GqlInterface>,
     pub query_type_name: String,
     pub mutation_type_name: String,
@@ -41,11 +45,14 @@ impl Deref for Schema {
     }
 }
 
-pub fn build_schema(schema_documents: &[&str]) -> Result<Schema, GqlError> {
+pub fn build_schema(
+    schema_documents: &[&str],
+    custom_directives: HashMap<&'static str, Box<dyn CustomDirective>>,
+) -> Result<Schema, GqlError> {
     let mut queries = HashMap::new();
     let mut mutations = HashMap::new();
     let mut subscriptions = HashMap::new();
-    let mut type_definitions = HashMap::new();
+    let mut type_definitions = BTreeMap::new();
     let mut directives = HashMap::new();
     let mut extensions = Vec::new();
     let mut schema_definition = None;
@@ -390,7 +397,7 @@ pub fn build_schema(schema_documents: &[&str]) -> Result<Schema, GqlError> {
         mutation_type_name,
         subscription_type_name,
         interfaces,
-        custom_directives: Default::default(),
+        custom_directives,
     })))
 }
 
@@ -403,14 +410,15 @@ mod tests {
     #[test]
     fn it_works() {
         let contents = fs::read_to_string("tests/schemas/github.graphql");
-        let schema = build_schema(&vec![contents.unwrap().as_str()]).unwrap();
+        let schema = build_schema(&vec![contents.unwrap().as_str()], Default::default()).unwrap();
 
         assert!(schema.queries.get("repository").is_some());
         assert!(schema.type_definitions.get("AddCommentInput").is_some());
 
         let base = fs::read_to_string("tests/schemas/test_schema.graphql").unwrap();
         let extend = fs::read_to_string("tests/schemas/extend.graphql").unwrap();
-        let schema = build_schema(&vec![base.as_str(), extend.as_str()]).unwrap();
+        let schema =
+            build_schema(&vec![base.as_str(), extend.as_str()], Default::default()).unwrap();
 
         assert!(schema.queries.get("pets").is_some());
         assert!(schema.queries.get("authors").is_some());
