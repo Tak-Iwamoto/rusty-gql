@@ -28,6 +28,7 @@ pub use error::{ErrorWrapper, GqlError};
 pub use executor::execute;
 use futures_util::Future;
 pub use graphiql_html::playground_html;
+pub use input::GqlInputType;
 pub use operation::OperationType;
 pub use query_root::QueryRoot;
 pub use request::{receive_http_request, HttpRequestError, Request};

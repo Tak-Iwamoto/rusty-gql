@@ -1,0 +1,9 @@
+type Query {
+  test_custom_scalar: SampleResponse!
+}
+
+type SampleResponse {
+  test: CustomScalar!
+}
+
+scalar CustomScalar
