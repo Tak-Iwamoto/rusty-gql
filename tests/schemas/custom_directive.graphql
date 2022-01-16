@@ -1,0 +1,17 @@
+type Query {
+  persons: [Person!]!
+  person(id: ID): Person
+}
+
+type Person {
+  name: String! @auth(requires: ADMIN)
+  description: String
+  age: Int! @auth(requires: USER)
+}
+
+directive @auth(requires: Role!) on FIELD_DEFINITION | OBJECT
+
+enum Role {
+  ADMIN
+  USER
+}

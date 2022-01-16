@@ -181,7 +181,11 @@ impl<'a> Fields<'a> {
                                 .unwrap_or(vec![]);
                             let resolve_fut = root_type.resolve_field(&ctx_field);
 
-                            if schema_ty_directives.is_empty() && query_directives.is_empty() {
+                            if schema_ty_directives.is_empty()
+                                && schema_field_directives.is_empty()
+                                && schema_impl_interface_directives.is_empty()
+                                && query_directives.is_empty()
+                            {
                                 Ok((
                                     field_name,
                                     root_type
