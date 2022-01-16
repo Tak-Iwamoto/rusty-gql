@@ -161,14 +161,27 @@ impl<'a> Fields<'a> {
                             let empty_vec = vec![];
 
                             let query_directives = &field.directives;
-                            let schema_directives = ctx
+                            let schema_ty_directives = ctx
                                 .schema
                                 .type_definitions
                                 .get(&type_name)
                                 .map(|ty_def| ty_def.directives())
                                 .unwrap_or(empty_vec.as_slice());
+                            let schema_field_directives = ctx
+                                .schema
+                                .type_definitions
+                                .get(&type_name)
+                                .map(|ty_def| ty_def.field_directives(&field_name))
+                                .unwrap_or(vec![]);
+                            let schema_impl_interface_directives = ctx
+                                .schema
+                                .type_definitions
+                                .get(&type_name)
+                                .map(|ty_def| ty_def.impl_interface_directives(&ctx.schema))
+                                .unwrap_or(vec![]);
                             let resolve_fut = root_type.resolve_field(&ctx_field);
-                            if schema_directives.is_empty() && query_directives.is_empty() {
+
+                            if schema_ty_directives.is_empty() && query_directives.is_empty() {
                                 Ok((
                                     field_name,
                                     root_type
@@ -194,7 +207,37 @@ impl<'a> Fields<'a> {
                                     }
                                 }
 
-                                for directive in schema_directives {
+                                for directive in schema_ty_directives {
+                                    if let Some(custom_dir) =
+                                        ctx.schema.custom_directives.get(directive.name.as_str())
+                                    {
+                                        resolve_fut = Box::pin({
+                                            let ctx = ctx_field.clone();
+                                            async move {
+                                                custom_dir
+                                                    .resolve_field(&ctx, &mut resolve_fut)
+                                                    .await
+                                            }
+                                        })
+                                    }
+                                }
+
+                                for directive in &schema_field_directives {
+                                    if let Some(custom_dir) =
+                                        ctx.schema.custom_directives.get(directive.name.as_str())
+                                    {
+                                        resolve_fut = Box::pin({
+                                            let ctx = ctx_field.clone();
+                                            async move {
+                                                custom_dir
+                                                    .resolve_field(&ctx, &mut resolve_fut)
+                                                    .await
+                                            }
+                                        })
+                                    }
+                                }
+
+                                for directive in &schema_impl_interface_directives {
                                     if let Some(custom_dir) =
                                         ctx.schema.custom_directives.get(directive.name.as_str())
                                     {

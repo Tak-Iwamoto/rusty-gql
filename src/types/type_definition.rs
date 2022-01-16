@@ -1,6 +1,6 @@
 use graphql_parser::schema::TypeDefinition;
 
-use crate::{GqlDirective, GqlField};
+use crate::{GqlDirective, GqlField, Schema};
 
 use super::{
     enum_type::GqlEnum, input_object::GqlInputObject, interface::GqlInterface, object::GqlObject,
@@ -114,5 +114,38 @@ impl GqlTypeDefinition {
             GqlTypeDefinition::Enum(ty) => &ty.directives,
             GqlTypeDefinition::InputObject(ty) => &ty.directives,
         }
+    }
+
+    pub fn field_directives(&self, field_name: &str) -> Vec<GqlDirective> {
+        let mut directives = vec![];
+
+        if let GqlTypeDefinition::Object(obj) = self {
+            for field in &obj.fields {
+                if field.name == field_name {
+                    directives.extend(field.directives.clone());
+                }
+            }
+        }
+        if let GqlTypeDefinition::Interface(interface) = self {
+            for field in &interface.fields {
+                if field.name == field_name {
+                    directives.extend(field.directives.clone());
+                }
+            }
+        }
+        directives
+    }
+
+    pub fn impl_interface_directives(&self, schema: &Schema) -> Vec<GqlDirective> {
+        let mut directives = vec![];
+
+        if let GqlTypeDefinition::Object(obj) = self {
+            for impl_interface in &obj.implements_interfaces {
+                if let Some(interface) = &schema.interfaces.get(impl_interface) {
+                    directives.extend(interface.directives.clone());
+                }
+            }
+        }
+        directives
     }
 }

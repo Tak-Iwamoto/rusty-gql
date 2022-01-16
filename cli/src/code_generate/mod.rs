@@ -14,7 +14,6 @@ use rusty_gql::{build_schema, OperationType};
 use self::{
     directive::create_directive_files, operation::create_operation_files,
     root_mod_file::RootModFile, type_definition::create_type_definition_files,
-    util::interface_ty_names,
 };
 
 pub use project::create_project_files;
@@ -63,7 +62,11 @@ pub(crate) async fn create_gql_files(schema_documents: &[&str], path: &str) -> R
     create_root_dirs(path).await?;
     create_root_mod_file(path).await?;
 
-    let interface_names = interface_ty_names(&schema.type_definitions);
+    let interface_names = &schema
+        .interfaces
+        .iter()
+        .map(|(key, _)| key.clone())
+        .collect::<Vec<_>>();
     let query_task = create_operation_files(
         &schema.queries,
         OperationType::Query,

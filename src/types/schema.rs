@@ -4,6 +4,8 @@ use std::{
     sync::Arc,
 };
 
+use graphql_parser::schema::TypeDefinition;
+
 use crate::{
     error::GqlError, CustomDirective, GqlDirective, GqlEnum, GqlInputObject, GqlInterface,
     GqlObject, GqlUnion,
@@ -20,6 +22,7 @@ pub struct SchemaInner {
     pub subscriptions: BTreeMap<String, GqlField>,
     pub directives: BTreeMap<String, GqlDirectiveDefinition>,
     pub type_definitions: BTreeMap<String, GqlTypeDefinition>,
+    pub interfaces: HashMap<String, GqlInterface>,
     pub query_type_name: String,
     pub mutation_type_name: String,
     pub subscription_type_name: String,
@@ -50,6 +53,7 @@ pub fn build_schema(schema_documents: &[&str]) -> Result<Schema, GqlError> {
     let mut directives = BTreeMap::new();
     let mut extensions = Vec::new();
     let mut schema_definition = None;
+    let mut interfaces = HashMap::new();
 
     type_definitions.insert(
         "String".to_string(),
@@ -93,6 +97,13 @@ pub fn build_schema(schema_documents: &[&str]) -> Result<Schema, GqlError> {
                 graphql_parser::schema::Definition::TypeDefinition(ty_def) => {
                     let gql_def = GqlTypeDefinition::from_schema_type_def(&ty_def);
                     type_definitions.insert(gql_def.name().to_string(), gql_def);
+
+                    if let TypeDefinition::Interface(interface) = &ty_def {
+                        interfaces.insert(
+                            interface.name.to_string(),
+                            GqlInterface::from(interface.clone()),
+                        );
+                    }
                 }
                 graphql_parser::schema::Definition::TypeExtension(ext) => {
                     extensions.push(ext);
@@ -203,8 +214,10 @@ pub fn build_schema(schema_documents: &[&str]) -> Result<Schema, GqlError> {
                             };
                             type_definitions.insert(
                                 original_name.to_string(),
-                                GqlTypeDefinition::Interface(extended_interface),
+                                GqlTypeDefinition::Interface(extended_interface.clone()),
                             );
+                            interfaces
+                                .insert(original_name.to_string(), extended_interface.clone());
                         }
                     }
                     None => {
@@ -380,6 +393,7 @@ pub fn build_schema(schema_documents: &[&str]) -> Result<Schema, GqlError> {
         query_type_name,
         mutation_type_name,
         subscription_type_name,
+        interfaces,
         custom_directives: Default::default(),
     })))
 }

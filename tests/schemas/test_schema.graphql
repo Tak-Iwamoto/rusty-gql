@@ -30,7 +30,7 @@ type Cat implements Pet {
 
 type Dog implements Pet {
   name: String
-  woofs: Boolean
+  woofs: Boolean @authAdmin
 }
 
 input TestInput {
@@ -47,3 +47,5 @@ enum Country {
 union Animal = Dog | Cat
 
 scalar DateTime
+
+directive @authAdmin on FIELD

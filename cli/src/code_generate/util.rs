@@ -1,14 +1,4 @@
-use std::collections::BTreeMap;
-
-use rusty_gql::{GqlTypeDefinition, GqlValueType};
-
-pub fn interface_ty_names(type_definitions: &BTreeMap<String, GqlTypeDefinition>) -> Vec<String> {
-    type_definitions
-        .iter()
-        .filter(|(_, ty_def)| matches!(ty_def, GqlTypeDefinition::Interface(_)))
-        .map(|(key, _)| key.clone())
-        .collect::<Vec<_>>()
-}
+use rusty_gql::GqlValueType;
 
 pub fn gql_value_ty_to_rust_ty(gql_value: &GqlValueType) -> String {
     value_ty_to_str(gql_value, true)
