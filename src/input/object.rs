@@ -2,9 +2,9 @@ use std::collections::{BTreeMap, HashMap};
 
 use crate::GqlValue;
 
-use super::GqlInputType;
+use super::VariableType;
 
-impl<T: GqlInputType> GqlInputType for BTreeMap<String, T> {
+impl<T: VariableType> VariableType for BTreeMap<String, T> {
     fn from_gql_value(value: Option<GqlValue>) -> Result<Self, String> {
         match value {
             Some(value) => match value {
@@ -33,7 +33,7 @@ impl<T: GqlInputType> GqlInputType for BTreeMap<String, T> {
     }
 }
 
-impl<T: GqlInputType> GqlInputType for HashMap<String, T> {
+impl<T: VariableType> VariableType for HashMap<String, T> {
     fn from_gql_value(value: Option<GqlValue>) -> Result<Self, String> {
         match value {
             Some(value) => match value {

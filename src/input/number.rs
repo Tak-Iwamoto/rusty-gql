@@ -2,9 +2,9 @@ use serde_json::Number;
 
 use crate::GqlValue;
 
-use super::GqlInputType;
+use super::VariableType;
 
-impl GqlInputType for i8 {
+impl VariableType for i8 {
     fn from_gql_value(value: Option<GqlValue>) -> Result<Self, String> {
         match value {
             Some(value) => match value {
@@ -26,7 +26,7 @@ impl GqlInputType for i8 {
     }
 }
 
-impl GqlInputType for i16 {
+impl VariableType for i16 {
     fn from_gql_value(value: Option<GqlValue>) -> Result<Self, String> {
         match value {
             Some(value) => match value {
@@ -48,7 +48,7 @@ impl GqlInputType for i16 {
     }
 }
 
-impl GqlInputType for i32 {
+impl VariableType for i32 {
     fn from_gql_value(value: Option<GqlValue>) -> Result<Self, String> {
         match value {
             Some(value) => match value {
@@ -70,7 +70,7 @@ impl GqlInputType for i32 {
     }
 }
 
-impl GqlInputType for i64 {
+impl VariableType for i64 {
     fn from_gql_value(value: Option<GqlValue>) -> Result<Self, String> {
         match value {
             Some(value) => match value {
@@ -92,7 +92,7 @@ impl GqlInputType for i64 {
     }
 }
 
-impl GqlInputType for u8 {
+impl VariableType for u8 {
     fn from_gql_value(value: Option<GqlValue>) -> Result<Self, String> {
         match value {
             Some(value) => match value {
@@ -114,7 +114,7 @@ impl GqlInputType for u8 {
     }
 }
 
-impl GqlInputType for u16 {
+impl VariableType for u16 {
     fn from_gql_value(value: Option<GqlValue>) -> Result<Self, String> {
         match value {
             Some(value) => match value {
@@ -136,7 +136,7 @@ impl GqlInputType for u16 {
     }
 }
 
-impl GqlInputType for u32 {
+impl VariableType for u32 {
     fn from_gql_value(value: Option<GqlValue>) -> Result<Self, String> {
         match value {
             Some(value) => match value {
@@ -158,7 +158,7 @@ impl GqlInputType for u32 {
     }
 }
 
-impl GqlInputType for u64 {
+impl VariableType for u64 {
     fn from_gql_value(value: Option<GqlValue>) -> Result<Self, String> {
         match value {
             Some(value) => match value {
@@ -180,7 +180,7 @@ impl GqlInputType for u64 {
     }
 }
 
-impl GqlInputType for usize {
+impl VariableType for usize {
     fn from_gql_value(value: Option<GqlValue>) -> Result<Self, String> {
         match value {
             Some(value) => match value {
@@ -202,7 +202,7 @@ impl GqlInputType for usize {
     }
 }
 
-impl GqlInputType for isize {
+impl VariableType for isize {
     fn from_gql_value(value: Option<GqlValue>) -> Result<Self, String> {
         match value {
             Some(value) => match value {
@@ -224,7 +224,7 @@ impl GqlInputType for isize {
     }
 }
 
-impl GqlInputType for f32 {
+impl VariableType for f32 {
     fn from_gql_value(value: Option<GqlValue>) -> Result<Self, String> {
         match value {
             Some(value) => match value {
@@ -249,7 +249,7 @@ impl GqlInputType for f32 {
     }
 }
 
-impl GqlInputType for f64 {
+impl VariableType for f64 {
     fn from_gql_value(value: Option<GqlValue>) -> Result<Self, String> {
         match value {
             Some(value) => match value {

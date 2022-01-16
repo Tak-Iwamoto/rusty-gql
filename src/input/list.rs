@@ -4,14 +4,14 @@ use std::hash::Hash;
 
 use crate::GqlValue;
 
-use super::GqlInputType;
+use super::VariableType;
 
 fn vec_to_array<T, const N: usize>(v: Vec<T>) -> [T; N] {
     v.try_into()
         .unwrap_or_else(|v: Vec<T>| panic!("Expected a Vec of length {} but it was {}", N, v.len()))
 }
 
-impl<T: GqlInputType, const N: usize> GqlInputType for [T; N] {
+impl<T: VariableType, const N: usize> VariableType for [T; N] {
     fn from_gql_value(value: Option<GqlValue>) -> Result<Self, String> {
         match value {
             Some(value) => match value {
@@ -38,7 +38,7 @@ impl<T: GqlInputType, const N: usize> GqlInputType for [T; N] {
     }
 }
 
-impl<T: GqlInputType + Eq + Hash> GqlInputType for HashSet<T> {
+impl<T: VariableType + Eq + Hash> VariableType for HashSet<T> {
     fn from_gql_value(value: Option<GqlValue>) -> Result<Self, String> {
         match value.unwrap_or_default() {
             GqlValue::List(list) => {
@@ -64,7 +64,7 @@ impl<T: GqlInputType + Eq + Hash> GqlInputType for HashSet<T> {
     }
 }
 
-impl<T: GqlInputType + Ord> GqlInputType for BTreeSet<T> {
+impl<T: VariableType + Ord> VariableType for BTreeSet<T> {
     fn from_gql_value(value: Option<GqlValue>) -> Result<Self, String> {
         match value.unwrap_or_default() {
             GqlValue::List(list) => {
@@ -90,7 +90,7 @@ impl<T: GqlInputType + Ord> GqlInputType for BTreeSet<T> {
     }
 }
 
-impl<T: GqlInputType> GqlInputType for LinkedList<T> {
+impl<T: VariableType> VariableType for LinkedList<T> {
     fn from_gql_value(value: Option<GqlValue>) -> Result<Self, String> {
         match value.unwrap_or_default() {
             GqlValue::List(list) => {
@@ -116,7 +116,7 @@ impl<T: GqlInputType> GqlInputType for LinkedList<T> {
     }
 }
 
-impl<T: GqlInputType> GqlInputType for VecDeque<T> {
+impl<T: VariableType> VariableType for VecDeque<T> {
     fn from_gql_value(value: Option<GqlValue>) -> Result<Self, String> {
         match value.unwrap_or_default() {
             GqlValue::List(list) => {
