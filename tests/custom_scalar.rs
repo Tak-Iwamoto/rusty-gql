@@ -4,11 +4,8 @@ use rusty_gql::*;
 pub async fn test_custom_scalar() {
     struct Query;
 
-    #[derive(Clone)]
+    #[derive(Clone, Scalar)]
     struct CustomScalar(String);
-
-    #[Resolver]
-    impl CustomScalar {}
 
     impl GqlInputType for CustomScalar {
         fn from_gql_value(value: Option<GqlValue>) -> Result<Self, String> {
@@ -23,7 +20,7 @@ pub async fn test_custom_scalar() {
         }
 
         fn into_gql_value(&self) -> GqlValue {
-            GqlValue::String(self.0.clone())
+            GqlValue::String(format!("Custom-{}", self.0))
         }
     }
 
@@ -58,8 +55,8 @@ pub async fn test_custom_scalar() {
     )
     .unwrap();
 
-    let query_doc = r#"{ test_custom_scalar {test } }"#;
+    let query_doc = r#"{ test_custom_scalar { test } }"#;
     let req = build_test_request(query_doc, None, Default::default());
-    let expected_response = r#"{"data":{"test_custom_scalar":{"test":{}}}}"#;
+    let expected_response = r#"{"data":{"test_custom_scalar":{"test":"Custom-Sample"}}}"#;
     check_gql_response(req, expected_response, &container).await;
 }

@@ -4,7 +4,7 @@ use syn::{ext::IdentExt, Block, FnArg, ImplItem, ItemImpl, NestedMeta, ReturnTyp
 
 use crate::utils::{get_method_args_without_context, is_context_type, is_internal, is_result_type};
 
-pub fn generate_gql_resolver(
+pub fn generate_resolver(
     item_impl: &mut ItemImpl,
     args: &[NestedMeta],
 ) -> Result<TokenStream, syn::Error> {
