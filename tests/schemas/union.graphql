@@ -1,0 +1,25 @@
+type Query {
+  search_animal(query: String!): SearchAnimal
+}
+
+type SearchAnimal {
+  test: CustomScalar!
+}
+
+type Cat {
+  name: String
+  meows: Boolean
+}
+
+type Dog {
+  name: String
+  woofs: Boolean
+}
+
+type Person {
+  name: String!
+  description: String
+  age: Int!
+}
+
+union SearchAnimal = Dog | Cat | Person
