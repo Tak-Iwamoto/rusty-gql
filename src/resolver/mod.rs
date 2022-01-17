@@ -33,6 +33,10 @@ pub trait FieldResolver: Send + Sync {
 
     fn type_name() -> String;
 
+    fn introspection_type_name(&self) -> String {
+        Self::type_name()
+    }
+
     fn collect_all_fields<'a, 'ctx: 'a>(
         &'a self,
         ctx: &SelectionSetContext<'ctx>,
@@ -144,7 +148,7 @@ impl<'a> Fields<'a> {
                     if field.name == "__typename" {
                         ctx.with_field(field);
                         let field_name = field.name.clone();
-                        let type_name = T::type_name();
+                        let type_name = root_type.introspection_type_name();
 
                         self.0.push(Box::pin(async move {
                             Ok((field_name, GqlValue::String(type_name)))
@@ -291,9 +295,12 @@ impl<'a> Fields<'a> {
                             ))
                         }
                     };
-                    let type_name = T::type_name();
 
-                    if is_fragment_condition(ctx, &type_name, Some(&fragment_def.type_condition)) {
+                    if is_fragment_condition(
+                        ctx,
+                        &root_type.introspection_type_name(),
+                        Some(&fragment_def.type_condition),
+                    ) {
                         root_type.collect_all_fields(
                             &ctx.with_selection_set(&fragment_def.selection_set),
                             self,
@@ -304,18 +311,17 @@ impl<'a> Fields<'a> {
                     if ctx.is_skip(&inline_fragment.directives) {
                         continue;
                     }
-                    let type_name = T::type_name();
 
                     if is_fragment_condition(
                         ctx,
-                        &type_name,
+                        &root_type.introspection_type_name(),
                         inline_fragment.type_condition.as_ref(),
                     ) {
                         root_type.collect_all_fields(
                             &ctx.with_selection_set(&inline_fragment.selection_set),
                             self,
                         )?;
-                    } else {
+                    } else if inline_fragment.type_condition.is_none() {
                         self.collect_fields(
                             &ctx.with_selection_set(&inline_fragment.selection_set),
                             root_type,

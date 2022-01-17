@@ -20,10 +20,16 @@ pub fn generate_union(derive_input: &DeriveInput) -> Result<TokenStream, syn::Er
         }
     };
 
+    let mut introspection_type_names = Vec::new();
     let mut collect_all_fields = Vec::new();
 
     for variant in &union_data.variants {
         let enum_value_ident = &variant.ident;
+
+        introspection_type_names.push(quote! {
+            #self_ty::#enum_value_ident(obj) => obj.introspection_type_name()
+        });
+
         collect_all_fields.push(quote! {
             #self_ty::#enum_value_ident(obj) => obj.collect_all_fields(ctx, fields)
         })
@@ -37,6 +43,12 @@ pub fn generate_union(derive_input: &DeriveInput) -> Result<TokenStream, syn::Er
             }
             fn type_name() -> String {
                 #type_name.to_string()
+            }
+
+            fn introspection_type_name(&self) -> String {
+                match self {
+                    #(#introspection_type_names),*
+                }
             }
 
             fn collect_all_fields<'union, 'ctx: 'union>(

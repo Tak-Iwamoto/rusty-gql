@@ -62,7 +62,6 @@ pub async fn test_union() {
     #[Resolver]
     impl Query {
         async fn search_animal(&self, query: String) -> Option<SearchAnimal> {
-            println!("{}", &query);
             if query.as_str() == "dog" {
                 return Some(SearchAnimal::Dog(Dog {
                     name: "Pochi".to_string(),
