@@ -13,7 +13,6 @@ pub async fn create_operation_files(
     operations: &HashMap<String, GqlField>,
     operation_type: OperationType,
     base_path: &str,
-    interface_names: &Vec<String>,
 ) -> Result<Vec<()>, Error> {
     let mut futures = Vec::new();
 
@@ -30,7 +29,6 @@ pub async fn create_operation_files(
             file_name: field.name.to_string(),
             def: field,
             path: filename,
-            interface_names: &interface_names,
         });
         futures.push(task);
     }
@@ -42,7 +40,6 @@ pub async fn create_operation_files(
             vec![base_path, &operation_type.to_string().to_lowercase(), "mod"],
             true,
         ),
-        interface_names: &interface_names,
     })
     .await?;
 

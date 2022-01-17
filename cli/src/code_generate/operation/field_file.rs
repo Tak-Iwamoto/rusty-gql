@@ -7,7 +7,6 @@ pub struct FieldFile<'a> {
     pub file_name: String,
     pub def: &'a GqlField,
     pub path: String,
-    pub interface_names: &'a Vec<String>,
 }
 
 impl<'a> FileDefinition for FieldFile<'a> {
@@ -27,18 +26,9 @@ impl<'a> FileDefinition for FieldFile<'a> {
             fn_scope.arg(&arg.name, gql_value_ty_to_rust_ty(&arg.meta_type));
         }
 
-        let is_interface_return_ty = self
-            .interface_names
-            .contains(&self.def.meta_type.name().to_string());
         let return_ty = gql_value_ty_to_rust_ty(&self.def.meta_type);
 
-        if is_interface_return_ty {
-            let name = &self.def.meta_type.name();
-            fn_scope.generic(&format!("T: {}", name));
-            fn_scope.ret(Type::new(&return_ty.replace(name, "T")));
-        } else {
-            fn_scope.ret(Type::new(&return_ty));
-        }
+        fn_scope.ret(Type::new(&return_ty));
 
         fn_scope.vis("pub");
         fn_scope.set_async(true);

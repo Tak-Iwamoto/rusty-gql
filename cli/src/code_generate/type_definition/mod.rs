@@ -6,32 +6,26 @@ mod scalar_file;
 mod union_file;
 
 use futures_util::future::try_join_all;
-use rusty_gql::{GqlInterface, GqlTypeDefinition, Schema};
-use std::{collections::BTreeMap, io::Error};
+use rusty_gql::{GqlTypeDefinition, Schema};
+use std::{collections::HashMap, io::Error};
 
 use self::{
     enum_file::EnumFile, input_file::InputObjectFile, interface_file::InterfaceFile,
     object_file::ObjectFile, scalar_file::ScalarFile, union_file::UnionFile,
 };
 
-use super::{
-    create_file,
-    mod_file::ModFile,
-    path_str,
-    util::{get_interface_impl_object_map, is_gql_primitive_ty},
-};
+use super::{create_file, mod_file::ModFile, path_str, util::is_gql_primitive_ty};
 
 pub async fn create_type_definition_files(
     schema: &Schema,
     base_path: &str,
+    interface_obj_map: &HashMap<String, Vec<String>>,
 ) -> Result<Vec<()>, Error> {
     let mut futures = Vec::new();
     let mut model_names = Vec::new();
     let mut interface_names = Vec::new();
     let mut input_names = Vec::new();
     let mut scalar_names = Vec::new();
-
-    let mut interfaces_map = BTreeMap::new();
 
     for (_, type_def) in schema.type_definitions.iter() {
         if is_gql_primitive_ty(&type_def.name()) {
@@ -51,19 +45,14 @@ pub async fn create_type_definition_files(
             GqlTypeDefinition::Union(v) => model_names.push(v.name.clone()),
             GqlTypeDefinition::Enum(v) => model_names.push(v.name.clone()),
             GqlTypeDefinition::Object(v) => model_names.push(v.name.clone()),
-            GqlTypeDefinition::Interface(v) => {
-                interfaces_map.insert(v.name.clone(), v.clone());
-                interface_names.push(v.name.clone())
-            }
+            GqlTypeDefinition::Interface(v) => interface_names.push(v.name.clone()),
             GqlTypeDefinition::InputObject(v) => input_names.push(v.name.clone()),
             GqlTypeDefinition::Scalar(v) => scalar_names.push(v.name.clone()),
         }
 
-        let task = create_type_definition_file(type_def, base_path, interfaces_map.clone());
+        let task = create_type_definition_file(type_def, base_path, &interface_obj_map);
         futures.push(task);
     }
-
-    let interface_obj_map = get_interface_impl_object_map(&schema.type_definitions);
 
     create_file(ModFile {
         path: &path_str(vec![base_path, "model"], false),
@@ -95,7 +84,7 @@ pub async fn create_type_definition_files(
 async fn create_type_definition_file(
     type_def: &GqlTypeDefinition,
     base_path: &str,
-    interfaces_map: BTreeMap<String, GqlInterface>,
+    interface_obj_map: &HashMap<String, Vec<String>>,
 ) -> Result<(), Error> {
     let file_name = type_def.name();
     match type_def {
@@ -113,7 +102,6 @@ async fn create_type_definition_file(
             create_file(ObjectFile {
                 def,
                 path: &path,
-                interfaces_map: &interfaces_map,
                 file_name: &file_name,
             })
             .await
@@ -123,8 +111,8 @@ async fn create_type_definition_file(
             create_file(InterfaceFile {
                 def,
                 path: &path,
-                interface_names: &interfaces_map.keys().cloned().collect::<Vec<_>>(),
                 file_name: &file_name,
+                interface_obj_map: &interface_obj_map,
             })
             .await
         }

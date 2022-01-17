@@ -1,7 +1,5 @@
-use std::collections::BTreeMap;
-
 use codegen::{Scope, Type};
-use rusty_gql::{GqlField, GqlInterface, GqlObject};
+use rusty_gql::{GqlField, GqlObject};
 
 use crate::code_generate::{
     use_gql_definitions,
@@ -13,7 +11,6 @@ pub struct ObjectFile<'a> {
     pub file_name: &'a str,
     pub def: &'a GqlObject,
     pub path: &'a str,
-    pub interfaces_map: &'a BTreeMap<String, GqlInterface>,
 }
 
 impl<'a> FileDefinition for ObjectFile<'a> {
@@ -32,42 +29,6 @@ impl<'a> FileDefinition for ObjectFile<'a> {
             .new_struct(&struct_name.to_string())
             .vis("pub");
 
-        let mut implemented_fields = Vec::new();
-        let mut impl_str = Vec::new();
-        for interface in &self.def.implements_interfaces {
-            let mut scope = Scope::new();
-            let impl_interface = scope.new_impl(&struct_name);
-            impl_interface.impl_trait(interface);
-            impl_interface.r#macro("#[async_trait::async_trait]");
-
-            if let Some(gql_interface) = self.interfaces_map.get(interface) {
-                for field in &gql_interface.fields {
-                    let field_name = &field.name;
-                    let return_ty = gql_value_ty_to_rust_ty(&field.meta_type);
-                    let fn_scope = impl_interface.new_fn(&field_name);
-                    fn_scope.set_async(true);
-                    fn_scope.arg_ref_self();
-
-                    implemented_fields.push(field_name.to_string());
-                    for arg in &field.arguments {
-                        fn_scope.arg(&arg.name, gql_value_ty_to_rust_ty(&arg.meta_type));
-                    }
-
-                    if self.is_return_interface_ty(field) {
-                        let name = field.meta_type.name();
-                        fn_scope.generic(&format!("T: {}", name));
-                        fn_scope.ret(Type::new(&return_ty.replace(name, "T")));
-                    } else {
-                        fn_scope.ret(Type::new(&return_ty));
-                    }
-
-                    let block_str = build_block_str(&field, &field_name);
-                    fn_scope.line(block_str);
-                }
-            }
-            impl_str.push(scope.to_string());
-        }
-
         let mut impl_scope = Scope::new();
         let struct_imp = impl_scope.new_impl(&struct_name.to_string());
 
@@ -78,10 +39,6 @@ impl<'a> FileDefinition for ObjectFile<'a> {
                 struct_scope.field(&field_name, &return_ty);
             }
 
-            if implemented_fields.contains(&field_name) {
-                continue;
-            }
-
             let fn_scope = struct_imp.new_fn(&field_name);
             for arg in &field.arguments {
                 fn_scope.arg(&arg.name, gql_value_ty_to_rust_ty(&arg.meta_type));
@@ -90,33 +47,19 @@ impl<'a> FileDefinition for ObjectFile<'a> {
             fn_scope.arg_ref_self();
             fn_scope.set_async(true);
 
-            if self.is_return_interface_ty(field) {
-                let name = &field.meta_type.name();
-                fn_scope.generic(&format!("T: {}", &name));
-                fn_scope.ret(Type::new(&return_ty.replace(name, "T")));
-            } else {
-                fn_scope.ret(Type::new(&return_ty));
-            }
+            fn_scope.ret(Type::new(&return_ty));
 
             let block_str = build_block_str(&field, &field_name);
             fn_scope.line(block_str);
         }
 
-        let impl_content = impl_str.join("\n");
         format!(
-            "{}\n\n{}\n\n{}\n\n{}",
+            "{}\n\n{}\n\n{}\n{}",
             use_gql_definitions(),
             struct_scope_base.to_string(),
-            impl_content,
+            "#[Resolver]",
             impl_scope.to_string()
         )
-    }
-}
-
-impl<'a> ObjectFile<'a> {
-    fn is_return_interface_ty(&self, field: &GqlField) -> bool {
-        let interface_names = self.interfaces_map.keys().collect::<Vec<_>>();
-        interface_names.contains(&&field.meta_type.name().to_string())
     }
 }
 

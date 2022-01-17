@@ -26,6 +26,11 @@ impl<'a> FileDefinition for UnionFile<'a> {
             enum_scope.new_variant(&value).tuple(&value);
         }
 
-        format!("{}\n\n{}", use_gql_definitions(), scope.to_string())
+        format!(
+            "{}\n\n{}\n{}",
+            use_gql_definitions(),
+            "#[derive(Union)]",
+            scope.to_string()
+        )
     }
 }

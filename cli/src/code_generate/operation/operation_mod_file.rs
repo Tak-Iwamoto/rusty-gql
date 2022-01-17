@@ -9,7 +9,6 @@ pub struct OperationModFile<'a> {
     pub operations: &'a HashMap<String, GqlField>,
     pub operation_type: OperationType,
     pub path: String,
-    pub interface_names: &'a Vec<String>,
 }
 
 impl<'a> FileDefinition for OperationModFile<'a> {
@@ -55,17 +54,8 @@ impl<'a> OperationModFile<'a> {
             fn_scope.set_async(true);
             fn_scope.vis("pub");
 
-            let is_interface_return_ty = self
-                .interface_names
-                .contains(&method.meta_type.name().to_string());
             let return_ty = gql_value_ty_to_rust_ty(&method.meta_type);
-            if is_interface_return_ty {
-                let name = &method.meta_type.name();
-                fn_scope.generic(&format!("T: {}", name));
-                fn_scope.ret(Type::new(&return_ty.replace(name, "T")));
-            } else {
-                fn_scope.ret(Type::new(&return_ty));
-            }
+            fn_scope.ret(Type::new(&return_ty));
 
             let file_name = operation_name;
             fn_scope.line(format!(
