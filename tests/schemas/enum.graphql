@@ -1,0 +1,8 @@
+type Query {
+  enum_value: SampleEnum
+}
+
+enum SampleEnum {
+  Value0
+  Value1
+}
