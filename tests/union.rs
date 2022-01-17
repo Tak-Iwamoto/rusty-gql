@@ -110,4 +110,14 @@ pub async fn test_union() {
     let req = build_test_request(query_doc, None, Default::default());
     let expected_response = r#"{"data":{"search_animal":{"name":"Pochi","woofs":true}}}"#;
     check_gql_response(req, expected_response, &container).await;
+
+    let query_doc = r#"{ search_animal(query: "person") {
+        ... on Person {
+            name
+            age
+        }
+    }}"#;
+    let req = build_test_request(query_doc, None, Default::default());
+    let expected_response = r#"{"data":{"search_animal":{"age":20,"name":"Tom"}}}"#;
+    check_gql_response(req, expected_response, &container).await;
 }
