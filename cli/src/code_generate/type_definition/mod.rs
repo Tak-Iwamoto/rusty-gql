@@ -14,7 +14,12 @@ use self::{
     object_file::ObjectFile, scalar_file::ScalarFile, union_file::UnionFile,
 };
 
-use super::{create_file, mod_file::ModFile, path_str, util::is_gql_primitive_ty};
+use super::{
+    create_file,
+    mod_file::ModFile,
+    path_str,
+    util::{get_interface_impl_object_map, is_gql_primitive_ty},
+};
 
 pub async fn create_type_definition_files(
     schema: &Schema,
@@ -57,6 +62,8 @@ pub async fn create_type_definition_files(
         let task = create_type_definition_file(type_def, base_path, interfaces_map.clone());
         futures.push(task);
     }
+
+    let interface_obj_map = get_interface_impl_object_map(&schema.type_definitions);
 
     create_file(ModFile {
         path: &path_str(vec![base_path, "model"], false),

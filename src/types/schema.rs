@@ -1,8 +1,4 @@
-use std::{
-    collections::{BTreeMap, HashMap},
-    ops::Deref,
-    sync::Arc,
-};
+use std::{collections::HashMap, ops::Deref, sync::Arc};
 
 use graphql_parser::schema::TypeDefinition;
 
@@ -21,7 +17,7 @@ pub struct SchemaInner {
     pub mutations: HashMap<String, GqlField>,
     pub subscriptions: HashMap<String, GqlField>,
     pub directives: HashMap<String, GqlDirectiveDefinition>,
-    pub type_definitions: BTreeMap<String, GqlTypeDefinition>,
+    pub type_definitions: HashMap<String, GqlTypeDefinition>,
     pub interfaces: HashMap<String, GqlInterface>,
     pub query_type_name: String,
     pub mutation_type_name: String,
@@ -52,7 +48,7 @@ pub fn build_schema(
     let mut queries = HashMap::new();
     let mut mutations = HashMap::new();
     let mut subscriptions = HashMap::new();
-    let mut type_definitions = BTreeMap::new();
+    let mut type_definitions = HashMap::new();
     let mut directives = HashMap::new();
     let mut extensions = Vec::new();
     let mut schema_definition = None;
