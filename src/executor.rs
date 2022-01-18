@@ -5,9 +5,9 @@ use crate::{
 };
 
 pub async fn execute<
-    Query: SelectionSetResolver,
-    Mutation: SelectionSetResolver,
-    Subscription: SelectionSetResolver,
+    Query: SelectionSetResolver + 'static,
+    Mutation: SelectionSetResolver + 'static,
+    Subscription: SelectionSetResolver + 'static,
 >(
     container: &Container<Query, Mutation, Subscription>,
     request: Request,

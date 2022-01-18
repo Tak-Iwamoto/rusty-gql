@@ -36,7 +36,8 @@ async fn main() {
         EmptyMutation,
         EmptySubscription,
         Default::default(),
-    );
+    )
+    .unwrap();
     let app = Router::new()
         .route("/graphql", get(gql_playground).post(graphql_handler))
         // .route("/graphql", get(test))

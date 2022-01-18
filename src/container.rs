@@ -3,7 +3,7 @@ use std::{collections::HashMap, ops::Deref, sync::Arc};
 use crate::{
     error::GqlError,
     types::schema::{build_schema, Schema},
-    CustomDirective, SelectionSetResolver,
+    CustomDirective, QueryRoot, SelectionSetResolver,
 };
 
 pub struct ContainerInner<
@@ -11,7 +11,7 @@ pub struct ContainerInner<
     Mutation: SelectionSetResolver,
     Subscription: SelectionSetResolver,
 > {
-    pub query_resolvers: Query,
+    pub query_resolvers: QueryRoot<Query>,
     pub mutation_resolvers: Mutation,
     pub subscription_resolvers: Subscription,
     pub schema: Schema,
@@ -26,9 +26,9 @@ pub struct Container<
 
 impl<Query, Mutation, Subscription> Deref for Container<Query, Mutation, Subscription>
 where
-    Query: SelectionSetResolver,
-    Mutation: SelectionSetResolver,
-    Subscription: SelectionSetResolver,
+    Query: SelectionSetResolver + 'static,
+    Mutation: SelectionSetResolver + 'static,
+    Subscription: SelectionSetResolver + 'static,
 {
     type Target = ContainerInner<Query, Mutation, Subscription>;
 
@@ -39,9 +39,9 @@ where
 
 impl<Query, Mutation, Subscription> Container<Query, Mutation, Subscription>
 where
-    Query: SelectionSetResolver,
-    Mutation: SelectionSetResolver,
-    Subscription: SelectionSetResolver,
+    Query: SelectionSetResolver + 'static,
+    Mutation: SelectionSetResolver + 'static,
+    Subscription: SelectionSetResolver + 'static,
 {
     pub fn new(
         schema_doc: &[&str],
@@ -52,7 +52,7 @@ where
     ) -> Result<Self, GqlError> {
         let schema = build_schema(schema_doc, custom_directives)?;
         Ok(Container(Arc::new(ContainerInner {
-            query_resolvers: query,
+            query_resolvers: QueryRoot { query },
             mutation_resolvers: mutation,
             subscription_resolvers: subscription,
             schema,

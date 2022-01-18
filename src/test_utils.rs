@@ -17,9 +17,9 @@ pub fn build_test_request(
 }
 
 pub async fn check_gql_response<
-    Query: SelectionSetResolver,
-    Mutation: SelectionSetResolver,
-    Subscription: SelectionSetResolver,
+    Query: SelectionSetResolver + 'static,
+    Mutation: SelectionSetResolver + 'static,
+    Subscription: SelectionSetResolver + 'static,
 >(
     request: Request,
     expected_response: &str,
