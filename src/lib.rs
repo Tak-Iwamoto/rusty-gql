@@ -46,7 +46,7 @@ pub use variables::Variables;
 
 pub type ResolverResult<T> = ::std::result::Result<T, GqlError>;
 
-pub use rusty_gql_macro::{Resolver, Scalar, Union};
+pub use rusty_gql_macro::{Enum, Resolver, Scalar, Union};
 
 #[derive(Clone)]
 pub struct EmptyMutation;

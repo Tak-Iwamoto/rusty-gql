@@ -145,7 +145,7 @@ pub async fn test_list() {
         QueryRoot { query: Query },
         EmptyMutation,
         EmptySubscription,
-        Default::default()
+        Default::default(),
     )
     .unwrap();
 

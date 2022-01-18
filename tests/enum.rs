@@ -4,36 +4,11 @@ use rusty_gql::*;
 pub async fn test_enum() {
     struct Query;
 
+    #[derive(Enum)]
     enum SampleEnum {
         Value0,
+        #[allow(unused)]
         Value1,
-    }
-
-    #[async_trait::async_trait]
-    impl FieldResolver for SampleEnum {
-        async fn resolve_field(&self, ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
-            match self {
-                SampleEnum::Value0 => Ok(Some(GqlValue::String("Value0".to_string()))),
-                SampleEnum::Value1 => Ok(Some(GqlValue::String("Value1".to_string()))),
-            }
-        }
-
-        fn type_name() -> String {
-            "SampleEnum".to_string()
-        }
-    }
-
-    #[async_trait::async_trait]
-    impl SelectionSetResolver for SampleEnum {
-        async fn resolve_selection_set(
-            &self,
-            ctx: &SelectionSetContext<'_>,
-        ) -> ResolverResult<GqlValue> {
-            match self {
-                SampleEnum::Value0 => Ok(GqlValue::String("Value0".to_string())),
-                SampleEnum::Value1 => Ok(GqlValue::String("Value1".to_string())),
-            }
-        }
     }
 
     #[Resolver]
