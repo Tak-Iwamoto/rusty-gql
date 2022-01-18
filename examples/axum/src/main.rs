@@ -1,4 +1,4 @@
-use rusty_gql::{execute, playground_html, Container, FieldResolver, Resolver};
+use rusty_gql::{execute, playground_html, Container, EmptyMutation, EmptySubscription, Resolver};
 use rusty_gql_axum::{GqlRequest, GqlResponse};
 use std::net::SocketAddr;
 
@@ -12,57 +12,31 @@ use axum::{
 #[derive(Clone)]
 struct Query;
 
-#[rusty_gql::async_trait::async_trait]
-impl FieldResolver for Query {
-    async fn resolve_field(
-        &self,
-        _ctx: &rusty_gql::FieldContext<'_>,
-    ) -> rusty_gql::ResolverResult<Option<rusty_gql::GqlValue>> {
-        Ok(None)
-    }
-}
+#[Resolver]
+impl Query {}
 
-#[derive(Clone)]
-struct Mutation;
+type ContainerType = Container<Query, EmptyMutation, EmptySubscription>;
 
-#[rusty_gql::async_trait::async_trait]
-impl FieldResolver for Mutation {
-    async fn resolve_field(
-        &self,
-        ctx: &rusty_gql::FieldContext<'_>,
-    ) -> rusty_gql::ResolverResult<Option<rusty_gql::GqlValue>> {
-        Ok(None)
-    }
-}
-
-#[derive(Clone)]
-struct Subscription;
-
-#[rusty_gql::async_trait::async_trait]
-impl FieldResolver for Subscription {
-    async fn resolve_field(
-        &self,
-        ctx: &rusty_gql::FieldContext<'_>,
-    ) -> rusty_gql::ResolverResult<Option<rusty_gql::GqlValue>> {
-        Ok(None)
-    }
-}
-
-type Container = Container<Query, Mutation, Subscription>;
-
-async fn graphql_handler(container: Extension<Container>, req: GqlRequest) -> GqlResponse {
+async fn graphql_handler(container: Extension<ContainerType>, req: GqlRequest) -> GqlResponse {
     let result = execute(&container, req.0).await;
     GqlResponse::from(result)
 }
 
 async fn gql_playground() -> impl IntoResponse {
-    response::Html(playground_html("/graphql"))
+    response::Html(playground_html("/graphql", None))
 }
 
 #[tokio::main]
 async fn main() {
-    let schema_doc = std::fs::read_to_string("./src/tests/starwars.graphql").unwrap();
-    let container = Container::new(schema_doc.as_str(), Query, Mutation, Subscription);
+    let schema_doc = std::fs::read_to_string("./tests/schemas/starwars.graphql").unwrap();
+
+    let container = Container::new(
+        &vec![schema_doc.as_str()],
+        Query,
+        EmptyMutation,
+        EmptySubscription,
+        Default::default(),
+    );
     let app = Router::new()
         .route("/graphql", get(gql_playground).post(graphql_handler))
         // .route("/graphql", get(test))
