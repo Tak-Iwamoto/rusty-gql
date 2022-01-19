@@ -17,13 +17,13 @@ impl Query {}
 
 type ContainerType = Container<Query, EmptyMutation, EmptySubscription>;
 
-async fn graphql_handler(container: Extension<ContainerType>, req: GqlRequest) -> GqlResponse {
+async fn gql_handler(container: Extension<ContainerType>, req: GqlRequest) -> GqlResponse {
     let result = execute(&container, req.0).await;
     GqlResponse::from(result)
 }
 
 async fn gql_playground() -> impl IntoResponse {
-    response::Html(playground_html("/graphql", None))
+    response::Html(playground_html("/", None))
 }
 
 #[tokio::main]
@@ -39,7 +39,7 @@ async fn main() {
     )
     .unwrap();
     let app = Router::new()
-        .route("/graphql", get(gql_playground).post(graphql_handler))
+        .route("/", get(gql_playground).post(gql_handler))
         // .route("/graphql", get(test))
         .layer(AddExtensionLayer::new(container));
     let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
