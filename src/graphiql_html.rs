@@ -2,7 +2,7 @@ pub fn playground_html(endpoint: &str, subscription_endpoint: Option<&str>) -> S
     r#"
     <html>
         <head>
-            <title>Simple GraphiQL Example</title>
+            <title>rusty gql</title>
             <link href="https://unpkg.com/graphiql/graphiql.min.css" rel="stylesheet" />
         </head>
         <body style="margin: 0;">

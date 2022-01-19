@@ -8,8 +8,9 @@ use crate::{
 };
 
 use super::{
-    argument::GqlArgument, directive::GqlDirectiveDefinition, field::GqlField, scalar::GqlScalar,
-    type_definition::GqlTypeDefinition, GqlEnumValue,
+    argument::GqlArgument, directive::GqlDirectiveDefinition, field::GqlField,
+    introspection::introspection_sdl, scalar::GqlScalar, type_definition::GqlTypeDefinition,
+    GqlEnumValue,
 };
 
 pub struct SchemaInner {
@@ -74,10 +75,6 @@ pub fn build_schema(
         "ID".to_string(),
         GqlTypeDefinition::Scalar(GqlScalar::id_scalar()),
     );
-    type_definitions.insert(
-        "__Type".to_string(),
-        GqlTypeDefinition::Object(GqlObject::introspection_type()),
-    );
 
     directives.insert("skip".to_string(), GqlDirectiveDefinition::skip_directive());
     directives.insert(
@@ -89,7 +86,10 @@ pub fn build_schema(
         GqlDirectiveDefinition::deprecated_directive(),
     );
 
-    for doc in schema_documents {
+    let mut definitions = schema_documents.to_vec();
+    definitions.push(introspection_sdl());
+
+    for doc in definitions {
         let parsed_schema =
             graphql_parser::parse_schema::<String>(doc).expect("failed to parse graphql schema");
         for node in parsed_schema.definitions {

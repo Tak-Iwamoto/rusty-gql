@@ -27,7 +27,7 @@ pub fn apply_validation<'a>(
         .with(rules::KnownTypeNames::default())
         .with(rules::NoFragmentCycles::default())
         .with(rules::NoUndefinedVariables::default())
-        .with(rules::NoUnusedFragment::default())
+        // .with(rules::NoUnusedFragment::default())
         .with(rules::NoUnusedVariables::default())
         .with(rules::OverlappingFieldsCanBeMerged::default())
         .with(rules::PossibleFragmentSpreads::default())

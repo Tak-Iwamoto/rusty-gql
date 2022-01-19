@@ -27,16 +27,3 @@ impl<'a> From<ObjectType<'a, String>> for GqlObject {
         }
     }
 }
-
-impl GqlObject {
-    pub fn introspection_type() -> Self {
-        GqlObject {
-            name: "__Type".to_string(),
-            description: Some("Requested Type information".to_string()),
-            position: Pos::default(),
-            directives: Default::default(),
-            implements_interfaces: Default::default(),
-            fields: Default::default(),
-        }
-    }
-}
