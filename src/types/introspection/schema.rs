@@ -13,6 +13,7 @@ pub fn build_schema_introspection<'a>(schema: &'a Schema) -> __Schema<'a> {
     __Schema { detail: schema }
 }
 
+#[allow(non_snake_case)]
 #[Resolver(internal)]
 impl<'a> __Schema<'a> {
     async fn types(&self) -> Vec<__Type<'a>> {
@@ -25,7 +26,7 @@ impl<'a> __Schema<'a> {
         result
     }
 
-    async fn query_type(&self) -> __Type<'a> {
+    async fn queryType(&self) -> __Type<'a> {
         match self
             .detail
             .type_definitions
@@ -36,7 +37,7 @@ impl<'a> __Schema<'a> {
         }
     }
 
-    async fn mutation_type(&self) -> Option<__Type<'a>> {
+    async fn mutationType(&self) -> Option<__Type<'a>> {
         match self
             .detail
             .type_definitions
@@ -47,7 +48,7 @@ impl<'a> __Schema<'a> {
         }
     }
 
-    async fn subscription_type(&self) -> Option<__Type<'a>> {
+    async fn subscriptionType(&self) -> Option<__Type<'a>> {
         match self
             .detail
             .type_definitions

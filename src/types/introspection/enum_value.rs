@@ -12,6 +12,7 @@ pub fn build_enum_value_introspection(value: &GqlEnumValue) -> __EnumValue {
     }
 }
 
+#[allow(non_snake_case)]
 #[Resolver(internal)]
 impl __EnumValue {
     async fn name(&self) -> &str {
@@ -22,7 +23,7 @@ impl __EnumValue {
         self.detail.description.as_deref()
     }
 
-    async fn is_deprecated(&self) -> bool {
+    async fn isDeprecated(&self) -> bool {
         self.detail.is_deprecated()
     }
 }

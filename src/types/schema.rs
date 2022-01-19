@@ -74,6 +74,10 @@ pub fn build_schema(
         "ID".to_string(),
         GqlTypeDefinition::Scalar(GqlScalar::id_scalar()),
     );
+    type_definitions.insert(
+        "__Type".to_string(),
+        GqlTypeDefinition::Object(GqlObject::introspection_type()),
+    );
 
     directives.insert("skip".to_string(), GqlDirectiveDefinition::skip_directive());
     directives.insert(

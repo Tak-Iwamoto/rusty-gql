@@ -30,15 +30,16 @@ pub async fn execute<
         Err(error) => return Response::from_errors(vec![error]),
     };
 
-    if let Err(errors) = apply_validation(
-        &container.schema,
-        &query_doc,
-        Some(&request.variables),
-        &operation,
-        request.operation_name.as_deref(),
-    ) {
-        return Response::from_errors(errors);
-    }
+    // if let Err(errors) = apply_validation(
+    //     &container.schema,
+    //     &query_doc,
+    //     Some(&request.variables),
+    //     &operation,
+    //     request.operation_name.as_deref(),
+    // ) {
+    //     println!("{:?}", &errors);
+    //     return Response::from_errors(errors);
+    // }
 
     let ctx = build_context(&container.schema, &operation);
 
