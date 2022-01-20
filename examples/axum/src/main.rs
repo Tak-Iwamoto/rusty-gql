@@ -1,6 +1,6 @@
-use rusty_gql::{execute, playground_html, Container, EmptyMutation, EmptySubscription, Resolver};
-use rusty_gql_axum::{GqlRequest, GqlResponse};
-use std::net::SocketAddr;
+use rusty_gql::*;
+use rusty_gql_axum::*;
+use std::{net::SocketAddr, path::Path};
 
 use axum::{
     extract::Extension,
@@ -28,10 +28,11 @@ async fn gql_playground() -> impl IntoResponse {
 
 #[tokio::main]
 async fn main() {
-    let schema_doc = std::fs::read_to_string("./tests/schemas/starwars.graphql").unwrap();
+    let schema_docs = read_schemas(Path::new("./examples/axum/schemas")).unwrap();
+    let schema_docs: Vec<&str> = schema_docs.iter().map(|s| &**s).collect();
 
     let container = Container::new(
-        &vec![schema_doc.as_str()],
+        &schema_docs.as_slice(),
         Query,
         EmptyMutation,
         EmptySubscription,

@@ -1,10 +1,10 @@
 use crate::code_generate::FileDefinition;
 
-pub struct MainFile<'a> {
+pub struct AxumMainFile<'a> {
     pub app_name: &'a str,
 }
 
-impl<'a> FileDefinition for MainFile<'a> {
+impl<'a> FileDefinition for AxumMainFile<'a> {
     fn name(&self) -> String {
         "main.rs".to_string()
     }

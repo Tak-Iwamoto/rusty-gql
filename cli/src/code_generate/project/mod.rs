@@ -1,13 +1,12 @@
-mod cargo_toml_file;
+mod axum;
 mod example_schema_file;
-mod main_file;
 
 use std::io::Error;
 
-pub use cargo_toml_file::CargoTomlFile;
 pub use example_schema_file::StarWarsSchemaFile;
 use futures_util::future::try_join_all;
-pub use main_file::MainFile;
+
+use self::axum::{AxumCargoTomlFile, AxumMainFile};
 
 use super::create_file;
 
@@ -23,11 +22,11 @@ pub async fn create_project_files(app_name: &str) -> Result<(), Error> {
 }
 
 async fn create_main_file(app_name: &str) -> Result<(), Error> {
-    create_file(MainFile { app_name }).await
+    create_file(AxumMainFile { app_name }).await
 }
 
 async fn create_cargo_toml(app_name: &str) -> Result<(), Error> {
-    create_file(CargoTomlFile { app_name }).await
+    create_file(AxumCargoTomlFile { app_name }).await
 }
 
 async fn create_example_gql_schema(app_name: &str) -> Result<(), Error> {

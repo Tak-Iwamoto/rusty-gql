@@ -16,6 +16,8 @@ mod types;
 mod validation;
 mod variables;
 
+use std::path::Path;
+
 #[doc(hidden)]
 pub use async_trait;
 
@@ -96,3 +98,20 @@ impl SelectionSetResolver for EmptySubscription {
 
 pub type ResolveFut<'a> =
     &'a mut (dyn Future<Output = ResolverResult<Option<GqlValue>>> + Send + Unpin);
+
+pub fn read_schemas(dir: &Path) -> std::io::Result<Vec<String>> {
+    let mut schemas = Vec::new();
+    if dir.is_dir() {
+        for entry in std::fs::read_dir(dir)? {
+            let entry = entry?;
+            let path = entry.path();
+            if path.is_dir() {
+                read_schemas(&path)?;
+            } else {
+                let content = std::fs::read_to_string(path)?;
+                schemas.push(content);
+            }
+        }
+    }
+    Ok(schemas)
+}
