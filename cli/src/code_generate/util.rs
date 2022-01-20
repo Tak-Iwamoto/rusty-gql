@@ -52,10 +52,20 @@ fn gql_to_rust_type_str(gql_type: &str, optional: bool) -> String {
     }
 }
 
-pub fn is_gql_primitive_ty(ty_name: &str) -> bool {
-    reserved_scalar_names().contains(&ty_name)
+pub fn is_gql_primitive_ty(type_name: &str) -> bool {
+    vec!["String", "Int", "Float", "Boolean", "ID"].contains(&type_name)
 }
 
-fn reserved_scalar_names() -> Vec<&'static str> {
-    vec!["String", "Int", "Float", "Boolean", "ID"]
+pub fn is_introspection_type_names(type_name: &str) -> bool {
+    vec![
+        "__Directive",
+        "__DirectiveLocation",
+        "__EnumValue",
+        "__Field",
+        "__InputValue",
+        "__Schema",
+        "__Type",
+        "__TypeKind",
+    ]
+    .contains(&type_name)
 }

@@ -85,7 +85,6 @@ fn gql_file_types() -> Vec<String> {
         "directive".to_string(),
         "scalar".to_string(),
         "input".to_string(),
-        "interface".to_string(),
     ]
 }
 async fn create_root_mod_file(path: &str) -> tokio::io::Result<()> {
