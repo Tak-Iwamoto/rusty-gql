@@ -37,12 +37,15 @@ pub async fn create_directive_files(
     let mut futures = Vec::new();
     let mut directive_names = Vec::new();
     for (_, directive) in directives.iter() {
-        let dir_file_name = &directive.name;
-        let path = path_str(vec![base_path, "directive", &dir_file_name], true);
+        if is_default_directive(&directive.name) {
+            continue;
+        }
+        let file_name = &directive.name;
+        let path = path_str(vec![base_path, "directive", &file_name], true);
         futures.push(create_file(DirectiveFile {
             def: directive,
             path,
-            file_name: dir_file_name.clone(),
+            file_name: file_name.clone(),
         }));
         directive_names.push(directive.name.clone());
     }
@@ -53,4 +56,8 @@ pub async fn create_directive_files(
     .await?;
 
     try_join_all(futures).await
+}
+
+fn is_default_directive(name: &str) -> bool {
+    vec!["skip", "include", "deprecated"].contains(&name)
 }
