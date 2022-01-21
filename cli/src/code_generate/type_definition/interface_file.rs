@@ -23,11 +23,12 @@ impl<'a> FileDefinition for InterfaceFile<'a> {
 
     fn content(&self) -> String {
         let mut scope = Scope::new();
-        let enum_scope = scope.new_enum(&self.def.name).vis("pub");
+        let interface_scope = scope.new_enum(&self.def.name).vis("pub");
+        interface_scope.derive("Union");
 
         if let Some(impl_objects) = self.interface_obj_map.get(&self.def.name) {
             for obj_name in impl_objects {
-                enum_scope.new_variant(format!("{}({})", obj_name, obj_name).as_str());
+                interface_scope.new_variant(format!("{}({})", obj_name, obj_name).as_str());
             }
         }
         format!("{}\n\n{}", use_gql_definitions(), scope.to_string())

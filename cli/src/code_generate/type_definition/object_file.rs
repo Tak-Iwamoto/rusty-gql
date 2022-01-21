@@ -31,6 +31,7 @@ impl<'a> FileDefinition for ObjectFile<'a> {
 
         let mut impl_scope = Scope::new();
         let struct_imp = impl_scope.new_impl(&struct_name.to_string());
+        struct_imp.r#macro("#[Resolver]");
 
         for field in &self.def.fields {
             let field_name = &field.name;
@@ -54,10 +55,9 @@ impl<'a> FileDefinition for ObjectFile<'a> {
         }
 
         format!(
-            "{}\n\n{}\n\n{}\n{}",
+            "{}\n\n{}\n\n{}",
             use_gql_definitions(),
             struct_scope_base.to_string(),
-            "#[Resolver]",
             impl_scope.to_string()
         )
     }

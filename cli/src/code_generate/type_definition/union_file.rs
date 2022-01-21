@@ -20,17 +20,13 @@ impl<'a> FileDefinition for UnionFile<'a> {
 
     fn content(&self) -> String {
         let mut scope = Scope::new();
-        let enum_scope = scope.new_enum(&self.def.name).vis("pub");
+        let union_scope = scope.new_enum(&self.def.name).vis("pub");
+        union_scope.derive("Union");
 
         for value in &self.def.types {
-            enum_scope.new_variant(&value).tuple(&value);
+            union_scope.new_variant(&value).tuple(&value);
         }
 
-        format!(
-            "{}\n\n{}\n{}",
-            use_gql_definitions(),
-            "#[derive(Union)]",
-            scope.to_string()
-        )
+        format!("{}\n\n{}", use_gql_definitions(), scope.to_string())
     }
 }

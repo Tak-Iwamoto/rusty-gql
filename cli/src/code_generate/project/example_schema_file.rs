@@ -101,5 +101,13 @@ input ReviewInput {
 
 union SearchResult = Human | Droid
 
+directive @possibleTypes(
+  abstractType: String
+  concreteTypes: [String!]!
+) on INPUT_FIELD_DEFINITION
+
+scalar Base64String
+scalar Date
+scalar DateTime
 "#
 }
