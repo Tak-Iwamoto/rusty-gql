@@ -67,9 +67,17 @@ fn is_return_primitive_ty(field: &GqlField) -> bool {
     is_gql_primitive_ty(&field.meta_type.name())
 }
 
+fn is_copy_gql_ty(field: &GqlField) -> bool {
+    vec!["Int", "Float", "Boolean"].contains(&field.meta_type.name())
+}
+
 fn build_block_str(field: &GqlField, name: &str) -> String {
     let block_str = if is_return_primitive_ty(&field) {
-        format!("self.{}.clone()", &name)
+        if is_copy_gql_ty(&field) {
+            format!("self.{}", &name)
+        } else {
+            format!("self.{}.clone()", &name)
+        }
     } else {
         "todo!()".to_string()
     };
