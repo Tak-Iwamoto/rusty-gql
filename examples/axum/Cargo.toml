@@ -3,8 +3,6 @@ edition = "2021"
 name = "rusty-gql-axum-example"
 version = "0.1.0"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
 axum = {version = "0.4.2", features = ["headers"]}
 hyper = "0.14.16"

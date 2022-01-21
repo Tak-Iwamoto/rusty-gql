@@ -8,6 +8,8 @@ repository = "https://github.com/Tak-Iwamoto/rusty-gql"
 authors = ["Tak-Iwamoto"]
 homepage = "https://github.com/Tak-Iwamoto/rusty-gql"
 license = "MIT"
+keywords = ["graphql", "async", "web"]
+categories = ["asynchronous", "web-programming"]
 
 [dependencies]
 async-trait = "0.1.52"

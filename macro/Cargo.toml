@@ -8,6 +8,8 @@ license = "MIT"
 documentation = "https://github.com/Tak-Iwamoto/rusty-gql"
 homepage = "https://github.com/Tak-Iwamoto/rusty-gql"
 repository = "https://github.com/Tak-Iwamoto/rusty-gql"
+keywords = ["graphql", "async", "web"]
+categories = ["asynchronous", "web-programming"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [lib]

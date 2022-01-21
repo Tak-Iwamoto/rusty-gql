@@ -8,4 +8,3 @@ version = "0.1.0"
 [dependencies]
 actix-web = "3.3.2"
 rusty-gql = {path = "../.."}
-rusty-gql-cli = {path = "../../cli"}

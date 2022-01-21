@@ -8,6 +8,8 @@ license = "MIT"
 documentation = "https://github.com/Tak-Iwamoto/rusty-gql"
 homepage = "https://github.com/Tak-Iwamoto/rusty-gql"
 repository = "https://github.com/Tak-Iwamoto/rusty-gql"
+keywords = ["graphql", "async", "web", "cli"]
+categories = ["asynchronous", "web-programming"]
 
 [[bin]]
 name = "rusty-gql"
