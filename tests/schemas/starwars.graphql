@@ -5,13 +5,12 @@ type Query {
   character(id: ID!): Character
   droid(id: ID!): Droid
   human(id: ID!): Human
-  starship(id: ID!): Starship
 }
 
 type Mutation {
   createReview(episode: Episode, review: ReviewInput!): Review
 }
-j
+
 enum Episode {
   NEWHOPE
   EMPIRE
@@ -21,8 +20,7 @@ enum Episode {
 interface Character {
   id: ID!
   name: String!
-  friends: [Character]
-  friendsConnection(first: Int, after: ID): FriendsConnection!
+  friends(first: Int, after: ID): FriendsConnection!
   appearsIn: [Episode]!
 }
 
@@ -38,17 +36,14 @@ type Human implements Character {
   height(unit: LengthUnit = METER): Float
   mass: Float
   episode: Episode
-  friends: [Character]
-  friendsConnection(first: Int, after: ID): FriendsConnection!
+  friends(first: Int, after: ID): FriendsConnection!
   appearsIn: [Episode]!
-  starships: [Starship]
 }
 
 type Droid implements Character {
   id: ID!
   name: String!
-  friends: [Character]
-  friendsConnection(first: Int, after: ID): FriendsConnection!
+  friends(first: Int, after: ID): FriendsConnection!
   appearsIn: [Episode]!
   primaryFunction: String
 }
@@ -56,7 +51,6 @@ type Droid implements Character {
 type FriendsConnection {
   totalCount: Int
   edges: [FriendsEdge]
-  friends: [Character]
   pageInfo: PageInfo!
 }
 
@@ -68,6 +62,7 @@ type FriendsEdge {
 type PageInfo {
   startCursor: ID
   endCursor: ID
+  hasPreviousPage: Boolean!
   hasNextPage: Boolean!
 }
 
@@ -80,23 +75,6 @@ type Review {
 input ReviewInput {
   stars: Int!
   commentary: String
-  favorite_color: ColorInput
 }
 
-input ColorInput {
-  red: Int!
-  green: Int!
-  blue: Int!
-}
-type Starship {
-  id: ID!
-  name: String!
-  length(unit: LengthUnit = METER): Float
-  coordinates: [[Float!]!]
-}
-
-union SearchResult = Human | Droid | Starship
-
-scalar Base64String
-scalar Date
-scalar DateTime
+union SearchResult = Human | Droid

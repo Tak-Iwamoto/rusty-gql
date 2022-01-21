@@ -19,124 +19,87 @@ impl<'a> FileDefinition for StarWarsSchemaFile<'a> {
 }
 
 pub fn starwars_schema_content() -> &'static str {
-    r#"schema {
-    query: Query
-    mutation: Mutation
-    subscription: Subscription
-}
+    r#"
 type Query {
-    hero(episode: Episode): Character
-    reviews(episode: Episode!): [Review]
-    search(text: String): [SearchResult]
-    character(id: ID!): Character
-    droid(id: ID!): Droid
-    human(id: ID!): Human
-    starship(id: ID!): Starship
+  hero(episode: Episode): Character
+  reviews(episode: Episode!): [Review]
+  search(text: String, episode: Episode): [SearchResult]
+  character(id: ID!): Character
+  droid(id: ID!): Droid
+  human(id: ID!): Human
 }
 
 type Mutation {
-    createReview(episode: Episode, review: ReviewInput!): Review
+  createReview(episode: Episode, review: ReviewInput!): Review
 }
 
-type Subscription {
-    reviewAdded(episode: Episode): Review
-}
 enum Episode {
-    NEWHOPE
-    EMPIRE
-    JEDI
+  NEWHOPE
+  EMPIRE
+  JEDI
 }
 
 interface Character {
-    id: ID!
-    name: String!
-    friends: [Character]
-    friendsConnection(first: Int, after: ID): FriendsConnection!
-    appearsIn: [Episode]!
+  id: ID!
+  name: String!
+  friends(first: Int, after: ID): FriendsConnection!
+  appearsIn: [Episode]!
 }
 
 enum LengthUnit {
-    METER
-    FOOT
+  METER
+  FOOT
 }
 
 type Human implements Character {
-    id: ID!
-    name: String!
-    homePlanet: String
-    height(unit: LengthUnit = METER): Float
-    mass: Float
-    friends: [Character]
-    friendsConnection(first: Int, after: ID): FriendsConnection!
-    appearsIn: [Episode]!
-    starships: [Starship]
+  id: ID!
+  name: String!
+  homePlanet: String
+  height(unit: LengthUnit = METER): Float
+  mass: Float
+  episode: Episode
+  friends(first: Int, after: ID): FriendsConnection!
+  appearsIn: [Episode]!
 }
 
 type Droid implements Character {
-    id: ID!
-    name: String!
-    friends: [Character]
-    friendsConnection(first: Int, after: ID): FriendsConnection!
-    appearsIn: [Episode]!
-    primaryFunction: String
+  id: ID!
+  name: String!
+  friends(first: Int, after: ID): FriendsConnection!
+  appearsIn: [Episode]!
+  primaryFunction: String
 }
 
 type FriendsConnection {
-    totalCount: Int
-    edges: [FriendsEdge]
-    friends: [Character]
-    pageInfo: PageInfo!
+  totalCount: Int
+  edges: [FriendsEdge]
+  pageInfo: PageInfo!
 }
 
 type FriendsEdge {
-    cursor: ID!
-    node: Character
+  cursor: ID!
+  node: Character
 }
 
 type PageInfo {
-    startCursor: ID
-    endCursor: ID
-    hasNextPage: Boolean!
+  startCursor: ID
+  endCursor: ID
+  hasPreviousPage: Boolean!
+  hasNextPage: Boolean!
 }
 
 type Review {
-    episode: Episode
-    stars: Int!
-    commentary: String
+  episode: Episode
+  stars: Int!
+  commentary: String
 }
 
 input ReviewInput {
-    stars: Int!
-    commentary: String
-    favorite_color: ColorInput
+  stars: Int!
+  commentary: String
 }
 
-input ColorInput {
-    red: Int!
-    green: Int!
-    blue: Int!
-}
-
-type Starship {
-    id: ID!
-    name: String!
-    length(unit: LengthUnit = METER): Float
-    coordinates: [[Float!]!]
-}
-
-union SearchResult = Human | Droid | Starship
-directive @preview(
-    toggledBy: String!
-) on SCALAR | OBJECT | FIELD_DEFINITION | ARGUMENT_DEFINITION | INTERFACE | UNION | ENUM | ENUM_VALUE | INPUT_OBJECT | INPUT_FIELD_DEFINITION
-
-directive @possibleTypes(
-    abstractType: String
-    concreteTypes: [String!]!
-) on INPUT_FIELD_DEFINITION
-
-scalar Base64String
-scalar Date
-scalar DateTime
+union SearchResult = Human | Droid
 
 "#
 }
