@@ -22,6 +22,7 @@ pub fn generate_enum(derive_input: &DeriveInput) -> Result<TokenStream, syn::Err
 
     let mut resolve_fields = Vec::new();
     let mut resolve_selection_sets = Vec::new();
+    let mut into_gql_values = Vec::new();
 
     for variant in &enum_data.variants {
         let enum_value_ident = &variant.ident;
@@ -33,10 +34,38 @@ pub fn generate_enum(derive_input: &DeriveInput) -> Result<TokenStream, syn::Err
 
         resolve_selection_sets.push(quote! {
             #self_ty::#enum_value_ident => Ok(GqlValue::Enum(#variant_str.to_string()))
+        });
+
+        into_gql_values.push(quote! {
+            #self_ty::#enum_value_ident => GqlValue::Enum(#variant_str.to_string())
         })
     }
 
     let expanded = quote! {
+        // #[#crate_name::async_trait::async_trait]
+        // impl #impl_generics #crate_name::VariableType for #self_ty #where_clause {
+        //     fn from_gql_value(value: Option<GqlValue>) -> Result<Self, String> {
+        //         match value {
+        //             Some(value) => match value {
+        //                 GqlValue::Enum(v) => {
+        //                     #self_ty::v
+        //                 }
+        //                 invalid_value => Err(format!(
+        //                     "Expected type: enum, but found {}",
+        //                     invalid_value.to_string()
+        //                 )),
+        //             },
+        //             None => Err("Expected type: enum, but not found".to_string()),
+        //         }
+        //     }
+
+        //     fn into_gql_value(&self) -> GqlValue {
+        //         match self {
+        //             #(#into_gql_values),*
+        //         }
+        //     }
+        // }
+
         #[#crate_name::async_trait::async_trait]
         impl #impl_generics #crate_name::FieldResolver for #self_ty #where_clause {
             async fn resolve_field(&self, ctx: &#crate_name::FieldContext<'_>) -> #crate_name::ResolverResult<::std::option::Option<#crate_name::GqlValue>> {

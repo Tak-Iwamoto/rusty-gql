@@ -1,3 +1,3 @@
-mod ReviewInput;
+mod review_input;
 
-pub use ReviewInput::ReviewInput;
+pub use review_input::ReviewInput;
