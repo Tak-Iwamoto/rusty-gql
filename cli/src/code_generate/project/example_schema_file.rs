@@ -106,8 +106,6 @@ directive @possibleTypes(
   concreteTypes: [String!]!
 ) on INPUT_FIELD_DEFINITION
 
-scalar Base64String
-scalar Date
 scalar DateTime
 "#
 }

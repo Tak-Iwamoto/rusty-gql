@@ -2,6 +2,8 @@ use rusty_gql::*;
 use rusty_gql_axum::*;
 use std::{net::SocketAddr, path::Path};
 
+mod graphql;
+
 use axum::{
     extract::Extension,
     response::{self, IntoResponse},

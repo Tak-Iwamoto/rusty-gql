@@ -1,3 +1,5 @@
+use heck::ToSnakeCase;
+
 use crate::code_generate::FileDefinition;
 
 use super::path_str;
@@ -12,8 +14,8 @@ impl<'a> FileDefinition for ModFile<'a> {
         let mut mod_str = String::from("");
         let mut pub_use_str = String::from("");
         for name in &self.struct_names {
-            mod_str += format!("mod {};\n", &name).as_str();
-            let file_name = &name;
+            let file_name = &name.to_snake_case();
+            mod_str += format!("mod {};\n", &file_name).as_str();
             pub_use_str += format!("pub use {}::{};\n", &file_name, &name).as_str();
         }
 

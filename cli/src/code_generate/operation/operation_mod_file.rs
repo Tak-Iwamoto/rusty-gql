@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 use codegen::{Scope, Type};
+use heck::ToSnakeCase;
 use rusty_gql::{GqlField, OperationType};
 
 use crate::code_generate::{use_gql_definitions, util::gql_value_ty_to_rust_ty, FileDefinition};
@@ -24,7 +25,7 @@ impl<'a> FileDefinition for OperationModFile<'a> {
         let mut result = String::from("");
 
         for (operation_name, _) in self.operations.iter() {
-            let file_name = operation_name;
+            let file_name = operation_name.to_snake_case();
             result += format!("mod {};\n", file_name,).as_str();
         }
 
@@ -41,6 +42,7 @@ impl<'a> OperationModFile<'a> {
         let struct_name = self.operation_type.to_string();
         scope.new_struct(&struct_name).vis("pub");
         let imp = scope.new_impl(&struct_name);
+        imp.r#macro("#[Resolver]");
 
         for (operation_name, method) in self.operations.iter() {
             let fn_scope = imp.new_fn(&operation_name);
@@ -57,7 +59,7 @@ impl<'a> OperationModFile<'a> {
             let return_ty = gql_value_ty_to_rust_ty(&method.meta_type);
             fn_scope.ret(Type::new(&return_ty));
 
-            let file_name = operation_name;
+            let file_name = operation_name.to_snake_case();
             fn_scope.line(format!(
                 "{file_name}::{method}({args}).await",
                 file_name = file_name,
