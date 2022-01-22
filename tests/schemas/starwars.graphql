@@ -78,3 +78,5 @@ input ReviewInput {
 }
 
 union SearchResult = Human | Droid
+
+scalar DateTime
