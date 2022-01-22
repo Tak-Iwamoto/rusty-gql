@@ -55,6 +55,7 @@ impl<'a> OperationModFile<'a> {
             args_str.pop();
             fn_scope.set_async(true);
             fn_scope.vis("pub");
+            fn_scope.arg_ref_self();
 
             let return_ty = gql_value_ty_to_rust_ty(&method.meta_type);
             fn_scope.ret(Type::new(&return_ty));
