@@ -21,6 +21,7 @@ impl<'a> FileDefinition for InputObjectFile<'a> {
     fn content(&self) -> String {
         let mut scope = Scope::new();
         let struct_scope = scope.new_struct(&self.def.name).vis("pub");
+        struct_scope.derive("InputObject");
 
         for field in &self.def.fields {
             struct_scope.field(&field.name, gql_value_ty_to_rust_ty(&field.meta_type));
