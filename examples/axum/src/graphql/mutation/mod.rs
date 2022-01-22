@@ -1,4 +1,4 @@
-mod createReview;
+mod create_review;
 
 use crate::graphql::*;
 use rusty_gql::*;
@@ -7,6 +7,6 @@ pub struct Mutation;
 
 impl Mutation {
     pub async fn createReview(episode: Option<Episode>, review: ReviewInput) -> Option<Review> {
-        createReview::createReview(episode,review).await
+        create_review::createReview(episode,review).await
     }
 }
