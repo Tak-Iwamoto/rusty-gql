@@ -42,6 +42,7 @@ impl<'a> OperationModFile<'a> {
         let struct_name = self.operation_type.to_string();
         scope.new_struct(&struct_name).vis("pub");
         let imp = scope.new_impl(&struct_name);
+        imp.r#macro("#[Resolver]");
 
         for (operation_name, method) in self.operations.iter() {
             let fn_scope = imp.new_fn(&operation_name);
