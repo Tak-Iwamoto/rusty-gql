@@ -6,6 +6,7 @@ mod scalar_file;
 mod union_file;
 
 use futures_util::future::try_join_all;
+use heck::ToSnakeCase;
 use rusty_gql::{GqlTypeDefinition, Schema};
 use std::{collections::HashMap, io::Error};
 
@@ -87,7 +88,7 @@ async fn create_type_definition_file(
     base_path: &str,
     interface_obj_map: &HashMap<String, Vec<String>>,
 ) -> Result<(), Error> {
-    let file_name = type_def.name();
+    let file_name = type_def.name().to_snake_case();
     match type_def {
         GqlTypeDefinition::Object(def) => {
             let path = path_str(vec![base_path, "model", &file_name], true);

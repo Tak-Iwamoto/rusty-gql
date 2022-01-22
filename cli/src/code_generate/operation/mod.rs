@@ -2,6 +2,7 @@ mod field_file;
 mod operation_mod_file;
 
 use futures_util::future::try_join_all;
+use heck::ToSnakeCase;
 use rusty_gql::{self, GqlField, OperationType};
 use std::{collections::HashMap, io::Error};
 
@@ -17,18 +18,19 @@ pub async fn create_operation_files(
     let mut futures = Vec::new();
 
     for (_, field) in operations.iter() {
-        let filename = path_str(
+        let filename = field.name.to_snake_case();
+        let path = path_str(
             vec![
                 base_path,
                 &operation_type.to_string().to_lowercase(),
-                &field.name,
+                &filename,
             ],
             true,
         );
         let task = create_file(FieldFile {
-            file_name: field.name.to_string(),
+            file_name: filename,
             def: field,
-            path: filename,
+            path,
         });
         futures.push(task);
     }
