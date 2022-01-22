@@ -1,6 +1,6 @@
 [package]
 name = "rusty-gql-axum"
-version = "0.0.2"
+version = "0.1.0"
 description = "axum integration for rusty-gql"
 documentation = "https://github.com/Tak-Iwamoto/rusty-gql"
 edition = "2021"
