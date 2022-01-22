@@ -1,10 +1,12 @@
 mod enum_type;
+mod input_object;
 mod resolver;
 mod scalar;
 mod union;
 mod utils;
 
 use enum_type::generate_enum;
+use input_object::generate_input_object;
 use proc_macro::{self, TokenStream};
 use scalar::generate_scalar;
 use syn::{parse_macro_input, AttributeArgs, DeriveInput, ItemImpl};
@@ -52,6 +54,17 @@ pub fn union_derive(input: TokenStream) -> TokenStream {
 pub fn enum_derive(input: TokenStream) -> TokenStream {
     let input = &parse_macro_input!(input as DeriveInput);
     let expanded = match generate_enum(&input) {
+        Ok(generated) => generated,
+        Err(err) => err.to_compile_error().into(),
+    };
+    expanded
+}
+
+#[proc_macro_derive(InputObject)]
+#[allow(non_snake_case)]
+pub fn input_object_derive(input: TokenStream) -> TokenStream {
+    let input = &parse_macro_input!(input as DeriveInput);
+    let expanded = match generate_input_object(&input) {
         Ok(generated) => generated,
         Err(err) => err.to_compile_error().into(),
     };
