@@ -1,0 +1,8 @@
+type Query {
+  input_test(input: InputObj): String!
+}
+
+input InputObj {
+  str_value: String!
+  int_value: Int
+}
