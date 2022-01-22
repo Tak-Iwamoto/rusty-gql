@@ -23,6 +23,7 @@ pub fn generate_enum(derive_input: &DeriveInput) -> Result<TokenStream, syn::Err
     let mut resolve_fields = Vec::new();
     let mut resolve_selection_sets = Vec::new();
     let mut into_gql_values = Vec::new();
+    let mut from_gql_values = Vec::new();
 
     for variant in &enum_data.variants {
         let enum_value_ident = &variant.ident;
@@ -38,33 +39,43 @@ pub fn generate_enum(derive_input: &DeriveInput) -> Result<TokenStream, syn::Err
 
         into_gql_values.push(quote! {
             #self_ty::#enum_value_ident => GqlValue::Enum(#variant_str.to_string())
+        });
+
+        from_gql_values.push(quote! {
+            if enum_value == #variant_str.to_string() {
+                return Ok(#self_ty::#enum_value_ident)
+            }
         })
     }
 
     let expanded = quote! {
-        // #[#crate_name::async_trait::async_trait]
-        // impl #impl_generics #crate_name::VariableType for #self_ty #where_clause {
-        //     fn from_gql_value(value: Option<GqlValue>) -> Result<Self, String> {
-        //         match value {
-        //             Some(value) => match value {
-        //                 GqlValue::Enum(v) => {
-        //                     #self_ty::v
-        //                 }
-        //                 invalid_value => Err(format!(
-        //                     "Expected type: enum, but found {}",
-        //                     invalid_value.to_string()
-        //                 )),
-        //             },
-        //             None => Err("Expected type: enum, but not found".to_string()),
-        //         }
-        //     }
+        impl #impl_generics #crate_name::VariableType for #self_ty #where_clause {
+            fn from_gql_value(value: Option<GqlValue>) -> Result<Self, String> {
+                match value {
+                    Some(v) => {
+                        let enum_value = match v {
+                            GqlValue::String(s) => s,
+                            GqlValue::Enum(enu) => enu,
+                            invalid_value => {
+                                return Err(format!(
+                                    "Expected type: enum, but found {}",
+                                    invalid_value.to_string()
+                                ));
+                            }
+                        };
+                        #(#from_gql_values)*
+                        Err(format!("{} is not contained", enum_value))
+                    }
+                    None => Err("Expected type: enum, but not found".to_string()),
+                }
+            }
 
-        //     fn into_gql_value(&self) -> GqlValue {
-        //         match self {
-        //             #(#into_gql_values),*
-        //         }
-        //     }
-        // }
+            fn into_gql_value(&self) -> GqlValue {
+                match self {
+                    #(#into_gql_values),*
+                }
+            }
+        }
 
         #[#crate_name::async_trait::async_trait]
         impl #impl_generics #crate_name::FieldResolver for #self_ty #where_clause {
