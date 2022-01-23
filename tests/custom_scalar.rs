@@ -28,14 +28,14 @@ pub async fn test_custom_scalar() {
         test: CustomScalar,
     }
 
-    #[Resolver]
+    #[GqlType]
     impl SampleResponse {
         async fn test(&self) -> CustomScalar {
             self.test.clone()
         }
     }
 
-    #[Resolver]
+    #[GqlType]
     impl Query {
         #[allow(unused)]
         async fn test_custom_scalar(&self) -> SampleResponse {

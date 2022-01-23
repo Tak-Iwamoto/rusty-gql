@@ -11,7 +11,7 @@ pub struct Droid {
     pub primaryFunction: Option<String>,
 }
 
-#[Resolver]
+#[GqlType]
 impl Droid {
     pub async fn id(&self) -> ID {
         self.id.clone()

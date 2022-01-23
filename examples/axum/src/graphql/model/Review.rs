@@ -7,7 +7,7 @@ pub struct Review {
     pub episode: Option<Episode>,
 }
 
-#[Resolver]
+#[GqlType]
 impl Review {
     pub async fn episode(&self) -> Option<Episode> {
         self.episode

@@ -4,7 +4,7 @@ use rusty_gql::*;
 pub async fn test_variables() {
     struct Query;
 
-    #[Resolver]
+    #[GqlType]
     impl Query {
         async fn twice_value(&self, value: i32) -> i32 {
             value * 2

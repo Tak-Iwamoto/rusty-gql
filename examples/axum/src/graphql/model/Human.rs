@@ -10,7 +10,7 @@ pub struct Human {
     pub mass: Option<f64>,
 }
 
-#[Resolver]
+#[GqlType]
 impl Human {
     pub async fn id(&self) -> ID {
         self.id.clone()

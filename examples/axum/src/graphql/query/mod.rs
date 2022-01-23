@@ -11,7 +11,7 @@ use rusty_gql::*;
 #[derive(Clone)]
 pub struct Query;
 
-#[Resolver]
+#[GqlType]
 impl Query {
     pub async fn droid(&self, id: ID) -> Option<Droid> {
         droid::droid(id).await

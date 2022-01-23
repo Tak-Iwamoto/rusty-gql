@@ -44,7 +44,7 @@ pub async fn test_directive() {
         age: i32,
     }
 
-    #[Resolver]
+    #[GqlType]
     impl Person {
         async fn name(&self) -> String {
             self.name.clone()
@@ -59,7 +59,7 @@ pub async fn test_directive() {
 
     struct Query;
 
-    #[Resolver]
+    #[GqlType]
     impl Query {
         async fn persons(&self) -> Vec<Person> {
             vec![

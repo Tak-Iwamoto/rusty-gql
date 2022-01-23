@@ -1,5 +1,5 @@
 use crate::*;
-use rusty_gql_macro::Resolver;
+use rusty_gql_macro::GqlType;
 
 use crate::Schema;
 
@@ -14,7 +14,7 @@ pub fn build_schema_introspection<'a>(schema: &'a Schema) -> __Schema<'a> {
 }
 
 #[allow(non_snake_case)]
-#[Resolver(internal)]
+#[GqlType(internal)]
 impl<'a> __Schema<'a> {
     async fn types(&self) -> Vec<__Type<'a>> {
         let mut result = Vec::new();

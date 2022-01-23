@@ -1,4 +1,4 @@
-use rusty_gql_macro::Resolver;
+use rusty_gql_macro::GqlType;
 
 use crate::{types::GqlEnumValue, SelectionSetResolver};
 
@@ -13,7 +13,7 @@ pub fn build_enum_value_introspection(value: &GqlEnumValue) -> __EnumValue {
 }
 
 #[allow(non_snake_case)]
-#[Resolver(internal)]
+#[GqlType(internal)]
 impl __EnumValue {
     async fn name(&self) -> &str {
         self.detail.name.as_str()

@@ -7,7 +7,7 @@ pub struct FriendsEdge {
     pub node: Option<Character>
 }
 
-#[Resolver]
+#[GqlType]
 impl FriendsEdge {
     pub async fn cursor(&self) -> ID {
         self.cursor.clone()

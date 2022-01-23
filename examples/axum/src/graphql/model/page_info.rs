@@ -9,7 +9,7 @@ pub struct PageInfo {
     pub hasNextPage: bool,
 }
 
-#[Resolver]
+#[GqlType]
 impl PageInfo {
     pub async fn startCursor(&self) -> Option<ID> {
         self.startCursor.clone()

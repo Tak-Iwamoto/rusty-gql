@@ -5,7 +5,7 @@ struct Test<'a> {
     test: &'a str,
 }
 
-#[Resolver]
+#[GqlType]
 impl<'a> Test<'a> {
     async fn value(&self) -> &'a str {
         self.test

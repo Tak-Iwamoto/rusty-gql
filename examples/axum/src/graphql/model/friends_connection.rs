@@ -7,7 +7,7 @@ pub struct FriendsConnection {
     pub pageInfo: PageInfo,
 }
 
-#[Resolver]
+#[GqlType]
 impl FriendsConnection {
     pub async fn totalCount(&self) -> Option<i64> {
         self.totalCount

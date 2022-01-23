@@ -4,7 +4,7 @@ use rusty_gql::*;
 async fn test_object_introspection() {
     struct Query;
 
-    #[Resolver]
+    #[GqlType]
     impl Query {
         async fn value(&self) -> i32 {
             10
@@ -31,7 +31,7 @@ async fn test_object_introspection() {
 async fn test_interface_introspection() {
     struct Query;
 
-    #[Resolver]
+    #[GqlType]
     impl Query {
         async fn value(&self) -> i32 {
             10
@@ -58,7 +58,7 @@ async fn test_interface_introspection() {
 async fn test_input_object_introspection() {
     struct Query;
 
-    #[Resolver]
+    #[GqlType]
     impl Query {
         async fn value(&self) -> i32 {
             10
@@ -85,7 +85,7 @@ async fn test_input_object_introspection() {
 async fn test_enum_introspection() {
     struct Query;
 
-    #[Resolver]
+    #[GqlType]
     impl Query {
         async fn value(&self) -> i32 {
             10
@@ -112,7 +112,7 @@ async fn test_enum_introspection() {
 async fn test_union_introspection() {
     struct Query;
 
-    #[Resolver]
+    #[GqlType]
     impl Query {
         async fn value(&self) -> i32 {
             10
@@ -139,7 +139,7 @@ async fn test_union_introspection() {
 async fn test_scalar_introspection() {
     struct Query;
 
-    #[Resolver]
+    #[GqlType]
     impl Query {
         async fn value(&self) -> i32 {
             10

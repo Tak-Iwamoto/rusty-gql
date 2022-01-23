@@ -10,7 +10,7 @@ pub async fn test_input_obj() {
         int_value: i64,
     }
 
-    #[Resolver]
+    #[GqlType]
     impl Query {
         async fn input_test(&self, input: InputObj) -> String {
             format!("{}*{}", &input.str_value, &input.int_value)

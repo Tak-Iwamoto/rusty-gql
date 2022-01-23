@@ -11,7 +11,7 @@ pub async fn test_enum() {
         Value1,
     }
 
-    #[Resolver]
+    #[GqlType]
     impl Query {
         async fn enum_value(&self) -> SampleEnum {
             SampleEnum::Value0

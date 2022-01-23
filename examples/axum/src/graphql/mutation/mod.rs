@@ -6,7 +6,7 @@ use rusty_gql::*;
 #[derive(Clone)]
 pub struct Mutation;
 
-#[Resolver]
+#[GqlType]
 impl Mutation {
     pub async fn createReview(&self, episode: Option<Episode>, review: ReviewInput) -> Option<Review> {
         create_review::createReview(episode,review).await

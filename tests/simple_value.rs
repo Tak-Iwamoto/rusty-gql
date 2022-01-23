@@ -6,7 +6,7 @@ use rusty_gql::*;
 pub async fn test_int() {
     struct Query;
 
-    #[Resolver]
+    #[GqlType]
     impl Query {
         async fn value(&self) -> i32 {
             10
@@ -37,7 +37,7 @@ pub async fn test_object() {
         age: i32,
     }
 
-    #[Resolver]
+    #[GqlType]
     impl Person {
         async fn name(&self) -> String {
             self.name.clone()
@@ -52,7 +52,7 @@ pub async fn test_object() {
 
     struct Query;
 
-    #[Resolver]
+    #[GqlType]
     impl Query {
         async fn obj(&self) -> BTreeMap<String, i32> {
             let mut map = BTreeMap::new();
@@ -108,7 +108,7 @@ pub async fn test_list() {
         age: i32,
     }
 
-    #[Resolver]
+    #[GqlType]
     impl Person {
         async fn name(&self) -> String {
             self.name.clone()
@@ -121,7 +121,7 @@ pub async fn test_list() {
         }
     }
 
-    #[Resolver]
+    #[GqlType]
     impl Query {
         async fn persons(&self) -> Vec<Person> {
             vec![

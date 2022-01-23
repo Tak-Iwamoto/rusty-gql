@@ -9,7 +9,7 @@ pub async fn test_union() {
         age: i32,
     }
 
-    #[Resolver]
+    #[GqlType]
     impl Person {
         async fn name(&self) -> String {
             self.name.clone()
@@ -27,7 +27,7 @@ pub async fn test_union() {
         woofs: bool,
     }
 
-    #[Resolver]
+    #[GqlType]
     impl Dog {
         async fn name(&self) -> String {
             self.name.clone()
@@ -42,7 +42,7 @@ pub async fn test_union() {
         meow: bool,
     }
 
-    #[Resolver]
+    #[GqlType]
     impl Cat {
         async fn name(&self) -> String {
             self.name.clone()
@@ -59,7 +59,7 @@ pub async fn test_union() {
         Cat(Cat),
     }
 
-    #[Resolver]
+    #[GqlType]
     impl Query {
         async fn search_animal(&self, query: String) -> Option<SearchAnimal> {
             if query.as_str() == "dog" {

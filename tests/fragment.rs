@@ -9,7 +9,7 @@ async fn test_inline_framgnet() {
         age: i32,
     }
 
-    #[Resolver]
+    #[GqlType]
     impl Person {
         async fn name(&self) -> String {
             self.name.clone()
@@ -24,7 +24,7 @@ async fn test_inline_framgnet() {
 
     struct Query;
 
-    #[Resolver]
+    #[GqlType]
     impl Query {
         #[allow(unused)]
         async fn person(&self, id: ID) -> Person {
@@ -62,7 +62,7 @@ async fn test_framgnet_spread() {
         age: i32,
     }
 
-    #[Resolver]
+    #[GqlType]
     impl Person {
         async fn name(&self) -> String {
             self.name.clone()
@@ -77,7 +77,7 @@ async fn test_framgnet_spread() {
 
     struct Query;
 
-    #[Resolver]
+    #[GqlType]
     impl Query {
         #[allow(unused)]
         async fn person(&self, id: ID) -> Person {

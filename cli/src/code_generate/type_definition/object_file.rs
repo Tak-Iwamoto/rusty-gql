@@ -32,7 +32,7 @@ impl<'a> FileDefinition for ObjectFile<'a> {
 
         let mut impl_scope = Scope::new();
         let struct_imp = impl_scope.new_impl(&struct_name.to_string());
-        struct_imp.r#macro("#[Resolver]");
+        struct_imp.r#macro("#[GqlType]");
 
         for field in &self.def.fields {
             let field_name = &field.name;
