@@ -1,4 +1,5 @@
 use crate::code_generate::FileDefinition;
+use codegen::Scope;
 
 pub struct AxumMainFile<'a> {
     pub app_name: &'a str,
@@ -18,10 +19,62 @@ impl<'a> FileDefinition for AxumMainFile<'a> {
     }
 }
 
-fn main_file_content() -> &'static str {
-    r#"mod graphql;
+fn main_file_content() -> String {
+    let contents = vec![
+        axum_import_str(),
+        axum_gql_handler(),
+        axum_gql_playground(),
+        axum_main_function(),
+    ];
+    contents.join("\n\n")
+}
 
-fn main() {
-    println!("Hello, world!");
-}"#
+fn axum_import_str() -> String {
+    let statements = vec![
+        "mod graphql;",
+        "use rusty_gql::*;",
+        "use rusty_gql_axum::*;",
+        "use std::{net::SocketAddr, path::Path};",
+        "use axum::{routing::get, AddExtensionLayer, Router};",
+        "use graphql::Query;",
+        "type ContainerType = Container<Query, EmptyMutation, EmptySubscription>;",
+    ];
+    statements.join("\n")
+}
+
+fn axum_gql_handler() -> String {
+    let mut scope = Scope::new();
+    let f = scope.new_fn("gql_handler");
+    f.set_async(true);
+    f.arg("container", "axum::extract::Extension<ContainerType>");
+    f.arg("req", "GqlRequest");
+    f.ret("GqlResponse");
+    f.line("let result = execute(&container, req.0).await;");
+    f.line("GqlResponse::from(result)");
+
+    scope.to_string()
+}
+
+fn axum_gql_playground() -> String {
+    let mut scope = Scope::new();
+    let f = scope.new_fn("gql_playground");
+    f.set_async(true);
+    f.ret("impl axum::response::IntoResponse");
+    f.line("axum::response::Html(playground_html(\"/\", None))");
+
+    scope.to_string()
+}
+
+fn axum_main_function() -> String {
+    let mut scope = Scope::new();
+    let f = scope.new_fn("main");
+    f.set_async(true);
+    f.line("let schema_docs = read_schemas(Path::new(\"./src/schemas\")).unwrap();");
+    f.line("let schema_docs: Vec<&str> = schema_docs.iter().map(|s| &**s).collect();");
+    f.line("let container = Container::new(&schema_docs.as_slice(), Query, EmptyMutation, EmptySubscription, Default::default(),).unwrap();");
+    f.line("let app = Router::new().route(\"/\", get(gql_playground).post(gql_handler)).layer(AddExtensionLayer::new(container));");
+    f.line("let addr = SocketAddr::from(([127, 0, 0, 1], 3000));");
+    f.line("axum::Server::bind(&addr).serve(app.into_make_service()).await.unwrap();");
+
+    format!("#[tokio::main]\n{}", scope.to_string())
 }
