@@ -28,7 +28,7 @@ pub async fn create_type_definition_files(
     interface_obj_map: &HashMap<String, Vec<String>>,
 ) -> Result<Vec<()>, Error> {
     let mut futures = Vec::new();
-    let mut model_names = Vec::new();
+    let mut resolver_names = Vec::new();
     let mut input_names = Vec::new();
     let mut scalar_names = Vec::new();
 
@@ -50,10 +50,10 @@ pub async fn create_type_definition_files(
         }
 
         match type_def {
-            GqlTypeDefinition::Union(v) => model_names.push(v.name.clone()),
-            GqlTypeDefinition::Enum(v) => model_names.push(v.name.clone()),
-            GqlTypeDefinition::Object(v) => model_names.push(v.name.clone()),
-            GqlTypeDefinition::Interface(v) => model_names.push(v.name.clone()),
+            GqlTypeDefinition::Union(v) => resolver_names.push(v.name.clone()),
+            GqlTypeDefinition::Enum(v) => resolver_names.push(v.name.clone()),
+            GqlTypeDefinition::Object(v) => resolver_names.push(v.name.clone()),
+            GqlTypeDefinition::Interface(v) => resolver_names.push(v.name.clone()),
             GqlTypeDefinition::InputObject(v) => input_names.push(v.name.clone()),
             GqlTypeDefinition::Scalar(v) => scalar_names.push(v.name.clone()),
         }
@@ -63,8 +63,8 @@ pub async fn create_type_definition_files(
     }
 
     create_file(ModFile {
-        path: &path_str(vec![base_path, "model"], false),
-        struct_names: model_names,
+        path: &path_str(vec![base_path, "resolver"], false),
+        struct_names: resolver_names,
     })
     .await?;
 
@@ -91,7 +91,7 @@ async fn create_type_definition_file(
     let filename = type_def.name().to_snake_case();
     match type_def {
         GqlTypeDefinition::Object(def) => {
-            let path = path_str(vec![base_path, "model", &filename], true);
+            let path = path_str(vec![base_path, "resolver", &filename], true);
             create_file(ObjectFile {
                 def,
                 path: &path,
@@ -100,7 +100,7 @@ async fn create_type_definition_file(
             .await
         }
         GqlTypeDefinition::Interface(def) => {
-            let path = path_str(vec![base_path, "model", &filename], true);
+            let path = path_str(vec![base_path, "resolver", &filename], true);
             create_file(InterfaceFile {
                 def,
                 path: &path,
@@ -110,7 +110,7 @@ async fn create_type_definition_file(
             .await
         }
         GqlTypeDefinition::Union(def) => {
-            let path = path_str(vec![base_path, "model", &filename], true);
+            let path = path_str(vec![base_path, "resolver", &filename], true);
             create_file(UnionFile {
                 def,
                 path: &path,
@@ -119,7 +119,7 @@ async fn create_type_definition_file(
             .await
         }
         GqlTypeDefinition::Enum(def) => {
-            let path = path_str(vec![base_path, "model", &filename], true);
+            let path = path_str(vec![base_path, "resolver", &filename], true);
             create_file(EnumFile {
                 def,
                 path: &path,

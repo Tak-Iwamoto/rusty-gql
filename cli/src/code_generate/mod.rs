@@ -81,7 +81,7 @@ fn gql_file_types() -> Vec<String> {
         "query".to_string(),
         "mutation".to_string(),
         "subscription".to_string(),
-        "model".to_string(),
+        "resolver".to_string(),
         "directive".to_string(),
         "scalar".to_string(),
         "input".to_string(),
