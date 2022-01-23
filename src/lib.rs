@@ -40,7 +40,7 @@ pub use response::Response;
 pub use test_utils::{build_test_request, check_gql_response, schema_content};
 pub use types::schema::build_schema;
 pub use types::{
-    DirectiveDefinition, EnumType, FieldType, ArgumentType, GqlConstValue as Value, GqlDirective,
+    ArgumentType, DirectiveDefinition, EnumType, FieldType, GqlConstValue as Value, GqlDirective,
     GqlValue, GqlValueType, InputObjectType, InterfaceType, ObjectType, ScalarType, Schema,
     TypeDefinition, UnionType, ID,
 };
@@ -48,7 +48,7 @@ pub use variables::Variables;
 
 pub type ResolverResult<T> = ::std::result::Result<T, GqlError>;
 
-pub use rusty_gql_macro::{Enum, GqlType, InputObject, Scalar, Union};
+pub use rusty_gql_macro::{GqlEnum, GqlInputObject, GqlType, GqlUnion, GqlScalar};
 
 #[derive(Clone)]
 pub struct EmptyMutation;

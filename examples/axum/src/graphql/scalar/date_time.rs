@@ -1,7 +1,7 @@
 use crate::graphql::*;
 use rusty_gql::*;
 
-#[derive(Scalar)]
+#[derive(GqlScalar)]
 pub struct DateTime;
 
 impl VariableType for DateTime {

@@ -4,7 +4,7 @@ use rusty_gql::*;
 pub async fn test_custom_scalar() {
     struct Query;
 
-    #[derive(Clone, Scalar)]
+    #[derive(Clone, GqlScalar)]
     struct CustomScalar(String);
 
     impl VariableType for CustomScalar {

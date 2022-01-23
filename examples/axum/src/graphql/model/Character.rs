@@ -1,7 +1,7 @@
 use crate::graphql::*;
 use rusty_gql::*;
 
-#[derive(Union, Debug, Clone)]
+#[derive(GqlUnion, Debug, Clone)]
 pub enum Character {
     Human(Human),
     Droid(Droid),

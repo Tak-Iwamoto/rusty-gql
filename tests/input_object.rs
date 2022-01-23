@@ -4,7 +4,7 @@ use rusty_gql::*;
 pub async fn test_input_obj() {
     struct Query;
 
-    #[derive(InputObject)]
+    #[derive(GqlInputObject)]
     pub struct InputObj {
         str_value: String,
         int_value: i64,

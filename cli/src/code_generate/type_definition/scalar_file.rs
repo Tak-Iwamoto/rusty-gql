@@ -22,7 +22,7 @@ impl<'a> FileDefinition for ScalarFile<'a> {
         let mut scope = Scope::new();
         let struct_name = &self.def.name;
         let scalar_scope = scope.new_struct(struct_name).vis("pub");
-        scalar_scope.derive("Scalar");
+        scalar_scope.derive("GqlScalar");
 
         let scalar_impl = scope.new_impl(struct_name);
         scalar_impl.impl_trait("VariableType");

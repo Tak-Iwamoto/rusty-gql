@@ -20,7 +20,7 @@ impl<'a> FileDefinition for EnumFile<'a> {
     fn content(&self) -> String {
         let mut scope = Scope::new();
         let enum_scope = scope.new_enum(&self.def.name).vis("pub");
-        enum_scope.derive("Enum");
+        enum_scope.derive("GqlEnum");
         enum_scope.derive("Copy");
         enum_scope.derive("Clone");
         enum_scope.derive("Eq");

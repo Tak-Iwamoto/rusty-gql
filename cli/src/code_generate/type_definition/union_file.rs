@@ -21,7 +21,7 @@ impl<'a> FileDefinition for UnionFile<'a> {
     fn content(&self) -> String {
         let mut scope = Scope::new();
         let union_scope = scope.new_enum(&self.def.name).vis("pub");
-        union_scope.derive("Union");
+        union_scope.derive("GqlUnion");
 
         for value in &self.def.types {
             union_scope.new_variant(&value).tuple(&value);

@@ -1,7 +1,7 @@
 use crate::graphql::*;
 use rusty_gql::*;
 
-#[derive(Union)]
+#[derive(GqlUnion)]
 pub enum SearchResult {
     Human(Human),
     Droid(Droid),

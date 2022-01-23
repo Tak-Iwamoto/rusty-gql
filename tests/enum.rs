@@ -4,7 +4,7 @@ use rusty_gql::*;
 pub async fn test_enum() {
     struct Query;
 
-    #[derive(Enum)]
+    #[derive(GqlEnum)]
     enum SampleEnum {
         Value0,
         #[allow(unused)]

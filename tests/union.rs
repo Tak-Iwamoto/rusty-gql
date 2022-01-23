@@ -52,7 +52,7 @@ pub async fn test_union() {
         }
     }
 
-    #[derive(Union)]
+    #[derive(GqlUnion)]
     enum SearchAnimal {
         Person(Person),
         Dog(Dog),
