@@ -3,6 +3,8 @@ use rusty_gql::*;
 
 pub struct FriendsConnection {
     pub totalCount: Option<i64>,
+    pub edges: Vec<FriendsEdge>,
+    pub pageInfo: PageInfo,
 }
 
 #[Resolver]
@@ -11,11 +13,11 @@ impl FriendsConnection {
         self.totalCount
     }
 
-    pub async fn edges(&self) -> Option<Vec<Option<FriendsEdge>>> {
-        todo!()
+    pub async fn edges(&self) -> Vec<FriendsEdge> {
+        self.edges.clone()
     }
 
     pub async fn pageInfo(&self) -> PageInfo {
-        todo!()
+        self.pageInfo.clone()
     }
 }

@@ -1,6 +1,16 @@
-use crate::graphql::*;
+use crate::{
+    graphql::*,
+    starwars::{luke, vader},
+};
 use rusty_gql::*;
 
 pub async fn hero(episode: Option<Episode>) -> Option<Character> {
-    todo!()
+    match episode {
+        Some(episode) => match episode {
+            Episode::NEWHOPE => Some(Character::Human(luke())),
+            Episode::EMPIRE => Some(Character::Human(luke())),
+            Episode::JEDI => Some(Character::Human(vader())),
+        },
+        None => None,
+    }
 }

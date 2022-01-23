@@ -1,6 +1,7 @@
 use crate::graphql::*;
 use rusty_gql::*;
 
+#[derive(Clone)]
 pub struct PageInfo {
     pub startCursor: Option<ID>,
     pub endCursor: Option<ID>,

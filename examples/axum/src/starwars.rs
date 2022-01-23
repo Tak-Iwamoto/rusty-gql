@@ -1,6 +1,6 @@
 use rusty_gql::ID;
 
-use crate::graphql::{Droid, Human};
+use crate::graphql::{Droid, Episode, Human, Review};
 
 pub fn luke() -> Human {
     Human {
@@ -56,4 +56,24 @@ pub fn c3po() -> Droid {
         name: "C3PO".to_string(),
         primaryFunction: Some("communication".to_string()),
     }
+}
+
+pub fn all_reviews() -> Vec<Review> {
+    vec![
+        Review {
+            stars: 3,
+            commentary: None,
+            episode: Some(Episode::EMPIRE),
+        },
+        Review {
+            stars: 5,
+            commentary: Some("Great!".to_string()),
+            episode: Some(Episode::NEWHOPE),
+        },
+        Review {
+            stars: 4,
+            commentary: None,
+            episode: Some(Episode::JEDI),
+        },
+    ]
 }

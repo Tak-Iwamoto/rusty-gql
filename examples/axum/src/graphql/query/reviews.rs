@@ -1,6 +1,6 @@
-use crate::graphql::*;
+use crate::{graphql::*, starwars::all_reviews};
 use rusty_gql::*;
 
 pub async fn reviews(episode: Episode) -> Vec<Review> {
-    todo!()
+    all_reviews()
 }

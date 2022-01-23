@@ -3,7 +3,7 @@ use std::ops::{Deref, DerefMut};
 
 use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Ord, PartialEq, PartialOrd, Hash, Serialize, Deserialize, Eq, Default)]
+#[derive(Clone, Ord, PartialEq, PartialOrd, Hash, Serialize, Deserialize, Eq, Default, Debug)]
 pub struct ID(pub String);
 
 impl Deref for ID {

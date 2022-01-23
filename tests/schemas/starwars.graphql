@@ -1,7 +1,7 @@
 type Query {
   hero(episode: Episode): Character
   reviews(episode: Episode!): [Review]
-  search(text: String, episode: Episode): [SearchResult]
+  search(text: String, episode: Episode): [SearchResult!]!
   character(id: ID!): Character
   droid(id: ID!): Droid
   human(id: ID!): Human
@@ -21,7 +21,7 @@ interface Character {
   id: ID!
   name: String!
   friends(first: Int, after: ID): FriendsConnection!
-  appearsIn: [Episode]!
+  appearsIn: [Episode!]!
 }
 
 enum LengthUnit {
@@ -37,7 +37,7 @@ type Human implements Character {
   mass: Float
   episode: Episode
   friends(first: Int, after: ID): FriendsConnection!
-  appearsIn: [Episode]!
+  appearsIn: [Episode!]!
 }
 
 type Droid implements Character {
@@ -50,7 +50,7 @@ type Droid implements Character {
 
 type FriendsConnection {
   totalCount: Int
-  edges: [FriendsEdge]
+  edges: [FriendsEdge!]!
   pageInfo: PageInfo!
 }
 

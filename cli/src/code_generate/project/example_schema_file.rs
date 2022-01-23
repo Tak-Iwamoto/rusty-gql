@@ -59,20 +59,20 @@ type Human implements Character {
   mass: Float
   episode: Episode
   friends(first: Int, after: ID): FriendsConnection!
-  appearsIn: [Episode]!
+  appearsIn: [Episode!]!
 }
 
 type Droid implements Character {
   id: ID!
   name: String!
   friends(first: Int, after: ID): FriendsConnection!
-  appearsIn: [Episode]!
+  appearsIn: [Episode!]!
   primaryFunction: String
 }
 
 type FriendsConnection {
   totalCount: Int
-  edges: [FriendsEdge]
+  edges: [FriendsEdge!]!
   pageInfo: PageInfo!
 }
 

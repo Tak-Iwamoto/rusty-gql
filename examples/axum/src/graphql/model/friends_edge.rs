@@ -1,8 +1,10 @@
 use crate::graphql::*;
 use rusty_gql::*;
 
+#[derive(Clone)]
 pub struct FriendsEdge {
     pub cursor: ID,
+    pub node: Option<Character>
 }
 
 #[Resolver]
@@ -12,6 +14,6 @@ impl FriendsEdge {
     }
 
     pub async fn node(&self) -> Option<Character> {
-        todo!()
+        self.node.clone()
     }
 }

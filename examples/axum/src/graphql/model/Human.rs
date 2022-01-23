@@ -1,6 +1,7 @@
 use crate::graphql::*;
 use rusty_gql::*;
 
+#[derive(Debug, Clone)]
 pub struct Human {
     pub id: ID,
     pub name: String,

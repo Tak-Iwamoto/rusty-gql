@@ -1,9 +1,9 @@
-mod droid;
 mod character;
-mod search;
-mod human;
+mod droid;
 mod hero;
+mod human;
 mod reviews;
+mod search;
 
 use crate::graphql::*;
 use rusty_gql::*;
@@ -21,8 +21,12 @@ impl Query {
         character::character(id).await
     }
 
-    pub async fn search(&self, text: Option<String>, episode: Option<Episode>) -> Vec<SearchResult> {
-        search::search(text,episode).await
+    pub async fn search(
+        &self,
+        text: Option<String>,
+        episode: Option<Episode>,
+    ) -> Vec<SearchResult> {
+        search::search(text, episode).await
     }
 
     pub async fn human(&self, id: ID) -> Option<Human> {
