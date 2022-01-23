@@ -1,7 +1,7 @@
 use graphql_parser::schema::DirectiveLocation;
 
 use crate::{
-    resolve_selection_parallelly, types::GqlDirectiveDefinition, FieldContext, FieldResolver,
+    resolve_selection_parallelly, types::DirectiveDefinition, FieldContext, FieldResolver,
     GqlValue, ResolverResult, Schema, SelectionSetContext, SelectionSetResolver,
 };
 
@@ -9,7 +9,7 @@ use super::input_value::{__InputValue, build_input_value_introspection};
 
 pub(crate) struct __Directive<'a> {
     pub schema: &'a Schema,
-    pub detail: &'a GqlDirectiveDefinition,
+    pub detail: &'a DirectiveDefinition,
 }
 
 fn dir_location_str(location: &DirectiveLocation) -> String {
@@ -36,7 +36,7 @@ fn dir_location_str(location: &DirectiveLocation) -> String {
 }
 
 impl<'a> __Directive<'a> {
-    pub fn new(schema: &'a Schema, directive: &'a GqlDirectiveDefinition) -> Self {
+    pub fn new(schema: &'a Schema, directive: &'a DirectiveDefinition) -> Self {
         __Directive {
             schema,
             detail: directive,

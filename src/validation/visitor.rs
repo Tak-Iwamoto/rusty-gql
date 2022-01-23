@@ -10,7 +10,7 @@ use graphql_parser::{
 };
 
 use crate::{
-    error::Location, operation::Operation, types::schema::Schema, GqlError, GqlTypeDefinition,
+    error::Location, operation::Operation, types::schema::Schema, GqlError, TypeDefinition,
     GqlValueType, Variables,
 };
 
@@ -48,7 +48,7 @@ pub struct ValidationContext<'a> {
     pub(crate) errors: Vec<ValidationError>,
     pub(crate) fragments: &'a HashMap<String, FragmentDefinition<'a, String>>,
     // pub(crate) variables: Option<&'a Variables>,
-    pub type_stack: Vec<Option<&'a GqlTypeDefinition>>,
+    pub type_stack: Vec<Option<&'a TypeDefinition>>,
     pub input_type: Vec<Option<GqlValueType>>,
 }
 impl<'a> ValidationContext<'a> {
@@ -77,10 +77,10 @@ impl<'a> ValidationContext<'a> {
         self.errors.extend(errors);
     }
 
-    pub fn current_type(&self) -> Option<&'a GqlTypeDefinition> {
+    pub fn current_type(&self) -> Option<&'a TypeDefinition> {
         self.type_stack.last().copied().flatten()
     }
-    pub fn parent_type(&self) -> Option<&'a GqlTypeDefinition> {
+    pub fn parent_type(&self) -> Option<&'a TypeDefinition> {
         if self.type_stack.len() >= 2 {
             self.type_stack
                 .get(self.type_stack.len() - 2)
@@ -93,7 +93,7 @@ impl<'a> ValidationContext<'a> {
 
     pub(crate) fn with_type<F: FnMut(&mut ValidationContext<'a>)>(
         &mut self,
-        ty: Option<&'a GqlTypeDefinition>,
+        ty: Option<&'a TypeDefinition>,
         mut f: F,
     ) {
         self.type_stack.push(ty);

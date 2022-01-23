@@ -1,6 +1,6 @@
 use crate::{
     resolve_selection_parallelly, types::GqlValueType, FieldContext, FieldResolver,
-    GqlTypeDefinition, GqlValue, ResolverResult, Schema, SelectionSetContext, SelectionSetResolver,
+    TypeDefinition, GqlValue, ResolverResult, Schema, SelectionSetContext, SelectionSetResolver,
 };
 
 use super::{
@@ -10,7 +10,7 @@ use super::{
 };
 
 enum TypeDetail<'a> {
-    Named(&'a GqlTypeDefinition),
+    Named(&'a TypeDefinition),
     NonNull(&'a str),
     List(&'a str),
 }
@@ -50,7 +50,7 @@ impl ToString for __TypeKind {
 impl<'a> __Type<'a> {
     pub fn from_type_definition(
         schema: &'a Schema,
-        type_definition: &'a GqlTypeDefinition,
+        type_definition: &'a TypeDefinition,
     ) -> Self {
         __Type {
             schema,
@@ -76,12 +76,12 @@ impl<'a> __Type<'a> {
     async fn kind(&self) -> __TypeKind {
         match self.detail {
             TypeDetail::Named(def) => match def {
-                GqlTypeDefinition::Scalar(_) => __TypeKind::Scalar,
-                GqlTypeDefinition::Object(_) => __TypeKind::Object,
-                GqlTypeDefinition::Interface(_) => __TypeKind::Interface,
-                GqlTypeDefinition::Union(_) => __TypeKind::Union,
-                GqlTypeDefinition::Enum(_) => __TypeKind::Enum,
-                GqlTypeDefinition::InputObject(_) => __TypeKind::InputObject,
+                TypeDefinition::Scalar(_) => __TypeKind::Scalar,
+                TypeDefinition::Object(_) => __TypeKind::Object,
+                TypeDefinition::Interface(_) => __TypeKind::Interface,
+                TypeDefinition::Union(_) => __TypeKind::Union,
+                TypeDefinition::Enum(_) => __TypeKind::Enum,
+                TypeDefinition::InputObject(_) => __TypeKind::InputObject,
             },
             TypeDetail::NonNull(_) => __TypeKind::NonNull,
             TypeDetail::List(_) => __TypeKind::List,
@@ -123,7 +123,7 @@ impl<'a> __Type<'a> {
 
     async fn interfaces(&self) -> Option<Vec<__Type<'a>>> {
         if let TypeDetail::Named(def) = self.detail {
-            if let GqlTypeDefinition::Object(obj) = def {
+            if let TypeDefinition::Object(obj) = def {
                 let mut interfaces = Vec::new();
 
                 for interface_name in &obj.implements_interfaces {
@@ -147,10 +147,10 @@ impl<'a> __Type<'a> {
     async fn possible_types(&self) -> Option<Vec<__Type<'a>>> {
         if let TypeDetail::Named(def) = self.detail {
             match def {
-                GqlTypeDefinition::Interface(interface) => {
+                TypeDefinition::Interface(interface) => {
                     let mut types = Vec::new();
                     for (_, ty) in &self.schema.type_definitions {
-                        if let GqlTypeDefinition::Object(obj) = ty {
+                        if let TypeDefinition::Object(obj) = ty {
                             if obj.implements_interfaces.contains(&interface.name) {
                                 let ty = __Type::from_type_definition(self.schema, ty);
                                 types.push(ty);
@@ -159,7 +159,7 @@ impl<'a> __Type<'a> {
                     }
                     Some(types)
                 }
-                GqlTypeDefinition::Union(uni) => {
+                TypeDefinition::Union(uni) => {
                     let mut types = Vec::new();
                     for type_name in &uni.types {
                         if let Some(def) = self.schema.type_definitions.get(type_name) {
@@ -177,7 +177,7 @@ impl<'a> __Type<'a> {
     }
 
     async fn enum_values(&self) -> Option<Vec<__EnumValue>> {
-        if let TypeDetail::Named(GqlTypeDefinition::Enum(enu)) = &self.detail {
+        if let TypeDetail::Named(TypeDefinition::Enum(enu)) = &self.detail {
             let mut values = Vec::new();
             for v in &enu.values {
                 let value = build_enum_value_introspection(&v);
@@ -190,7 +190,7 @@ impl<'a> __Type<'a> {
     }
 
     async fn input_fields(&self) -> Option<Vec<__InputValue<'a>>> {
-        if let TypeDetail::Named(GqlTypeDefinition::InputObject(input_obj)) = &self.detail {
+        if let TypeDetail::Named(TypeDefinition::InputObject(input_obj)) = &self.detail {
             let mut values = Vec::new();
             for v in &input_obj.fields {
                 let value = build_input_value_introspection(self.schema, &v);

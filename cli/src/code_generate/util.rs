@@ -1,14 +1,14 @@
 use std::collections::HashMap;
 
-use rusty_gql::{GqlTypeDefinition, GqlValueType};
+use rusty_gql::{TypeDefinition, GqlValueType};
 
 pub fn get_interface_impl_object_map(
-    type_definitions: &HashMap<String, GqlTypeDefinition>,
+    type_definitions: &HashMap<String, TypeDefinition>,
 ) -> HashMap<String, Vec<String>> {
     let mut map = HashMap::new();
 
     for (_, ty_def) in type_definitions {
-        if let GqlTypeDefinition::Object(obj) = ty_def {
+        if let TypeDefinition::Object(obj) = ty_def {
             for interface_name in &obj.implements_interfaces {
                 map.entry(interface_name.to_string())
                     .or_insert_with(|| vec![])

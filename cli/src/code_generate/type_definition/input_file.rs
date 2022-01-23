@@ -1,11 +1,11 @@
 use codegen::Scope;
-use rusty_gql::GqlInputObject;
+use rusty_gql::InputObjectType;
 
 use crate::code_generate::{use_gql_definitions, util::gql_value_ty_to_rust_ty, FileDefinition};
 
 pub struct InputObjectFile<'a> {
     pub filename: &'a str,
-    pub def: &'a GqlInputObject,
+    pub def: &'a InputObjectType,
     pub path: &'a str,
 }
 

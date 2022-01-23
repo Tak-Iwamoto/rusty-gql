@@ -7,7 +7,7 @@ use graphql_parser::{
 
 use crate::GqlValueType;
 
-use super::{argument::GqlArgument, value::GqlValue};
+use super::{argument::ArgumentType, value::GqlValue};
 
 #[derive(Debug, Clone)]
 pub struct GqlDirective {
@@ -41,21 +41,21 @@ impl<'a> From<Directive<'a, String>> for GqlDirective {
 }
 
 #[derive(Debug)]
-pub struct GqlDirectiveDefinition {
+pub struct DirectiveDefinition {
     pub position: Pos,
     pub name: String,
     pub description: Option<String>,
-    pub arguments: Vec<GqlArgument>,
+    pub arguments: Vec<ArgumentType>,
     pub locations: Vec<DirectiveLocation>,
 }
 
-impl GqlDirectiveDefinition {
+impl DirectiveDefinition {
     pub fn skip_directive() -> Self {
-        GqlDirectiveDefinition {
+        DirectiveDefinition {
             position: Pos::default(),
             name: "skip".to_string(),
             description: None,
-            arguments: vec![GqlArgument {
+            arguments: vec![ArgumentType {
                 name: "if".to_string(),
                 description: None,
                 position: Pos::default(),
@@ -74,11 +74,11 @@ impl GqlDirectiveDefinition {
     }
 
     pub fn include_directive() -> Self {
-        GqlDirectiveDefinition {
+        DirectiveDefinition {
             position: Pos::default(),
             name: "include".to_string(),
             description: None,
-            arguments: vec![GqlArgument {
+            arguments: vec![ArgumentType {
                 name: "if".to_string(),
                 description: None,
                 position: Pos::default(),
@@ -97,11 +97,11 @@ impl GqlDirectiveDefinition {
     }
 
     pub fn deprecated_directive() -> Self {
-        GqlDirectiveDefinition {
+        DirectiveDefinition {
             position: Pos::default(),
             name: "deprecated".to_string(),
             description: None,
-            arguments: vec![GqlArgument {
+            arguments: vec![ArgumentType {
                 name: "reason".to_string(),
                 description: None,
                 position: Pos::default(),

@@ -2,12 +2,12 @@ use std::collections::HashMap;
 
 use codegen::{Scope, Type};
 use heck::ToSnakeCase;
-use rusty_gql::{GqlField, OperationType};
+use rusty_gql::{FieldType, OperationType};
 
 use crate::code_generate::{use_gql_definitions, util::gql_value_ty_to_rust_ty, FileDefinition};
 
 pub struct OperationModFile<'a> {
-    pub operations: &'a HashMap<String, GqlField>,
+    pub operations: &'a HashMap<String, FieldType>,
     pub operation_type: OperationType,
     pub path: String,
 }

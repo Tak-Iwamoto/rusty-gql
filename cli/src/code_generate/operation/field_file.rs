@@ -1,11 +1,11 @@
 use codegen::{Scope, Type};
-use rusty_gql::GqlField;
+use rusty_gql::FieldType;
 
 use crate::code_generate::{use_gql_definitions, util::gql_value_ty_to_rust_ty, FileDefinition};
 
 pub struct FieldFile<'a> {
     pub filename: String,
-    pub def: &'a GqlField,
+    pub def: &'a FieldType,
     pub path: String,
 }
 

@@ -1,13 +1,13 @@
 use std::collections::HashMap;
 
 use codegen::Scope;
-use rusty_gql::GqlInterface;
+use rusty_gql::InterfaceType;
 
 use crate::code_generate::{use_gql_definitions, FileDefinition};
 
 pub struct InterfaceFile<'a> {
     pub filename: &'a str,
-    pub def: &'a GqlInterface,
+    pub def: &'a InterfaceType,
     pub path: &'a str,
     pub interface_obj_map: &'a HashMap<String, Vec<String>>,
 }

@@ -3,14 +3,14 @@ use std::{collections::HashMap, io::Error};
 use codegen::Scope;
 use futures_util::future::try_join_all;
 use heck::ToSnakeCase;
-use rusty_gql::GqlDirectiveDefinition;
+use rusty_gql::DirectiveDefinition;
 
 use crate::code_generate::{use_gql_definitions, FileDefinition};
 
 use super::{create_file, mod_file::ModFile, path_str};
 
 pub struct DirectiveFile<'a> {
-    pub def: &'a GqlDirectiveDefinition,
+    pub def: &'a DirectiveDefinition,
     pub path: String,
     pub filename: String,
 }
@@ -50,7 +50,7 @@ impl<'a> FileDefinition for DirectiveFile<'a> {
 }
 
 pub async fn create_directive_files(
-    directives: &HashMap<String, GqlDirectiveDefinition>,
+    directives: &HashMap<String, DirectiveDefinition>,
     base_path: &str,
 ) -> Result<Vec<()>, Error> {
     let mut futures = Vec::new();

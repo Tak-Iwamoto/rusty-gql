@@ -1,22 +1,22 @@
 use graphql_parser::{
-    schema::{ScalarType, Value},
+    schema::{ScalarType as ParserScalarType, Value},
     Pos,
 };
 
 use super::directive::GqlDirective;
 
 #[derive(Debug, Clone)]
-pub struct GqlScalar {
+pub struct ScalarType {
     pub name: String,
     pub description: Option<String>,
     pub position: Pos,
     pub directives: Vec<GqlDirective>,
 }
 
-impl<'a> From<ScalarType<'a, String>> for GqlScalar {
-    fn from(scalar_type: ScalarType<'a, String>) -> Self {
+impl<'a> From<ParserScalarType<'a, String>> for ScalarType {
+    fn from(scalar_type: ParserScalarType<'a, String>) -> Self {
         let directives = GqlDirective::from_vec_directive(scalar_type.directives);
-        GqlScalar {
+        ScalarType {
             name: scalar_type.name,
             description: scalar_type.description,
             position: scalar_type.position,
@@ -25,7 +25,7 @@ impl<'a> From<ScalarType<'a, String>> for GqlScalar {
     }
 }
 
-impl GqlScalar {
+impl ScalarType {
     pub fn is_valid_value(&self, value: &Value<'_, String>) -> bool {
         match value {
             Value::Variable(_) => false,
@@ -41,7 +41,7 @@ impl GqlScalar {
     }
 
     pub fn string_scalar() -> Self {
-        GqlScalar {
+        ScalarType {
             name: "String".to_string(),
             description: None,
             position: Pos::default(),
@@ -50,7 +50,7 @@ impl GqlScalar {
     }
 
     pub fn int_scalar() -> Self {
-        GqlScalar {
+        ScalarType {
             name: "Int".to_string(),
             description: None,
             position: Pos::default(),
@@ -59,7 +59,7 @@ impl GqlScalar {
     }
 
     pub fn float_scalar() -> Self {
-        GqlScalar {
+        ScalarType {
             name: "Float".to_string(),
             description: None,
             position: Pos::default(),
@@ -68,7 +68,7 @@ impl GqlScalar {
     }
 
     pub fn boolean_scalar() -> Self {
-        GqlScalar {
+        ScalarType {
             name: "Boolean".to_string(),
             description: None,
             position: Pos::default(),
@@ -77,7 +77,7 @@ impl GqlScalar {
     }
 
     pub fn id_scalar() -> Self {
-        GqlScalar {
+        ScalarType {
             name: "ID".to_string(),
             description: None,
             position: Pos::default(),

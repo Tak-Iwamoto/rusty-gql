@@ -1,29 +1,29 @@
 use super::directive::GqlDirective;
 use graphql_parser::{
-    schema::{EnumType, EnumValue},
+    schema::{EnumType as ParserEnumType, EnumValue},
     Pos,
 };
 
 #[derive(Debug, Clone)]
-pub struct GqlEnum {
+pub struct EnumType {
     pub name: String,
     pub description: Option<String>,
     pub position: Pos,
     pub directives: Vec<GqlDirective>,
-    pub values: Vec<GqlEnumValue>,
+    pub values: Vec<EnumTypeValue>,
 }
 
-impl<'a> From<EnumType<'a, String>> for GqlEnum {
-    fn from(gql_enum: EnumType<'a, String>) -> Self {
+impl<'a> From<ParserEnumType<'a, String>> for EnumType {
+    fn from(gql_enum: ParserEnumType<'a, String>) -> Self {
         let directives = GqlDirective::from_vec_directive(gql_enum.directives);
 
         let values = gql_enum
             .values
             .into_iter()
-            .map(|value| GqlEnumValue::from(value))
+            .map(|value| EnumTypeValue::from(value))
             .collect();
 
-        GqlEnum {
+        EnumType {
             name: gql_enum.name,
             description: gql_enum.description,
             position: gql_enum.position,
@@ -33,7 +33,7 @@ impl<'a> From<EnumType<'a, String>> for GqlEnum {
     }
 }
 
-impl GqlEnum {
+impl EnumType {
     pub fn contains(&self, name: &str) -> bool {
         let values: Vec<String> = self.values.iter().map(|v| v.name.clone()).collect();
         values.contains(&name.to_string())
@@ -41,14 +41,14 @@ impl GqlEnum {
 }
 
 #[derive(Debug, Clone)]
-pub struct GqlEnumValue {
+pub struct EnumTypeValue {
     pub name: String,
     pub description: Option<String>,
     pub position: Pos,
     pub directives: Vec<GqlDirective>,
 }
 
-impl<'a> From<EnumValue<'a, String>> for GqlEnumValue {
+impl<'a> From<EnumValue<'a, String>> for EnumTypeValue {
     fn from(enum_value: EnumValue<'a, String>) -> Self {
         let directives = enum_value
             .directives
@@ -56,7 +56,7 @@ impl<'a> From<EnumValue<'a, String>> for GqlEnumValue {
             .map(|dir| GqlDirective::from(dir))
             .collect();
 
-        GqlEnumValue {
+        EnumTypeValue {
             name: enum_value.name,
             description: enum_value.description,
             position: enum_value.position,
@@ -65,7 +65,7 @@ impl<'a> From<EnumValue<'a, String>> for GqlEnumValue {
     }
 }
 
-impl GqlEnumValue {
+impl EnumTypeValue {
     pub fn is_deprecated(&self) -> bool {
         for dir in &self.directives {
             if dir.name == "deprecated" {

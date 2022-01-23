@@ -1,12 +1,12 @@
 use rusty_gql_macro::GqlType;
 
-use crate::{types::GqlEnumValue, SelectionSetResolver};
+use crate::{types::EnumTypeValue, SelectionSetResolver};
 
 pub struct __EnumValue {
-    detail: GqlEnumValue,
+    detail: EnumTypeValue,
 }
 
-pub fn build_enum_value_introspection(value: &GqlEnumValue) -> __EnumValue {
+pub fn build_enum_value_introspection(value: &EnumTypeValue) -> __EnumValue {
     __EnumValue {
         detail: value.clone(),
     }

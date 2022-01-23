@@ -1,11 +1,11 @@
 use codegen::Scope;
-use rusty_gql::GqlUnion;
+use rusty_gql::UnionType;
 
 use crate::code_generate::{use_gql_definitions, FileDefinition};
 
 pub struct UnionFile<'a> {
     pub filename: &'a str,
-    pub def: &'a GqlUnion,
+    pub def: &'a UnionType,
     pub path: &'a str,
 }
 

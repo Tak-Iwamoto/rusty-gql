@@ -1,10 +1,10 @@
 use codegen::Scope;
-use rusty_gql::GqlEnum;
+use rusty_gql::EnumType;
 
 use crate::code_generate::{use_gql_definitions, FileDefinition};
 pub struct EnumFile<'a> {
     pub filename: &'a str,
-    pub def: &'a GqlEnum,
+    pub def: &'a EnumType,
     pub path: &'a str,
 }
 

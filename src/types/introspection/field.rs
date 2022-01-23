@@ -1,5 +1,5 @@
 use crate::{
-    resolve_selection_parallelly, FieldResolver, GqlField, GqlValue, ResolverResult, Schema,
+    resolve_selection_parallelly, FieldResolver, FieldType, GqlValue, ResolverResult, Schema,
     SelectionSetContext, SelectionSetResolver,
 };
 
@@ -10,11 +10,11 @@ use super::{
 
 pub(crate) struct __Field<'a> {
     schema: &'a Schema,
-    detail: GqlField,
+    detail: FieldType,
 }
 
 impl<'a> __Field<'a> {
-    pub fn new(schema: &'a Schema, field: GqlField) -> Self {
+    pub fn new(schema: &'a Schema, field: FieldType) -> Self {
         __Field {
             schema,
             detail: field,

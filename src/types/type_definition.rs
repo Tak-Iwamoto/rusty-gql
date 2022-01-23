@@ -1,82 +1,82 @@
-use graphql_parser::schema::TypeDefinition;
+use graphql_parser::schema::TypeDefinition as ParserTypeDefinition;
 
-use crate::{GqlDirective, GqlField, Schema};
+use crate::{FieldType, GqlDirective, Schema};
 
 use super::{
-    enum_type::GqlEnum, input_object::GqlInputObject, interface::GqlInterface, object::GqlObject,
-    scalar::GqlScalar, union_type::GqlUnion,
+    enum_type::EnumType, input_object::InputObjectType, interface::InterfaceType,
+    object::ObjectType, scalar::ScalarType, union_type::UnionType,
 };
 
 #[derive(Debug, Clone)]
-pub enum GqlTypeDefinition {
-    Scalar(GqlScalar),
-    Object(GqlObject),
-    Interface(GqlInterface),
-    Union(GqlUnion),
-    Enum(GqlEnum),
-    InputObject(GqlInputObject),
+pub enum TypeDefinition {
+    Scalar(ScalarType),
+    Object(ObjectType),
+    Interface(InterfaceType),
+    Union(UnionType),
+    Enum(EnumType),
+    InputObject(InputObjectType),
 }
 
-impl ToString for GqlTypeDefinition {
+impl ToString for TypeDefinition {
     fn to_string(&self) -> String {
         match self {
-            GqlTypeDefinition::Scalar(_) => "Scalar".to_string(),
-            GqlTypeDefinition::Object(_) => "Object".to_string(),
-            GqlTypeDefinition::Interface(_) => "Interface".to_string(),
-            GqlTypeDefinition::Union(_) => "Union".to_string(),
-            GqlTypeDefinition::Enum(_) => "Enum".to_string(),
-            GqlTypeDefinition::InputObject(_) => "InputObject".to_string(),
+            TypeDefinition::Scalar(_) => "Scalar".to_string(),
+            TypeDefinition::Object(_) => "Object".to_string(),
+            TypeDefinition::Interface(_) => "Interface".to_string(),
+            TypeDefinition::Union(_) => "Union".to_string(),
+            TypeDefinition::Enum(_) => "Enum".to_string(),
+            TypeDefinition::InputObject(_) => "InputObject".to_string(),
         }
     }
 }
 
-impl GqlTypeDefinition {
-    pub fn from_schema_type_def<'a>(ty_def: &TypeDefinition<'a, String>) -> Self {
+impl TypeDefinition {
+    pub fn from_schema_type_def<'a>(ty_def: &ParserTypeDefinition<'a, String>) -> Self {
         match ty_def {
-            TypeDefinition::Scalar(v) => GqlTypeDefinition::Scalar(GqlScalar::from(v.clone())),
-            TypeDefinition::Object(v) => GqlTypeDefinition::Object(GqlObject::from(v.clone())),
-            TypeDefinition::Interface(v) => {
-                GqlTypeDefinition::Interface(GqlInterface::from(v.clone()))
+            ParserTypeDefinition::Scalar(v) => TypeDefinition::Scalar(ScalarType::from(v.clone())),
+            ParserTypeDefinition::Object(v) => TypeDefinition::Object(ObjectType::from(v.clone())),
+            ParserTypeDefinition::Interface(v) => {
+                TypeDefinition::Interface(InterfaceType::from(v.clone()))
             }
-            TypeDefinition::Union(v) => GqlTypeDefinition::Union(GqlUnion::from(v.clone())),
-            TypeDefinition::Enum(v) => GqlTypeDefinition::Enum(GqlEnum::from(v.clone())),
-            TypeDefinition::InputObject(v) => {
-                GqlTypeDefinition::InputObject(GqlInputObject::from(v.clone()))
+            ParserTypeDefinition::Union(v) => TypeDefinition::Union(UnionType::from(v.clone())),
+            ParserTypeDefinition::Enum(v) => TypeDefinition::Enum(EnumType::from(v.clone())),
+            ParserTypeDefinition::InputObject(v) => {
+                TypeDefinition::InputObject(InputObjectType::from(v.clone()))
             }
         }
     }
 
     pub fn name(&self) -> &str {
         match self {
-            GqlTypeDefinition::Scalar(scalar) => &scalar.name,
-            GqlTypeDefinition::Object(obj) => &obj.name,
-            GqlTypeDefinition::Interface(interface) => &interface.name,
-            GqlTypeDefinition::Union(uni) => &uni.name,
-            GqlTypeDefinition::Enum(enu) => &enu.name,
-            GqlTypeDefinition::InputObject(input_object) => &input_object.name,
+            TypeDefinition::Scalar(scalar) => &scalar.name,
+            TypeDefinition::Object(obj) => &obj.name,
+            TypeDefinition::Interface(interface) => &interface.name,
+            TypeDefinition::Union(uni) => &uni.name,
+            TypeDefinition::Enum(enu) => &enu.name,
+            TypeDefinition::InputObject(input_object) => &input_object.name,
         }
     }
 
     pub fn description(&self) -> &Option<String> {
         match self {
-            GqlTypeDefinition::Scalar(scalar) => &scalar.description,
-            GqlTypeDefinition::Object(obj) => &obj.description,
-            GqlTypeDefinition::Interface(interface) => &interface.description,
-            GqlTypeDefinition::Union(uni) => &uni.description,
-            GqlTypeDefinition::Enum(enu) => &enu.description,
-            GqlTypeDefinition::InputObject(input_object) => &input_object.description,
+            TypeDefinition::Scalar(scalar) => &scalar.description,
+            TypeDefinition::Object(obj) => &obj.description,
+            TypeDefinition::Interface(interface) => &interface.description,
+            TypeDefinition::Union(uni) => &uni.description,
+            TypeDefinition::Enum(enu) => &enu.description,
+            TypeDefinition::InputObject(input_object) => &input_object.description,
         }
     }
 
-    pub fn fields(&self) -> Option<&Vec<GqlField>> {
+    pub fn fields(&self) -> Option<&Vec<FieldType>> {
         match self {
-            GqlTypeDefinition::Object(obj) => Some(&obj.fields),
-            GqlTypeDefinition::Interface(interface) => Some(&interface.fields),
+            TypeDefinition::Object(obj) => Some(&obj.fields),
+            TypeDefinition::Interface(interface) => Some(&interface.fields),
             _ => None,
         }
     }
 
-    pub fn get_field_by_name(&self, name: &str) -> Option<&GqlField> {
+    pub fn get_field_by_name(&self, name: &str) -> Option<&FieldType> {
         self.fields()
             .and_then(|fields| fields.into_iter().find(|f| f.name == name))
     }
@@ -84,49 +84,42 @@ impl GqlTypeDefinition {
     pub fn is_composite_type(&self) -> bool {
         matches!(
             self,
-            &GqlTypeDefinition::Object(_)
-                | &GqlTypeDefinition::Interface(_)
-                | &GqlTypeDefinition::Union(_)
+            &TypeDefinition::Object(_) | &TypeDefinition::Interface(_) | &TypeDefinition::Union(_)
         )
     }
 
     pub fn is_input_type(&self) -> bool {
         matches!(
             self,
-            &GqlTypeDefinition::Scalar(_)
-                | &GqlTypeDefinition::InputObject(_)
-                | &GqlTypeDefinition::Enum(_)
+            &TypeDefinition::Scalar(_) | &TypeDefinition::InputObject(_) | &TypeDefinition::Enum(_)
         )
     }
     pub fn is_leaf_type(&self) -> bool {
-        matches!(
-            self,
-            &GqlTypeDefinition::Enum(_) | &GqlTypeDefinition::Scalar(_)
-        )
+        matches!(self, &TypeDefinition::Enum(_) | &TypeDefinition::Scalar(_))
     }
 
     pub fn directives(&self) -> &[GqlDirective] {
         match self {
-            GqlTypeDefinition::Scalar(ty) => &ty.directives,
-            GqlTypeDefinition::Object(ty) => &ty.directives,
-            GqlTypeDefinition::Interface(ty) => &ty.directives,
-            GqlTypeDefinition::Union(ty) => &ty.directives,
-            GqlTypeDefinition::Enum(ty) => &ty.directives,
-            GqlTypeDefinition::InputObject(ty) => &ty.directives,
+            TypeDefinition::Scalar(ty) => &ty.directives,
+            TypeDefinition::Object(ty) => &ty.directives,
+            TypeDefinition::Interface(ty) => &ty.directives,
+            TypeDefinition::Union(ty) => &ty.directives,
+            TypeDefinition::Enum(ty) => &ty.directives,
+            TypeDefinition::InputObject(ty) => &ty.directives,
         }
     }
 
     pub fn field_directives(&self, field_name: &str) -> Vec<GqlDirective> {
         let mut directives = vec![];
 
-        if let GqlTypeDefinition::Object(obj) = self {
+        if let TypeDefinition::Object(obj) = self {
             for field in &obj.fields {
                 if field.name == field_name {
                     directives.extend(field.directives.clone());
                 }
             }
         }
-        if let GqlTypeDefinition::Interface(interface) = self {
+        if let TypeDefinition::Interface(interface) = self {
             for field in &interface.fields {
                 if field.name == field_name {
                     directives.extend(field.directives.clone());
@@ -139,7 +132,7 @@ impl GqlTypeDefinition {
     pub fn impl_interface_directives(&self, schema: &Schema) -> Vec<GqlDirective> {
         let mut directives = vec![];
 
-        if let GqlTypeDefinition::Object(obj) = self {
+        if let TypeDefinition::Object(obj) = self {
             for impl_interface in &obj.implements_interfaces {
                 if let Some(interface) = &schema.interfaces.get(impl_interface) {
                     directives.extend(interface.directives.clone());

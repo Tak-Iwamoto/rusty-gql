@@ -1,23 +1,23 @@
-use graphql_parser::{schema::ObjectType, Pos};
+use graphql_parser::{schema::ObjectType as ParserObjectType, Pos};
 
-use super::{directive::GqlDirective, field::GqlField};
+use super::{directive::GqlDirective, field::FieldType};
 
 #[derive(Debug, Clone)]
-pub struct GqlObject {
+pub struct ObjectType {
     pub name: String,
     pub description: Option<String>,
     pub position: Pos,
     pub implements_interfaces: Vec<String>,
     pub directives: Vec<GqlDirective>,
-    pub fields: Vec<GqlField>,
+    pub fields: Vec<FieldType>,
 }
 
-impl<'a> From<ObjectType<'a, String>> for GqlObject {
-    fn from(object: ObjectType<'a, String>) -> Self {
+impl<'a> From<ParserObjectType<'a, String>> for ObjectType {
+    fn from(object: ParserObjectType<'a, String>) -> Self {
         let directives = GqlDirective::from_vec_directive(object.directives);
-        let fields = GqlField::from_vec_field(object.fields);
+        let fields = FieldType::from_vec_field(object.fields);
 
-        GqlObject {
+        ObjectType {
             name: object.name,
             description: object.description,
             position: object.position,

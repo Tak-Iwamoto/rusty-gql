@@ -17,7 +17,7 @@ use graphql_parser::query::{Selection, TypeCondition};
 
 use crate::{
     context::{FieldContext, SelectionSetContext},
-    GqlDirective, GqlError, GqlTypeDefinition, GqlValue, ResolverResult,
+    GqlDirective, GqlError, TypeDefinition, GqlValue, ResolverResult,
 };
 
 #[async_trait]
@@ -373,7 +373,7 @@ fn is_fragment_condition<'a, 'ctx: 'a>(
                     .type_definitions
                     .get(type_name)
                     .map_or(false, |ty_def| {
-                        if let GqlTypeDefinition::Object(obj) = ty_def {
+                        if let TypeDefinition::Object(obj) = ty_def {
                             obj.implements_interfaces.contains(on_type)
                         } else {
                             false

@@ -6,7 +6,7 @@ use graphql_parser::{
     Pos,
 };
 
-use crate::{types::GqlValueType, GqlTypeDefinition, Schema};
+use crate::{types::GqlValueType, TypeDefinition, Schema};
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
 pub enum Scope<'a> {
@@ -38,14 +38,14 @@ pub fn check_valid_input_value(
             let type_def = schema.type_definitions.get(type_name);
             match type_def {
                 Some(def) => match def {
-                    GqlTypeDefinition::Scalar(scalar) => {
+                    TypeDefinition::Scalar(scalar) => {
                         if scalar.is_valid_value(value) {
                             None
                         } else {
                             Some("Invalid type".to_string())
                         }
                     }
-                    GqlTypeDefinition::InputObject(input_object) => match value {
+                    TypeDefinition::InputObject(input_object) => match value {
                         Value::Object(object_value) => {
                             let mut value_keys: HashSet<String> =
                                 object_value.keys().cloned().collect::<HashSet<String>>();
@@ -77,7 +77,7 @@ pub fn check_valid_input_value(
                         }
                         _ => None,
                     },
-                    GqlTypeDefinition::Enum(enum_value) => match value {
+                    TypeDefinition::Enum(enum_value) => match value {
                         Value::String(name) => {
                             if enum_value.contains(&name) {
                                 Some(format!(

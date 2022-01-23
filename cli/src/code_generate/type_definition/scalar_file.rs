@@ -1,11 +1,11 @@
 use codegen::Scope;
-use rusty_gql::GqlScalar;
+use rusty_gql::ScalarType;
 
 use crate::code_generate::{use_gql_definitions, FileDefinition};
 
 pub struct ScalarFile<'a> {
     pub filename: &'a str,
-    pub def: &'a GqlScalar,
+    pub def: &'a ScalarType,
     pub path: &'a str,
 }
 

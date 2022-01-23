@@ -1,25 +1,25 @@
 use graphql_parser::schema::Field;
 use graphql_parser::Pos;
 
-use super::argument::GqlArgument;
+use super::argument::ArgumentType;
 use super::directive::GqlDirective;
 use super::value_type::GqlValueType;
 
 #[derive(Debug, Clone)]
-pub struct GqlField {
+pub struct FieldType {
     pub name: String,
     pub description: Option<String>,
     pub position: Pos,
     pub meta_type: GqlValueType,
-    pub arguments: Vec<GqlArgument>,
+    pub arguments: Vec<ArgumentType>,
     pub directives: Vec<GqlDirective>,
 }
 
-impl GqlField {
-    pub fn from_vec_field<'a>(fields: Vec<Field<'a, String>>) -> Vec<GqlField> {
+impl FieldType {
+    pub fn from_vec_field<'a>(fields: Vec<Field<'a, String>>) -> Vec<FieldType> {
         fields
             .into_iter()
-            .map(|field| GqlField::from(field))
+            .map(|field| FieldType::from(field))
             .collect()
     }
 
@@ -34,13 +34,13 @@ impl GqlField {
     }
 }
 
-impl<'a> From<Field<'a, String>> for GqlField {
+impl<'a> From<Field<'a, String>> for FieldType {
     fn from(field: Field<'a, String>) -> Self {
         let meta_type = GqlValueType::from(field.field_type);
         let directives = GqlDirective::from_vec_directive(field.directives);
-        let arguments = GqlArgument::from_vec_input_value(field.arguments);
+        let arguments = ArgumentType::from_vec_input_value(field.arguments);
 
-        GqlField {
+        FieldType {
             name: field.name,
             description: field.description,
             position: field.position,

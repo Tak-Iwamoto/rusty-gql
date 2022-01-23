@@ -40,9 +40,9 @@ pub use response::Response;
 pub use test_utils::{build_test_request, check_gql_response, schema_content};
 pub use types::schema::build_schema;
 pub use types::{
-    GqlArgument, GqlConstValue as Value, GqlDirective, GqlDirectiveDefinition, GqlEnum, GqlField,
-    GqlInputObject, GqlInterface, GqlObject, GqlScalar, GqlTypeDefinition, GqlUnion, GqlValue,
-    GqlValueType, Schema, ID,
+    DirectiveDefinition, EnumType, FieldType, ArgumentType, GqlConstValue as Value, GqlDirective,
+    GqlValue, GqlValueType, InputObjectType, InterfaceType, ObjectType, ScalarType, Schema,
+    TypeDefinition, UnionType, ID,
 };
 pub use variables::Variables;
 

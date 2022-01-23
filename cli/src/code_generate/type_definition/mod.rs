@@ -7,7 +7,7 @@ mod union_file;
 
 use futures_util::future::try_join_all;
 use heck::ToSnakeCase;
-use rusty_gql::{GqlTypeDefinition, Schema};
+use rusty_gql::{TypeDefinition, Schema};
 use std::{collections::HashMap, io::Error};
 
 use self::{
@@ -50,12 +50,12 @@ pub async fn create_type_definition_files(
         }
 
         match type_def {
-            GqlTypeDefinition::Union(v) => resolver_names.push(v.name.clone()),
-            GqlTypeDefinition::Enum(v) => resolver_names.push(v.name.clone()),
-            GqlTypeDefinition::Object(v) => resolver_names.push(v.name.clone()),
-            GqlTypeDefinition::Interface(v) => resolver_names.push(v.name.clone()),
-            GqlTypeDefinition::InputObject(v) => input_names.push(v.name.clone()),
-            GqlTypeDefinition::Scalar(v) => scalar_names.push(v.name.clone()),
+            TypeDefinition::Union(v) => resolver_names.push(v.name.clone()),
+            TypeDefinition::Enum(v) => resolver_names.push(v.name.clone()),
+            TypeDefinition::Object(v) => resolver_names.push(v.name.clone()),
+            TypeDefinition::Interface(v) => resolver_names.push(v.name.clone()),
+            TypeDefinition::InputObject(v) => input_names.push(v.name.clone()),
+            TypeDefinition::Scalar(v) => scalar_names.push(v.name.clone()),
         }
 
         let task = create_type_definition_file(type_def, base_path, &interface_obj_map);
@@ -84,13 +84,13 @@ pub async fn create_type_definition_files(
 }
 
 async fn create_type_definition_file(
-    type_def: &GqlTypeDefinition,
+    type_def: &TypeDefinition,
     base_path: &str,
     interface_obj_map: &HashMap<String, Vec<String>>,
 ) -> Result<(), Error> {
     let filename = type_def.name().to_snake_case();
     match type_def {
-        GqlTypeDefinition::Object(def) => {
+        TypeDefinition::Object(def) => {
             let path = path_str(vec![base_path, "resolver", &filename], true);
             create_file(ObjectFile {
                 def,
@@ -99,7 +99,7 @@ async fn create_type_definition_file(
             })
             .await
         }
-        GqlTypeDefinition::Interface(def) => {
+        TypeDefinition::Interface(def) => {
             let path = path_str(vec![base_path, "resolver", &filename], true);
             create_file(InterfaceFile {
                 def,
@@ -109,7 +109,7 @@ async fn create_type_definition_file(
             })
             .await
         }
-        GqlTypeDefinition::Union(def) => {
+        TypeDefinition::Union(def) => {
             let path = path_str(vec![base_path, "resolver", &filename], true);
             create_file(UnionFile {
                 def,
@@ -118,7 +118,7 @@ async fn create_type_definition_file(
             })
             .await
         }
-        GqlTypeDefinition::Enum(def) => {
+        TypeDefinition::Enum(def) => {
             let path = path_str(vec![base_path, "resolver", &filename], true);
             create_file(EnumFile {
                 def,
@@ -127,7 +127,7 @@ async fn create_type_definition_file(
             })
             .await
         }
-        GqlTypeDefinition::InputObject(def) => {
+        TypeDefinition::InputObject(def) => {
             let path = path_str(vec![base_path, "input", &filename], true);
             create_file(InputObjectFile {
                 def,
@@ -136,7 +136,7 @@ async fn create_type_definition_file(
             })
             .await
         }
-        GqlTypeDefinition::Scalar(def) => {
+        TypeDefinition::Scalar(def) => {
             let path = path_str(vec![base_path, "scalar", &filename], true);
             create_file(ScalarFile {
                 def,

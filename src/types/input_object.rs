@@ -1,18 +1,18 @@
-use graphql_parser::{schema::InputObjectType, Pos};
+use graphql_parser::{schema::InputObjectType as ParserInputObjectType, Pos};
 
-use super::{argument::GqlArgument, directive::GqlDirective};
+use super::{argument::ArgumentType, directive::GqlDirective};
 
 #[derive(Debug, Clone)]
-pub struct GqlInputObject {
+pub struct InputObjectType {
     pub name: String,
     pub description: Option<String>,
     pub position: Pos,
     pub directives: Vec<GqlDirective>,
-    pub fields: Vec<GqlArgument>,
+    pub fields: Vec<ArgumentType>,
 }
 
-impl<'a> From<InputObjectType<'a, String>> for GqlInputObject {
-    fn from(input_object: InputObjectType<'a, String>) -> Self {
+impl<'a> From<ParserInputObjectType<'a, String>> for InputObjectType {
+    fn from(input_object: ParserInputObjectType<'a, String>) -> Self {
         let directives = input_object
             .directives
             .into_iter()
@@ -22,10 +22,10 @@ impl<'a> From<InputObjectType<'a, String>> for GqlInputObject {
         let fields = input_object
             .fields
             .into_iter()
-            .map(|field| GqlArgument::from(field))
+            .map(|field| ArgumentType::from(field))
             .collect();
 
-        GqlInputObject {
+        InputObjectType {
             name: input_object.name,
             description: input_object.description,
             position: input_object.position,

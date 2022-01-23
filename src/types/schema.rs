@@ -1,25 +1,25 @@
 use std::{collections::HashMap, ops::Deref, sync::Arc};
 
-use graphql_parser::schema::TypeDefinition;
+use graphql_parser::schema::TypeDefinition as ParserTypeDefinition;
 
 use crate::{
-    error::GqlError, CustomDirective, GqlDirective, GqlEnum, GqlInputObject, GqlInterface,
-    GqlObject, GqlUnion,
+    error::GqlError, CustomDirective, EnumType, GqlDirective, ObjectType, InputObjectType,
+    InterfaceType, UnionType,
 };
 
 use super::{
-    argument::GqlArgument, directive::GqlDirectiveDefinition, field::GqlField,
-    introspection::introspection_sdl, scalar::GqlScalar, type_definition::GqlTypeDefinition,
-    GqlEnumValue,
+    argument::ArgumentType, directive::DirectiveDefinition, field::FieldType,
+    introspection::introspection_sdl, scalar::ScalarType, type_definition::TypeDefinition,
+    EnumTypeValue,
 };
 
 pub struct SchemaInner {
-    pub queries: HashMap<String, GqlField>,
-    pub mutations: HashMap<String, GqlField>,
-    pub subscriptions: HashMap<String, GqlField>,
-    pub directives: HashMap<String, GqlDirectiveDefinition>,
-    pub type_definitions: HashMap<String, GqlTypeDefinition>,
-    pub interfaces: HashMap<String, GqlInterface>,
+    pub queries: HashMap<String, FieldType>,
+    pub mutations: HashMap<String, FieldType>,
+    pub subscriptions: HashMap<String, FieldType>,
+    pub directives: HashMap<String, DirectiveDefinition>,
+    pub type_definitions: HashMap<String, TypeDefinition>,
+    pub interfaces: HashMap<String, InterfaceType>,
     pub query_type_name: String,
     pub mutation_type_name: String,
     pub subscription_type_name: String,
@@ -57,33 +57,33 @@ pub fn build_schema(
 
     type_definitions.insert(
         "String".to_string(),
-        GqlTypeDefinition::Scalar(GqlScalar::string_scalar()),
+        TypeDefinition::Scalar(ScalarType::string_scalar()),
     );
     type_definitions.insert(
         "Int".to_string(),
-        GqlTypeDefinition::Scalar(GqlScalar::int_scalar()),
+        TypeDefinition::Scalar(ScalarType::int_scalar()),
     );
     type_definitions.insert(
         "Float".to_string(),
-        GqlTypeDefinition::Scalar(GqlScalar::float_scalar()),
+        TypeDefinition::Scalar(ScalarType::float_scalar()),
     );
     type_definitions.insert(
         "Boolean".to_string(),
-        GqlTypeDefinition::Scalar(GqlScalar::boolean_scalar()),
+        TypeDefinition::Scalar(ScalarType::boolean_scalar()),
     );
     type_definitions.insert(
         "ID".to_string(),
-        GqlTypeDefinition::Scalar(GqlScalar::id_scalar()),
+        TypeDefinition::Scalar(ScalarType::id_scalar()),
     );
 
-    directives.insert("skip".to_string(), GqlDirectiveDefinition::skip_directive());
+    directives.insert("skip".to_string(), DirectiveDefinition::skip_directive());
     directives.insert(
         "include".to_string(),
-        GqlDirectiveDefinition::include_directive(),
+        DirectiveDefinition::include_directive(),
     );
     directives.insert(
         "deprecated".to_string(),
-        GqlDirectiveDefinition::deprecated_directive(),
+        DirectiveDefinition::deprecated_directive(),
     );
 
     let mut definitions = schema_documents.to_vec();
@@ -98,13 +98,13 @@ pub fn build_schema(
                     schema_definition = Some(schema_def);
                 }
                 graphql_parser::schema::Definition::TypeDefinition(ty_def) => {
-                    let gql_def = GqlTypeDefinition::from_schema_type_def(&ty_def);
+                    let gql_def = TypeDefinition::from_schema_type_def(&ty_def);
                     type_definitions.insert(gql_def.name().to_string(), gql_def);
 
-                    if let TypeDefinition::Interface(interface) = &ty_def {
+                    if let ParserTypeDefinition::Interface(interface) = &ty_def {
                         interfaces.insert(
                             interface.name.to_string(),
-                            GqlInterface::from(interface.clone()),
+                            InterfaceType::from(interface.clone()),
                         );
                     }
                 }
@@ -112,8 +112,8 @@ pub fn build_schema(
                     extensions.push(ext);
                 }
                 graphql_parser::schema::Definition::DirectiveDefinition(directive) => {
-                    let arguments = GqlArgument::from_vec_input_value(directive.arguments);
-                    let result = GqlDirectiveDefinition {
+                    let arguments = ArgumentType::from_vec_input_value(directive.arguments);
+                    let result = DirectiveDefinition {
                         position: directive.position,
                         name: directive.name,
                         description: directive.description,
@@ -132,20 +132,20 @@ pub fn build_schema(
                 let original_name = scalar_ext.name.clone();
                 match type_definitions.get(&original_name) {
                     Some(original_scalar) => {
-                        if let GqlTypeDefinition::Scalar(original) = original_scalar {
+                        if let TypeDefinition::Scalar(original) = original_scalar {
                             let mut extended_directives = original.directives.clone();
                             let directives =
                                 GqlDirective::from_vec_directive(scalar_ext.directives);
                             extended_directives.extend(directives);
 
-                            let extended_scalar = GqlScalar {
+                            let extended_scalar = ScalarType {
                                 position: original.position,
                                 description: original.description.clone(),
                                 name: original_name.clone(),
                                 directives: extended_directives,
                             };
                             type_definitions
-                                .insert(original_name, GqlTypeDefinition::Scalar(extended_scalar));
+                                .insert(original_name, TypeDefinition::Scalar(extended_scalar));
                         }
                     }
                     None => {
@@ -160,20 +160,20 @@ pub fn build_schema(
                 let original_name = obj_ext.name.clone();
                 match type_definitions.get(&original_name) {
                     Some(original_obj) => {
-                        if let GqlTypeDefinition::Object(original) = original_obj {
+                        if let TypeDefinition::Object(original) = original_obj {
                             let mut extended_directives = original.directives.clone();
                             let directives = GqlDirective::from_vec_directive(obj_ext.directives);
                             extended_directives.extend(directives);
 
                             let mut extended_fields = original.fields.clone();
-                            let fields = GqlField::from_vec_field(obj_ext.fields);
+                            let fields = FieldType::from_vec_field(obj_ext.fields);
                             extended_fields.extend(fields);
 
                             let mut extended_impl_interfaces =
                                 original.implements_interfaces.clone();
                             extended_impl_interfaces.extend(obj_ext.implements_interfaces.clone());
 
-                            let extended_obj = GqlObject {
+                            let extended_obj = ObjectType {
                                 position: original.position,
                                 description: original.description.clone(),
                                 name: original_name.clone(),
@@ -183,7 +183,7 @@ pub fn build_schema(
                             };
                             type_definitions.insert(
                                 original_name.to_string(),
-                                GqlTypeDefinition::Object(extended_obj),
+                                TypeDefinition::Object(extended_obj),
                             );
                         }
                     }
@@ -199,16 +199,16 @@ pub fn build_schema(
                 let original_name = inter_ext.name.clone();
                 match type_definitions.get(&original_name) {
                     Some(original_interface) => {
-                        if let GqlTypeDefinition::Interface(original) = original_interface {
+                        if let TypeDefinition::Interface(original) = original_interface {
                             let mut extended_directives = original.directives.clone();
                             let directives = GqlDirective::from_vec_directive(inter_ext.directives);
                             extended_directives.extend(directives);
 
                             let mut extended_fields = original.fields.clone();
-                            let fields = GqlField::from_vec_field(inter_ext.fields);
+                            let fields = FieldType::from_vec_field(inter_ext.fields);
                             extended_fields.extend(fields);
 
-                            let extended_interface = GqlInterface {
+                            let extended_interface = InterfaceType {
                                 position: original.position,
                                 description: original.description.clone(),
                                 name: original_name.clone(),
@@ -217,7 +217,7 @@ pub fn build_schema(
                             };
                             type_definitions.insert(
                                 original_name.to_string(),
-                                GqlTypeDefinition::Interface(extended_interface.clone()),
+                                TypeDefinition::Interface(extended_interface.clone()),
                             );
                             interfaces
                                 .insert(original_name.to_string(), extended_interface.clone());
@@ -235,7 +235,7 @@ pub fn build_schema(
                 let original_name = union_ext.name.clone();
                 match type_definitions.get(&original_name) {
                     Some(original_union) => {
-                        if let GqlTypeDefinition::Union(original) = original_union {
+                        if let TypeDefinition::Union(original) = original_union {
                             let mut extended_directives = original.directives.clone();
                             let directives =
                                 GqlDirective::from_vec_directive(union_ext.directives.clone());
@@ -244,7 +244,7 @@ pub fn build_schema(
                             let mut extended_types = original.types.clone();
                             extended_types.extend(union_ext.types.clone());
 
-                            let extended_union = GqlUnion {
+                            let extended_union = UnionType {
                                 position: original.position,
                                 description: original.description.clone(),
                                 name: original_name.clone(),
@@ -253,7 +253,7 @@ pub fn build_schema(
                             };
                             type_definitions.insert(
                                 original_name.to_string(),
-                                GqlTypeDefinition::Union(extended_union),
+                                TypeDefinition::Union(extended_union),
                             );
                         }
                     }
@@ -269,32 +269,30 @@ pub fn build_schema(
                 let original_name = enum_ext.name.clone();
                 match type_definitions.get(&original_name) {
                     Some(original_enum) => {
-                        if let GqlTypeDefinition::Enum(original) = original_enum {
+                        if let TypeDefinition::Enum(original) = original_enum {
                             let mut extended_directives = original.directives.clone();
                             let directives =
                                 GqlDirective::from_vec_directive(enum_ext.directives.clone());
                             extended_directives.extend(directives);
 
                             let mut extended_values = original.values.clone();
-                            let values: Vec<GqlEnumValue> = enum_ext
+                            let values: Vec<EnumTypeValue> = enum_ext
                                 .values
                                 .into_iter()
-                                .map(|value| GqlEnumValue::from(value))
+                                .map(|value| EnumTypeValue::from(value))
                                 .collect();
                             extended_values.extend(values);
 
-                            let extended_enum = GqlEnum {
+                            let extended_enum = EnumType {
                                 position: original.position,
                                 description: original.description.clone(),
                                 name: original_name.clone(),
                                 directives: extended_directives,
                                 values: extended_values,
                             };
-                            let gql_enum = GqlEnum::from(extended_enum);
-                            type_definitions.insert(
-                                original_name.to_string(),
-                                GqlTypeDefinition::Enum(gql_enum),
-                            );
+                            let gql_enum = EnumType::from(extended_enum);
+                            type_definitions
+                                .insert(original_name.to_string(), TypeDefinition::Enum(gql_enum));
                         }
                     }
                     None => {
@@ -309,17 +307,17 @@ pub fn build_schema(
                 let original_name = input_ext.name.clone();
                 match type_definitions.get(&original_name) {
                     Some(original_input) => {
-                        if let GqlTypeDefinition::InputObject(original) = original_input {
+                        if let TypeDefinition::InputObject(original) = original_input {
                             let mut extended_directives = original.directives.clone();
                             let directives =
                                 GqlDirective::from_vec_directive(input_ext.directives.clone());
                             extended_directives.extend(directives);
 
                             let mut extended_fields = original.fields.clone();
-                            let fields = GqlArgument::from_vec_input_value(input_ext.fields);
+                            let fields = ArgumentType::from_vec_input_value(input_ext.fields);
                             extended_fields.extend(fields);
 
-                            let extended_input = GqlInputObject {
+                            let extended_input = InputObjectType {
                                 position: original.position,
                                 description: original.description.clone(),
                                 name: original_name.clone(),
@@ -328,7 +326,7 @@ pub fn build_schema(
                             };
                             type_definitions.insert(
                                 original_name.to_string(),
-                                GqlTypeDefinition::InputObject(extended_input),
+                                TypeDefinition::InputObject(extended_input),
                             );
                         }
                     }
@@ -361,9 +359,9 @@ pub fn build_schema(
 
     match type_definitions.get(&query_type_name) {
         Some(query_def) => {
-            if let GqlTypeDefinition::Object(def) = query_def {
+            if let TypeDefinition::Object(def) = query_def {
                 for f in &def.fields {
-                    queries.insert(f.name.to_string(), GqlField::from(f.clone()));
+                    queries.insert(f.name.to_string(), FieldType::from(f.clone()));
                 }
             }
         }
@@ -372,18 +370,17 @@ pub fn build_schema(
         }
     }
 
-    if let Some(GqlTypeDefinition::Object(mutation_def)) = type_definitions.get(&mutation_type_name)
-    {
+    if let Some(TypeDefinition::Object(mutation_def)) = type_definitions.get(&mutation_type_name) {
         for f in &mutation_def.fields {
-            mutations.insert(f.name.to_string(), GqlField::from(f.clone()));
+            mutations.insert(f.name.to_string(), FieldType::from(f.clone()));
         }
     }
 
-    if let Some(GqlTypeDefinition::Object(subscription_def)) =
+    if let Some(TypeDefinition::Object(subscription_def)) =
         type_definitions.get(&subscription_type_name)
     {
         for f in &subscription_def.fields {
-            subscriptions.insert(f.name.to_string(), GqlField::from(f.clone()));
+            subscriptions.insert(f.name.to_string(), FieldType::from(f.clone()));
         }
     }
 

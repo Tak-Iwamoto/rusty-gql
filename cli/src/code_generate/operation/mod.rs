@@ -3,7 +3,7 @@ mod operation_mod_file;
 
 use futures_util::future::try_join_all;
 use heck::ToSnakeCase;
-use rusty_gql::{self, GqlField, OperationType};
+use rusty_gql::{self, FieldType, OperationType};
 use std::{collections::HashMap, io::Error};
 
 use self::{field_file::FieldFile, operation_mod_file::OperationModFile};
@@ -11,7 +11,7 @@ use self::{field_file::FieldFile, operation_mod_file::OperationModFile};
 use super::{create_file, path_str};
 
 pub async fn create_operation_files(
-    operations: &HashMap<String, GqlField>,
+    operations: &HashMap<String, FieldType>,
     operation_type: OperationType,
     base_path: &str,
 ) -> Result<Vec<()>, Error> {

@@ -1,5 +1,5 @@
 use codegen::{Scope, Type};
-use rusty_gql::{GqlField, GqlObject};
+use rusty_gql::{FieldType, ObjectType};
 
 use crate::code_generate::{
     use_gql_definitions,
@@ -9,7 +9,7 @@ use crate::code_generate::{
 
 pub struct ObjectFile<'a> {
     pub filename: &'a str,
-    pub def: &'a GqlObject,
+    pub def: &'a ObjectType,
     pub path: &'a str,
 }
 
@@ -65,15 +65,15 @@ impl<'a> FileDefinition for ObjectFile<'a> {
     }
 }
 
-fn is_return_primitive_ty(field: &GqlField) -> bool {
+fn is_return_primitive_ty(field: &FieldType) -> bool {
     is_gql_primitive_ty(&field.meta_type.name())
 }
 
-fn is_copy_gql_ty(field: &GqlField) -> bool {
+fn is_copy_gql_ty(field: &FieldType) -> bool {
     vec!["Int", "Float", "Boolean"].contains(&field.meta_type.name())
 }
 
-fn build_block_str(field: &GqlField, name: &str) -> String {
+fn build_block_str(field: &FieldType, name: &str) -> String {
     let block_str = if is_return_primitive_ty(&field) {
         if is_copy_gql_ty(&field) {
             format!("self.{}", &name)
