@@ -5,7 +5,7 @@ use futures_util::future::try_join_all;
 use heck::ToSnakeCase;
 use rusty_gql::GqlDirectiveDefinition;
 
-use crate::code_generate::FileDefinition;
+use crate::code_generate::{use_gql_definitions, FileDefinition};
 
 use super::{create_file, mod_file::ModFile, path_str};
 
@@ -22,8 +22,10 @@ impl<'a> FileDefinition for DirectiveFile<'a> {
         scope.new_struct(struct_name).vis("pub");
         let directive_impl = scope.new_impl(struct_name);
         directive_impl.impl_trait("CustomDirective");
+        directive_impl.r#macro("#[async_trait::async_trait]");
 
         let f = directive_impl.new_fn("resolve_field");
+        f.set_async(true);
         f.arg_ref_self();
         f.arg("ctx", "&FieldContext<'_>");
         f.arg("directive_args", "&BTreeMap<String, GqlValue>");
@@ -31,7 +33,11 @@ impl<'a> FileDefinition for DirectiveFile<'a> {
         f.ret("ResolverResult<Option<GqlValue>>");
         f.line("todo!()");
 
-        scope.to_string()
+        format!(
+            "{}\nuse std::collections::BTreeMap;\n\n{}",
+            use_gql_definitions(),
+            scope.to_string()
+        )
     }
 
     fn path(&self) -> String {

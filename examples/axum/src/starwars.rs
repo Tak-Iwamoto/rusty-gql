@@ -1,6 +1,6 @@
 use rusty_gql::ID;
 
-use crate::graphql::Human;
+use crate::graphql::{Droid, Human};
 
 pub fn luke() -> Human {
     Human {
@@ -39,5 +39,21 @@ pub fn leia() -> Human {
         homePlanet: None,
         height: None,
         mass: None,
+    }
+}
+
+pub fn r2d2() -> Droid {
+    Droid {
+        id: ID("5".to_string()),
+        name: "R2D2".to_string(),
+        primaryFunction: Some("support jedi".to_string()),
+    }
+}
+
+pub fn c3po() -> Droid {
+    Droid {
+        id: ID("6".to_string()),
+        name: "C3PO".to_string(),
+        primaryFunction: Some("communication".to_string()),
     }
 }

@@ -1,7 +1,12 @@
+use crate::graphql::*;
+use rusty_gql::*;
+use std::collections::BTreeMap;
+
 pub struct possibleTypes;
 
+#[async_trait::async_trait]
 impl CustomDirective for possibleTypes {
-    fn resolve_field(&self, ctx: &FieldContext<'_>, directive_args: &BTreeMap<String, GqlValue>, resolve_fut: ResolveFut<'_>) -> ResolverResult<Option<GqlValue>> {
+    async fn resolve_field(&self, ctx: &FieldContext<'_>, directive_args: &BTreeMap<String, GqlValue>, resolve_fut: ResolveFut<'_>) -> ResolverResult<Option<GqlValue>> {
         todo!()
     }
 }
