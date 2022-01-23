@@ -1,13 +1,14 @@
-mod hero;
 mod character;
 mod droid;
+mod hero;
+mod human;
 mod reviews;
 mod search;
-mod human;
 
 use crate::graphql::*;
 use rusty_gql::*;
 
+#[derive(Clone)]
 pub struct Query;
 
 #[Resolver]
@@ -28,8 +29,12 @@ impl Query {
         reviews::reviews(episode).await
     }
 
-    pub async fn search(&self, text: Option<String>, episode: Option<Episode>) -> Option<Vec<Option<SearchResult>>> {
-        search::search(text,episode).await
+    pub async fn search(
+        &self,
+        text: Option<String>,
+        episode: Option<Episode>,
+    ) -> Option<Vec<Option<SearchResult>>> {
+        search::search(text, episode).await
     }
 
     pub async fn human(&self, id: ID) -> Option<Human> {

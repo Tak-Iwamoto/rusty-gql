@@ -2,11 +2,11 @@ use crate::graphql::*;
 use rusty_gql::*;
 
 pub struct Human {
-    id: ID,
-    name: String,
-    homePlanet: Option<String>,
-    height: Option<f64>,
-    mass: Option<f64>,
+    pub id: ID,
+    pub name: String,
+    pub homePlanet: Option<String>,
+    pub height: Option<f64>,
+    pub mass: Option<f64>,
 }
 
 #[Resolver]

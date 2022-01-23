@@ -10,12 +10,7 @@ use axum::{
     routing::get,
     AddExtensionLayer, Router,
 };
-
-#[derive(Clone)]
-struct Query;
-
-#[Resolver]
-impl Query {}
+use graphql::Query;
 
 type ContainerType = Container<Query, EmptyMutation, EmptySubscription>;
 
