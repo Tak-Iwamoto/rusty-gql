@@ -40,7 +40,8 @@ impl<'a> OperationModFile<'a> {
     fn build_query_str(&self) -> String {
         let mut scope = Scope::new();
         let struct_name = self.operation_type.to_string();
-        scope.new_struct(&struct_name).vis("pub");
+        let struct_scope = scope.new_struct(&struct_name).vis("pub");
+        struct_scope.derive("Clone");
         let imp = scope.new_impl(&struct_name);
         imp.r#macro("#[Resolver]");
 
