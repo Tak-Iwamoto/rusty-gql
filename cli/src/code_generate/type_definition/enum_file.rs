@@ -21,6 +21,10 @@ impl<'a> FileDefinition for EnumFile<'a> {
         let mut scope = Scope::new();
         let enum_scope = scope.new_enum(&self.def.name).vis("pub");
         enum_scope.derive("Enum");
+        enum_scope.derive("Copy");
+        enum_scope.derive("Clone");
+        enum_scope.derive("Eq");
+        enum_scope.derive("PartialEq");
 
         for value in &self.def.values {
             enum_scope.new_variant(&value.name);
