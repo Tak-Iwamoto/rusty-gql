@@ -8,14 +8,14 @@ use crate::code_generate::{
 };
 
 pub struct ObjectFile<'a> {
-    pub file_name: &'a str,
+    pub filename: &'a str,
     pub def: &'a GqlObject,
     pub path: &'a str,
 }
 
 impl<'a> FileDefinition for ObjectFile<'a> {
     fn name(&self) -> String {
-        self.file_name.to_string()
+        self.filename.to_string()
     }
 
     fn path(&self) -> String {

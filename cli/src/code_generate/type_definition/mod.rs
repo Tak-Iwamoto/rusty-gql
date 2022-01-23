@@ -88,60 +88,60 @@ async fn create_type_definition_file(
     base_path: &str,
     interface_obj_map: &HashMap<String, Vec<String>>,
 ) -> Result<(), Error> {
-    let file_name = type_def.name().to_snake_case();
+    let filename = type_def.name().to_snake_case();
     match type_def {
         GqlTypeDefinition::Object(def) => {
-            let path = path_str(vec![base_path, "model", &file_name], true);
+            let path = path_str(vec![base_path, "model", &filename], true);
             create_file(ObjectFile {
                 def,
                 path: &path,
-                file_name: &file_name,
+                filename: &filename,
             })
             .await
         }
         GqlTypeDefinition::Interface(def) => {
-            let path = path_str(vec![base_path, "model", &file_name], true);
+            let path = path_str(vec![base_path, "model", &filename], true);
             create_file(InterfaceFile {
                 def,
                 path: &path,
-                file_name: &file_name,
+                filename: &filename,
                 interface_obj_map: &interface_obj_map,
             })
             .await
         }
         GqlTypeDefinition::Union(def) => {
-            let path = path_str(vec![base_path, "model", &file_name], true);
+            let path = path_str(vec![base_path, "model", &filename], true);
             create_file(UnionFile {
                 def,
                 path: &path,
-                file_name: &file_name,
+                filename: &filename,
             })
             .await
         }
         GqlTypeDefinition::Enum(def) => {
-            let path = path_str(vec![base_path, "model", &file_name], true);
+            let path = path_str(vec![base_path, "model", &filename], true);
             create_file(EnumFile {
                 def,
                 path: &path,
-                file_name: &file_name,
+                filename: &filename,
             })
             .await
         }
         GqlTypeDefinition::InputObject(def) => {
-            let path = path_str(vec![base_path, "input", &file_name], true);
+            let path = path_str(vec![base_path, "input", &filename], true);
             create_file(InputObjectFile {
                 def,
                 path: &path,
-                file_name: &file_name,
+                filename: &filename,
             })
             .await
         }
         GqlTypeDefinition::Scalar(def) => {
-            let path = path_str(vec![base_path, "scalar", &file_name], true);
+            let path = path_str(vec![base_path, "scalar", &filename], true);
             create_file(ScalarFile {
                 def,
                 path: &path,
-                file_name: &file_name,
+                filename: &filename,
             })
             .await
         }

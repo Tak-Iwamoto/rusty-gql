@@ -88,8 +88,8 @@ fn gql_file_types() -> Vec<String> {
     ]
 }
 async fn create_root_mod_file(path: &str) -> tokio::io::Result<()> {
-    let file_names = gql_file_types();
-    create_file(RootModFile { path, file_names }).await
+    let filenames = gql_file_types();
+    create_file(RootModFile { path, filenames }).await
 }
 
 async fn create_root_dirs(path: &str) -> Result<Vec<()>, Error> {

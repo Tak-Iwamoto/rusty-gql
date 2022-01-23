@@ -6,7 +6,7 @@ use rusty_gql::GqlInterface;
 use crate::code_generate::{use_gql_definitions, FileDefinition};
 
 pub struct InterfaceFile<'a> {
-    pub file_name: &'a str,
+    pub filename: &'a str,
     pub def: &'a GqlInterface,
     pub path: &'a str,
     pub interface_obj_map: &'a HashMap<String, Vec<String>>,
@@ -14,7 +14,7 @@ pub struct InterfaceFile<'a> {
 
 impl<'a> FileDefinition for InterfaceFile<'a> {
     fn name(&self) -> String {
-        self.file_name.to_string()
+        self.filename.to_string()
     }
 
     fn path(&self) -> String {

@@ -12,7 +12,7 @@ use super::{create_file, mod_file::ModFile, path_str};
 pub struct DirectiveFile<'a> {
     pub def: &'a GqlDirectiveDefinition,
     pub path: String,
-    pub file_name: String,
+    pub filename: String,
 }
 
 impl<'a> FileDefinition for DirectiveFile<'a> {
@@ -45,7 +45,7 @@ impl<'a> FileDefinition for DirectiveFile<'a> {
     }
 
     fn name(&self) -> String {
-        self.file_name.clone()
+        self.filename.clone()
     }
 }
 
@@ -59,12 +59,12 @@ pub async fn create_directive_files(
         if is_default_directive(&directive.name) {
             continue;
         }
-        let file_name = &directive.name.to_snake_case();
-        let path = path_str(vec![base_path, "directive", &file_name], true);
+        let filename = &directive.name.to_snake_case();
+        let path = path_str(vec![base_path, "directive", &filename], true);
         futures.push(create_file(DirectiveFile {
             def: directive,
             path,
-            file_name: file_name.clone(),
+            filename: filename.clone(),
         }));
         directive_names.push(directive.name.clone());
     }

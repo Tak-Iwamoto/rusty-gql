@@ -4,14 +4,14 @@ use rusty_gql::GqlField;
 use crate::code_generate::{use_gql_definitions, util::gql_value_ty_to_rust_ty, FileDefinition};
 
 pub struct FieldFile<'a> {
-    pub file_name: String,
+    pub filename: String,
     pub def: &'a GqlField,
     pub path: String,
 }
 
 impl<'a> FileDefinition for FieldFile<'a> {
     fn name(&self) -> String {
-        self.file_name.clone()
+        self.filename.clone()
     }
 
     fn path(&self) -> String {

@@ -3,14 +3,14 @@ use rusty_gql::GqlEnum;
 
 use crate::code_generate::{use_gql_definitions, FileDefinition};
 pub struct EnumFile<'a> {
-    pub file_name: &'a str,
+    pub filename: &'a str,
     pub def: &'a GqlEnum,
     pub path: &'a str,
 }
 
 impl<'a> FileDefinition for EnumFile<'a> {
     fn name(&self) -> String {
-        self.file_name.to_string()
+        self.filename.to_string()
     }
 
     fn path(&self) -> String {

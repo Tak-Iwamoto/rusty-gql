@@ -4,14 +4,14 @@ use rusty_gql::GqlScalar;
 use crate::code_generate::{use_gql_definitions, FileDefinition};
 
 pub struct ScalarFile<'a> {
-    pub file_name: &'a str,
+    pub filename: &'a str,
     pub def: &'a GqlScalar,
     pub path: &'a str,
 }
 
 impl<'a> FileDefinition for ScalarFile<'a> {
     fn name(&self) -> String {
-        self.file_name.to_string()
+        self.filename.to_string()
     }
 
     fn path(&self) -> String {

@@ -25,8 +25,8 @@ impl<'a> FileDefinition for OperationModFile<'a> {
         let mut result = String::from("");
 
         for (operation_name, _) in self.operations.iter() {
-            let file_name = operation_name.to_snake_case();
-            result += format!("mod {};\n", file_name,).as_str();
+            let filename = operation_name.to_snake_case();
+            result += format!("mod {};\n", filename,).as_str();
         }
 
         result += "\n";
@@ -61,10 +61,10 @@ impl<'a> OperationModFile<'a> {
             let return_ty = gql_value_ty_to_rust_ty(&method.meta_type);
             fn_scope.ret(Type::new(&return_ty));
 
-            let file_name = operation_name.to_snake_case();
+            let filename = operation_name.to_snake_case();
             fn_scope.line(format!(
-                "{file_name}::{method}({args}).await",
-                file_name = file_name,
+                "{filename}::{method}({args}).await",
+                filename = filename,
                 method = method.name,
                 args = args_str
             ));

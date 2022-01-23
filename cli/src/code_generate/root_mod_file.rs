@@ -3,7 +3,7 @@ use crate::code_generate::FileDefinition;
 use super::path_str;
 
 pub struct RootModFile<'a> {
-    pub file_names: Vec<String>,
+    pub filenames: Vec<String>,
     pub path: &'a str,
 }
 
@@ -15,7 +15,7 @@ impl<'a> FileDefinition for RootModFile<'a> {
     fn content(&self) -> String {
         let mut mod_str = String::from("");
         let mut pub_use_str = String::from("");
-        for name in &self.file_names {
+        for name in &self.filenames {
             mod_str += format!("mod {};\n", &name).as_str();
             pub_use_str += format!("pub use {}::*;\n", &name).as_str();
         }

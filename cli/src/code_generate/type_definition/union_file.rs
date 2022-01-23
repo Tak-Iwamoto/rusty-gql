@@ -4,14 +4,14 @@ use rusty_gql::GqlUnion;
 use crate::code_generate::{use_gql_definitions, FileDefinition};
 
 pub struct UnionFile<'a> {
-    pub file_name: &'a str,
+    pub filename: &'a str,
     pub def: &'a GqlUnion,
     pub path: &'a str,
 }
 
 impl<'a> FileDefinition for UnionFile<'a> {
     fn name(&self) -> String {
-        self.file_name.to_string()
+        self.filename.to_string()
     }
 
     fn path(&self) -> String {

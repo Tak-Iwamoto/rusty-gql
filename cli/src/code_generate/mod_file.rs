@@ -14,9 +14,9 @@ impl<'a> FileDefinition for ModFile<'a> {
         let mut mod_str = String::from("");
         let mut pub_use_str = String::from("");
         for name in &self.struct_names {
-            let file_name = &name.to_snake_case();
-            mod_str += format!("mod {};\n", &file_name).as_str();
-            pub_use_str += format!("pub use {}::{};\n", &file_name, &name).as_str();
+            let filename = &name.to_snake_case();
+            mod_str += format!("mod {};\n", &filename).as_str();
+            pub_use_str += format!("pub use {}::{};\n", &filename, &name).as_str();
         }
 
         format!("{}\n{}", mod_str, pub_use_str)
