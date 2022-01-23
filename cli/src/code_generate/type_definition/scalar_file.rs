@@ -20,8 +20,21 @@ impl<'a> FileDefinition for ScalarFile<'a> {
 
     fn content(&self) -> String {
         let mut scope = Scope::new();
-        let scalar_scope = scope.new_struct(&self.def.name).vis("pub");
+        let struct_name = &self.def.name;
+        let scalar_scope = scope.new_struct(struct_name).vis("pub");
         scalar_scope.derive("Scalar");
+
+        let scalar_impl = scope.new_impl(struct_name);
+        scalar_impl.impl_trait("VariableType");
+        let from_gql_value_fn = scalar_impl.new_fn("from_gql_value");
+        from_gql_value_fn.arg("value", "Option<GqlValue>");
+        from_gql_value_fn.ret("Result<Self, String>");
+        from_gql_value_fn.line("todo!()");
+
+        let into_gql_value_fn = scalar_impl.new_fn("into_gql_value");
+        into_gql_value_fn.arg_ref_self();
+        into_gql_value_fn.ret("GqlValue");
+        into_gql_value_fn.line("todo!()");
 
         format!("{}\n\n{}", use_gql_definitions(), scope.to_string())
     }

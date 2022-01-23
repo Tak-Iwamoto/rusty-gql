@@ -18,7 +18,19 @@ pub struct DirectiveFile<'a> {
 impl<'a> FileDefinition for DirectiveFile<'a> {
     fn content(&self) -> String {
         let mut scope = Scope::new();
-        scope.new_struct(&self.def.name).vis("pub");
+        let struct_name = &self.def.name;
+        scope.new_struct(struct_name).vis("pub");
+        let directive_impl = scope.new_impl(struct_name);
+        directive_impl.impl_trait("CustomDirective");
+
+        let f = directive_impl.new_fn("resolve_field");
+        f.arg_ref_self();
+        f.arg("ctx", "&FieldContext<'_>");
+        f.arg("directive_args", "&BTreeMap<String, GqlValue>");
+        f.arg("resolve_fut", "ResolveFut<'_>");
+        f.ret("ResolverResult<Option<GqlValue>>");
+        f.line("todo!()");
+
         scope.to_string()
     }
 
