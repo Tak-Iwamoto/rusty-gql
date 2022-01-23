@@ -1,9 +1,9 @@
+mod graphql;
+mod starwars;
+
 use rusty_gql::*;
 use rusty_gql_axum::*;
 use std::{net::SocketAddr, path::Path};
-
-mod graphql;
-mod starwars;
 
 use axum::{
     extract::Extension,
@@ -39,7 +39,6 @@ async fn main() {
     .unwrap();
     let app = Router::new()
         .route("/", get(gql_playground).post(gql_handler))
-        // .route("/graphql", get(test))
         .layer(AddExtensionLayer::new(container));
     let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
     axum::Server::bind(&addr)

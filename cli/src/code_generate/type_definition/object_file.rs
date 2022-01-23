@@ -28,6 +28,7 @@ impl<'a> FileDefinition for ObjectFile<'a> {
         let struct_scope = struct_scope_base
             .new_struct(&struct_name.to_string())
             .vis("pub");
+        struct_scope.derive("Clone");
 
         let mut impl_scope = Scope::new();
         let struct_imp = impl_scope.new_impl(&struct_name.to_string());
