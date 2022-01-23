@@ -22,8 +22,8 @@ pub fn starwars_schema_content() -> &'static str {
     r#"
 type Query {
   hero(episode: Episode): Character
-  reviews(episode: Episode!): [Review]
-  search(text: String, episode: Episode): [SearchResult]
+  reviews(episode: Episode!): [Review!]!
+  search(text: String, episode: Episode): [SearchResult!]!
   character(id: ID!): Character
   droid(id: ID!): Droid
   human(id: ID!): Human

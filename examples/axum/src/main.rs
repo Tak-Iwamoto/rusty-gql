@@ -3,6 +3,7 @@ use rusty_gql_axum::*;
 use std::{net::SocketAddr, path::Path};
 
 mod graphql;
+mod starwars;
 
 use axum::{
     extract::Extension,

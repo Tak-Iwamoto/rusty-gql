@@ -3,6 +3,6 @@ use rusty_gql::*;
 
 #[derive(Union)]
 pub enum Character {
-    Human(Human),
     Droid(Droid),
+    Human(Human),
 }

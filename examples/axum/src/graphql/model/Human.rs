@@ -11,35 +11,35 @@ pub struct Human {
 
 #[Resolver]
 impl Human {
-    async fn id(&self) -> ID {
+    pub async fn id(&self) -> ID {
         self.id.clone()
     }
 
-    async fn name(&self) -> String {
+    pub async fn name(&self) -> String {
         self.name.clone()
     }
 
-    async fn homePlanet(&self) -> Option<String> {
+    pub async fn homePlanet(&self) -> Option<String> {
         self.homePlanet.clone()
     }
 
-    async fn height(&self, unit: Option<LengthUnit>) -> Option<f64> {
+    pub async fn height(&self, unit: Option<LengthUnit>) -> Option<f64> {
         self.height
     }
 
-    async fn mass(&self) -> Option<f64> {
+    pub async fn mass(&self) -> Option<f64> {
         self.mass
     }
 
-    async fn episode(&self) -> Option<Episode> {
+    pub async fn episode(&self) -> Option<Episode> {
         todo!()
     }
 
-    async fn friends(&self, first: Option<i64>, after: Option<ID>) -> FriendsConnection {
+    pub async fn friends(&self, first: Option<i64>, after: Option<ID>) -> FriendsConnection {
         todo!()
     }
 
-    async fn appearsIn(&self) -> Vec<Option<Episode>> {
+    pub async fn appearsIn(&self) -> Vec<Option<Episode>> {
         todo!()
     }
 }

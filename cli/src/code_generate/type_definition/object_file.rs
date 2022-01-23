@@ -37,7 +37,7 @@ impl<'a> FileDefinition for ObjectFile<'a> {
             let field_name = &field.name;
             let return_ty = gql_value_ty_to_rust_ty(&field.meta_type);
             if is_return_primitive_ty(&field) {
-                struct_scope.field(&field_name, &return_ty);
+                struct_scope.field(format!("pub {}", &field_name).as_str(), &return_ty);
             }
 
             let fn_scope = struct_imp.new_fn(&field_name);
@@ -47,6 +47,7 @@ impl<'a> FileDefinition for ObjectFile<'a> {
 
             fn_scope.arg_ref_self();
             fn_scope.set_async(true);
+            fn_scope.vis("pub");
 
             fn_scope.ret(Type::new(&return_ty));
 

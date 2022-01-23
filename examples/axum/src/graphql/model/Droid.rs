@@ -2,30 +2,30 @@ use crate::graphql::*;
 use rusty_gql::*;
 
 pub struct Droid {
-    id: ID,
-    name: String,
-    primaryFunction: Option<String>,
+    pub id: ID,
+    pub name: String,
+    pub primaryFunction: Option<String>,
 }
 
 #[Resolver]
 impl Droid {
-    async fn id(&self) -> ID {
+    pub async fn id(&self) -> ID {
         self.id.clone()
     }
 
-    async fn name(&self) -> String {
+    pub async fn name(&self) -> String {
         self.name.clone()
     }
 
-    async fn friends(&self, first: Option<i64>, after: Option<ID>) -> FriendsConnection {
+    pub async fn friends(&self, first: Option<i64>, after: Option<ID>) -> FriendsConnection {
         todo!()
     }
 
-    async fn appearsIn(&self) -> Vec<Option<Episode>> {
+    pub async fn appearsIn(&self) -> Vec<Option<Episode>> {
         todo!()
     }
 
-    async fn primaryFunction(&self) -> Option<String> {
+    pub async fn primaryFunction(&self) -> Option<String> {
         self.primaryFunction.clone()
     }
 }

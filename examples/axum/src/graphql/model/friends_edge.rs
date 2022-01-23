@@ -2,16 +2,16 @@ use crate::graphql::*;
 use rusty_gql::*;
 
 pub struct FriendsEdge {
-    cursor: ID,
+    pub cursor: ID,
 }
 
 #[Resolver]
 impl FriendsEdge {
-    async fn cursor(&self) -> ID {
+    pub async fn cursor(&self) -> ID {
         self.cursor.clone()
     }
 
-    async fn node(&self) -> Option<Character> {
+    pub async fn node(&self) -> Option<Character> {
         todo!()
     }
 }
