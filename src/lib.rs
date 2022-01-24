@@ -27,7 +27,7 @@ pub use custom_directive::CustomDirective;
 pub use error::{ErrorWrapper, GqlError};
 pub use executor::execute;
 use futures_util::Future;
-pub use input::VariableType;
+pub use input::GqlInputType;
 pub use operation::OperationType;
 pub use playground_html::playground_html;
 pub use query_root::QueryRoot;

@@ -1,5 +1,5 @@
 use crate::{
-    error::GqlError, input::VariableType, operation::Operation, path::GqlPath,
+    error::GqlError, input::GqlInputType, operation::Operation, path::GqlPath,
     types::schema::Schema, GqlValue, ResolverResult,
 };
 use graphql_parser::{
@@ -18,7 +18,7 @@ pub struct ExecutionContext<'a, T> {
 pub type FieldContext<'a> = ExecutionContext<'a, &'a Field<'a, String>>;
 
 impl<'a> FieldContext<'a> {
-    pub fn get_arg_value<T: VariableType>(&self, arg_name: &str) -> ResolverResult<T> {
+    pub fn get_arg_value<T: GqlInputType>(&self, arg_name: &str) -> ResolverResult<T> {
         let value = self
             .item
             .arguments

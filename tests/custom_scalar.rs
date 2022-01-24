@@ -7,7 +7,7 @@ pub async fn test_custom_scalar() {
     #[derive(Clone, GqlScalar)]
     struct CustomScalar(String);
 
-    impl VariableType for CustomScalar {
+    impl GqlInputType for CustomScalar {
         fn from_gql_value(value: Option<GqlValue>) -> Result<Self, String> {
             if let Some(GqlValue::String(v)) = value {
                 Ok(CustomScalar(format!("Custom-{}", v)))

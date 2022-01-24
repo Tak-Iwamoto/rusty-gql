@@ -29,17 +29,17 @@ pub fn generate_input_object(derive_input: &DeriveInput) -> Result<TokenStream, 
         let field_name = ident.unraw().to_string();
 
         get_fields.push(quote! {
-            let #ident: #ty = #crate_name::VariableType::from_gql_value(obj.get(#field_name).cloned())?;
+            let #ident: #ty = #crate_name::GqlInputType::from_gql_value(obj.get(#field_name).cloned())?;
         });
         fields.push(ident);
 
         set_fields.push(quote! {
-            obj.insert(#field_name.to_string(), #crate_name::VariableType::into_gql_value(&self.#ident));
+            obj.insert(#field_name.to_string(), #crate_name::GqlInputType::into_gql_value(&self.#ident));
         })
     }
 
     let expanded = quote! {
-        impl #impl_generics #crate_name::VariableType for #self_ty #where_clause {
+        impl #impl_generics #crate_name::GqlInputType for #self_ty #where_clause {
             fn from_gql_value(value: Option<GqlValue>) -> Result<Self, String> {
                 if let Some(GqlValue::Object(obj)) = value {
                     #(#get_fields)*

@@ -10,13 +10,13 @@ use std::sync::Arc;
 
 use crate::GqlValue;
 
-pub trait VariableType: Send + Sync + Sized {
+pub trait GqlInputType: Send + Sync + Sized {
     fn from_gql_value(value: Option<GqlValue>) -> Result<Self, String>;
 
     fn into_gql_value(&self) -> GqlValue;
 }
 
-impl<T: VariableType> VariableType for Arc<T> {
+impl<T: GqlInputType> GqlInputType for Arc<T> {
     fn from_gql_value(value: Option<GqlValue>) -> Result<Self, String> {
         T::from_gql_value(value).map(|v| Arc::new(v))
     }
@@ -26,7 +26,7 @@ impl<T: VariableType> VariableType for Arc<T> {
     }
 }
 
-impl<T: VariableType> VariableType for Box<T> {
+impl<T: GqlInputType> GqlInputType for Box<T> {
     fn from_gql_value(value: Option<GqlValue>) -> Result<Self, String> {
         T::from_gql_value(value).map(|v| Box::new(v))
     }

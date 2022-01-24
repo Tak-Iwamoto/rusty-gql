@@ -1,8 +1,8 @@
 use crate::GqlValue;
 
-use super::VariableType;
+use super::GqlInputType;
 
-impl<T: VariableType> VariableType for Option<T> {
+impl<T: GqlInputType> GqlInputType for Option<T> {
     fn from_gql_value(value: Option<GqlValue>) -> Result<Self, String> {
         match value.unwrap_or_default() {
             GqlValue::Null => Ok(None),

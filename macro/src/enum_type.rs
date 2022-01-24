@@ -49,7 +49,7 @@ pub fn generate_enum(derive_input: &DeriveInput) -> Result<TokenStream, syn::Err
     }
 
     let expanded = quote! {
-        impl #impl_generics #crate_name::VariableType for #self_ty #where_clause {
+        impl #impl_generics #crate_name::GqlInputType for #self_ty #where_clause {
             fn from_gql_value(value: Option<GqlValue>) -> Result<Self, String> {
                 match value {
                     Some(v) => {

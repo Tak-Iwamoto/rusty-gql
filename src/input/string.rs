@@ -1,8 +1,8 @@
 use crate::GqlValue;
 
-use super::VariableType;
+use super::GqlInputType;
 
-impl VariableType for String {
+impl GqlInputType for String {
     fn from_gql_value(value: Option<GqlValue>) -> Result<Self, String> {
         match value {
             Some(value) => match value {

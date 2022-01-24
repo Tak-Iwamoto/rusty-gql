@@ -25,7 +25,7 @@ impl<'a> FileDefinition for ScalarFile<'a> {
         scalar_scope.derive("GqlScalar");
 
         let scalar_impl = scope.new_impl(struct_name);
-        scalar_impl.impl_trait("VariableType");
+        scalar_impl.impl_trait("GqlInputType");
         let from_gql_value_fn = scalar_impl.new_fn("from_gql_value");
         from_gql_value_fn.arg("value", "Option<GqlValue>");
         from_gql_value_fn.ret("Result<Self, String>");
