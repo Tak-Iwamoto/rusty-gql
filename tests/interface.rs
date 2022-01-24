@@ -40,6 +40,7 @@ pub async fn test_interface() {
         Cat(Cat),
     }
 
+    #[GqlType(interface)]
     impl Animal {
         async fn name(&self) -> String {
             match self {

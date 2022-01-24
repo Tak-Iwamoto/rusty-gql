@@ -2,9 +2,11 @@ use proc_macro::{self, TokenStream};
 use quote::quote;
 use syn::{ext::IdentExt, Block, FnArg, ImplItem, ItemImpl, NestedMeta, ReturnType};
 
-use crate::utils::{get_method_args_without_context, is_context_type, is_internal, is_result_type};
+use crate::utils::{
+    get_method_args_without_context, is_context_type, is_interface, is_internal, is_result_type,
+};
 
-pub fn generate_resolver(
+pub fn generate_type(
     item_impl: &mut ItemImpl,
     args: &[NestedMeta],
 ) -> Result<TokenStream, syn::Error> {
@@ -108,6 +110,14 @@ pub fn generate_resolver(
         }
     }
 
+    let collect_fields = if is_interface(&args) {
+        None
+    } else {
+        Some(quote! {
+            impl #impl_generics #crate_name::CollectFields for #self_ty #where_clause {}
+        })
+    };
+
     let expanded = quote! {
         #item_impl
 
@@ -122,7 +132,7 @@ pub fn generate_resolver(
             }
         }
 
-        impl #impl_generics #crate_name::CollectFields for #self_ty #where_clause {}
+        #collect_fields
 
         #[#crate_name::async_trait::async_trait]
         impl #impl_generics #crate_name::SelectionSetResolver for #self_ty #where_clause {

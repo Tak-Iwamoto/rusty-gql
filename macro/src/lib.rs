@@ -1,8 +1,8 @@
 mod enum_type;
 mod input_object;
 mod interface;
-mod resolver;
 mod scalar;
+mod ty;
 mod union;
 mod utils;
 
@@ -14,7 +14,7 @@ use scalar::generate_scalar;
 use syn::{parse_macro_input, AttributeArgs, DeriveInput, ItemImpl};
 use union::generate_union;
 
-use crate::resolver::generate_resolver;
+use crate::ty::generate_type;
 
 #[proc_macro_attribute]
 #[allow(non_snake_case)]
@@ -22,7 +22,7 @@ pub fn GqlType(args: TokenStream, input: TokenStream) -> TokenStream {
     let mut item_impl = parse_macro_input!(input as ItemImpl);
     let args = parse_macro_input!(args as AttributeArgs);
 
-    let expanded = match generate_resolver(&mut item_impl, &args[..]) {
+    let expanded = match generate_type(&mut item_impl, &args[..]) {
         Ok(generated) => generated,
         Err(err) => err.to_compile_error().into(),
     };

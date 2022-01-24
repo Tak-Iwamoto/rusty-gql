@@ -14,6 +14,20 @@ pub fn is_internal(args: &[NestedMeta]) -> bool {
     false
 }
 
+pub fn is_interface(args: &[NestedMeta]) -> bool {
+    for arg in args {
+        if let NestedMeta::Meta(meta) = arg {
+            if let Meta::Path(path) = meta {
+                let ident = &path.segments.last().unwrap().ident;
+                if ident == "interface" {
+                    return true;
+                }
+            }
+        }
+    }
+    false
+}
+
 pub fn get_method_args_without_context(
     method: &ImplItemMethod,
 ) -> Result<Vec<(PatIdent, Type)>, syn::Error> {
