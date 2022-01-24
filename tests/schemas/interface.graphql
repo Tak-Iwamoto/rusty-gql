@@ -1,0 +1,17 @@
+type Query {
+  search_animal(query: String!): Animal
+}
+
+interface Animal {
+  name: String
+}
+
+type Cat implements Pet {
+  name: String
+  meows: Boolean
+}
+
+type Dog implements Pet {
+  name: String
+  woofs: Boolean
+}

@@ -30,7 +30,6 @@ pub fn GqlType(args: TokenStream, input: TokenStream) -> TokenStream {
 }
 
 #[proc_macro_derive(GqlScalar)]
-#[allow(non_snake_case)]
 pub fn scalar_derive(input: TokenStream) -> TokenStream {
     let input = &parse_macro_input!(input as DeriveInput);
     let expanded = match generate_scalar(&input) {
@@ -41,7 +40,6 @@ pub fn scalar_derive(input: TokenStream) -> TokenStream {
 }
 
 #[proc_macro_derive(GqlUnion)]
-#[allow(non_snake_case)]
 pub fn union_derive(input: TokenStream) -> TokenStream {
     let input = &parse_macro_input!(input as DeriveInput);
     let expanded = match generate_union(&input) {
@@ -51,8 +49,7 @@ pub fn union_derive(input: TokenStream) -> TokenStream {
     expanded
 }
 
-#[proc_macro_derive(Inteface)]
-#[allow(non_snake_case)]
+#[proc_macro_derive(GqlInterface)]
 pub fn interface_derive(input: TokenStream) -> TokenStream {
     let input = &parse_macro_input!(input as DeriveInput);
     let expanded = match generate_interface(&input) {
@@ -63,7 +60,6 @@ pub fn interface_derive(input: TokenStream) -> TokenStream {
 }
 
 #[proc_macro_derive(GqlEnum)]
-#[allow(non_snake_case)]
 pub fn enum_derive(input: TokenStream) -> TokenStream {
     let input = &parse_macro_input!(input as DeriveInput);
     let expanded = match generate_enum(&input) {
@@ -74,7 +70,6 @@ pub fn enum_derive(input: TokenStream) -> TokenStream {
 }
 
 #[proc_macro_derive(GqlInputObject)]
-#[allow(non_snake_case)]
 pub fn input_object_derive(input: TokenStream) -> TokenStream {
     let input = &parse_macro_input!(input as DeriveInput);
     let expanded = match generate_input_object(&input) {

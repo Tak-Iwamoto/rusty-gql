@@ -39,6 +39,11 @@ pub fn generate_interface(derive_input: &DeriveInput) -> Result<TokenStream, syn
         #[#crate_name::async_trait::async_trait]
         impl #impl_generics #crate_name::FieldResolver for #self_ty #where_clause {
             async fn resolve_field(&self, ctx: &#crate_name::FieldContext<'_>) -> #crate_name::ResolverResult<::std::option::Option<#crate_name::GqlValue>> {
+                if ctx.item.name == "name" {
+                    let obj = self.name().await;
+                    let ctx_selection_set = ctx.with_selection_set(&ctx.item.selection_set);
+                    return obj.resolve_selection_set(&ctx_selection_set).await.map(Some);
+                }
                 Ok(None)
             }
             fn type_name() -> String {
