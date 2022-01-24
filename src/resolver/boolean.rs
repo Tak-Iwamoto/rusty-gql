@@ -3,6 +3,8 @@ use crate::{
     SelectionSetResolver,
 };
 
+use super::CollectFields;
+
 #[async_trait::async_trait]
 impl FieldResolver for bool {
     async fn resolve_field(&self, _ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
@@ -12,6 +14,8 @@ impl FieldResolver for bool {
         "Boolean".to_string()
     }
 }
+
+impl CollectFields for bool {}
 
 #[async_trait::async_trait]
 impl SelectionSetResolver for bool {

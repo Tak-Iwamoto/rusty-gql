@@ -49,7 +49,9 @@ pub fn generate_interface(derive_input: &DeriveInput) -> Result<TokenStream, syn
             fn type_name() -> String {
                 #type_name.to_string()
             }
+        }
 
+        impl #impl_generics #crate_name::CollectFields for #self_ty #where_clause {
             fn introspection_type_name(&self) -> String {
                 match self {
                     #(#introspection_type_names),*
@@ -65,6 +67,7 @@ pub fn generate_interface(derive_input: &DeriveInput) -> Result<TokenStream, syn
                     #(#collect_all_fields),*
                 }
             }
+
         }
 
         #[#crate_name::async_trait::async_trait]

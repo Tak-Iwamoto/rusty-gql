@@ -1,7 +1,7 @@
 use crate::{
     error::GqlError,
     types::{__Type, build_schema_introspection},
-    FieldContext, FieldResolver, GqlValue, ResolverResult, SelectionSetResolver,
+    CollectFields, FieldContext, FieldResolver, GqlValue, ResolverResult, SelectionSetResolver,
 };
 
 pub struct QueryRoot<T> {
@@ -41,6 +41,8 @@ impl<T: SelectionSetResolver> FieldResolver for QueryRoot<T> {
         "Query".to_string()
     }
 }
+
+impl<T: SelectionSetResolver> CollectFields for QueryRoot<T> {}
 
 #[async_trait::async_trait]
 impl<T: SelectionSetResolver> SelectionSetResolver for QueryRoot<T> {

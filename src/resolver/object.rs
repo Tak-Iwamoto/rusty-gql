@@ -3,8 +3,8 @@ use std::collections::{BTreeMap, HashMap};
 use serde::Serialize;
 
 use crate::{
-    types::value::serialize_into_gql_value, FieldContext, FieldResolver, GqlValue, ResolverResult,
-    SelectionSetContext, SelectionSetResolver,
+    types::value::serialize_into_gql_value, CollectFields, FieldContext, FieldResolver, GqlValue,
+    ResolverResult, SelectionSetContext, SelectionSetResolver,
 };
 
 #[async_trait::async_trait]
@@ -26,6 +26,13 @@ where
     fn type_name() -> String {
         "Object".to_string()
     }
+}
+
+impl<K, V> CollectFields for BTreeMap<K, V>
+where
+    K: ToString + Eq + Send + Sync,
+    V: Serialize + Send + Sync,
+{
 }
 
 #[async_trait::async_trait]
@@ -68,6 +75,13 @@ where
     fn type_name() -> String {
         "Object".to_string()
     }
+}
+
+impl<K, V> CollectFields for HashMap<K, V>
+where
+    K: ToString + Eq + Send + Sync,
+    V: Serialize + Send + Sync,
+{
 }
 
 #[async_trait::async_trait]

@@ -1,8 +1,8 @@
 use graphql_parser::schema::DirectiveLocation;
 
 use crate::{
-    resolve_selection_parallelly, types::DirectiveDefinition, FieldContext, FieldResolver,
-    GqlValue, ResolverResult, Schema, SelectionSetContext, SelectionSetResolver,
+    resolve_selection_parallelly, types::DirectiveDefinition, CollectFields, FieldContext,
+    FieldResolver, GqlValue, ResolverResult, Schema, SelectionSetContext, SelectionSetResolver,
 };
 
 use super::input_value::{__InputValue, build_input_value_introspection};
@@ -116,6 +116,8 @@ impl<'a> FieldResolver for __Directive<'a> {
         "__Directive".to_string()
     }
 }
+
+impl<'a> CollectFields for __Directive<'a> {}
 
 #[async_trait::async_trait]
 impl<'a> SelectionSetResolver for __Directive<'a> {

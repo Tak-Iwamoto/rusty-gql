@@ -1,7 +1,7 @@
 use std::collections::{HashSet, LinkedList, VecDeque};
 
 use crate::{
-    FieldContext, FieldResolver, GqlValue, ResolverResult, SelectionSetContext,
+    CollectFields, FieldContext, FieldResolver, GqlValue, ResolverResult, SelectionSetContext,
     SelectionSetResolver,
 };
 
@@ -21,6 +21,8 @@ impl<T: FieldResolver, const N: usize> FieldResolver for [T; N] {
         format!("[{}]!", T::type_name())
     }
 }
+
+impl<T: FieldResolver, const N: usize> CollectFields for [T; N] {}
 
 #[async_trait::async_trait]
 impl<T: SelectionSetResolver, const N: usize> SelectionSetResolver for [T; N] {
@@ -53,6 +55,8 @@ impl<T: FieldResolver> FieldResolver for HashSet<T> {
     }
 }
 
+impl<T: FieldResolver> CollectFields for HashSet<T> {}
+
 #[async_trait::async_trait]
 impl<T: SelectionSetResolver> SelectionSetResolver for HashSet<T> {
     async fn resolve_selection_set(
@@ -83,6 +87,8 @@ impl<'a, T: FieldResolver + 'a> FieldResolver for &'a [T] {
         format!("[{}]!", T::type_name())
     }
 }
+
+impl<'a, T: FieldResolver + 'a> CollectFields for &'a [T] {}
 
 #[async_trait::async_trait]
 impl<'a, T: SelectionSetResolver + 'a> SelectionSetResolver for &'a [T] {
@@ -115,6 +121,8 @@ impl<T: FieldResolver> FieldResolver for VecDeque<T> {
     }
 }
 
+impl<T: FieldResolver> CollectFields for VecDeque<T> {}
+
 #[async_trait::async_trait]
 impl<T: SelectionSetResolver> SelectionSetResolver for VecDeque<T> {
     async fn resolve_selection_set(
@@ -146,6 +154,8 @@ impl<T: FieldResolver> FieldResolver for LinkedList<T> {
     }
 }
 
+impl<T: FieldResolver> CollectFields for LinkedList<T> {}
+
 #[async_trait::async_trait]
 impl<T: SelectionSetResolver> SelectionSetResolver for LinkedList<T> {
     async fn resolve_selection_set(
@@ -176,6 +186,8 @@ impl<T: FieldResolver> FieldResolver for Vec<T> {
         format!("[{}]!", T::type_name())
     }
 }
+
+impl<T: FieldResolver> CollectFields for Vec<T> {}
 
 #[async_trait::async_trait]
 impl<T: SelectionSetResolver> SelectionSetResolver for Vec<T> {

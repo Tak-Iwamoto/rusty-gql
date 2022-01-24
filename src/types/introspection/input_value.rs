@@ -1,6 +1,6 @@
 use crate::{
-    resolve_selection_parallelly, FieldResolver, InputValueType, GqlValue, ResolverResult, Schema,
-    SelectionSetContext, SelectionSetResolver,
+    resolve_selection_parallelly, CollectFields, FieldResolver, GqlValue, InputValueType,
+    ResolverResult, Schema, SelectionSetContext, SelectionSetResolver,
 };
 
 use super::introspection_type::__Type;
@@ -92,6 +92,8 @@ impl<'a> FieldResolver for __InputValue<'a> {
         "__InputValue".to_string()
     }
 }
+
+impl<'a> CollectFields for __InputValue<'a> {}
 
 #[async_trait::async_trait]
 impl<'a> SelectionSetResolver for __InputValue<'a> {

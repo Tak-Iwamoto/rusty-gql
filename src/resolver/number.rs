@@ -1,7 +1,7 @@
 use serde_json::Number;
 
 use crate::{
-    FieldContext, FieldResolver, GqlValue, ResolverResult, SelectionSetContext,
+    CollectFields, FieldContext, FieldResolver, GqlValue, ResolverResult, SelectionSetContext,
     SelectionSetResolver,
 };
 
@@ -14,6 +14,8 @@ impl FieldResolver for i8 {
         "Int".to_string()
     }
 }
+
+impl CollectFields for i8 {}
 
 #[async_trait::async_trait]
 impl SelectionSetResolver for i8 {
@@ -35,6 +37,8 @@ impl FieldResolver for i16 {
     }
 }
 
+impl CollectFields for i16 {}
+
 #[async_trait::async_trait]
 impl SelectionSetResolver for i16 {
     async fn resolve_selection_set(
@@ -54,6 +58,8 @@ impl FieldResolver for i32 {
         "Int".to_string()
     }
 }
+
+impl CollectFields for i32 {}
 
 #[async_trait::async_trait]
 impl SelectionSetResolver for i32 {
@@ -75,6 +81,8 @@ impl FieldResolver for i64 {
     }
 }
 
+impl CollectFields for i64 {}
+
 #[async_trait::async_trait]
 impl SelectionSetResolver for i64 {
     async fn resolve_selection_set(
@@ -95,6 +103,8 @@ impl FieldResolver for u8 {
     }
 }
 
+impl CollectFields for u8 {}
+
 #[async_trait::async_trait]
 impl SelectionSetResolver for u8 {
     async fn resolve_selection_set(
@@ -113,6 +123,8 @@ impl FieldResolver for u16 {
         "Int".to_string()
     }
 }
+
+impl CollectFields for u16 {}
 
 #[async_trait::async_trait]
 impl SelectionSetResolver for u16 {
@@ -134,6 +146,8 @@ impl FieldResolver for u32 {
     }
 }
 
+impl CollectFields for u32 {}
+
 #[async_trait::async_trait]
 impl SelectionSetResolver for u32 {
     async fn resolve_selection_set(
@@ -153,6 +167,8 @@ impl FieldResolver for u64 {
         "Int".to_string()
     }
 }
+
+impl CollectFields for u64 {}
 
 #[async_trait::async_trait]
 impl SelectionSetResolver for u64 {
@@ -174,6 +190,8 @@ impl FieldResolver for usize {
     }
 }
 
+impl CollectFields for usize {}
+
 #[async_trait::async_trait]
 impl SelectionSetResolver for usize {
     async fn resolve_selection_set(
@@ -193,6 +211,8 @@ impl FieldResolver for isize {
         "Int".to_string()
     }
 }
+
+impl CollectFields for isize {}
 
 #[async_trait::async_trait]
 impl SelectionSetResolver for isize {
@@ -216,6 +236,8 @@ impl FieldResolver for f32 {
         "Float".to_string()
     }
 }
+
+impl CollectFields for f32 {}
 
 #[async_trait::async_trait]
 impl SelectionSetResolver for f32 {
@@ -242,6 +264,8 @@ impl FieldResolver for f64 {
         "Float".to_string()
     }
 }
+
+impl CollectFields for f64 {}
 
 #[async_trait::async_trait]
 impl SelectionSetResolver for f64 {

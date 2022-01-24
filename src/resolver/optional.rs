@@ -1,5 +1,5 @@
 use crate::{
-    FieldContext, FieldResolver, GqlValue, ResolverResult, SelectionSetContext,
+    CollectFields, FieldContext, FieldResolver, GqlValue, ResolverResult, SelectionSetContext,
     SelectionSetResolver,
 };
 
@@ -15,6 +15,8 @@ impl<T: FieldResolver> FieldResolver for Option<T> {
         T::type_name()
     }
 }
+
+impl<T: FieldResolver> CollectFields for Option<T> {}
 
 #[async_trait::async_trait]
 impl<T: SelectionSetResolver> SelectionSetResolver for Option<T> {

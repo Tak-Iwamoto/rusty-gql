@@ -1,6 +1,6 @@
 use crate::{
-    resolve_selection_parallelly, FieldResolver, FieldType, GqlValue, ResolverResult, Schema,
-    SelectionSetContext, SelectionSetResolver,
+    resolve_selection_parallelly, CollectFields, FieldResolver, FieldType, GqlValue,
+    ResolverResult, Schema, SelectionSetContext, SelectionSetResolver,
 };
 
 use super::{
@@ -109,6 +109,8 @@ impl<'a> FieldResolver for __Field<'a> {
         "__Field".to_string()
     }
 }
+
+impl<'a> CollectFields for __Field<'a> {}
 
 #[async_trait::async_trait]
 impl<'a> SelectionSetResolver for __Field<'a> {

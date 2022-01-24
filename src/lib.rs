@@ -33,7 +33,7 @@ pub use playground_html::playground_html;
 pub use query_root::QueryRoot;
 pub use request::{receive_http_request, HttpRequestError, Request};
 pub use resolver::{
-    resolve_selection_parallelly, resolve_selection_serially, FieldResolver, Fields,
+    resolve_selection_parallelly, resolve_selection_serially, CollectFields, FieldResolver, Fields,
     SelectionSetResolver,
 };
 pub use response::Response;
@@ -63,6 +63,8 @@ impl FieldResolver for EmptyMutation {
     }
 }
 
+impl CollectFields for EmptyMutation {}
+
 #[async_trait::async_trait]
 impl SelectionSetResolver for EmptyMutation {
     async fn resolve_selection_set(
@@ -85,6 +87,8 @@ impl FieldResolver for EmptySubscription {
         "Subscription".to_string()
     }
 }
+
+impl CollectFields for EmptySubscription {}
 
 #[async_trait::async_trait]
 impl SelectionSetResolver for EmptySubscription {

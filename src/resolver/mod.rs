@@ -17,11 +17,11 @@ use graphql_parser::query::{Selection, TypeCondition};
 
 use crate::{
     context::{FieldContext, SelectionSetContext},
-    GqlDirective, GqlError, TypeDefinition, GqlValue, ResolverResult,
+    GqlDirective, GqlError, GqlValue, ResolverResult, TypeDefinition,
 };
 
 #[async_trait]
-pub trait SelectionSetResolver: FieldResolver {
+pub trait SelectionSetResolver: CollectFields {
     async fn resolve_selection_set(
         &self,
         ctx: &SelectionSetContext<'_>,
@@ -29,11 +29,7 @@ pub trait SelectionSetResolver: FieldResolver {
 }
 
 #[async_trait]
-pub trait FieldResolver: Send + Sync {
-    async fn resolve_field(&self, ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>>;
-
-    fn type_name() -> String;
-
+pub trait CollectFields: FieldResolver {
     fn introspection_type_name(&self) -> String {
         Self::type_name()
     }
@@ -47,6 +43,13 @@ pub trait FieldResolver: Send + Sync {
     }
 }
 
+#[async_trait]
+pub trait FieldResolver: Send + Sync {
+    async fn resolve_field(&self, ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>>;
+
+    fn type_name() -> String;
+}
+
 #[async_trait::async_trait]
 impl<T: FieldResolver> FieldResolver for &T {
     #[allow(clippy::trivially_copy_pass_by_ref)]
@@ -57,6 +60,8 @@ impl<T: FieldResolver> FieldResolver for &T {
         T::type_name()
     }
 }
+
+impl<T: FieldResolver> CollectFields for &T {}
 
 #[async_trait::async_trait]
 impl<T: FieldResolver> FieldResolver for Arc<T> {
@@ -69,6 +74,8 @@ impl<T: FieldResolver> FieldResolver for Arc<T> {
     }
 }
 
+impl<T: FieldResolver> CollectFields for Arc<T> {}
+
 #[async_trait::async_trait]
 impl<T: FieldResolver> FieldResolver for Box<T> {
     #[allow(clippy::trivially_copy_pass_by_ref)]
@@ -80,20 +87,22 @@ impl<T: FieldResolver> FieldResolver for Box<T> {
     }
 }
 
-pub async fn resolve_selection_parallelly<'a, 'ctx: 'a, T: FieldResolver + SelectionSetResolver>(
+impl<T: FieldResolver> CollectFields for Box<T> {}
+
+pub async fn resolve_selection_parallelly<'a, 'ctx: 'a, T: CollectFields + SelectionSetResolver>(
     ctx: &SelectionSetContext<'ctx>,
     root_type: &'a T,
 ) -> ResolverResult<GqlValue> {
     resolve_selection(ctx, root_type, true).await
 }
 
-pub async fn resolve_selection_serially<'a, 'ctx: 'a, T: FieldResolver + SelectionSetResolver>(
+pub async fn resolve_selection_serially<'a, 'ctx: 'a, T: CollectFields + SelectionSetResolver>(
     ctx: &SelectionSetContext<'ctx>,
     root_type: &'a T,
 ) -> ResolverResult<GqlValue> {
     resolve_selection(ctx, root_type, false).await
 }
-async fn resolve_selection<'a, 'ctx: 'a, T: FieldResolver + SelectionSetResolver>(
+async fn resolve_selection<'a, 'ctx: 'a, T: CollectFields + SelectionSetResolver>(
     ctx: &SelectionSetContext<'ctx>,
     root_type: &'a T,
     parallel: bool,
@@ -157,7 +166,7 @@ pub type ResolveFieldFuture<'a> = BoxFuture<'a, ResolverResult<(String, GqlValue
 pub struct Fields<'a>(Vec<ResolveFieldFuture<'a>>);
 
 impl<'a> Fields<'a> {
-    pub fn collect_fields<'ctx: 'a, T: FieldResolver + ?Sized>(
+    pub fn collect_fields<'ctx: 'a, T: CollectFields + ?Sized>(
         &mut self,
         ctx: &SelectionSetContext<'ctx>,
         root_type: &'a T,

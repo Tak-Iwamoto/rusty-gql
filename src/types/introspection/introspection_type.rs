@@ -1,6 +1,6 @@
 use crate::{
-    resolve_selection_parallelly, types::GqlValueType, FieldContext, FieldResolver,
-    TypeDefinition, GqlValue, ResolverResult, Schema, SelectionSetContext, SelectionSetResolver,
+    resolve_selection_parallelly, types::GqlValueType, CollectFields, FieldContext, FieldResolver,
+    GqlValue, ResolverResult, Schema, SelectionSetContext, SelectionSetResolver, TypeDefinition,
 };
 
 use super::{
@@ -48,10 +48,7 @@ impl ToString for __TypeKind {
 }
 
 impl<'a> __Type<'a> {
-    pub fn from_type_definition(
-        schema: &'a Schema,
-        type_definition: &'a TypeDefinition,
-    ) -> Self {
+    pub fn from_type_definition(schema: &'a Schema, type_definition: &'a TypeDefinition) -> Self {
         __Type {
             schema,
             detail: TypeDetail::Named(type_definition),
@@ -353,6 +350,8 @@ impl<'a> FieldResolver for __Type<'a> {
         "__Type".to_string()
     }
 }
+
+impl<'a> CollectFields for __Type<'a> {}
 
 #[async_trait::async_trait]
 impl<'a> SelectionSetResolver for __Type<'a> {

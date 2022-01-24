@@ -1,5 +1,5 @@
 use crate::{
-    FieldContext, FieldResolver, GqlValue, ResolverResult, SelectionSetContext,
+    CollectFields, FieldContext, FieldResolver, GqlValue, ResolverResult, SelectionSetContext,
     SelectionSetResolver, ID,
 };
 
@@ -12,6 +12,8 @@ impl FieldResolver for ID {
         "ID".to_string()
     }
 }
+
+impl CollectFields for ID {}
 
 #[async_trait::async_trait]
 impl SelectionSetResolver for ID {

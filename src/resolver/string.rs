@@ -1,5 +1,5 @@
 use crate::{
-    FieldContext, FieldResolver, GqlValue, ResolverResult, SelectionSetContext,
+    CollectFields, FieldContext, FieldResolver, GqlValue, ResolverResult, SelectionSetContext,
     SelectionSetResolver,
 };
 
@@ -12,6 +12,8 @@ impl FieldResolver for str {
         "String".to_string()
     }
 }
+
+impl CollectFields for str {}
 
 #[async_trait::async_trait]
 impl SelectionSetResolver for str {
@@ -33,6 +35,8 @@ impl FieldResolver for &str {
     }
 }
 
+impl CollectFields for &str {}
+
 #[async_trait::async_trait]
 impl SelectionSetResolver for &str {
     async fn resolve_selection_set(
@@ -52,6 +56,8 @@ impl FieldResolver for String {
         "String".to_string()
     }
 }
+
+impl CollectFields for String {}
 
 #[async_trait::async_trait]
 impl SelectionSetResolver for String {
