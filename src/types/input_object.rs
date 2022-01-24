@@ -1,6 +1,6 @@
 use graphql_parser::{schema::InputObjectType as ParserInputObjectType, Pos};
 
-use super::{argument::ArgumentType, directive::GqlDirective};
+use super::{argument::InputValueType, directive::GqlDirective};
 
 #[derive(Debug, Clone)]
 pub struct InputObjectType {
@@ -8,7 +8,7 @@ pub struct InputObjectType {
     pub description: Option<String>,
     pub position: Pos,
     pub directives: Vec<GqlDirective>,
-    pub fields: Vec<ArgumentType>,
+    pub fields: Vec<InputValueType>,
 }
 
 impl<'a> From<ParserInputObjectType<'a, String>> for InputObjectType {
@@ -22,7 +22,7 @@ impl<'a> From<ParserInputObjectType<'a, String>> for InputObjectType {
         let fields = input_object
             .fields
             .into_iter()
-            .map(|field| ArgumentType::from(field))
+            .map(|field| InputValueType::from(field))
             .collect();
 
         InputObjectType {

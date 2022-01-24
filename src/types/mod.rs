@@ -14,7 +14,7 @@ pub mod value;
 mod value_type;
 
 pub mod schema;
-pub use argument::ArgumentType;
+pub use argument::InputValueType;
 pub use field::FieldType;
 pub use id::ID;
 pub use introspection::__Schema;

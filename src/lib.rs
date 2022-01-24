@@ -40,7 +40,7 @@ pub use response::Response;
 pub use test_utils::{build_test_request, check_gql_response, schema_content};
 pub use types::schema::build_schema;
 pub use types::{
-    ArgumentType, DirectiveDefinition, EnumType, FieldType, GqlConstValue as Value, GqlDirective,
+    InputValueType, DirectiveDefinition, EnumType, FieldType, GqlConstValue as Value, GqlDirective,
     GqlValue, GqlValueType, InputObjectType, InterfaceType, ObjectType, ScalarType, Schema,
     TypeDefinition, UnionType, ID,
 };

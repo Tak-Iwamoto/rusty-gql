@@ -7,7 +7,7 @@ use graphql_parser::{
 
 use crate::GqlValueType;
 
-use super::{argument::ArgumentType, value::GqlValue};
+use super::{argument::InputValueType, value::GqlValue};
 
 #[derive(Debug, Clone)]
 pub struct GqlDirective {
@@ -45,7 +45,7 @@ pub struct DirectiveDefinition {
     pub position: Pos,
     pub name: String,
     pub description: Option<String>,
-    pub arguments: Vec<ArgumentType>,
+    pub arguments: Vec<InputValueType>,
     pub locations: Vec<DirectiveLocation>,
 }
 
@@ -55,7 +55,7 @@ impl DirectiveDefinition {
             position: Pos::default(),
             name: "skip".to_string(),
             description: None,
-            arguments: vec![ArgumentType {
+            arguments: vec![InputValueType {
                 name: "if".to_string(),
                 description: None,
                 position: Pos::default(),
@@ -78,7 +78,7 @@ impl DirectiveDefinition {
             position: Pos::default(),
             name: "include".to_string(),
             description: None,
-            arguments: vec![ArgumentType {
+            arguments: vec![InputValueType {
                 name: "if".to_string(),
                 description: None,
                 position: Pos::default(),
@@ -101,7 +101,7 @@ impl DirectiveDefinition {
             position: Pos::default(),
             name: "deprecated".to_string(),
             description: None,
-            arguments: vec![ArgumentType {
+            arguments: vec![InputValueType {
                 name: "reason".to_string(),
                 description: None,
                 position: Pos::default(),

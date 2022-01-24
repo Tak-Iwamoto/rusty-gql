@@ -1,7 +1,7 @@
 use graphql_parser::schema::Field;
 use graphql_parser::Pos;
 
-use super::argument::ArgumentType;
+use super::argument::InputValueType;
 use super::directive::GqlDirective;
 use super::value_type::GqlValueType;
 
@@ -11,7 +11,7 @@ pub struct FieldType {
     pub description: Option<String>,
     pub position: Pos,
     pub meta_type: GqlValueType,
-    pub arguments: Vec<ArgumentType>,
+    pub arguments: Vec<InputValueType>,
     pub directives: Vec<GqlDirective>,
 }
 
@@ -38,7 +38,7 @@ impl<'a> From<Field<'a, String>> for FieldType {
     fn from(field: Field<'a, String>) -> Self {
         let meta_type = GqlValueType::from(field.field_type);
         let directives = GqlDirective::from_vec_directive(field.directives);
-        let arguments = ArgumentType::from_vec_input_value(field.arguments);
+        let arguments = InputValueType::from_vec_input_value(field.arguments);
 
         FieldType {
             name: field.name,

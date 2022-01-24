@@ -1,5 +1,5 @@
 use crate::{
-    resolve_selection_parallelly, FieldResolver, ArgumentType, GqlValue, ResolverResult, Schema,
+    resolve_selection_parallelly, FieldResolver, InputValueType, GqlValue, ResolverResult, Schema,
     SelectionSetContext, SelectionSetResolver,
 };
 
@@ -7,11 +7,11 @@ use super::introspection_type::__Type;
 
 pub struct __InputValue<'a> {
     schema: &'a Schema,
-    detail: ArgumentType,
+    detail: InputValueType,
 }
 pub fn build_input_value_introspection<'a>(
     schema: &'a Schema,
-    value: &'a ArgumentType,
+    value: &'a InputValueType,
 ) -> __InputValue<'a> {
     __InputValue {
         schema,

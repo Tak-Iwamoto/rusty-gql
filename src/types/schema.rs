@@ -8,7 +8,7 @@ use crate::{
 };
 
 use super::{
-    argument::ArgumentType, directive::DirectiveDefinition, field::FieldType,
+    argument::InputValueType, directive::DirectiveDefinition, field::FieldType,
     introspection::introspection_sdl, scalar::ScalarType, type_definition::TypeDefinition,
     EnumTypeValue,
 };
@@ -112,7 +112,7 @@ pub fn build_schema(
                     extensions.push(ext);
                 }
                 graphql_parser::schema::Definition::DirectiveDefinition(directive) => {
-                    let arguments = ArgumentType::from_vec_input_value(directive.arguments);
+                    let arguments = InputValueType::from_vec_input_value(directive.arguments);
                     let result = DirectiveDefinition {
                         position: directive.position,
                         name: directive.name,
@@ -314,7 +314,7 @@ pub fn build_schema(
                             extended_directives.extend(directives);
 
                             let mut extended_fields = original.fields.clone();
-                            let fields = ArgumentType::from_vec_input_value(input_ext.fields);
+                            let fields = InputValueType::from_vec_input_value(input_ext.fields);
                             extended_fields.extend(fields);
 
                             let extended_input = InputObjectType {
