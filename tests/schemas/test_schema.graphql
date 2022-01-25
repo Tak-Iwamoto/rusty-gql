@@ -7,6 +7,14 @@ type Query {
   obj: Obj
 }
 
+type Mutation {
+  testMutation(input: MutationInput!): Boolean
+}
+
+input MutationInput {
+  value: String
+}
+
 type Person {
   name: String!
   description: String
