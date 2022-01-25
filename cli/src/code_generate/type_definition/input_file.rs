@@ -24,7 +24,10 @@ impl<'a> FileDefinition for InputObjectFile<'a> {
         struct_scope.derive("GqlInputObject");
 
         for field in &self.def.fields {
-            struct_scope.field(&field.name, gql_value_ty_to_rust_ty(&field.meta_type));
+            struct_scope.field(
+                format!("pub {}", &field.name).as_str(),
+                gql_value_ty_to_rust_ty(&field.meta_type),
+            );
         }
 
         format!("{}\n\n{}", use_gql_definitions(), scope.to_string())
