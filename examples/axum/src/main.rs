@@ -32,7 +32,7 @@ async fn main() {
     let container = Container::new(
         &schema_docs.as_slice(),
         Query,
-        EmptyMutation,
+        Mutation,
         EmptySubscription,
         Default::default(),
     )
