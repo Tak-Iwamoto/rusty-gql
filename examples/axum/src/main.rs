@@ -11,9 +11,9 @@ use axum::{
     routing::get,
     AddExtensionLayer, Router,
 };
-use graphql::Query;
+use graphql::{Mutation, Query};
 
-type ContainerType = Container<Query, EmptyMutation, EmptySubscription>;
+type ContainerType = Container<Query, Mutation, EmptySubscription>;
 
 async fn gql_handler(container: Extension<ContainerType>, req: GqlRequest) -> GqlResponse {
     let result = execute(&container, req.0).await;

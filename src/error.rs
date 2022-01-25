@@ -75,12 +75,12 @@ impl Display for GqlError {
     }
 }
 
-pub struct ErrorWrapper {
+pub struct Error {
     pub message: String,
     pub extensions: Option<GqlTypedError>,
 }
 
-impl ErrorWrapper {
+impl Error {
     pub fn new(message: impl Into<String>) -> Self {
         Self {
             message: message.into(),
@@ -100,7 +100,7 @@ impl ErrorWrapper {
     }
 }
 
-impl<T: Display + Send + Sync + 'static> From<T> for ErrorWrapper {
+impl<T: Display + Send + Sync + 'static> From<T> for Error {
     fn from(err: T) -> Self {
         Self {
             message: err.to_string(),
@@ -109,15 +109,15 @@ impl<T: Display + Send + Sync + 'static> From<T> for ErrorWrapper {
     }
 }
 
-impl Debug for ErrorWrapper {
+impl Debug for Error {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        f.debug_struct("ErrorWrapper")
+        f.debug_struct("Error")
             .field("message", &self.message)
             .finish()
     }
 }
 
-impl PartialEq for ErrorWrapper {
+impl PartialEq for Error {
     fn eq(&self, other: &Self) -> bool {
         self.message.eq(&other.message) && self.extensions.eq(&other.extensions)
     }

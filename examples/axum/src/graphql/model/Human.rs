@@ -1,4 +1,7 @@
-use crate::graphql::*;
+use crate::{
+    graphql::*,
+    starwars::{han, luke},
+};
 use rusty_gql::*;
 
 #[derive(Debug, Clone)]
@@ -33,14 +36,45 @@ impl Human {
     }
 
     pub async fn episode(&self) -> Option<Episode> {
-        todo!()
+        Some(Episode::JEDI)
     }
 
     pub async fn friends(&self, first: Option<i64>, after: Option<ID>) -> FriendsConnection {
-        todo!()
+        if self.id.0 == "2".to_string() {
+            FriendsConnection {
+                totalCount: Some(0),
+                edges: vec![],
+                pageInfo: PageInfo {
+                    startCursor: None,
+                    endCursor: None,
+                    hasPreviousPage: false,
+                    hasNextPage: false,
+                },
+            }
+        } else {
+            FriendsConnection {
+                totalCount: Some(2),
+                edges: vec![
+                    FriendsEdge {
+                        cursor: ID::from("1"),
+                        node: Some(Character::Human(luke())),
+                    },
+                    FriendsEdge {
+                        cursor: ID::from("3"),
+                        node: Some(Character::Human(han())),
+                    },
+                ],
+                pageInfo: PageInfo {
+                    startCursor: None,
+                    endCursor: None,
+                    hasPreviousPage: false,
+                    hasNextPage: false,
+                },
+            }
+        }
     }
 
-    pub async fn appearsIn(&self) -> Vec<Option<Episode>> {
-        todo!()
+    pub async fn appearsIn(&self) -> Vec<Episode> {
+        vec![Episode::NEWHOPE, Episode::JEDI, Episode::EMPIRE]
     }
 }

@@ -61,7 +61,7 @@ pub fn generate_type(
                 method.block =
                     syn::parse2::<Block>(result_block).expect("ItemImpl method is invalid.");
                 method.sig.output = syn::parse2::<ReturnType>(
-                    quote! { -> ::std::result::Result<#return_type, #crate_name::ErrorWrapper>},
+                    quote! { -> ::std::result::Result<#return_type, #crate_name::Error>},
                 )
                 .expect("ItemImpl return type is invalid.");
             }
@@ -99,7 +99,7 @@ pub fn generate_type(
                     let resolve_fn = async move {
                         #(#gql_arg_values)*
                         let res = self.#method_name(ctx, #(#args),*).await;
-                        res.map_err(|err| #crate_name::ErrorWrapper::from(err).into_gql_error(ctx.item.position))
+                        res.map_err(|err| #crate_name::Error::from(err).into_gql_error(ctx.item.position))
                     };
 
                     let obj = resolve_fn.await?;
