@@ -16,7 +16,7 @@ pub async fn test_int() {
 
     let container = Container::new(
         &vec![contents.as_str()],
-        QueryRoot { query: Query },
+        Query,
         EmptyMutation,
         EmptySubscription,
         Default::default(),
@@ -142,7 +142,7 @@ pub async fn test_list() {
 
     let container = Container::new(
         &vec![contents.as_str()],
-        QueryRoot { query: Query },
+        Query,
         EmptyMutation,
         EmptySubscription,
         Default::default(),

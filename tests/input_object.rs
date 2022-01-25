@@ -20,7 +20,7 @@ pub async fn test_input_obj() {
 
     let container = Container::new(
         &vec![contents.as_str()],
-        QueryRoot { query: Query },
+        Query,
         EmptyMutation,
         EmptySubscription,
         Default::default(),

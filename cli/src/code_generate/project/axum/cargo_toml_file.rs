@@ -32,5 +32,5 @@ rusty-gql = {registry = "ktra", version = "0.0.3"}
 rusty-gql-axum = {registry = "ktra", version = "0.0.1"}
 tokio = { version = "1.0", features = ["full"] }
 "#
-        .replace("APP_NAME", app_name)
+    .replace("APP_NAME", app_name)
 }

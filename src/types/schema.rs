@@ -3,8 +3,8 @@ use std::{collections::HashMap, ops::Deref, sync::Arc};
 use graphql_parser::schema::TypeDefinition as ParserTypeDefinition;
 
 use crate::{
-    error::GqlError, CustomDirective, EnumType, GqlDirective, ObjectType, InputObjectType,
-    InterfaceType, UnionType,
+    error::GqlError, CustomDirective, EnumType, GqlDirective, InputObjectType, InterfaceType,
+    ObjectType, UnionType,
 };
 
 use super::{

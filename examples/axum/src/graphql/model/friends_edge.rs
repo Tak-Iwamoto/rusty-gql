@@ -4,7 +4,7 @@ use rusty_gql::*;
 #[derive(Clone)]
 pub struct FriendsEdge {
     pub cursor: ID,
-    pub node: Option<Character>
+    pub node: Option<Character>,
 }
 
 #[GqlType]

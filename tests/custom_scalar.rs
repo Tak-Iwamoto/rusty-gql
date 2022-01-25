@@ -48,7 +48,7 @@ pub async fn test_custom_scalar() {
 
     let container = Container::new(
         &vec![contents.as_str()],
-        QueryRoot { query: Query },
+        Query,
         EmptyMutation,
         EmptySubscription,
         Default::default(),

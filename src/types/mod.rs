@@ -26,7 +26,7 @@ pub use type_definition::TypeDefinition;
 pub use value::{GqlConstValue, GqlValue};
 pub use value_type::GqlValueType;
 
-pub use directive::{GqlDirective, DirectiveDefinition};
+pub use directive::{DirectiveDefinition, GqlDirective};
 pub use enum_type::{EnumType, EnumTypeValue};
 pub use input_object::InputObjectType;
 pub use interface::InterfaceType;

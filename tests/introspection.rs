@@ -14,7 +14,7 @@ async fn test_object_introspection() {
 
     let container = Container::new(
         &vec![contents.as_str()],
-        QueryRoot { query: Query },
+        Query,
         EmptyMutation,
         EmptySubscription,
         Default::default(),
@@ -41,7 +41,7 @@ async fn test_interface_introspection() {
 
     let container = Container::new(
         &vec![contents.as_str()],
-        QueryRoot { query: Query },
+        Query,
         EmptyMutation,
         EmptySubscription,
         Default::default(),
@@ -68,7 +68,7 @@ async fn test_input_object_introspection() {
 
     let container = Container::new(
         &vec![contents.as_str()],
-        QueryRoot { query: Query },
+        Query,
         EmptyMutation,
         EmptySubscription,
         Default::default(),
@@ -95,7 +95,7 @@ async fn test_enum_introspection() {
 
     let container = Container::new(
         &vec![contents.as_str()],
-        QueryRoot { query: Query },
+        Query,
         EmptyMutation,
         EmptySubscription,
         Default::default(),
@@ -122,7 +122,7 @@ async fn test_union_introspection() {
 
     let container = Container::new(
         &vec![contents.as_str()],
-        QueryRoot { query: Query },
+        Query,
         EmptyMutation,
         EmptySubscription,
         Default::default(),
@@ -149,7 +149,7 @@ async fn test_scalar_introspection() {
 
     let container = Container::new(
         &vec![contents.as_str()],
-        QueryRoot { query: Query },
+        Query,
         EmptyMutation,
         EmptySubscription,
         Default::default(),

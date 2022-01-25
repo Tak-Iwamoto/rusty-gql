@@ -10,8 +10,8 @@ use graphql_parser::{
 };
 
 use crate::{
-    error::Location, operation::Operation, types::schema::Schema, GqlError, TypeDefinition,
-    GqlValueType, Variables,
+    error::Location, operation::Operation, types::schema::Schema, GqlError, GqlValueType,
+    TypeDefinition, Variables,
 };
 
 use super::utils::get_fragment_definition_on_str;

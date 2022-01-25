@@ -6,7 +6,7 @@ use graphql_parser::{
     Pos,
 };
 
-use crate::{types::GqlValueType, TypeDefinition, Schema};
+use crate::{types::GqlValueType, Schema, TypeDefinition};
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
 pub enum Scope<'a> {

@@ -1,4 +1,3 @@
-
 use crate::graphql::*;
 use rusty_gql::*;
 
@@ -6,5 +5,4 @@ use rusty_gql::*;
 pub struct Subscription;
 
 #[GqlType]
-impl Subscription {
-}
+impl Subscription {}

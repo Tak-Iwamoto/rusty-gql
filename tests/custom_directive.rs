@@ -92,7 +92,7 @@ pub async fn test_directive() {
 
     let container = Container::new(
         &vec![contents.as_str()],
-        QueryRoot { query: Query },
+        Query,
         EmptyMutation,
         EmptySubscription,
         custom_directive_maps,

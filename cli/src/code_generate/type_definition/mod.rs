@@ -7,7 +7,7 @@ mod union_file;
 
 use futures_util::future::try_join_all;
 use heck::ToSnakeCase;
-use rusty_gql::{TypeDefinition, Schema};
+use rusty_gql::{Schema, TypeDefinition};
 use std::{collections::HashMap, io::Error};
 
 use self::{

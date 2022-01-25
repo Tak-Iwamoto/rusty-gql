@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use rusty_gql::{TypeDefinition, GqlValueType};
+use rusty_gql::{GqlValueType, TypeDefinition};
 
 pub fn get_interface_impl_object_map(
     type_definitions: &HashMap<String, TypeDefinition>,

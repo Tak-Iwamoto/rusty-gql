@@ -1,15 +1,15 @@
-mod query;
-mod mutation;
-mod subscription;
-mod model;
 mod directive;
-mod scalar;
 mod input;
+mod model;
+mod mutation;
+mod query;
+mod scalar;
+mod subscription;
 
-pub use query::*;
-pub use mutation::*;
-pub use subscription::*;
-pub use model::*;
 pub use directive::*;
-pub use scalar::*;
 pub use input::*;
+pub use model::*;
+pub use mutation::*;
+pub use query::*;
+pub use scalar::*;
+pub use subscription::*;

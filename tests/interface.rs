@@ -71,7 +71,7 @@ pub async fn test_interface() {
 
     let container = Container::new(
         &vec![contents.as_str()],
-        QueryRoot { query: Query },
+        Query,
         EmptyMutation,
         EmptySubscription,
         Default::default(),
