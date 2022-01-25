@@ -41,7 +41,8 @@ impl<'a> FileDefinition for InterfaceFile<'a> {
         for field in &self.def.fields {
             let fn_scope = interface_impl.new_fn(&field.name);
             fn_scope.arg_ref_self();
-            fn_scope.arg("ctx", "&FieleContext<'_>");
+            fn_scope.set_async(true);
+            fn_scope.arg("ctx", "&FieldContext<'_>");
             for arg in &field.arguments {
                 fn_scope.arg(&arg.name, gql_value_ty_to_rust_ty(&arg.meta_type));
             }
@@ -49,6 +50,22 @@ impl<'a> FileDefinition for InterfaceFile<'a> {
                 "Result<{}, Error>",
                 gql_value_ty_to_rust_ty(&field.meta_type)
             ));
+            fn_scope.line("match self {");
+            if let Some(impl_objects) = self.interface_obj_map.get(interface_name) {
+                for obj_name in impl_objects {
+                    let args = &field
+                        .arguments
+                        .iter()
+                        .map(|arg| arg.name.clone())
+                        .collect::<Vec<_>>()
+                        .join(",");
+                    fn_scope.line(format!(
+                        "{interface_name}::{obj_name}(obj) => {{obj.{field_name}(&ctx, {args}).await}}",
+                        interface_name = interface_name, obj_name = &obj_name, field_name = &field.name, args = args
+                    ));
+                }
+            }
+            fn_scope.line("}");
         }
         format!(
             "{}\n\n{}\n\n{}",
