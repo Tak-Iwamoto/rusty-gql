@@ -1,0 +1,6 @@
+[book]
+authors = ["Tak-Iwamoto"]
+language = "en"
+multilingual = false
+src = "src"
+title = "rusty-gql Book"
