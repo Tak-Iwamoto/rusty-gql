@@ -38,7 +38,8 @@ async fn main() {
     )
     .unwrap();
     let app = Router::new()
-        .route("/", get(gql_playground).post(gql_handler))
+        .route("/graphiql", get(gql_playground))
+        .route("/", get(gql_handler).post(gql_handler))
         .layer(AddExtensionLayer::new(container));
     let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
     axum::Server::bind(&addr)

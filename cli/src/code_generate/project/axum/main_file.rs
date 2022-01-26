@@ -72,7 +72,7 @@ fn axum_main_function() -> String {
     f.line("let schema_docs = read_schemas(Path::new(\"./src/schemas\")).unwrap();");
     f.line("let schema_docs: Vec<&str> = schema_docs.iter().map(|s| &**s).collect();");
     f.line("let container = Container::new(&schema_docs.as_slice(), Query, EmptyMutation, EmptySubscription, Default::default(),).unwrap();");
-    f.line("let app = Router::new().route(\"/\", get(gql_playground).post(gql_handler)).layer(AddExtensionLayer::new(container));");
+    f.line("let app = Router::new().route(\"/graphiql\", get(gql_playground)).route(\"/\", get(gql_handler).post(gql_handler)).layer(AddExtensionLayer::new(container));");
     f.line("let addr = SocketAddr::from(([127, 0, 0, 1], 3000));");
     f.line("axum::Server::bind(&addr).serve(app.into_make_service()).await.unwrap();");
 

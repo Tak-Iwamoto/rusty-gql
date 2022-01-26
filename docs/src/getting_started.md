@@ -17,7 +17,7 @@ cargo run
 
 ## Creating a GraphQL Schema
 rusty-gql is designed for schema first development.
-It reads any graphql files under `/schema`
+It reads any graphql files under `schema/**`.
 
 For example,
 
