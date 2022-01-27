@@ -35,8 +35,8 @@ fn gql_files_path(app_name: Option<&str>) -> String {
 
 async fn create_graphql_files(app_name: Option<&str>) -> Result<(), std::io::Error> {
     let path = app_name
-        .map(|name| format!("{}/schemas", name))
-        .unwrap_or("schemas".to_string());
+        .map(|name| format!("{}/schema", name))
+        .unwrap_or("schema".to_string());
     let schema_contents = visit_dirs(Path::new(&path)).await?;
 
     let schema_contents: Vec<&str> = schema_contents.iter().map(|s| &**s).collect();

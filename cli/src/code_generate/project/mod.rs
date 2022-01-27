@@ -13,7 +13,7 @@ use super::create_file;
 pub async fn create_project_files(app_name: &str) -> Result<(), Error> {
     try_join_all(vec![
         tokio::fs::create_dir_all(format!("{}/src", app_name).as_str()),
-        tokio::fs::create_dir_all(format!("{}/schemas", app_name).as_str()),
+        tokio::fs::create_dir_all(format!("{}/schema", app_name).as_str()),
     ])
     .await?;
     create_main_file(app_name).await?;
