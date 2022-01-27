@@ -1,3 +1,4 @@
+#![allow(warnings, unused)]
 mod character;
 mod droid;
 mod hero;

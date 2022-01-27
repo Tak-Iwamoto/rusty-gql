@@ -1,3 +1,4 @@
+#![allow(warnings, unused)]
 use crate::graphql::*;
 use rusty_gql::*;
 use std::collections::BTreeMap;

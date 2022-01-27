@@ -1,3 +1,4 @@
+#![allow(warnings, unused)]
 mod create_review;
 
 use crate::graphql::*;

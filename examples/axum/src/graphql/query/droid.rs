@@ -1,3 +1,4 @@
+#![allow(warnings, unused)]
 use crate::{
     graphql::*,
     starwars::{c3po, r2d2},
