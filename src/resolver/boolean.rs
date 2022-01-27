@@ -1,5 +1,5 @@
 use crate::{
-    FieldContext, FieldResolver, GqlValue, ResolverResult, SelectionSetContext,
+    Context, FieldResolver, GqlValue, ResolverResult, SelectionSetContext,
     SelectionSetResolver,
 };
 
@@ -7,7 +7,7 @@ use super::CollectFields;
 
 #[async_trait::async_trait]
 impl FieldResolver for bool {
-    async fn resolve_field(&self, _ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
+    async fn resolve_field(&self, _ctx: &Context<'_>) -> ResolverResult<Option<GqlValue>> {
         Ok(Some(GqlValue::Boolean(*self)))
     }
     fn type_name() -> String {

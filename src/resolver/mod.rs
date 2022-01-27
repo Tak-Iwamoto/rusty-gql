@@ -16,7 +16,7 @@ use futures_util::{
 use graphql_parser::query::{Selection, TypeCondition};
 
 use crate::{
-    context::{FieldContext, SelectionSetContext},
+    context::{Context, SelectionSetContext},
     GqlDirective, GqlError, GqlValue, ResolverResult, TypeDefinition,
 };
 
@@ -45,7 +45,7 @@ pub trait CollectFields: FieldResolver {
 
 #[async_trait]
 pub trait FieldResolver: Send + Sync {
-    async fn resolve_field(&self, ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>>;
+    async fn resolve_field(&self, ctx: &Context<'_>) -> ResolverResult<Option<GqlValue>>;
 
     fn type_name() -> String;
 }
@@ -53,7 +53,7 @@ pub trait FieldResolver: Send + Sync {
 #[async_trait::async_trait]
 impl<T: FieldResolver> FieldResolver for &T {
     #[allow(clippy::trivially_copy_pass_by_ref)]
-    async fn resolve_field(&self, ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
+    async fn resolve_field(&self, ctx: &Context<'_>) -> ResolverResult<Option<GqlValue>> {
         T::resolve_field(*self, ctx).await
     }
     fn type_name() -> String {
@@ -66,7 +66,7 @@ impl<T: FieldResolver> CollectFields for &T {}
 #[async_trait::async_trait]
 impl<T: FieldResolver> FieldResolver for Arc<T> {
     #[allow(clippy::trivially_copy_pass_by_ref)]
-    async fn resolve_field(&self, ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
+    async fn resolve_field(&self, ctx: &Context<'_>) -> ResolverResult<Option<GqlValue>> {
         T::resolve_field(self, ctx).await
     }
     fn type_name() -> String {
@@ -79,7 +79,7 @@ impl<T: FieldResolver> CollectFields for Arc<T> {}
 #[async_trait::async_trait]
 impl<T: FieldResolver> FieldResolver for Box<T> {
     #[allow(clippy::trivially_copy_pass_by_ref)]
-    async fn resolve_field(&self, ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
+    async fn resolve_field(&self, ctx: &Context<'_>) -> ResolverResult<Option<GqlValue>> {
         T::resolve_field(self, ctx).await
     }
     fn type_name() -> String {

@@ -1,11 +1,11 @@
 use crate::{
-    CollectFields, FieldContext, FieldResolver, GqlValue, ResolverResult, SelectionSetContext,
+    CollectFields, Context, FieldResolver, GqlValue, ResolverResult, SelectionSetContext,
     SelectionSetResolver,
 };
 
 #[async_trait::async_trait]
 impl FieldResolver for str {
-    async fn resolve_field(&self, _ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
+    async fn resolve_field(&self, _ctx: &Context<'_>) -> ResolverResult<Option<GqlValue>> {
         Ok(Some(GqlValue::String(self.to_string())))
     }
     fn type_name() -> String {
@@ -27,7 +27,7 @@ impl SelectionSetResolver for str {
 
 #[async_trait::async_trait]
 impl FieldResolver for &str {
-    async fn resolve_field(&self, _ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
+    async fn resolve_field(&self, _ctx: &Context<'_>) -> ResolverResult<Option<GqlValue>> {
         Ok(Some(GqlValue::String(self.to_string())))
     }
     fn type_name() -> String {
@@ -49,7 +49,7 @@ impl SelectionSetResolver for &str {
 
 #[async_trait::async_trait]
 impl FieldResolver for String {
-    async fn resolve_field(&self, _ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
+    async fn resolve_field(&self, _ctx: &Context<'_>) -> ResolverResult<Option<GqlValue>> {
         Ok(Some(GqlValue::String(self.clone())))
     }
     fn type_name() -> String {

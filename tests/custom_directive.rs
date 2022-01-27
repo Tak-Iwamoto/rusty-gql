@@ -17,7 +17,7 @@ pub async fn test_directive() {
     impl CustomDirective for AuthDirective {
         async fn resolve_field(
             &self,
-            _ctx: &FieldContext<'_>,
+            _ctx: &Context<'_>,
             directive_args: &BTreeMap<String, GqlValue>,
             resolve_fut: ResolveFut<'_>,
         ) -> ResolverResult<Option<GqlValue>> {

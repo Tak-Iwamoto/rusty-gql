@@ -9,14 +9,14 @@ pub enum Character {
 
 #[GqlType(interface)]
 impl Character {
-    async fn id(&self, ctx: &FieldContext<'_>) -> Result<ID, Error> {
+    async fn id(&self, ctx: &Context<'_>) -> Result<ID, Error> {
         match self {
             Character::Human(obj) => Ok(obj.id(&ctx).await?),
             Character::Droid(obj) => Ok(obj.id(&ctx).await?),
         }
     }
 
-    async fn name(&self, ctx: &FieldContext<'_>) -> Result<String, Error> {
+    async fn name(&self, ctx: &Context<'_>) -> Result<String, Error> {
         match self {
             Character::Human(obj) => Ok(obj.name(&ctx).await?),
             Character::Droid(obj) => Ok(obj.name(&ctx).await?),
@@ -25,7 +25,7 @@ impl Character {
 
     async fn friends(
         &self,
-        ctx: &FieldContext<'_>,
+        ctx: &Context<'_>,
         first: Option<i64>,
         after: Option<ID>,
     ) -> Result<FriendsConnection, Error> {
@@ -35,7 +35,7 @@ impl Character {
         }
     }
 
-    async fn appearsIn(&self, ctx: &FieldContext<'_>) -> Result<Vec<Episode>, Error> {
+    async fn appearsIn(&self, ctx: &Context<'_>) -> Result<Vec<Episode>, Error> {
         match self {
             Character::Human(obj) => Ok(obj.appearsIn(&ctx).await?),
             Character::Droid(obj) => Ok(obj.appearsIn(&ctx).await?),

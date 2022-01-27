@@ -1,7 +1,7 @@
 use graphql_parser::schema::DirectiveLocation;
 
 use crate::{
-    resolve_selection_parallelly, types::DirectiveDefinition, CollectFields, FieldContext,
+    resolve_selection_parallelly, types::DirectiveDefinition, CollectFields, Context,
     FieldResolver, GqlValue, ResolverResult, Schema, SelectionSetContext, SelectionSetResolver,
 };
 
@@ -67,7 +67,7 @@ impl<'a> __Directive<'a> {
 
 #[async_trait::async_trait]
 impl<'a> FieldResolver for __Directive<'a> {
-    async fn resolve_field(&self, ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
+    async fn resolve_field(&self, ctx: &Context<'_>) -> ResolverResult<Option<GqlValue>> {
         if ctx.item.name == "name" {
             let name = self.name().await;
             let ctx_selection_set = ctx.with_selection_set(&ctx.item.selection_set);

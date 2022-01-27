@@ -42,7 +42,7 @@ impl<'a> FileDefinition for InterfaceFile<'a> {
             let fn_scope = interface_impl.new_fn(&field.name);
             fn_scope.arg_ref_self();
             fn_scope.set_async(true);
-            fn_scope.arg("ctx", "&FieldContext<'_>");
+            fn_scope.arg("ctx", "&Context<'_>");
             for arg in &field.arguments {
                 fn_scope.arg(&arg.name, gql_value_ty_to_rust_ty(&arg.meta_type));
             }

@@ -27,7 +27,7 @@ impl<'a> FileDefinition for DirectiveFile<'a> {
         let f = directive_impl.new_fn("resolve_field");
         f.set_async(true);
         f.arg_ref_self();
-        f.arg("ctx", "&FieldContext<'_>");
+        f.arg("ctx", "&Context<'_>");
         f.arg("directive_args", "&BTreeMap<String, GqlValue>");
         f.arg("resolve_fut", "ResolveFut<'_>");
         f.ret("ResolverResult<Option<GqlValue>>");

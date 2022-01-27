@@ -3,7 +3,7 @@ use std::collections::{BTreeMap, HashMap};
 use serde::Serialize;
 
 use crate::{
-    types::value::serialize_into_gql_value, CollectFields, FieldContext, FieldResolver, GqlValue,
+    types::value::serialize_into_gql_value, CollectFields, Context, FieldResolver, GqlValue,
     ResolverResult, SelectionSetContext, SelectionSetResolver,
 };
 
@@ -13,7 +13,7 @@ where
     K: ToString + Eq + Send + Sync,
     V: Serialize + Send + Sync,
 {
-    async fn resolve_field(&self, _ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
+    async fn resolve_field(&self, _ctx: &Context<'_>) -> ResolverResult<Option<GqlValue>> {
         let mut map = BTreeMap::new();
         for (name, v) in self {
             map.insert(
@@ -62,7 +62,7 @@ where
     K: ToString + Eq + Send + Sync,
     V: Serialize + Send + Sync,
 {
-    async fn resolve_field(&self, _ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
+    async fn resolve_field(&self, _ctx: &Context<'_>) -> ResolverResult<Option<GqlValue>> {
         let mut map = BTreeMap::new();
         for (name, v) in self {
             map.insert(

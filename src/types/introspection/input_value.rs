@@ -44,7 +44,7 @@ impl<'a> __InputValue<'a> {
 impl<'a> FieldResolver for __InputValue<'a> {
     async fn resolve_field(
         &self,
-        ctx: &crate::FieldContext<'_>,
+        ctx: &crate::Context<'_>,
     ) -> crate::ResolverResult<Option<crate::GqlValue>> {
         if ctx.item.name == "name" {
             let name = self.name().await;

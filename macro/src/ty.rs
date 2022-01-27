@@ -74,7 +74,7 @@ pub fn generate_type(
                 .is_some();
 
             if !*is_contain_context {
-                let arg_ctx = syn::parse2::<FnArg>(quote! { ctx: &#crate_name::FieldContext<'_> })
+                let arg_ctx = syn::parse2::<FnArg>(quote! { ctx: &#crate_name::Context<'_> })
                     .expect("invalid arg type");
                 method.sig.inputs.insert(1, arg_ctx);
             }
@@ -123,7 +123,7 @@ pub fn generate_type(
 
         #[#crate_name::async_trait::async_trait]
         impl #impl_generics #crate_name::FieldResolver for #self_ty #where_clause {
-            async fn resolve_field(&self, ctx: &#crate_name::FieldContext<'_>) -> #crate_name::ResolverResult<::std::option::Option<#crate_name::GqlValue>> {
+            async fn resolve_field(&self, ctx: &#crate_name::Context<'_>) -> #crate_name::ResolverResult<::std::option::Option<#crate_name::GqlValue>> {
                 #(#resolvers)*
                 Ok(::std::option::Option::None)
             }

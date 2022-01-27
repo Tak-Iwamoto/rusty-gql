@@ -1,5 +1,5 @@
 use crate::{
-    resolve_selection_parallelly, types::GqlValueType, CollectFields, FieldContext, FieldResolver,
+    resolve_selection_parallelly, types::GqlValueType, CollectFields, Context, FieldResolver,
     GqlValue, ResolverResult, Schema, SelectionSetContext, SelectionSetResolver, TypeDefinition,
 };
 
@@ -222,7 +222,7 @@ impl<'a> __Type<'a> {
 
 #[async_trait::async_trait]
 impl<'a> FieldResolver for __Type<'a> {
-    async fn resolve_field(&self, ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
+    async fn resolve_field(&self, ctx: &Context<'_>) -> ResolverResult<Option<GqlValue>> {
         if ctx.item.name == "kind" {
             let kind = self.kind().await;
             let ctx_selection_set = ctx.with_selection_set(&ctx.item.selection_set);

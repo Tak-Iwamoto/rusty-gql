@@ -78,7 +78,7 @@ pub fn is_context_type(arg: &FnArg) -> bool {
     if let FnArg::Typed(pat) = arg {
         if let Type::Reference(TypeReference { elem, .. }) = &*pat.ty {
             if let Type::Path(path) = elem.as_ref() {
-                is_context = path.path.segments.last().unwrap().ident == "FieldContext";
+                is_context = path.path.segments.last().unwrap().ident == "Context";
             }
         }
     }

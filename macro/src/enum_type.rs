@@ -79,7 +79,7 @@ pub fn generate_enum(derive_input: &DeriveInput) -> Result<TokenStream, syn::Err
 
         #[#crate_name::async_trait::async_trait]
         impl #impl_generics #crate_name::FieldResolver for #self_ty #where_clause {
-            async fn resolve_field(&self, ctx: &#crate_name::FieldContext<'_>) -> #crate_name::ResolverResult<::std::option::Option<#crate_name::GqlValue>> {
+            async fn resolve_field(&self, ctx: &#crate_name::Context<'_>) -> #crate_name::ResolverResult<::std::option::Option<#crate_name::GqlValue>> {
                 match self {
                     #(#resolve_fields),*
                 }

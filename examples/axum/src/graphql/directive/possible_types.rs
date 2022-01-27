@@ -8,7 +8,7 @@ pub struct possibleTypes;
 impl CustomDirective for possibleTypes {
     async fn resolve_field(
         &self,
-        ctx: &FieldContext<'_>,
+        ctx: &Context<'_>,
         directive_args: &BTreeMap<String, GqlValue>,
         resolve_fut: ResolveFut<'_>,
     ) -> ResolverResult<Option<GqlValue>> {

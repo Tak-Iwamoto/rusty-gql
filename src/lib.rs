@@ -22,7 +22,7 @@ use std::path::Path;
 pub use async_trait;
 
 pub use container::Container;
-pub use context::{ExecutionContext, FieldContext, SelectionSetContext};
+pub use context::{ExecutionContext, Context, SelectionSetContext};
 pub use custom_directive::CustomDirective;
 pub use error::{Error, GqlError};
 pub use executor::execute;
@@ -55,7 +55,7 @@ pub struct EmptyMutation;
 
 #[async_trait::async_trait]
 impl FieldResolver for EmptyMutation {
-    async fn resolve_field(&self, _ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
+    async fn resolve_field(&self, _ctx: &Context<'_>) -> ResolverResult<Option<GqlValue>> {
         Ok(None)
     }
     fn type_name() -> String {
@@ -80,7 +80,7 @@ pub struct EmptySubscription;
 
 #[async_trait::async_trait]
 impl FieldResolver for EmptySubscription {
-    async fn resolve_field(&self, _ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
+    async fn resolve_field(&self, _ctx: &Context<'_>) -> ResolverResult<Option<GqlValue>> {
         Ok(None)
     }
     fn type_name() -> String {

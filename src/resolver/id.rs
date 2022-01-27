@@ -1,11 +1,11 @@
 use crate::{
-    CollectFields, FieldContext, FieldResolver, GqlValue, ResolverResult, SelectionSetContext,
+    CollectFields, Context, FieldResolver, GqlValue, ResolverResult, SelectionSetContext,
     SelectionSetResolver, ID,
 };
 
 #[async_trait::async_trait]
 impl FieldResolver for ID {
-    async fn resolve_field(&self, _ctx: &FieldContext<'_>) -> ResolverResult<Option<GqlValue>> {
+    async fn resolve_field(&self, _ctx: &Context<'_>) -> ResolverResult<Option<GqlValue>> {
         Ok(Some(GqlValue::String(self.0.to_string())))
     }
     fn type_name() -> String {

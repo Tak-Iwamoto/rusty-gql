@@ -15,9 +15,9 @@ pub struct ExecutionContext<'a, T> {
     pub current_path: GqlPath,
 }
 
-pub type FieldContext<'a> = ExecutionContext<'a, &'a Field<'a, String>>;
+pub type Context<'a> = ExecutionContext<'a, &'a Field<'a, String>>;
 
-impl<'a> FieldContext<'a> {
+impl<'a> Context<'a> {
     pub fn get_arg_value<T: GqlInputType>(&self, arg_name: &str) -> ResolverResult<T> {
         let value = self
             .item
