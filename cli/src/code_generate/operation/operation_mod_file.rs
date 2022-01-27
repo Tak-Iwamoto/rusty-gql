@@ -47,6 +47,11 @@ impl<'a> OperationModFile<'a> {
 
         for (operation_name, method) in self.operations.iter() {
             let fn_scope = imp.new_fn(&operation_name);
+            fn_scope.set_async(true);
+            fn_scope.vis("pub");
+            fn_scope.arg_ref_self();
+            fn_scope.arg("ctx", "&Context<'_>");
+
             let mut args_str = String::from("");
             for arg in &method.arguments {
                 fn_scope.arg(&arg.name, gql_value_ty_to_rust_ty(&arg.meta_type));
@@ -54,16 +59,13 @@ impl<'a> OperationModFile<'a> {
             }
             // remove last `,`
             args_str.pop();
-            fn_scope.set_async(true);
-            fn_scope.vis("pub");
-            fn_scope.arg_ref_self();
 
             let return_ty = gql_value_ty_to_rust_ty(&method.meta_type);
             fn_scope.ret(Type::new(&return_ty));
 
             let filename = operation_name.to_snake_case();
             fn_scope.line(format!(
-                "{filename}::{method}({args}).await",
+                "{filename}::{method}(&ctx,{args}).await",
                 filename = filename,
                 method = method.name,
                 args = args_str

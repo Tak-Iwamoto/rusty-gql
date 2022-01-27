@@ -42,6 +42,7 @@ impl<'a> FileDefinition for ObjectFile<'a> {
             }
 
             let fn_scope = struct_imp.new_fn(&field_name);
+            fn_scope.arg("ctx", "&Context<'_>");
             for arg in &field.arguments {
                 fn_scope.arg(&arg.name, gql_value_ty_to_rust_ty(&arg.meta_type));
             }

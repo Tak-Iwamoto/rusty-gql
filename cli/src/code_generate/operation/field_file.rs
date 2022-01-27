@@ -21,6 +21,9 @@ impl<'a> FileDefinition for FieldFile<'a> {
     fn content(&self) -> String {
         let mut scope = Scope::new();
         let fn_scope = scope.new_fn(&self.def.name);
+        fn_scope.vis("pub");
+        fn_scope.set_async(true);
+        fn_scope.arg("ctx", "&Context<'_>");
 
         for arg in &self.def.arguments {
             fn_scope.arg(&arg.name, gql_value_ty_to_rust_ty(&arg.meta_type));
@@ -29,9 +32,6 @@ impl<'a> FileDefinition for FieldFile<'a> {
         let return_ty = gql_value_ty_to_rust_ty(&self.def.meta_type);
 
         fn_scope.ret(Type::new(&return_ty));
-
-        fn_scope.vis("pub");
-        fn_scope.set_async(true);
         fn_scope.line("todo!()");
 
         format!("{}\n\n{}", use_gql_definitions(), scope.to_string())
