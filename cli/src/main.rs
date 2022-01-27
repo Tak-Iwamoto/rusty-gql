@@ -58,9 +58,6 @@ async fn run() -> Result<ExitCode> {
             create_graphql_files(Some(app_name)).await?;
             println!("Successfully created the rusty-gql project!");
             return Ok(ExitCode::Success);
-            // if let Some(server_lib) = new_matches.value_of("lib") {
-            //     println!("server library: {:?}", server_lib);
-            // }
         }
     }
 
