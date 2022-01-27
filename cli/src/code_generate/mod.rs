@@ -101,6 +101,7 @@ async fn create_root_dirs(path: &str) -> Result<Vec<()>, Error> {
 }
 
 pub(crate) fn use_gql_definitions() -> &'static str {
-    r#"use crate::graphql::*;
+    r#"#![allow(warnings, unused)]
+use crate::graphql::*;
 use rusty_gql::*;"#
 }
