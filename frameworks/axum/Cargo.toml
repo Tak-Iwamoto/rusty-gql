@@ -17,7 +17,6 @@ axum = {version = "0.4.2", features = ["ws", "headers"]}
 bytes = "1.1.0"
 futures-util = {version = "0.3.18", default-features = false, features = ["io", "sink"]}
 http-body = "0.4.4"
-# rusty-gql = {registry = "ktra", version = "0.0.3"}
 rusty-gql = {path = "../.."}
 serde_urlencoded = "0.7.0"
 tokio-util = {version = "0.6.9", default-features = false, features = ["io", "compat"]}
