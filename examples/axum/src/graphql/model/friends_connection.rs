@@ -3,14 +3,14 @@ use crate::graphql::*;
 use rusty_gql::*;
 
 pub struct FriendsConnection {
-    pub totalCount: Option<i64>,
+    pub totalCount: Option<i32>,
     pub edges: Vec<FriendsEdge>,
     pub pageInfo: PageInfo,
 }
 
 #[GqlType]
 impl FriendsConnection {
-    pub async fn totalCount(&self) -> Option<i64> {
+    pub async fn totalCount(&self) -> Option<i32> {
         self.totalCount
     }
 

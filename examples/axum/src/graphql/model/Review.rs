@@ -3,7 +3,7 @@ use crate::graphql::*;
 use rusty_gql::*;
 
 pub struct Review {
-    pub stars: i64,
+    pub stars: i32,
     pub commentary: Option<String>,
     pub episode: Option<Episode>,
 }
@@ -14,7 +14,7 @@ impl Review {
         self.episode
     }
 
-    pub async fn stars(&self) -> i64 {
+    pub async fn stars(&self) -> i32 {
         self.stars
     }
 

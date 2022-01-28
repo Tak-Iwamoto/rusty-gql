@@ -39,8 +39,8 @@ fn value_ty_to_str(gql_value: &GqlValueType, optional: bool) -> String {
 
 fn gql_to_rust_type_str(gql_type: &str, optional: bool) -> String {
     let name = match gql_type {
-        "Int" => "i64".to_string(),
-        "Float" => "f64".to_string(),
+        "Int" => "i32".to_string(),
+        "Float" => "f32".to_string(),
         "String" => "String".to_string(),
         "Boolean" => "bool".to_string(),
         _ => gql_type.to_string(),

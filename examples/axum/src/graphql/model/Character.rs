@@ -27,7 +27,7 @@ impl Character {
     async fn friends(
         &self,
         ctx: &Context<'_>,
-        first: Option<i64>,
+        first: Option<i32>,
         after: Option<ID>,
     ) -> Result<FriendsConnection, Error> {
         match self {
