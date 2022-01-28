@@ -10,15 +10,15 @@ pub struct Review {
 
 #[GqlType]
 impl Review {
-    pub async fn episode(&self) -> Option<Episode> {
+    pub async fn episode(&self, ctx: &Context<'_>) -> Option<Episode> {
         self.episode
     }
 
-    pub async fn stars(&self) -> i32 {
+    pub async fn stars(&self, ctx: &Context<'_>) -> i32 {
         self.stars
     }
 
-    pub async fn commentary(&self) -> Option<String> {
+    pub async fn commentary(&self, ctx: &Context<'_>) -> Option<String> {
         self.commentary.clone()
     }
 }

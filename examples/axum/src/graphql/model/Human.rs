@@ -16,31 +16,31 @@ pub struct Human {
 
 #[GqlType]
 impl Human {
-    pub async fn id(&self) -> ID {
+    pub async fn id(&self, ctx: &Context<'_>) -> ID {
         self.id.clone()
     }
 
-    pub async fn name(&self) -> String {
+    pub async fn name(&self, ctx: &Context<'_>) -> String {
         self.name.clone()
     }
 
-    pub async fn homePlanet(&self) -> Option<String> {
+    pub async fn homePlanet(&self, ctx: &Context<'_>) -> Option<String> {
         self.homePlanet.clone()
     }
 
-    pub async fn height(&self, unit: Option<LengthUnit>) -> Option<f64> {
+    pub async fn height(&self, ctx: &Context<'_>, unit: Option<LengthUnit>) -> Option<f64> {
         self.height
     }
 
-    pub async fn mass(&self) -> Option<f64> {
+    pub async fn mass(&self, ctx: &Context<'_>) -> Option<f64> {
         self.mass
     }
 
-    pub async fn episode(&self) -> Option<Episode> {
+    pub async fn episode(&self, ctx: &Context<'_>) -> Option<Episode> {
         Some(Episode::JEDI)
     }
 
-    pub async fn friends(&self, first: Option<i32>, after: Option<ID>) -> FriendsConnection {
+    pub async fn friends(&self, ctx: &Context<'_>, first: Option<i32>, after: Option<ID>) -> FriendsConnection {
         if self.id.0 == "2".to_string() {
             FriendsConnection {
                 totalCount: Some(0),
@@ -75,7 +75,7 @@ impl Human {
         }
     }
 
-    pub async fn appearsIn(&self) -> Vec<Episode> {
+    pub async fn appearsIn(&self, ctx: &Context<'_>) -> Vec<Episode> {
         vec![Episode::NEWHOPE, Episode::JEDI, Episode::EMPIRE]
     }
 }

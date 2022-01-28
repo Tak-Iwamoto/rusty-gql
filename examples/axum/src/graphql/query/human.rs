@@ -5,7 +5,7 @@ use crate::{
 };
 use rusty_gql::*;
 
-pub async fn human(id: ID) -> Option<Human> {
+pub async fn human(ctx: &Context<'_>, id: ID) -> Option<Human> {
     if id.0 == "1" {
         Some(luke())
     } else if id.0 == "2" {

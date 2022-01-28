@@ -10,11 +10,11 @@ pub struct FriendsEdge {
 
 #[GqlType]
 impl FriendsEdge {
-    pub async fn cursor(&self) -> ID {
+    pub async fn cursor(&self, ctx: &Context<'_>) -> ID {
         self.cursor.clone()
     }
 
-    pub async fn node(&self) -> Option<Character> {
+    pub async fn node(&self, ctx: &Context<'_>) -> Option<Character> {
         self.node.clone()
     }
 }

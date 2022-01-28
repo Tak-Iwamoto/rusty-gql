@@ -14,15 +14,15 @@ pub struct Droid {
 
 #[GqlType]
 impl Droid {
-    pub async fn id(&self) -> ID {
+    pub async fn id(&self, ctx: &Context<'_>) -> ID {
         self.id.clone()
     }
 
-    pub async fn name(&self) -> String {
+    pub async fn name(&self, ctx: &Context<'_>) -> String {
         self.name.clone()
     }
 
-    pub async fn friends(&self, first: Option<i32>, after: Option<ID>) -> FriendsConnection {
+    pub async fn friends(&self, ctx: &Context<'_>,first: Option<i32>, after: Option<ID>) -> FriendsConnection {
         FriendsConnection {
             totalCount: Some(4),
             edges: vec![
@@ -44,7 +44,7 @@ impl Droid {
         }
     }
 
-    pub async fn appearsIn(&self) -> Vec<Episode> {
+    pub async fn appearsIn(&self, ctx: &Context<'_>) -> Vec<Episode> {
         if self.name == "R2D2".to_string() {
             vec![Episode::EMPIRE, Episode::NEWHOPE, Episode::JEDI]
         } else if self.name == "C3PO".to_string() {
@@ -54,7 +54,7 @@ impl Droid {
         }
     }
 
-    pub async fn primaryFunction(&self) -> Option<String> {
+    pub async fn primaryFunction(&self, ctx: &Context<'_>) -> Option<String> {
         self.primaryFunction.clone()
     }
 }

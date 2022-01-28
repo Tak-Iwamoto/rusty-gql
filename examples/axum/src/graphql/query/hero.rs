@@ -5,7 +5,7 @@ use crate::{
 };
 use rusty_gql::*;
 
-pub async fn hero(episode: Option<Episode>) -> Option<Character> {
+pub async fn hero(ctx: &Context<'_>, episode: Option<Episode>) -> Option<Character> {
     match episode {
         Some(episode) => match episode {
             Episode::NEWHOPE => Some(Character::Human(luke())),

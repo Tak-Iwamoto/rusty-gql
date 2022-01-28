@@ -5,7 +5,11 @@ use crate::{
 };
 use rusty_gql::*;
 
-pub async fn search(text: Option<String>, episode: Option<Episode>) -> Vec<SearchResult> {
+pub async fn search(
+    ctx: &Context<'_>,
+    text: Option<String>,
+    episode: Option<Episode>,
+) -> Vec<SearchResult> {
     if let Some(text) = text {
         if text == "luke" {
             vec![SearchResult::Human(luke())]
