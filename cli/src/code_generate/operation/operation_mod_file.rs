@@ -22,28 +22,24 @@ impl<'a> FileDefinition for OperationModFile<'a> {
     }
 
     fn content(&self) -> String {
-        let mut result = String::from("");
-
-        for (operation_name, _) in self.operations.iter() {
-            let filename = operation_name.to_snake_case();
-            result += format!("mod {};\n", filename,).as_str();
-        }
-
-        result += "\n";
-        result += &self.build_query_str();
-
-        result
+        self.build_content()
     }
 }
 
 impl<'a> OperationModFile<'a> {
-    fn build_query_str(&self) -> String {
+    fn build_content(&self) -> String {
         let mut scope = Scope::new();
         let struct_name = self.operation_type.to_string();
         let struct_scope = scope.new_struct(&struct_name).vis("pub");
         struct_scope.derive("Clone");
         let imp = scope.new_impl(&struct_name);
         imp.r#macro("#[GqlType]");
+
+        let mut mod_str = "".to_string();
+        for (operation_name, _) in self.operations.iter() {
+            let filename = operation_name.to_snake_case();
+            mod_str += format!("mod {};\n", filename,).as_str();
+        }
 
         for (operation_name, method) in self.operations.iter() {
             let fn_scope = imp.new_fn(&operation_name);
@@ -72,6 +68,11 @@ impl<'a> OperationModFile<'a> {
             ));
         }
 
-        format!("{}\n\n{}", use_gql_definitions(), scope.to_string())
+        format!(
+            "{}\n{}\n\n{}",
+            use_gql_definitions(),
+            mod_str,
+            scope.to_string()
+        )
     }
 }
