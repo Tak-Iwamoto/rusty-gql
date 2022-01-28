@@ -19,7 +19,7 @@ cargo run
 rusty-gql is designed for schema first development.
 It reads any graphql files under `schema/**`.
 
-For example,
+The following example is the default schema.
 
 `schema/schema.graphql`
 ``` graphql
@@ -29,12 +29,52 @@ type Query {
 
 type Todo {
   title: String!
+  content: String
+  done: Boolean!
+}
+```
+
+## Implement Resolvers
+Let's edit `src/graphql/query/todos.rs`.
+
+``` rs
+pub async fn todos(ctx: &Context<'_>, first: Option<i32>) -> Vec<Todo> {
+    let all_todos = vec![
+        Todo {
+            title: "Programming".to_string(),
+            content: Some("Learn Rust".to_string()),
+            done: false,
+        },
+        Todo {
+            title: "Shopping".to_string(),
+            content: None,
+            done: true,
+        },
+    ];
+    match first {
+        Some(first) => all_todos.into_iter().take(first as usize).collect(),
+        None => all_todos,
+    }
+}
+```
+
+## Generate Rust code
+Add a type definition to schema.graphql.
+
+``` graphql
+type Query {
+  todos(first: Int): [Todo!]!
+  # added
+  todo(id: ID!): Todo
+}
+
+type Todo {
+  title: String!
   description: String
   done: Boolean!
 }
 ```
 
-## Generate Rust code
 rusty-gql generates rust code from graphql schema files.
 ```
 rusty-gql generate // or rusty-gql g
@@ -52,8 +92,10 @@ src
  ┃ ┃ ┗ mod.rs
  ┃ ┣ query
  ┃ ┃ ┣ mod.rs
+ ┃ ┃ ┣ todo.rs
  ┃ ┃ ┗ todos.rs
  ┃ ┣ resolver
+ ┃ ┃ ┣ mod.rs
  ┃ ┃ ┗ todo.rs
  ┃ ┣ scalar
  ┃ ┃ ┗ mod.rs
@@ -63,7 +105,6 @@ src
  ┗ main.rs
 ```
 
-## Implement Resolvers
 ## GraphQL Playground
 rusty-gql supports GraphiQL playground.
 Open a browser to http://localhost:3000/graphiql.
