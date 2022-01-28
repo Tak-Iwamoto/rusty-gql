@@ -3,10 +3,12 @@ mod example_schema_file;
 
 use std::io::Error;
 
-pub use example_schema_file::StarWarsSchemaFile;
 use futures_util::future::try_join_all;
 
-use self::axum::{AxumCargoTomlFile, AxumMainFile};
+use self::{
+    axum::{AxumCargoTomlFile, AxumMainFile},
+    example_schema_file::TodoSchemaFile,
+};
 
 use super::create_file;
 
@@ -30,5 +32,5 @@ async fn create_cargo_toml(app_name: &str) -> Result<(), Error> {
 }
 
 async fn create_example_gql_schema(app_name: &str) -> Result<(), Error> {
-    create_file(StarWarsSchemaFile { app_name }).await
+    create_file(TodoSchemaFile { app_name }).await
 }
