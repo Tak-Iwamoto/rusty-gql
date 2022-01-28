@@ -5,7 +5,6 @@ mod error;
 mod executor;
 mod input;
 mod operation;
-mod path;
 mod playground_html;
 mod query_root;
 mod request;

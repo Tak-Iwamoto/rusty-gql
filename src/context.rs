@@ -1,6 +1,6 @@
 use crate::{
-    error::GqlError, input::GqlInputType, operation::Operation, path::GqlPath,
-    types::schema::Schema, GqlValue, ResolverResult,
+    error::GqlError, input::GqlInputType, operation::Operation, types::schema::Schema, GqlValue,
+    ResolverResult,
 };
 use graphql_parser::{
     query::{Field, SelectionSet},
@@ -12,7 +12,6 @@ pub struct ExecutionContext<'a, T> {
     pub schema: &'a Schema,
     pub operation: &'a Operation<'a>,
     pub item: T,
-    pub current_path: GqlPath,
 }
 
 pub type Context<'a> = ExecutionContext<'a, &'a Field<'a, String>>;
@@ -53,7 +52,6 @@ impl<'a, T> ExecutionContext<'a, T> {
             schema: self.schema,
             operation: self.operation,
             item: field,
-            current_path: self.current_path.clone(),
         }
     }
 
@@ -65,7 +63,6 @@ impl<'a, T> ExecutionContext<'a, T> {
             schema: self.schema,
             operation: self.operation,
             item: selection_set,
-            current_path: self.current_path.clone(),
         }
     }
 
@@ -119,14 +116,9 @@ pub(crate) fn build_context<'a>(
     schema: &'a Schema,
     operation: &'a Operation<'a>,
 ) -> ExecutionContext<'a, &'a SelectionSet<'a, String>> {
-    let operation_type = operation.operation_type.to_string();
-
-    let current_path = GqlPath::default().prev(None).parent_name(operation_type);
-
     ExecutionContext {
         schema,
         operation,
         item: &operation.selection_set,
-        current_path,
     }
 }
