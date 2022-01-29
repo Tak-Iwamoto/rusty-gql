@@ -1,8 +1,9 @@
 # Interface
 
-rusty-gql defines Graphql Interface as Rust enum with different types.
+GraphQL Interface is represented as Rust enum with different types and `#[derive(GqlInterface)`, `#[GqlType(interface)]`.
 
 schema.graphql
+
 ```graphql
 interface Pet {
   name: String
@@ -20,12 +21,13 @@ type Dog implements Pet {
 ```
 
 pet.rs
-``` rust
+
+```rust
 #![allow(warnings, unused)]
 use crate::graphql::*;
 use rusty_gql::*;
 
-#[derive(GqlInterface, Debug, Clone)]
+#[derive(GqlInterface, Clone)]
 pub enum Pet {
     Cat(Cat),
     Dog(Dog),

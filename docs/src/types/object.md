@@ -1,6 +1,6 @@
 # Object
 
-rusty-gql defines Graphql Object as Rust struct like the following.
+rusty-gql defines GraphQL Object as Rust struct and `#[GqlType]` like the following.
 
 schema.graphql
 
@@ -40,7 +40,7 @@ impl Todo {
 
 We'll implement async fn for each fields with `#[GqlType]`.
 
-If we want to execute the field resolver when the query includes the field, we can define only async fn without the struct field.
+If we want to execute the field resolver only when the query includes the field, we can define only async fn without the struct field.
 
 ```graphql
 type Todo {
