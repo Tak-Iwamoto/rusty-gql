@@ -30,7 +30,7 @@ async fn main() {
     let schema_docs: Vec<&str> = schema_docs.iter().map(|s| &**s).collect();
 
     let container = Container::new(
-        &schema_docs.as_slice(),
+        schema_docs.as_slice(),
         Query,
         Mutation,
         EmptySubscription,

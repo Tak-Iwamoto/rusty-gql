@@ -230,7 +230,7 @@ impl<'a> From<Value<'a, String>> for GqlValue {
             Value::Null => GqlValue::Null,
             Value::Enum(enum_value) => GqlValue::Enum(enum_value),
             Value::List(list) => {
-                let result = list.into_iter().map(|ele| Self::from(ele)).collect();
+                let result = list.into_iter().map(Self::from).collect();
                 GqlValue::List(result)
             }
             Value::Object(obj) => {

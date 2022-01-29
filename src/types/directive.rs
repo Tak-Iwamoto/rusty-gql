@@ -17,11 +17,8 @@ pub struct GqlDirective {
 }
 
 impl GqlDirective {
-    pub fn from_vec_directive<'a>(directives: Vec<Directive<'a, String>>) -> Vec<GqlDirective> {
-        directives
-            .into_iter()
-            .map(|dir| GqlDirective::from(dir))
-            .collect()
+    pub fn from_vec_directive(directives: Vec<Directive<'_, String>>) -> Vec<GqlDirective> {
+        directives.into_iter().map(GqlDirective::from).collect()
     }
 }
 

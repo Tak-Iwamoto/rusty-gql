@@ -20,7 +20,7 @@ impl<'a> From<ParserEnumType<'a, String>> for EnumType {
         let values = gql_enum
             .values
             .into_iter()
-            .map(|value| EnumTypeValue::from(value))
+            .map(EnumTypeValue::from)
             .collect();
 
         EnumType {
@@ -35,8 +35,10 @@ impl<'a> From<ParserEnumType<'a, String>> for EnumType {
 
 impl EnumType {
     pub fn contains(&self, name: &str) -> bool {
-        let values: Vec<String> = self.values.iter().map(|v| v.name.clone()).collect();
-        values.contains(&name.to_string())
+        self.values
+            .iter()
+            .map(|v| v.name.clone())
+            .any(|x| x == *name)
     }
 }
 
@@ -53,7 +55,7 @@ impl<'a> From<EnumValue<'a, String>> for EnumTypeValue {
         let directives = enum_value
             .directives
             .into_iter()
-            .map(|dir| GqlDirective::from(dir))
+            .map(GqlDirective::from)
             .collect();
 
         EnumTypeValue {

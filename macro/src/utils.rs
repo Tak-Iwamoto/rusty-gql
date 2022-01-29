@@ -2,12 +2,10 @@ use syn::{FnArg, ImplItemMethod, Meta, NestedMeta, Pat, PatIdent, Type, TypeRefe
 
 pub fn is_internal(args: &[NestedMeta]) -> bool {
     for arg in args {
-        if let NestedMeta::Meta(meta) = arg {
-            if let Meta::Path(path) = meta {
-                let ident = &path.segments.last().unwrap().ident;
-                if ident == "internal" {
-                    return true;
-                }
+        if let NestedMeta::Meta(Meta::Path(path)) = arg {
+            let ident = &path.segments.last().unwrap().ident;
+            if ident == "internal" {
+                return true;
             }
         }
     }
@@ -16,12 +14,10 @@ pub fn is_internal(args: &[NestedMeta]) -> bool {
 
 pub fn is_interface(args: &[NestedMeta]) -> bool {
     for arg in args {
-        if let NestedMeta::Meta(meta) = arg {
-            if let Meta::Path(path) = meta {
-                let ident = &path.segments.last().unwrap().ident;
-                if ident == "interface" {
-                    return true;
-                }
+        if let NestedMeta::Meta(Meta::Path(path)) = arg {
+            let ident = &path.segments.last().unwrap().ident;
+            if ident == "interface" {
+                return true;
             }
         }
     }

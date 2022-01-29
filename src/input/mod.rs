@@ -22,7 +22,7 @@ impl<T: GqlInputType> GqlInputType for Arc<T> {
     }
 
     fn into_gql_value(&self) -> GqlValue {
-        T::into_gql_value(&self)
+        T::into_gql_value(self)
     }
 }
 
@@ -32,6 +32,6 @@ impl<T: GqlInputType> GqlInputType for Box<T> {
     }
 
     fn into_gql_value(&self) -> GqlValue {
-        T::into_gql_value(&self)
+        T::into_gql_value(self)
     }
 }

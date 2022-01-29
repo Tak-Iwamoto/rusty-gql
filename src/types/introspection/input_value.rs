@@ -33,10 +33,7 @@ impl<'a> __InputValue<'a> {
     }
 
     async fn default_value(&self) -> Option<String> {
-        match &self.detail.default_value {
-            Some(v) => Some(v.to_string()),
-            None => None,
-        }
+        self.detail.default_value.as_ref().map(|v| v.to_string())
     }
 }
 

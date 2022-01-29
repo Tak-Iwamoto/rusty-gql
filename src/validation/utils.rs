@@ -79,7 +79,7 @@ pub fn check_valid_input_value(
                     },
                     TypeDefinition::Enum(enum_value) => match value {
                         Value::String(name) => {
-                            if enum_value.contains(&name) {
+                            if enum_value.contains(name) {
                                 Some(format!(
                                     "Enum type {} does not contain the value {}",
                                     enum_value.name, name
@@ -89,7 +89,7 @@ pub fn check_valid_input_value(
                             }
                         }
                         Value::Enum(name) => {
-                            if enum_value.contains(&name) {
+                            if enum_value.contains(name) {
                                 Some(format!(
                                     "Enum type {} does not contain the value {}",
                                     enum_value.name, name
@@ -109,21 +109,21 @@ pub fn check_valid_input_value(
             Value::Null => None,
             Value::List(values) => {
                 for v in values {
-                    let error_msg = check_valid_input_value(schema, &list_type, v);
+                    let error_msg = check_valid_input_value(schema, list_type, v);
                     if let Some(msg) = error_msg {
                         return Some(msg);
                     }
                 }
                 None
             }
-            _ => check_valid_input_value(schema, &list_type, value),
+            _ => check_valid_input_value(schema, list_type, value),
         },
         Type::NonNullType(non_null_type) => match value {
             Value::Null => Some(format!(
                 "type {} is non null but not provided value",
                 get_type_name(ty)
             )),
-            _ => check_valid_input_value(schema, &non_null_type, value),
+            _ => check_valid_input_value(schema, non_null_type, value),
         },
     }
 }
@@ -157,9 +157,7 @@ fn referenced_variables_to_vec<'a>(value: &'a Value<'a, String>, vars: &mut Vec<
     }
 }
 
-pub fn get_operation_def_position<'a>(
-    operation_definition: &OperationDefinition<'a, String>,
-) -> Pos {
+pub fn get_operation_def_position(operation_definition: &OperationDefinition<'_, String>) -> Pos {
     match operation_definition {
         OperationDefinition::SelectionSet(selection_set) => selection_set.span.0,
         OperationDefinition::Query(query) => query.position,
@@ -168,8 +166,8 @@ pub fn get_operation_def_position<'a>(
     }
 }
 
-pub fn get_fragment_definition_on_str<'a>(
-    type_condition: Option<&TypeCondition<'a, String>>,
+pub fn get_fragment_definition_on_str(
+    type_condition: Option<&TypeCondition<'_, String>>,
 ) -> Option<String> {
     if let Some(TypeCondition::On(ty)) = type_condition {
         Some(ty.clone())

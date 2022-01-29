@@ -11,7 +11,7 @@ pub fn generate_type(
     args: &[NestedMeta],
 ) -> Result<TokenStream, syn::Error> {
     let self_ty = &item_impl.self_ty;
-    let crate_name = if is_internal(&args) {
+    let crate_name = if is_internal(args) {
         quote! { crate }
     } else {
         quote! { rusty_gql }
@@ -20,7 +20,7 @@ pub fn generate_type(
     let type_name = match self_ty.as_ref() {
         syn::Type::Path(path) => path.path.segments.last().unwrap().ident.unraw().to_string(),
         _ => {
-            return Err(syn::Error::new_spanned(&self_ty, "Invalid struct").into());
+            return Err(syn::Error::new_spanned(&self_ty, "Invalid struct"));
         }
     };
 
@@ -30,9 +30,10 @@ pub fn generate_type(
     for item in &mut item_impl.items {
         if let ImplItem::Method(method) = item {
             if method.sig.asyncness.is_none() {
-                return Err(
-                    syn::Error::new_spanned(&method, "Resolver must be an async method.").into(),
-                );
+                return Err(syn::Error::new_spanned(
+                    &method,
+                    "Resolver must be an async method.",
+                ));
             }
 
             let return_type = match &method.sig.output {
@@ -40,8 +41,7 @@ pub fn generate_type(
                     return Err(syn::Error::new_spanned(
                         &method.sig.output,
                         "Resolver must have a return type",
-                    )
-                    .into());
+                    ));
                 }
                 syn::ReturnType::Type(_, ty) => ty,
             };
@@ -66,12 +66,7 @@ pub fn generate_type(
                 .expect("ItemImpl return type is invalid.");
             }
 
-            let is_contain_context = &method
-                .sig
-                .inputs
-                .iter()
-                .find(|arg| is_context_type(arg))
-                .is_some();
+            let is_contain_context = &method.sig.inputs.iter().any(is_context_type);
 
             if !*is_contain_context {
                 let arg_ctx = syn::parse2::<FnArg>(quote! { ctx: &#crate_name::Context<'_> })
@@ -81,7 +76,7 @@ pub fn generate_type(
             let method_name = &method.sig.ident;
             let field_name = method_name.unraw().to_string();
 
-            let method_args = get_method_args_without_context(&method)?;
+            let method_args = get_method_args_without_context(method)?;
             let mut args = Vec::new();
             let mut gql_arg_values = Vec::new();
 
@@ -110,7 +105,7 @@ pub fn generate_type(
         }
     }
 
-    let collect_fields = if is_interface(&args) {
+    let collect_fields = if is_interface(args) {
         None
     } else {
         Some(quote! {

@@ -65,7 +65,7 @@ pub async fn create_directive_files(
             continue;
         }
         let filename = &directive.name.to_snake_case();
-        let path = path_str(vec![base_path, "directive", &filename], true);
+        let path = path_str(vec![base_path, "directive", filename], true);
         futures.push(create_file(DirectiveFile {
             def: directive,
             path,

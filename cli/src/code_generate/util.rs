@@ -7,11 +7,11 @@ pub fn get_interface_impl_object_map(
 ) -> HashMap<String, Vec<String>> {
     let mut map = HashMap::new();
 
-    for (_, ty_def) in type_definitions {
+    for ty_def in type_definitions.values() {
         if let TypeDefinition::Object(obj) = ty_def {
             for interface_name in &obj.implements_interfaces {
                 map.entry(interface_name.to_string())
-                    .or_insert_with(|| vec![])
+                    .or_insert_with(Vec::new)
                     .push(obj.name.to_string());
             }
         }

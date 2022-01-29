@@ -15,7 +15,7 @@ impl<'a> Visitor<'a> for DefaultValueOfCorrectType {
             if matches!(&variable_definition.var_type, Type::NonNullType(_)) {
                 ctx.add_error(format!("{} has type {} and it can't have a default value because it is non null type.", &variable_definition.name, &variable_definition.var_type), vec![variable_definition.position]);
             } else if let Some(err_msg) =
-                check_valid_input_value(&ctx.schema, &variable_definition.var_type, value)
+                check_valid_input_value(ctx.schema, &variable_definition.var_type, value)
             {
                 ctx.add_error(
                     format!("Invalid default value: {}", err_msg),

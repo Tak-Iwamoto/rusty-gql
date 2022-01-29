@@ -9,7 +9,7 @@ pub struct __Schema<'a> {
     detail: &'a Schema,
 }
 
-pub fn build_schema_introspection<'a>(schema: &'a Schema) -> __Schema<'a> {
+pub fn build_schema_introspection(schema: &Schema) -> __Schema<'_> {
     __Schema { detail: schema }
 }
 
@@ -18,7 +18,7 @@ pub fn build_schema_introspection<'a>(schema: &'a Schema) -> __Schema<'a> {
 impl<'a> __Schema<'a> {
     async fn types(&self) -> Vec<__Type<'a>> {
         let mut result = Vec::new();
-        for (_, def) in &self.detail.type_definitions {
+        for def in self.detail.type_definitions.values() {
             let ty = __Type::from_type_definition(self.detail, def);
             result.push(ty);
         }
@@ -38,31 +38,23 @@ impl<'a> __Schema<'a> {
     }
 
     async fn mutationType(&self) -> Option<__Type<'a>> {
-        match self
-            .detail
+        self.detail
             .type_definitions
             .get(&self.detail.mutation_type_name)
-        {
-            Some(mutation) => Some(__Type::from_type_definition(self.detail, mutation)),
-            None => None,
-        }
+            .map(|mutation| __Type::from_type_definition(self.detail, mutation))
     }
 
     async fn subscriptionType(&self) -> Option<__Type<'a>> {
-        match self
-            .detail
+        self.detail
             .type_definitions
             .get(&self.detail.subscription_type_name)
-        {
-            Some(subscription) => Some(__Type::from_type_definition(self.detail, subscription)),
-            None => None,
-        }
+            .map(|subscription| __Type::from_type_definition(self.detail, subscription))
     }
 
     async fn directives(&self) -> Vec<__Directive<'a>> {
         let mut result = Vec::new();
 
-        for (_, dir) in &self.detail.directives {
+        for dir in self.detail.directives.values() {
             let directive = __Directive::new(self.detail, dir);
             result.push(directive);
         }

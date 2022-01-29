@@ -279,7 +279,7 @@ pub fn build_schema(
                             let values: Vec<EnumTypeValue> = enum_ext
                                 .values
                                 .into_iter()
-                                .map(|value| EnumTypeValue::from(value))
+                                .map(EnumTypeValue::from)
                                 .collect();
                             extended_values.extend(values);
 
@@ -290,9 +290,10 @@ pub fn build_schema(
                                 directives: extended_directives,
                                 values: extended_values,
                             };
-                            let gql_enum = EnumType::from(extended_enum);
-                            type_definitions
-                                .insert(original_name.to_string(), TypeDefinition::Enum(gql_enum));
+                            type_definitions.insert(
+                                original_name.to_string(),
+                                TypeDefinition::Enum(extended_enum),
+                            );
                         }
                     }
                     None => {
@@ -361,7 +362,7 @@ pub fn build_schema(
         Some(query_def) => {
             if let TypeDefinition::Object(def) = query_def {
                 for f in &def.fields {
-                    queries.insert(f.name.to_string(), FieldType::from(f.clone()));
+                    queries.insert(f.name.to_string(), f.clone());
                 }
             }
         }
@@ -372,7 +373,7 @@ pub fn build_schema(
 
     if let Some(TypeDefinition::Object(mutation_def)) = type_definitions.get(&mutation_type_name) {
         for f in &mutation_def.fields {
-            mutations.insert(f.name.to_string(), FieldType::from(f.clone()));
+            mutations.insert(f.name.to_string(), f.clone());
         }
     }
 
@@ -380,7 +381,7 @@ pub fn build_schema(
         type_definitions.get(&subscription_type_name)
     {
         for f in &subscription_def.fields {
-            subscriptions.insert(f.name.to_string(), FieldType::from(f.clone()));
+            subscriptions.insert(f.name.to_string(), f.clone());
         }
     }
 

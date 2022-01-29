@@ -1,6 +1,5 @@
 use crate::{
-    Context, FieldResolver, GqlValue, ResolverResult, SelectionSetContext,
-    SelectionSetResolver,
+    Context, FieldResolver, GqlValue, ResolverResult, SelectionSetContext, SelectionSetResolver,
 };
 
 use super::CollectFields;

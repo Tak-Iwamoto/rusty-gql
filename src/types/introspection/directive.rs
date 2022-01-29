@@ -93,7 +93,7 @@ impl<'a> FieldResolver for __Directive<'a> {
 
         if ctx.item.name == "locations" {
             let locations = self.locations().await;
-            let locs: Vec<String> = locations.iter().map(|loc| dir_location_str(loc)).collect();
+            let locs: Vec<String> = locations.iter().map(dir_location_str).collect();
             let ctx_selection_set = ctx.with_selection_set(&ctx.item.selection_set);
 
             return SelectionSetResolver::resolve_selection_set(&locs, &ctx_selection_set)

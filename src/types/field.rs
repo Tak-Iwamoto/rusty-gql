@@ -16,11 +16,8 @@ pub struct FieldType {
 }
 
 impl FieldType {
-    pub fn from_vec_field<'a>(fields: Vec<Field<'a, String>>) -> Vec<FieldType> {
-        fields
-            .into_iter()
-            .map(|field| FieldType::from(field))
-            .collect()
+    pub fn from_vec_field(fields: Vec<Field<'_, String>>) -> Vec<FieldType> {
+        fields.into_iter().map(FieldType::from).collect()
     }
 
     pub fn is_deprecated(&self) -> bool {

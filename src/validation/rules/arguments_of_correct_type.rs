@@ -49,9 +49,7 @@ impl<'a> Visitor<'a> for ArgumentsOfCorrectType<'a> {
         match &self.current_args {
             Some(args) => {
                 let target_arg = args.iter().find(|arg| arg.0 == arg_name);
-                if target_arg.is_none() {
-                    return;
-                }
+                if target_arg.is_none() {}
 
                 // if let Some(vars) = &ctx.variables {
                 //     if let Some(def) = vars.0.get(arg_name) {
@@ -63,7 +61,7 @@ impl<'a> Visitor<'a> for ArgumentsOfCorrectType<'a> {
                 //     }
                 // }
             }
-            None => return,
+            None => {}
         }
     }
 }

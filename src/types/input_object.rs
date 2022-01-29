@@ -16,13 +16,13 @@ impl<'a> From<ParserInputObjectType<'a, String>> for InputObjectType {
         let directives = input_object
             .directives
             .into_iter()
-            .map(|dir| GqlDirective::from(dir))
+            .map(GqlDirective::from)
             .collect();
 
         let fields = input_object
             .fields
             .into_iter()
-            .map(|field| InputValueType::from(field))
+            .map(InputValueType::from)
             .collect();
 
         InputObjectType {

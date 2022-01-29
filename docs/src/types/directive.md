@@ -56,7 +56,7 @@ async fn main() {
     custom_directive_maps.insert("hidden", hidden::new());
 
     let container = Container::new(
-        &schema_docs.as_slice(),
+        schema_docs.as_slice(),
         Query,
         Mutation,
         EmptySubscription,
