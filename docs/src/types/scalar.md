@@ -25,7 +25,7 @@ fn from_gql_value(value: Option<GqlValue>) -> Result<Self, String> {
         Ok(Base64(encoded))
     } else {
         Err(format!(
-            "{}: is invalid type for UUID",
+            "{}: is invalid type for Base64",
             value.unwrap_or(GqlValue::Null).to_string()
         ))
     }

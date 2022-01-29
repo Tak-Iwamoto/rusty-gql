@@ -15,6 +15,10 @@ If we don't want to expose a specific field, we can define the following directi
 schema.graphql
 
 ```graphql
+type User {
+  name: String!
+  password_hash: String @hidden
+}
 directive @hidden on FIELD_DEFINITION | OBJECT
 ```
 
