@@ -55,7 +55,7 @@ mod graphql;
 async fn main() {
     ...
     let container = Container::new(
-        &schema_docs.as_slice(),
+        schema_docs.as_slice(),
         Query,
         EmptyMutation, // or graphql::Mutation
         EmptySubscription,
