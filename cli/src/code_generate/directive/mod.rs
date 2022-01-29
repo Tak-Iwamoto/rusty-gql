@@ -20,18 +20,23 @@ impl<'a> FileDefinition for DirectiveFile<'a> {
         let mut scope = Scope::new();
         let struct_name = &self.def.name;
         scope.new_struct(struct_name).vis("pub");
+        let new_impl = scope.new_impl(struct_name);
+        let new_fn = new_impl.new_fn("new");
+        new_fn.ret("Box<dyn CustomDirective>");
+        new_fn.line(format!("Box::new({} {{}})", struct_name));
+
         let directive_impl = scope.new_impl(struct_name);
         directive_impl.impl_trait("CustomDirective");
         directive_impl.r#macro("#[async_trait::async_trait]");
 
-        let f = directive_impl.new_fn("resolve_field");
-        f.set_async(true);
-        f.arg_ref_self();
-        f.arg("ctx", "&Context<'_>");
-        f.arg("directive_args", "&BTreeMap<String, GqlValue>");
-        f.arg("resolve_fut", "ResolveFut<'_>");
-        f.ret("ResolverResult<Option<GqlValue>>");
-        f.line("todo!()");
+        let resolve_fn = directive_impl.new_fn("resolve_field");
+        resolve_fn.set_async(true);
+        resolve_fn.arg_ref_self();
+        resolve_fn.arg("ctx", "&Context<'_>");
+        resolve_fn.arg("directive_args", "&BTreeMap<String, GqlValue>");
+        resolve_fn.arg("resolve_fut", "ResolveFut<'_>");
+        resolve_fn.ret("ResolverResult<Option<GqlValue>>");
+        resolve_fn.line("todo!()");
 
         format!(
             "{}\nuse std::collections::BTreeMap;\n\n{}",
