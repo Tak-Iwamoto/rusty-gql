@@ -12,15 +12,15 @@ pub enum Character {
 impl Character {
     async fn id(&self, ctx: &Context<'_>) -> Result<ID, Error> {
         match self {
-            Character::Human(obj) => Ok(obj.id(&ctx).await?),
-            Character::Droid(obj) => Ok(obj.id(&ctx).await?),
+            Character::Human(obj) => obj.id(&ctx).await,
+            Character::Droid(obj) => obj.id(&ctx).await,
         }
     }
 
     async fn name(&self, ctx: &Context<'_>) -> Result<String, Error> {
         match self {
-            Character::Human(obj) => Ok(obj.name(&ctx).await?),
-            Character::Droid(obj) => Ok(obj.name(&ctx).await?),
+            Character::Human(obj) => obj.name(&ctx).await,
+            Character::Droid(obj) => obj.name(&ctx).await,
         }
     }
 
@@ -31,15 +31,15 @@ impl Character {
         after: Option<ID>,
     ) -> Result<FriendsConnection, Error> {
         match self {
-            Character::Human(obj) => Ok(obj.friends(&ctx, first, after).await?),
-            Character::Droid(obj) => Ok(obj.friends(&ctx, first, after).await?),
+            Character::Human(obj) => obj.friends(&ctx, first, after).await,
+            Character::Droid(obj) => obj.friends(&ctx, first, after).await,
         }
     }
 
     async fn appearsIn(&self, ctx: &Context<'_>) -> Result<Vec<Episode>, Error> {
         match self {
-            Character::Human(obj) => Ok(obj.appearsIn(&ctx).await?),
-            Character::Droid(obj) => Ok(obj.appearsIn(&ctx).await?),
+            Character::Human(obj) => obj.appearsIn(&ctx).await,
+            Character::Droid(obj) => obj.appearsIn(&ctx).await,
         }
     }
 }
