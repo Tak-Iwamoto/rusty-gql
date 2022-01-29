@@ -23,13 +23,9 @@ pub async fn test_directive() {
             resolve_fut: ResolveFut<'_>,
         ) -> ResolverResult<Option<GqlValue>> {
             resolve_fut.await.map(|v| {
-                if let Some(requires) = directive_args.get("requires") {
-                    if let GqlValue::Enum(arg_value) = requires {
-                        if arg_value == "ADMIN" {
-                            return None;
-                        } else {
-                            v
-                        }
+                if let Some(GqlValue::Enum(arg_value)) = directive_args.get("requires") {
+                    if arg_value == "ADMIN" {
+                        return None;
                     } else {
                         v
                     }

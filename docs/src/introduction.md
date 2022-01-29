@@ -10,5 +10,6 @@ It is designed to make it easier to create a GraphQL server.
 - Convention Over Configuration
 
 ## Status
-rusty-gql is still an experimental project.
+rusty-gql is still an experimental project. APIs are subject to change.
+
 It is not yet recommended for use in a production.

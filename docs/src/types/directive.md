@@ -10,18 +10,15 @@ It is useful in the following use cases.
 - Logging, metrics
 - etc.
 
+If we don't want to expose a specific field, we can define the following directive.
+
 schema.graphql
 
 ```graphql
-directive @auth(requires: Role!) on FIELD_DEFINITION | OBJECT
-
-enum Role {
-  ADMIN
-  USER
-}
+directive @hidden on FIELD_DEFINITION | OBJECT
 ```
 
-directive/auth.rs
+directive/hidden.rs
 
 ```rust
 #![allow(warnings, unused)]
@@ -29,17 +26,17 @@ use crate::graphql::*;
 use rusty_gql::*;
 
 #[derive(Clone)]
-struct auth;
+struct hidden;
 
 #[async_trait::async_trait]
-impl CustomDirective for auth {
+impl CustomDirective for hidden {
     async fn resolve_field(
         &self,
         _ctx: &Context<'_>,
-        directive_args: &BTreeMap<String, GqlValue>,
+        _directive_args: &BTreeMap<String, GqlValue>,
         resolve_fut: ResolveFut<'_>,
     ) -> ResolverResult<Option<GqlValue>> {
-      todo!()
+      resolve_fut.await.map(|_v| None)
     }
 }
 ```
