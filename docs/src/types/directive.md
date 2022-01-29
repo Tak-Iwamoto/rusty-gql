@@ -12,16 +12,6 @@ It is useful in the following use cases.
 
 If we don't want to expose a specific field, we can define the following directive.
 
-schema.graphql
-
-```graphql
-type User {
-  name: String!
-  password_hash: String @hidden
-}
-directive @hidden on FIELD_DEFINITION | OBJECT
-```
-
 src/graphql/directive/hidden.rs
 
 ```rust
@@ -43,6 +33,16 @@ impl CustomDirective for hidden {
       resolve_fut.await.map(|_v| None)
     }
 }
+```
+
+schema.graphql
+
+```graphql
+type User {
+  name: String!
+  password_hash: String @hidden
+}
+directive @hidden on FIELD_DEFINITION | OBJECT
 ```
 
 We need to pass a HashMap of directives when Container::new in main.rs.

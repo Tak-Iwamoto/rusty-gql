@@ -1,14 +1,8 @@
 # Scalar
 
-We can define custom scalars. The following is an example.
+We can define custom scalars.
 
 rusty-gql represents custom scalar by using `#[derive(GqlScalar)]` and `GqlInputType` trait.
-
-schema.graphql
-
-```graphql
-scalar Base64
-```
 
 src/graphql/scalar/base64.rs
 
@@ -37,4 +31,10 @@ fn to_gql_value(&self) -> GqlValue {
     GqlValue::String(self.0.to_string())
 }
 }
+```
+
+schema.graphql
+
+```graphql
+scalar Base64
 ```

@@ -1,6 +1,6 @@
 # Query
 
-rusty-gql has `Query` files under `src/graphql/query/**`.
+rusty-gql has Query files under `src/graphql/query/**`.
 
 For example,
 
@@ -58,6 +58,6 @@ impl Query {
 }
 ```
 
-Files except for `mod.rs` implements resolvers for each Query Type fields.
+Files except for `mod.rs` implements resolvers for each Query fields.
 
 `mod.rs` only bundles these files and defines `Query` struct.

@@ -31,7 +31,7 @@ rusty-gql-project
 
 GraphQL schema files are located under `schema/**`.
 
-We can place multiple GraphQL files.
+We can also place multiple GraphQL files.
 
 For example, like this.
 

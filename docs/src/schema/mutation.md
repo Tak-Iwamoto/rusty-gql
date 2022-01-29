@@ -1,8 +1,8 @@
 # Mutation
 
-`Mutation` has a similar directory structure to `Query`.
+Mutation has a similar directory structure to Query.
 
-rusty-gql has `Mutation` files under `src/graphql/mutation/**`.
+rusty-gql has Mutation files under `src/graphql/mutation/**`.
 
 ```
 src
@@ -43,7 +43,7 @@ impl Mutation {
 }
 ```
 
-`Mutation` is optional, so if we don't need to define `Mutation`, use `EmptyMutation` struct in `main.rs`
+Mutation is optional, so if we don't need Mutation, use `EmptyMutation` struct in `main.rs`
 
 main.rs
 

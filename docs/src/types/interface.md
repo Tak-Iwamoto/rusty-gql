@@ -4,24 +4,6 @@ GraphQL Interface is represented as Rust enum with different types and `#[derive
 
 Each variants is possible types of interface.
 
-schema.graphql
-
-```graphql
-interface Pet {
-  name: String
-}
-
-type Cat implements Pet {
-  name: String
-  meows: Boolean
-}
-
-type Dog implements Pet {
-  name: String
-  woofs: Boolean
-}
-```
-
 src/graphql/resolver/pet.rs
 
 ```rust
@@ -45,4 +27,22 @@ impl Pet {
     }
 }
 
+```
+
+schema.graphql
+
+```graphql
+interface Pet {
+  name: String
+}
+
+type Cat implements Pet {
+  name: String
+  meows: Boolean
+}
+
+type Dog implements Pet {
+  name: String
+  woofs: Boolean
+}
 ```

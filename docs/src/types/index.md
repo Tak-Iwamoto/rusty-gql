@@ -1,3 +1,3 @@
 # Types
 
-rusty-gql generates graphql types as Rust codes from schemas.
+rusty-gql generates GraphQL types as Rust codes from schemas.

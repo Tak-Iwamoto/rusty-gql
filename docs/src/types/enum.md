@@ -2,16 +2,6 @@
 
 rusty-gql defines GraphQL Enum as Rust enum with `#[derive(GqlEnum)]`.
 
-schema.graphql
-
-```graphql
-enum Episode {
-  NEWHOPE
-  EMPIRE
-  JEDI
-}
-```
-
 src/graphql/resolver/episode.rs
 
 ```rust
@@ -24,5 +14,15 @@ pub enum Episode {
     NEWHOPE,
     EMPIRE,
     JEDI,
+}
+```
+
+schema.graphql
+
+```graphql
+enum Episode {
+  NEWHOPE
+  EMPIRE
+  JEDI
 }
 ```

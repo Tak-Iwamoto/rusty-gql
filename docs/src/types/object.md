@@ -2,16 +2,6 @@
 
 rusty-gql defines GraphQL Object as Rust struct and `#[GqlType]` like the following.
 
-schema.graphql
-
-```graphql
-type Todo {
-  title: String!
-  content: String
-  done: Boolean!
-}
-```
-
 src/graphql/resolver/todo.rs
 
 ```rust
@@ -38,22 +28,19 @@ impl Todo {
 }
 ```
 
-We'll implement async fn for each fields with `#[GqlType]`.
-
-If we want to execute the field resolver only when the query includes the field, we can define only async fn without the struct field.
+schema.graphql
 
 ```graphql
 type Todo {
   title: String!
   content: String
   done: Boolean!
-  user: User!
-}
-
-type User {
-  name
 }
 ```
+
+We'll implement `async fn` for each fields with `#[GqlType]`.
+
+If we want to execute only when the query includes the field, we can define only `async fn` without the struct field.
 
 src/graphql/resolver/todo.rs
 
@@ -71,5 +58,18 @@ impl Todo {
     pub async fn user(&self, ctx: &Context<'_>) -> User {
       todo!()
     }
+}
+```
+
+```graphql
+type Todo {
+  title: String!
+  content: String
+  done: Boolean!
+  user: User!
+}
+
+type User {
+  name
 }
 ```

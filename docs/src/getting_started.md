@@ -24,8 +24,6 @@ cargo run
 rusty-gql is designed for schema first development.
 It reads any graphql files under `schema/**`.
 
-The following example is the default schema.
-
 `schema/schema.graphql`
 
 ```graphql
@@ -67,7 +65,7 @@ pub async fn todos(ctx: &Context<'_>, first: Option<i32>) -> Vec<Todo> {
 
 ## Generate Rust code
 
-Add a type definition to schema.graphql.
+Edit schema.graphql.
 
 ```graphql
 type Query {
