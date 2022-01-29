@@ -34,3 +34,50 @@ pub async fn todos(ctx: &Context<'_>, first: Option<i32>) -> Vec<Todo> {
     }
 }
 ```
+
+When we want to add meta info, use `extensions`.
+
+```rust
+ctx.add_error(
+    &GqlError::new("Error happens", Some(ctx.item.position)).set_extentions(
+        GqlTypedError {
+            error_type: GqlErrorType::Internal,
+            error_detail: Some("Internal Error".to_string()),
+            origin: None,
+            debug_info: None,
+            debug_uri: None,
+        },
+    ),
+);
+```
+
+The GraphQL definition of rusty-gql error is as follows.
+Also see [GraphQL spec](https://spec.graphql.org/June2018/#sec-Errors).
+
+```graphql
+type GqlError {
+  message: String!
+  locations: [Location!]!
+  path: [String!]!
+  extensions: GqlTypedError
+}
+
+type GqlTypedError {
+  errorType: GqlErrorType!
+  errorDetail: String
+  origin: String
+  debugInfo: DebugInfo
+  debugUri: String
+}
+
+enum GqlErrorType {
+  BadRequest
+  FailedPreCondition
+  Internal
+  NotFound
+  PermissionDenied
+  Unauthenticated
+  Unavailable
+  Unknown
+}
+```
