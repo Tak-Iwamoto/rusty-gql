@@ -48,9 +48,9 @@ async fn test_interface_introspection() {
     )
     .unwrap();
 
-    let query = r#"{ __type(name: "Pet") { kind name description fields {name description type isDeprecated} possibleTypes {name} } }"#;
+    let query = r#"{ __type(name: "Pet") { kind name description fields {name description type isDeprecated} } }"#;
     let req = build_test_request(query, None, Default::default());
-    let expected_response = r#"{"data":{"__type":{"description":null,"fields":[{"description":null,"isDeprecated":false,"name":"name","type":{}}],"kind":"INTERFACE","name":"Pet","possibleTypes":[{"name":"Cat"},{"name":"Dog"}]}}}"#;
+    let expected_response = r#"{"data":{"__type":{"description":null,"fields":[{"description":null,"isDeprecated":false,"name":"name","type":{}}],"kind":"INTERFACE","name":"Pet"}}}"#;
     check_gql_response(req, expected_response, &container).await;
 }
 

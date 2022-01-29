@@ -10,7 +10,7 @@ impl GqlInputType for DateTime {
         todo!()
     }
 
-    fn into_gql_value(&self) -> GqlValue {
+    fn to_gql_value(&self) -> GqlValue {
         todo!()
     }
 }

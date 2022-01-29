@@ -13,7 +13,7 @@ use crate::GqlValue;
 pub trait GqlInputType: Send + Sync + Sized {
     fn from_gql_value(value: Option<GqlValue>) -> Result<Self, String>;
 
-    fn into_gql_value(&self) -> GqlValue;
+    fn to_gql_value(&self) -> GqlValue;
 }
 
 impl<T: GqlInputType> GqlInputType for Arc<T> {
@@ -21,8 +21,8 @@ impl<T: GqlInputType> GqlInputType for Arc<T> {
         T::from_gql_value(value).map(|v| Arc::new(v))
     }
 
-    fn into_gql_value(&self) -> GqlValue {
-        T::into_gql_value(self)
+    fn to_gql_value(&self) -> GqlValue {
+        T::to_gql_value(self)
     }
 }
 
@@ -31,7 +31,7 @@ impl<T: GqlInputType> GqlInputType for Box<T> {
         T::from_gql_value(value).map(|v| Box::new(v))
     }
 
-    fn into_gql_value(&self) -> GqlValue {
-        T::into_gql_value(self)
+    fn to_gql_value(&self) -> GqlValue {
+        T::to_gql_value(self)
     }
 }

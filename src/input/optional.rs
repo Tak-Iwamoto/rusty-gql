@@ -10,9 +10,9 @@ impl<T: GqlInputType> GqlInputType for Option<T> {
         }
     }
 
-    fn into_gql_value(&self) -> GqlValue {
+    fn to_gql_value(&self) -> GqlValue {
         match self {
-            Some(value) => value.into_gql_value(),
+            Some(value) => value.to_gql_value(),
             None => GqlValue::Null,
         }
     }

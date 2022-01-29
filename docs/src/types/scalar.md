@@ -33,7 +33,7 @@ fn from_gql_value(value: Option<GqlValue>) -> Result<Self, String> {
     }
 }
 
-fn into_gql_value(&self) -> GqlValue {
+fn to_gql_value(&self) -> GqlValue {
     GqlValue::String(self.0.to_string())
 }
 }

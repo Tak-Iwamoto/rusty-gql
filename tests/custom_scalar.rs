@@ -19,7 +19,7 @@ pub async fn test_custom_scalar() {
             }
         }
 
-        fn into_gql_value(&self) -> GqlValue {
+        fn to_gql_value(&self) -> GqlValue {
             GqlValue::String(format!("Custom-{}", self.0))
         }
     }

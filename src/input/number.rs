@@ -21,7 +21,7 @@ impl GqlInputType for i8 {
         }
     }
 
-    fn into_gql_value(&self) -> GqlValue {
+    fn to_gql_value(&self) -> GqlValue {
         GqlValue::Number(Number::from(*self))
     }
 }
@@ -43,7 +43,7 @@ impl GqlInputType for i16 {
         }
     }
 
-    fn into_gql_value(&self) -> GqlValue {
+    fn to_gql_value(&self) -> GqlValue {
         GqlValue::Number(Number::from(*self))
     }
 }
@@ -65,7 +65,7 @@ impl GqlInputType for i32 {
         }
     }
 
-    fn into_gql_value(&self) -> GqlValue {
+    fn to_gql_value(&self) -> GqlValue {
         GqlValue::Number(Number::from(*self))
     }
 }
@@ -87,7 +87,7 @@ impl GqlInputType for i64 {
         }
     }
 
-    fn into_gql_value(&self) -> GqlValue {
+    fn to_gql_value(&self) -> GqlValue {
         GqlValue::Number(Number::from(*self))
     }
 }
@@ -109,7 +109,7 @@ impl GqlInputType for u8 {
         }
     }
 
-    fn into_gql_value(&self) -> GqlValue {
+    fn to_gql_value(&self) -> GqlValue {
         GqlValue::Number(Number::from(*self))
     }
 }
@@ -131,7 +131,7 @@ impl GqlInputType for u16 {
         }
     }
 
-    fn into_gql_value(&self) -> GqlValue {
+    fn to_gql_value(&self) -> GqlValue {
         GqlValue::Number(Number::from(*self))
     }
 }
@@ -153,7 +153,7 @@ impl GqlInputType for u32 {
         }
     }
 
-    fn into_gql_value(&self) -> GqlValue {
+    fn to_gql_value(&self) -> GqlValue {
         GqlValue::Number(Number::from(*self))
     }
 }
@@ -175,7 +175,7 @@ impl GqlInputType for u64 {
         }
     }
 
-    fn into_gql_value(&self) -> GqlValue {
+    fn to_gql_value(&self) -> GqlValue {
         GqlValue::Number(Number::from(*self))
     }
 }
@@ -197,7 +197,7 @@ impl GqlInputType for usize {
         }
     }
 
-    fn into_gql_value(&self) -> GqlValue {
+    fn to_gql_value(&self) -> GqlValue {
         GqlValue::Number(Number::from(*self))
     }
 }
@@ -219,7 +219,7 @@ impl GqlInputType for isize {
         }
     }
 
-    fn into_gql_value(&self) -> GqlValue {
+    fn to_gql_value(&self) -> GqlValue {
         GqlValue::Number(Number::from(*self))
     }
 }
@@ -241,7 +241,7 @@ impl GqlInputType for f32 {
         }
     }
 
-    fn into_gql_value(&self) -> GqlValue {
+    fn to_gql_value(&self) -> GqlValue {
         match Number::from_f64(*self as f64) {
             Some(n) => GqlValue::Number(n),
             None => GqlValue::Null,
@@ -266,7 +266,7 @@ impl GqlInputType for f64 {
         }
     }
 
-    fn into_gql_value(&self) -> GqlValue {
+    fn to_gql_value(&self) -> GqlValue {
         match Number::from_f64(*self) {
             Some(n) => GqlValue::Number(n),
             None => GqlValue::Null,

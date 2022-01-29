@@ -70,7 +70,7 @@ pub fn generate_enum(derive_input: &DeriveInput) -> Result<TokenStream, syn::Err
                 }
             }
 
-            fn into_gql_value(&self) -> GqlValue {
+            fn to_gql_value(&self) -> GqlValue {
                 match self {
                     #(#into_gql_values),*
                 }
