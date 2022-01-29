@@ -1,6 +1,6 @@
 # Directive
 
-rusty-gql uses directives as middleware.
+We can use directives as middleware.
 
 It is useful in the following use cases.
 
@@ -42,5 +42,26 @@ impl CustomDirective for hidden {
     ) -> ResolverResult<Option<GqlValue>> {
       resolve_fut.await.map(|_v| None)
     }
+}
+```
+
+We need to pass a HashMap of directives when Container::new in main.rs.
+
+main.rs
+```rust
+async fn main() {
+    ...
+    let mut custom_directive_maps = HashMap::new();
+    custom_directive_maps.insert("hidden", hidden::new());
+
+    let container = Container::new(
+        &schema_docs.as_slice(),
+        Query,
+        Mutation,
+        EmptySubscription,
+        custom_directive_maps, // path here
+    )
+    .unwrap();
+    ...
 }
 ```
