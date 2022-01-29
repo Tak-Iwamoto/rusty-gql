@@ -20,7 +20,7 @@ impl<'a> From<ParserEnumType<'a, String>> for EnumType {
         let values = gql_enum
             .values
             .into_iter()
-            .map(|value| EnumTypeValue::from(value))
+            .map(EnumTypeValue::from)
             .collect();
 
         EnumType {
@@ -38,7 +38,7 @@ impl EnumType {
         self.values
             .iter()
             .map(|v| v.name.clone())
-            .any(|x| x == name.to_string())
+            .any(|x| x == *name)
     }
 }
 

@@ -87,7 +87,7 @@ pub fn build_operation<'a>(
         }
     }
 
-    if operation_name.is_none() && get_operation_definitions(&doc).len() > 1 {
+    if operation_name.is_none() && get_operation_definitions(doc).len() > 1 {
         return Err(GqlError::new(
             "Must provide operation name if multiple operation exist",
             None,

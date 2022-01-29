@@ -157,9 +157,7 @@ fn referenced_variables_to_vec<'a>(value: &'a Value<'a, String>, vars: &mut Vec<
     }
 }
 
-pub fn get_operation_def_position<'a>(
-    operation_definition: &OperationDefinition<'a, String>,
-) -> Pos {
+pub fn get_operation_def_position(operation_definition: &OperationDefinition<'_, String>) -> Pos {
     match operation_definition {
         OperationDefinition::SelectionSet(selection_set) => selection_set.span.0,
         OperationDefinition::Query(query) => query.position,
@@ -168,8 +166,8 @@ pub fn get_operation_def_position<'a>(
     }
 }
 
-pub fn get_fragment_definition_on_str<'a>(
-    type_condition: Option<&TypeCondition<'a, String>>,
+pub fn get_fragment_definition_on_str(
+    type_condition: Option<&TypeCondition<'_, String>>,
 ) -> Option<String> {
     if let Some(TypeCondition::On(ty)) = type_condition {
         Some(ty.clone())

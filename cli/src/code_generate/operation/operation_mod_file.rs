@@ -42,7 +42,7 @@ impl<'a> OperationModFile<'a> {
         }
 
         for (operation_name, method) in self.operations.iter() {
-            let fn_scope = imp.new_fn(&operation_name);
+            let fn_scope = imp.new_fn(operation_name);
             fn_scope.set_async(true);
             fn_scope.vis("pub");
             fn_scope.arg_ref_self();

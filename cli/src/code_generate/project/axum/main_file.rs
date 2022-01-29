@@ -15,7 +15,7 @@ impl<'a> FileDefinition for AxumMainFile<'a> {
     }
 
     fn content(&self) -> String {
-        main_file_content().to_string()
+        main_file_content()
     }
 }
 

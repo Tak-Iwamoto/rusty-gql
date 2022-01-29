@@ -56,54 +56,54 @@ jobs:
       - name: Check format
         run: cargo fmt --all -- --check
 
-  clippy:
-    name: clippy - Rust (${{ matrix.rust }}) on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - { rust: stable, os: ubuntu-latest }
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-        with:
-          submodules: true
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: ${{ matrix.rust }}
-          override: true
-          components: clippy
-      - name: Check with clippy
-        run: cargo clippy --all
+  # clippy:
+  #   name: clippy - Rust (${{ matrix.rust }}) on ${{ matrix.os }}
+  #   runs-on: ${{ matrix.os }}
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       include:
+  #         - { rust: stable, os: ubuntu-latest }
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v2
+  #       with:
+  #         submodules: true
+  #     - uses: actions-rs/toolchain@v1
+  #       with:
+  #         toolchain: ${{ matrix.rust }}
+  #         override: true
+  #         components: clippy
+  #     - name: Check with clippy
+  #       run: cargo clippy --all
 
-  examples:
-    name: Build examples - Rust (${{ matrix.rust }}) on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - { rust: stable, os: ubuntu-latest }
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-        with:
-          submodules: true
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: ${{ matrix.rust }}
-          override: true
-          components: clippy, rustfmt
-      - name: Check examples format
-        run: cargo fmt --all -- --check
-        working-directory: ./examples
-      - name: Check examples with clippy
-        run: cargo clippy --all
-        working-directory: ./examples
-      - name: Build examples
-        run: cargo build --all --verbose
-        working-directory: ./examples
-      - name: Clean examples
-        run: cargo clean
-        working-directory: ./examples
+  # examples:
+  #   name: Build examples - Rust (${{ matrix.rust }}) on ${{ matrix.os }}
+  #   runs-on: ${{ matrix.os }}
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       include:
+  #         - { rust: stable, os: ubuntu-latest }
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v2
+  #       with:
+  #         submodules: true
+  #     - uses: actions-rs/toolchain@v1
+  #       with:
+  #         toolchain: ${{ matrix.rust }}
+  #         override: true
+  #         components: clippy, rustfmt
+  #     - name: Check examples format
+  #       run: cargo fmt --all -- --check
+  #       working-directory: ./examples
+  #     - name: Check examples with clippy
+  #       run: cargo clippy --all
+  #       working-directory: ./examples
+  #     - name: Build examples
+  #       run: cargo build --all --verbose
+  #       working-directory: ./examples
+  #     - name: Clean examples
+  #       run: cargo clean
+  #       working-directory: ./examples

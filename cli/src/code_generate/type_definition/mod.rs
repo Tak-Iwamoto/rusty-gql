@@ -33,10 +33,10 @@ pub async fn create_type_definition_files(
     let mut scalar_names = Vec::new();
 
     for (_, type_def) in schema.type_definitions.iter() {
-        if is_gql_primitive_ty(&type_def.name()) {
+        if is_gql_primitive_ty(type_def.name()) {
             continue;
         }
-        if is_introspection_type_names(&type_def.name()) {
+        if is_introspection_type_names(type_def.name()) {
             continue;
         }
         let operation_type_names = vec![
@@ -58,7 +58,7 @@ pub async fn create_type_definition_files(
             TypeDefinition::Scalar(v) => scalar_names.push(v.name.clone()),
         }
 
-        let task = create_type_definition_file(type_def, base_path, &interface_obj_map);
+        let task = create_type_definition_file(type_def, base_path, interface_obj_map);
         futures.push(task);
     }
 
@@ -105,7 +105,7 @@ async fn create_type_definition_file(
                 def,
                 path: &path,
                 filename: &filename,
-                interface_obj_map: &interface_obj_map,
+                interface_obj_map,
             })
             .await
         }

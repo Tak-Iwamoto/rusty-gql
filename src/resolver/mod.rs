@@ -136,12 +136,10 @@ fn build_gql_object(target_obj: &mut BTreeMap<String, GqlValue>, gql_value: (Str
             GqlValue::List(target_list) => {
                 if let GqlValue::List(list) = value {
                     for (index, v) in list.into_iter().enumerate() {
-                        if let Some(prev_value) = target_list.get_mut(index) {
-                            if let GqlValue::Object(prev_obj) = prev_value {
-                                if let GqlValue::Object(new_obj) = v {
-                                    for (key, value) in new_obj.into_iter() {
-                                        build_gql_object(prev_obj, (key, value))
-                                    }
+                        if let Some(GqlValue::Object(prev_obj)) = target_list.get_mut(index) {
+                            if let GqlValue::Object(new_obj) = v {
+                                for (key, value) in new_obj.into_iter() {
+                                    build_gql_object(prev_obj, (key, value))
                                 }
                             }
                         }
@@ -155,7 +153,7 @@ fn build_gql_object(target_obj: &mut BTreeMap<String, GqlValue>, gql_value: (Str
                     }
                 }
             }
-            _ => return,
+            _ => {}
         }
     } else {
         target_obj.insert(field_name, value.clone());
@@ -202,20 +200,20 @@ impl<'a> Fields<'a> {
                                 .type_definitions
                                 .get(&type_name)
                                 .map(|ty_def| ty_def.directives())
-                                .unwrap_or(empty_vec.as_slice());
+                                .unwrap_or_else(|| empty_vec.as_slice());
                             let schema_field_directives = ctx
                                 .schema
                                 .type_definitions
                                 .get(&type_name)
                                 .map(|ty_def| ty_def.field_directives(&field_name))
-                                .unwrap_or(vec![]);
+                                .unwrap_or_default();
                             let schema_impl_interface_directives = ctx
                                 .schema
                                 .type_definitions
                                 .get(&type_name)
-                                .map(|ty_def| ty_def.impl_interface_directives(&ctx.schema))
-                                .unwrap_or(vec![]);
-                            let resolve_fut = root_type.resolve_field(&ctx_field);
+                                .map(|ty_def| ty_def.impl_interface_directives(ctx.schema))
+                                .unwrap_or_default();
+                            let resolve_fut = root_type.resolve_field(ctx_field);
 
                             if schema_ty_directives.is_empty()
                                 && schema_field_directives.is_empty()
@@ -225,7 +223,7 @@ impl<'a> Fields<'a> {
                                 Ok((
                                     field_name,
                                     root_type
-                                        .resolve_field(&ctx_field)
+                                        .resolve_field(ctx_field)
                                         .await?
                                         .unwrap_or_default(),
                                 ))
@@ -368,14 +366,12 @@ impl<'a> Fields<'a> {
 
 fn is_fragment_condition<'a, 'ctx: 'a>(
     ctx: &SelectionSetContext<'ctx>,
-    type_name: &String,
+    type_name: &str,
     ty_cond: Option<&TypeCondition<'a, String>>,
 ) -> bool {
     match ty_cond {
         Some(cond) => {
-            let on_type = match cond {
-                TypeCondition::On(ty) => ty,
-            };
+            let TypeCondition::On(on_type) = cond;
             let is_on_type_name = on_type == type_name;
             let is_impl_interface =
                 ctx.schema

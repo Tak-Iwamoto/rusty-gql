@@ -77,11 +77,9 @@ impl<'a, T> ExecutionContext<'a, T> {
             for (key, value) in &dir.arguments {
                 if key != "if" {
                     continue;
-                } else {
-                    if let Value::Boolean(cond) = value {
-                        if skip && *cond {
-                            return true;
-                        }
+                } else if let Value::Boolean(cond) = value {
+                    if skip && *cond {
+                        return true;
                     }
                 }
             }

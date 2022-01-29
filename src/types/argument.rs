@@ -13,12 +13,10 @@ pub struct InputValueType {
 }
 
 impl InputValueType {
-    pub fn from_vec_input_value<'a>(
-        input_objects: Vec<InputValue<'a, String>>,
-    ) -> Vec<InputValueType> {
+    pub fn from_vec_input_value(input_objects: Vec<InputValue<'_, String>>) -> Vec<InputValueType> {
         input_objects
             .into_iter()
-            .map(|arg| InputValueType::from(arg))
+            .map(InputValueType::from)
             .collect()
     }
 }
@@ -26,9 +24,7 @@ impl InputValueType {
 impl<'a> From<InputValue<'a, String>> for InputValueType {
     fn from(input_value: InputValue<'a, String>) -> Self {
         let meta_type = GqlValueType::from(input_value.value_type);
-        let default_value = input_value
-            .default_value
-            .map_or(None, |value| Some(GqlValue::from(value)));
+        let default_value = input_value.default_value.map(GqlValue::from);
         let directives = GqlDirective::from_vec_directive(input_value.directives);
 
         InputValueType {

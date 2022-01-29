@@ -25,6 +25,6 @@ pub async fn check_gql_response<
     expected_response: &str,
     container: &Container<Query, Mutation, Subscription>,
 ) {
-    let res = execute(&container, request).await;
+    let res = execute(container, request).await;
     assert_eq!(serde_json::to_string(&res).unwrap(), expected_response);
 }

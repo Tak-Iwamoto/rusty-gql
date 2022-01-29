@@ -765,12 +765,10 @@ fn visit_input_value<'a, T: Visitor<'a>>(
     visitor.enter_input_value(ctx, &expected_type, value, pos);
     match value {
         Value::List(values) => {
-            if let Some(expected_ty) = expected_type.clone() {
-                if let GqlValueType::ListType(expected_ty) = expected_ty {
-                    values.iter().for_each(|value| {
-                        visit_input_value(visitor, ctx, pos, Some(*expected_ty.clone()), value)
-                    })
-                }
+            if let Some(GqlValueType::ListType(expected_ty)) = expected_type.clone() {
+                values.iter().for_each(|value| {
+                    visit_input_value(visitor, ctx, pos, Some(*expected_ty.clone()), value)
+                })
             }
         }
         Value::Object(values) => {

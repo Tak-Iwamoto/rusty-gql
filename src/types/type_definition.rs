@@ -31,7 +31,7 @@ impl ToString for TypeDefinition {
 }
 
 impl TypeDefinition {
-    pub fn from_schema_type_def<'a>(ty_def: &ParserTypeDefinition<'a, String>) -> Self {
+    pub fn from_schema_type_def(ty_def: &ParserTypeDefinition<'_, String>) -> Self {
         match ty_def {
             ParserTypeDefinition::Scalar(v) => TypeDefinition::Scalar(ScalarType::from(v.clone())),
             ParserTypeDefinition::Object(v) => TypeDefinition::Object(ObjectType::from(v.clone())),

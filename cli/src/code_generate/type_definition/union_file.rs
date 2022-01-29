@@ -24,7 +24,7 @@ impl<'a> FileDefinition for UnionFile<'a> {
         union_scope.derive("GqlUnion");
 
         for value in &self.def.types {
-            union_scope.new_variant(&value).tuple(&value);
+            union_scope.new_variant(value).tuple(value);
         }
 
         format!("{}\n\n{}", use_gql_definitions(), scope.to_string())

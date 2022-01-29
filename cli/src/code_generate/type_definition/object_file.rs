@@ -37,11 +37,11 @@ impl<'a> FileDefinition for ObjectFile<'a> {
         for field in &self.def.fields {
             let field_name = &field.name;
             let return_ty = gql_value_ty_to_rust_ty(&field.meta_type);
-            if is_return_primitive_ty(&field) {
+            if is_return_primitive_ty(field) {
                 struct_scope.field(format!("pub {}", &field_name).as_str(), &return_ty);
             }
 
-            let fn_scope = struct_imp.new_fn(&field_name);
+            let fn_scope = struct_imp.new_fn(field_name);
             fn_scope.arg("ctx", "&Context<'_>");
             for arg in &field.arguments {
                 fn_scope.arg(&arg.name, gql_value_ty_to_rust_ty(&arg.meta_type));
@@ -53,7 +53,7 @@ impl<'a> FileDefinition for ObjectFile<'a> {
 
             fn_scope.ret(Type::new(&return_ty));
 
-            let block_str = build_block_str(&field, &field_name);
+            let block_str = build_block_str(field, field_name);
             fn_scope.line(block_str);
         }
 
@@ -67,7 +67,7 @@ impl<'a> FileDefinition for ObjectFile<'a> {
 }
 
 fn is_return_primitive_ty(field: &FieldType) -> bool {
-    is_gql_primitive_ty(&field.meta_type.name())
+    is_gql_primitive_ty(field.meta_type.name())
 }
 
 fn is_copy_gql_ty(field: &FieldType) -> bool {
@@ -75,8 +75,8 @@ fn is_copy_gql_ty(field: &FieldType) -> bool {
 }
 
 fn build_block_str(field: &FieldType, name: &str) -> String {
-    let block_str = if is_return_primitive_ty(&field) {
-        if is_copy_gql_ty(&field) {
+    let block_str = if is_return_primitive_ty(field) {
+        if is_copy_gql_ty(field) {
             format!("self.{}", &name)
         } else {
             format!("self.{}.clone()", &name)

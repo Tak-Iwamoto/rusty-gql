@@ -119,23 +119,19 @@ impl<'a> __Type<'a> {
     }
 
     async fn interfaces(&self) -> Option<Vec<__Type<'a>>> {
-        if let TypeDetail::Named(def) = self.detail {
-            if let TypeDefinition::Object(obj) = def {
-                let mut interfaces = Vec::new();
+        if let TypeDetail::Named(TypeDefinition::Object(obj)) = self.detail {
+            let mut interfaces = Vec::new();
 
-                for interface_name in &obj.implements_interfaces {
-                    match self.schema.type_definitions.get(interface_name) {
-                        Some(def) => {
-                            let ty = __Type::from_type_definition(self.schema, def);
-                            interfaces.push(ty);
-                        }
-                        None => continue,
+            for interface_name in &obj.implements_interfaces {
+                match self.schema.type_definitions.get(interface_name) {
+                    Some(def) => {
+                        let ty = __Type::from_type_definition(self.schema, def);
+                        interfaces.push(ty);
                     }
+                    None => continue,
                 }
-                Some(interfaces)
-            } else {
-                None
             }
+            Some(interfaces)
         } else {
             None
         }
@@ -146,7 +142,7 @@ impl<'a> __Type<'a> {
             match def {
                 TypeDefinition::Interface(interface) => {
                     let mut types = Vec::new();
-                    for (_, ty) in &self.schema.type_definitions {
+                    for ty in self.schema.type_definitions.values() {
                         if let TypeDefinition::Object(obj) = ty {
                             if obj.implements_interfaces.contains(&interface.name) {
                                 let ty = __Type::from_type_definition(self.schema, ty);
@@ -190,7 +186,7 @@ impl<'a> __Type<'a> {
         if let TypeDetail::Named(TypeDefinition::InputObject(input_obj)) = &self.detail {
             let mut values = Vec::new();
             for v in &input_obj.fields {
-                let value = build_input_value_introspection(self.schema, &v);
+                let value = build_input_value_introspection(self.schema, v);
                 values.push(value);
             }
             Some(values)
