@@ -21,10 +21,11 @@ pub enum GqlErrorType {
     PermissionDenied,
     Unauthenticated,
     Unavailable,
-    Unknow,
+    Unknown,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize, PartialEq)]
+#[serde(rename_all = "camelCase")]
 pub struct GqlTypedError {
     pub error_type: GqlErrorType,
     pub error_detail: Option<String>,

@@ -21,9 +21,9 @@ use std::path::Path;
 pub use async_trait;
 
 pub use container::Container;
-pub use context::{ExecutionContext, Context, SelectionSetContext};
+pub use context::{Context, ExecutionContext, SelectionSetContext};
 pub use custom_directive::CustomDirective;
-pub use error::{Error, GqlError};
+pub use error::{Error, GqlError, GqlErrorType, GqlTypedError};
 pub use executor::execute;
 use futures_util::Future;
 pub use input::GqlInputType;
