@@ -58,6 +58,11 @@ impl GqlError {
         }
     }
 
+    pub fn set_path(&mut self, path: &str) -> Self {
+        self.path.push(path.to_string());
+        self.clone()
+    }
+
     pub fn set_extentions(&mut self, typed_error: GqlTypedError) -> Self {
         self.extensions = Some(typed_error);
         self.clone()

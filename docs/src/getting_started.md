@@ -37,7 +37,7 @@ type Todo {
 ## Implement Resolvers
 Let's edit `src/graphql/query/todos.rs`.
 
-``` rs
+``` rust
 pub async fn todos(ctx: &Context<'_>, first: Option<i32>) -> Vec<Todo> {
     let all_todos = vec![
         Todo {

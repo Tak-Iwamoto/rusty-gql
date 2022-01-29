@@ -11,7 +11,7 @@ pub async fn droid(ctx: &Context<'_>, id: ID) -> Option<Droid> {
     } else if id.0 == "6" {
         Some(c3po())
     } else {
-        ctx.add_error(&GqlError::new("Droid Not found", None));
+        ctx.add_error(&GqlError::new("Droid Not found", Some(ctx.item.position)));
         None
     }
 }

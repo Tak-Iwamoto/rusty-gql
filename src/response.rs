@@ -17,14 +17,24 @@ impl Response {
     pub fn new(data: impl Into<GqlValue>) -> Self {
         Self {
             data: data.into(),
-            ..Default::default()
+            errors: vec![],
+            http_headers: Default::default(),
         }
     }
 
     pub fn from_errors(errors: Vec<GqlError>) -> Self {
         Self {
             errors,
-            ..Default::default()
+            data: Default::default(),
+            http_headers: Default::default(),
+        }
+    }
+
+    pub fn from_data_and_errors(data: impl Into<GqlValue>, errors: Vec<GqlError>) -> Self {
+        Self {
+            data: data.into(),
+            errors,
+            http_headers: Default::default(),
         }
     }
 

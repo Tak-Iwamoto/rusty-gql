@@ -14,4 +14,5 @@
 - [Schema](./schema/index.md)
   - [Query](./schema/query.md)
   - [Mutation](./schema/mutation.md)
+- [Error Handling](./error_handling.md)
 - [Roadmap](./roadmap.md)

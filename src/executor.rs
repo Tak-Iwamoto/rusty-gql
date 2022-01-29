@@ -55,12 +55,14 @@ pub async fn execute<
         }
     };
 
-    if !ctx.operation.errors.lock().unwrap().is_empty() {
-        return Response::from_errors(ctx.operation.errors.lock().unwrap().clone());
-    }
-
     match result {
-        Ok(value) => Response::new(value),
+        Ok(value) => {
+            if !ctx.operation.errors.lock().unwrap().is_empty() {
+                Response::from_data_and_errors(value, ctx.operation.errors.lock().unwrap().clone())
+            } else {
+                Response::new(value)
+            }
+        }
         Err(error) => {
             let mut errors = vec![error];
             errors.extend(ctx.operation.errors.lock().unwrap().clone());
