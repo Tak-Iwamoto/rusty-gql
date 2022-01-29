@@ -22,7 +22,7 @@ type User {
 directive @hidden on FIELD_DEFINITION | OBJECT
 ```
 
-directive/hidden.rs
+src/graphql/directive/hidden.rs
 
 ```rust
 #![allow(warnings, unused)]
@@ -48,6 +48,7 @@ impl CustomDirective for hidden {
 We need to pass a HashMap of directives when Container::new in main.rs.
 
 main.rs
+
 ```rust
 async fn main() {
     ...

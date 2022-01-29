@@ -21,7 +21,7 @@ type Review {
 }
 ```
 
-input/review_input.rs
+src/graphql/input/review_input.rs
 
 ```rust
 #![allow(warnings, unused)]

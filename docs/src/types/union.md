@@ -23,7 +23,7 @@ type Droid {
 }
 ```
 
-search_result.rs
+src/graphql/resolver/search_result.rs
 ```rust
 #![allow(warnings, unused)]
 use crate::graphql::*;

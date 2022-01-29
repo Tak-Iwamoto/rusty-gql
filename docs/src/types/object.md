@@ -12,7 +12,7 @@ type Todo {
 }
 ```
 
-todo.rs
+src/graphql/resolver/todo.rs
 
 ```rust
 #[derive(Clone)]
@@ -55,7 +55,7 @@ type User {
 }
 ```
 
-todo.rs
+src/graphql/resolver/todo.rs
 
 ```rust
 #[derive(Clone)]

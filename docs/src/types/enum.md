@@ -11,7 +11,7 @@ enum Episode {
 }
 ```
 
-episode.rs
+src/graphql/resolver/episode.rs
 ``` rust
 #![allow(warnings, unused)]
 use crate::graphql::*;
