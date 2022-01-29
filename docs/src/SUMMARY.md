@@ -2,6 +2,7 @@
 
 - [Introduction](./introduction.md)
 - [Getting Started](./getting_started.md)
+- [Directory Structure](./directory_structure.md)
 - [Types](./types/index.md)
   - [Object](./types/object.md)
   - [Interface](./types/interface.md)
