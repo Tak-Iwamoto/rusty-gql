@@ -1,3 +1,4 @@
+#![allow(warnings, unused)]
 use std::collections::{BTreeMap, HashMap};
 
 use rusty_gql::*;
@@ -5,16 +6,16 @@ use rusty_gql::*;
 #[tokio::test]
 pub async fn test_directive() {
     #[derive(Clone, Debug)]
-    struct AuthDirective;
+    struct auth;
 
-    impl AuthDirective {
+    impl auth {
         fn new() -> Box<dyn CustomDirective> {
-            Box::new(AuthDirective {})
+            Box::new(auth {})
         }
     }
 
     #[async_trait::async_trait]
-    impl CustomDirective for AuthDirective {
+    impl CustomDirective for auth {
         async fn resolve_field(
             &self,
             _ctx: &Context<'_>,
@@ -88,7 +89,7 @@ pub async fn test_directive() {
     let contents = schema_content("./tests/schemas/custom_directive.graphql");
 
     let mut custom_directive_maps = HashMap::new();
-    custom_directive_maps.insert("auth", AuthDirective::new());
+    custom_directive_maps.insert("auth", auth::new());
 
     let container = Container::new(
         &vec![contents.as_str()],
