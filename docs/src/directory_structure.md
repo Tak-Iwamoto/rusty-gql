@@ -28,11 +28,13 @@ rusty-gql-project
 ```
 
 ## schema
+
 GraphQL schema files are located under `schema/**`.
 
 We can place multiple GraphQL files.
 
 For example, like this.
+
 ```
 schema
  ┣ post
@@ -43,16 +45,19 @@ schema
 ```
 
 ## src/graphql/query
+
 Query resolvers are placed under `src/graphql/query/`.
 
 [Query](./schema/query.md)
 
 ## src/graphql/mutation
+
 Mutation resolvers are placed under `src/graphql/mutation/`.
 
 [Mutation](./schema/mutation.md)
 
 ## src/graphql/resolver
+
 GraphQL `Object`, `Enum`, `Union`, `Interface` types are located under `src/graphql/resolver`.
 
 - [Object](./types/object.md)
@@ -61,11 +66,13 @@ GraphQL `Object`, `Enum`, `Union`, `Interface` types are located under `src/grap
 - [Interface](./types/interface.md)
 
 ## src/graphql/scalar
+
 Custom scalars are located under `src/graphql/scalar`.
 
 [Scalar](./types/scalar.md)
 
 ## src/graphql/directive
+
 We can define custom directives in `src/graphql/directive`.
 
 [Directive](./types/directive.md)

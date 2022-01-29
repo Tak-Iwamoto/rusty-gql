@@ -3,7 +3,8 @@
 rusty-gql defines GraphQL Enum as Rust enum with `#[derive(GqlEnum)]`.
 
 schema.graphql
-``` graphql
+
+```graphql
 enum Episode {
   NEWHOPE
   EMPIRE
@@ -12,7 +13,8 @@ enum Episode {
 ```
 
 src/graphql/resolver/episode.rs
-``` rust
+
+```rust
 #![allow(warnings, unused)]
 use crate::graphql::*;
 use rusty_gql::*;

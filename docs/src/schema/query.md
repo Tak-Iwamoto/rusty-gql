@@ -3,15 +3,17 @@
 rusty-gql has `Query` files under `src/graphql/query/**`.
 
 For example,
+
 ```
 src
  ┣ graphql
  ┃ ┣ query
  ┃ ┃ ┣ mod.rs
  ┃ ┃ ┗ todos.rs
- ```
+```
 
 src/graphql/query/todos.rs
+
 ```rust
 #![allow(warnings, unused)]
 use crate::graphql::*;
@@ -38,6 +40,7 @@ pub async fn todos(ctx: &Context<'_>, first: Option<i32>) -> Vec<Todo> {
 ```
 
 src/graphql/query/mod.rs
+
 ```rust
 #![allow(warnings, unused)]
 use crate::graphql::*;

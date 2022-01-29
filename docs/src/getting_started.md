@@ -1,28 +1,34 @@
 # Getting Started
+
 ## Install rusty-gql-cli
+
 ```
 cargo install rusty-gql-cli
 ```
 
 ## Run new command
+
 ```
 rusty-gql new gql-example
 cd gql-example
 ```
 
 ## Start the GraphQL Server
+
 ```
 cargo run
 ```
 
 ## Creating a GraphQL Schema
+
 rusty-gql is designed for schema first development.
 It reads any graphql files under `schema/**`.
 
 The following example is the default schema.
 
 `schema/schema.graphql`
-``` graphql
+
+```graphql
 type Query {
   todos(first: Int): [Todo!]!
 }
@@ -35,9 +41,10 @@ type Todo {
 ```
 
 ## Implement Resolvers
+
 Let's edit `src/graphql/query/todos.rs`.
 
-``` rust
+```rust
 pub async fn todos(ctx: &Context<'_>, first: Option<i32>) -> Vec<Todo> {
     let all_todos = vec![
         Todo {
@@ -59,9 +66,10 @@ pub async fn todos(ctx: &Context<'_>, first: Option<i32>) -> Vec<Todo> {
 ```
 
 ## Generate Rust code
+
 Add a type definition to schema.graphql.
 
-``` graphql
+```graphql
 type Query {
   todos(first: Int): [Todo!]!
   # added
@@ -76,11 +84,13 @@ type Todo {
 ```
 
 rusty-gql generates rust code from graphql schema files.
+
 ```
 rusty-gql generate // or rusty-gql g
 ```
 
 ### Directory Structure
+
 ```
 src
  ┣ graphql
@@ -106,5 +116,6 @@ src
 ```
 
 ## GraphQL Playground
+
 rusty-gql supports GraphiQL playground.
 Open a browser to http://localhost:3000/graphiql.

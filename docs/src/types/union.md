@@ -3,6 +3,7 @@
 rusty-gql defines GraphQL Union as Rust enum with different types and `#[derive(GqlUnion)]`.
 
 schema.graphql
+
 ```graphql
 type Query {
   search(text: String): [SearchResult!]!
@@ -24,6 +25,7 @@ type Droid {
 ```
 
 src/graphql/resolver/search_result.rs
+
 ```rust
 #![allow(warnings, unused)]
 use crate::graphql::*;
