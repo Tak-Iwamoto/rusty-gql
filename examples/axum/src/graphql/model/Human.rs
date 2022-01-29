@@ -40,7 +40,12 @@ impl Human {
         Some(Episode::JEDI)
     }
 
-    pub async fn friends(&self, ctx: &Context<'_>, first: Option<i32>, after: Option<ID>) -> FriendsConnection {
+    pub async fn friends(
+        &self,
+        ctx: &Context<'_>,
+        first: Option<i32>,
+        after: Option<ID>,
+    ) -> FriendsConnection {
         if self.id.0 == "2".to_string() {
             FriendsConnection {
                 totalCount: Some(0),
