@@ -774,19 +774,17 @@ fn visit_input_value<'a, T: Visitor<'a>>(
             }
         }
         Value::Object(values) => {
-            if let Some(expected_ty) = expected_type.clone() {
-                if let GqlValueType::NamedType(expected_ty) = expected_ty {
-                    if let Some(ty) = ctx.schema.type_definitions.get(&expected_ty) {
-                        for (item_key, item_value) in values {
-                            if let Some(input_value) = ty.get_field_by_name(&item_key) {
-                                visit_input_value(
-                                    visitor,
-                                    ctx,
-                                    pos,
-                                    Some(input_value.meta_type.clone()),
-                                    item_value,
-                                )
-                            }
+            if let Some(GqlValueType::NamedType(expected_ty)) = expected_type.clone() {
+                if let Some(ty) = ctx.schema.type_definitions.get(&expected_ty) {
+                    for (item_key, item_value) in values {
+                        if let Some(input_value) = ty.get_field_by_name(item_key) {
+                            visit_input_value(
+                                visitor,
+                                ctx,
+                                pos,
+                                Some(input_value.meta_type.clone()),
+                                item_value,
+                            )
                         }
                     }
                 }

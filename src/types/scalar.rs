@@ -29,10 +29,10 @@ impl ScalarType {
     pub fn is_valid_value(&self, value: &Value<'_, String>) -> bool {
         match value {
             Value::Variable(_) => false,
-            Value::Int(_) => self.name == "Int".to_string(),
-            Value::Float(_) => self.name == "Float".to_string(),
-            Value::String(_) => self.name == "String".to_string(),
-            Value::Boolean(_) => self.name == "Boolean".to_string(),
+            Value::Int(_) => self.name == *"Int",
+            Value::Float(_) => self.name == *"Float",
+            Value::String(_) => self.name == *"String",
+            Value::Boolean(_) => self.name == *"Boolean",
             Value::Null => true,
             Value::Enum(_) => false,
             Value::List(_) => false,

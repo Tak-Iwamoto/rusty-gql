@@ -78,7 +78,7 @@ impl TypeDefinition {
 
     pub fn get_field_by_name(&self, name: &str) -> Option<&FieldType> {
         self.fields()
-            .and_then(|fields| fields.into_iter().find(|f| f.name == name))
+            .and_then(|fields| fields.iter().find(|f| f.name == name))
     }
 
     pub fn is_composite_type(&self) -> bool {

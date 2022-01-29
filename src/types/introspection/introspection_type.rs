@@ -106,7 +106,7 @@ impl<'a> __Type<'a> {
             match def.fields() {
                 Some(fields) => {
                     let result = fields
-                        .into_iter()
+                        .iter()
                         .map(|field| __Field::new(self.schema, field.clone()))
                         .collect();
                     Some(result)
@@ -177,7 +177,7 @@ impl<'a> __Type<'a> {
         if let TypeDetail::Named(TypeDefinition::Enum(enu)) = &self.detail {
             let mut values = Vec::new();
             for v in &enu.values {
-                let value = build_enum_value_introspection(&v);
+                let value = build_enum_value_introspection(v);
                 values.push(value);
             }
             Some(values)

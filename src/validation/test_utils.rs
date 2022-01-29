@@ -21,9 +21,9 @@ where
     V: Visitor<'a> + 'a,
     F: Fn() -> V,
 {
-    let mut ctx = ValidationContext::new(&schema, None, &operation);
+    let mut ctx = ValidationContext::new(schema, None, operation);
     let mut visitor = factory();
-    visit(&mut visitor, &mut ctx, &doc, None);
+    visit(&mut visitor, &mut ctx, doc, None);
 
     if ctx.errors.is_empty() {
         Ok(())
@@ -90,15 +90,15 @@ pub(crate) fn assert_fails_rule<'a, V, F>(
 #[allow(dead_code)]
 pub(crate) fn test_schema() -> Schema {
     let contents = std::fs::read_to_string("tests/schemas/validation_test.graphql").unwrap();
-    build_schema(&vec![contents.as_str()], Default::default()).unwrap()
+    build_schema(&[contents.as_str()], Default::default()).unwrap()
 }
 
 #[allow(dead_code)]
-pub(crate) fn parse_test_query<'a>(query_doc: &'a str) -> Document<'a, String> {
+pub(crate) fn parse_test_query(query_doc: &str) -> Document<'_, String> {
     graphql_parser::parse_query::<String>(query_doc).unwrap()
 }
 
 #[allow(dead_code)]
 pub(crate) fn build_test_operation<'a>(doc: &'a Document<'a, String>) -> Operation<'a> {
-    build_operation(&doc, None, Default::default()).unwrap()
+    build_operation(doc, None, Default::default()).unwrap()
 }

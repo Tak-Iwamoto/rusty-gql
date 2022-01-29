@@ -91,7 +91,7 @@ impl<'a> Visitor<'a> for NoUndefinedVariables<'a> {
         self.defined_variables.insert(
             name,
             (
-                get_operation_def_position(&operation_definition),
+                get_operation_def_position(operation_definition),
                 HashSet::new(),
             ),
         );
@@ -129,7 +129,7 @@ impl<'a> Visitor<'a> for NoUndefinedVariables<'a> {
                 .entry(*scope)
                 .or_insert_with(HashMap::new)
                 .extend(
-                    referenced_variables(&arg_value)
+                    referenced_variables(arg_value)
                         .into_iter()
                         .map(|n| (n, Pos::default())),
                 );

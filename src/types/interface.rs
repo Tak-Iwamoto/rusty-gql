@@ -17,7 +17,7 @@ impl<'a> From<ParserInterfaceType<'a, String>> for InterfaceType {
         let fields = interface_type
             .fields
             .into_iter()
-            .map(|field| FieldType::from(field))
+            .map(FieldType::from)
             .collect();
 
         InterfaceType {

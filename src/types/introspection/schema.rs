@@ -9,7 +9,7 @@ pub struct __Schema<'a> {
     detail: &'a Schema,
 }
 
-pub fn build_schema_introspection<'a>(schema: &'a Schema) -> __Schema<'a> {
+pub fn build_schema_introspection(schema: &Schema) -> __Schema<'_> {
     __Schema { detail: schema }
 }
 

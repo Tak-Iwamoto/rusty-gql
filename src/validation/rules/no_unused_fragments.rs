@@ -83,7 +83,7 @@ impl<'a> Visitor<'a> for NoUnusedFragment<'a> {
     ) {
         if let Some(scope) = &self.current_scope {
             self.fragment_spreads
-                .entry(scope.clone())
+                .entry(*scope)
                 .or_insert_with(Vec::new)
                 .push(&fragment_spread.fragment_name)
         }

@@ -40,7 +40,7 @@ impl<'a> VariablesInAllowedPosition<'a> {
         if let Some(usages) = self.variable_usages.get(scope) {
             for (var_name, usage_pos, var_type) in usages {
                 if let Some(var_def) = variable_defs.iter().find(|def| def.name == *var_name) {
-                    let default_value = var_def.default_value.clone().map(|v| GqlValue::from(v));
+                    let default_value = var_def.default_value.clone().map(GqlValue::from);
                     if !var_type.is_sub_type(
                         &GqlValueType::from(var_def.var_type.clone()),
                         &default_value,
