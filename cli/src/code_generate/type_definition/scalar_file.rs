@@ -31,10 +31,10 @@ impl<'a> FileDefinition for ScalarFile<'a> {
         from_gql_value_fn.ret("Result<Self, String>");
         from_gql_value_fn.line("todo!()");
 
-        let into_gql_value_fn = scalar_impl.new_fn("into_gql_value");
-        into_gql_value_fn.arg_ref_self();
-        into_gql_value_fn.ret("GqlValue");
-        into_gql_value_fn.line("todo!()");
+        let to_gql_value_fn = scalar_impl.new_fn("to_gql_value");
+        to_gql_value_fn.arg_ref_self();
+        to_gql_value_fn.ret("GqlValue");
+        to_gql_value_fn.line("todo!()");
 
         format!("{}\n\n{}", use_gql_definitions(), scope.to_string())
     }

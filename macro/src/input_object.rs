@@ -34,7 +34,7 @@ pub fn generate_input_object(derive_input: &DeriveInput) -> Result<TokenStream, 
         fields.push(ident);
 
         set_fields.push(quote! {
-            obj.insert(#field_name.to_string(), #crate_name::GqlInputType::into_gql_value(&self.#ident));
+            obj.insert(#field_name.to_string(), #crate_name::GqlInputType::to_gql_value(&self.#ident));
         })
     }
 
@@ -49,7 +49,7 @@ pub fn generate_input_object(derive_input: &DeriveInput) -> Result<TokenStream, 
                 }
             }
 
-            fn into_gql_value(&self) -> GqlValue {
+            fn to_gql_value(&self) -> GqlValue {
                 let mut obj = std::collections::BTreeMap::new();
                 #(#set_fields)*
                 #crate_name::GqlValue::Object(obj)
@@ -59,7 +59,7 @@ pub fn generate_input_object(derive_input: &DeriveInput) -> Result<TokenStream, 
         #[#crate_name::async_trait::async_trait]
         impl #impl_generics #crate_name::FieldResolver for #self_ty #where_clause {
             async fn resolve_field(&self, ctx: &#crate_name::Context<'_>) -> #crate_name::ResolverResult<::std::option::Option<#crate_name::GqlValue>> {
-                Ok(Some(self.into_gql_value()))
+                Ok(Some(self.to_gql_value()))
             }
             fn type_name() -> String {
                 #type_name.to_string()
@@ -71,7 +71,7 @@ pub fn generate_input_object(derive_input: &DeriveInput) -> Result<TokenStream, 
         #[#crate_name::async_trait::async_trait]
         impl #impl_generics #crate_name::SelectionSetResolver for #self_ty #where_clause {
             async fn resolve_selection_set(&self, ctx: &#crate_name::SelectionSetContext<'_>) -> #crate_name::ResolverResult<#crate_name::GqlValue> {
-                Ok(self.into_gql_value())
+                Ok(self.to_gql_value())
             }
         }
     };
