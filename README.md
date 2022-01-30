@@ -4,6 +4,8 @@ rusty-gql is a Schema First GraphQL library for Rust.
 
 It is designed to make it easier to create a GraphQL server.
 
+[Book](https://tak-iwamoto.github.io/rusty-gql/)
+
 ## Features
 
 - Schema First approach
