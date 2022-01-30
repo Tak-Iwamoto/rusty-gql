@@ -35,7 +35,7 @@ pub async fn todos(ctx: &Context<'_>, first: Option<i32>) -> Vec<Todo> {
 }
 ```
 
-When we want to add meta info, use `extensions`.
+When we want to add a meta info, use `extensions`.
 
 ```rust
 ctx.add_error(

@@ -20,8 +20,6 @@ rusty-gql-project
  ┃ ┃ ┃ ┣ mod.rs
  ┃ ┃ ┣ scalar
  ┃ ┃ ┃ ┗ mod.rs
- ┃ ┃ ┣ subscription
- ┃ ┃ ┃ ┗ mod.rs
  ┃ ┃ ┗ mod.rs
  ┃ ┗ main.rs
  ┗ Cargo.toml
@@ -46,33 +44,39 @@ schema
 
 ## src/graphql/query
 
-Query resolvers are placed under `src/graphql/query/`.
+Query resolvers.
 
 [Query](./schema/query.md)
 
 ## src/graphql/mutation
 
-Mutation resolvers are placed under `src/graphql/mutation/`.
+Mutation resolvers.
 
 [Mutation](./schema/mutation.md)
 
 ## src/graphql/resolver
 
-GraphQL `Object`, `Enum`, `Union`, `Interface` types are located under `src/graphql/resolver`.
+GraphQL `Object`, `Enum`, `Union`, `Interface` types.
 
 - [Object](./types/object.md)
 - [Enum](./types/enum.md)
 - [Union](./types/union.md)
 - [Interface](./types/interface.md)
 
+## src/graphql/input
+
+GraphQL InputObject.
+
+[InputObject](./types/input_object.md)
+
 ## src/graphql/scalar
 
-Custom scalars are located under `src/graphql/scalar`.
+Custom scalars.
 
 [Scalar](./types/scalar.md)
 
 ## src/graphql/directive
 
-We can define custom directives in `src/graphql/directive`.
+Custom directives.
 
 [Directive](./types/directive.md)

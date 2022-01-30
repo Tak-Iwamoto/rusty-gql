@@ -40,7 +40,7 @@ type Todo {
 
 We'll implement `async fn` for each fields with `#[GqlType]`.
 
-If we want to execute only when the query includes the field, we can define only `async fn` without the struct field.
+If we want to execute only when the field is included in a operation, implement `async fn` without the struct field.
 
 src/graphql/resolver/todo.rs
 

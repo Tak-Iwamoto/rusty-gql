@@ -52,7 +52,8 @@ directive @hidden on FIELD_DEFINITION | OBJECT
 ```
 
 Need to pass a HashMap of directives when Container::new in main.rs.
-key is the directive name, value is the directive struct.
+
+A Key is the directive name, a value is the directive struct.
 
 main.rs
 

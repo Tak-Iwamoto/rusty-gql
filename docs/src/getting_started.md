@@ -107,8 +107,6 @@ src
  ┃ ┃ ┗ todo.rs
  ┃ ┣ scalar
  ┃ ┃ ┗ mod.rs
- ┃ ┣ subscription
- ┃ ┃ ┗ mod.rs
  ┃ ┗ mod.rs
  ┗ main.rs
 ```

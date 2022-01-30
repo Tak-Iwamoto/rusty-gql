@@ -63,10 +63,8 @@ pub(crate) async fn create_gql_files(schema_documents: &[&str], path: &str) -> R
 
     let query_task = create_operation_files(&schema.queries, OperationType::Query, path);
     let mutation_task = create_operation_files(&schema.mutations, OperationType::Mutation, path);
-    let subscription_task =
-        create_operation_files(&schema.subscriptions, OperationType::Subscription, path);
 
-    try_join_all(vec![query_task, mutation_task, subscription_task]).await?;
+    try_join_all(vec![query_task, mutation_task]).await?;
 
     let interface_obj_maps = get_interface_impl_object_map(&schema.type_definitions);
     create_type_definition_files(&schema, path, &interface_obj_maps).await?;
@@ -78,7 +76,6 @@ fn gql_file_types() -> Vec<String> {
     vec![
         "query".to_string(),
         "mutation".to_string(),
-        "subscription".to_string(),
         "resolver".to_string(),
         "directive".to_string(),
         "scalar".to_string(),

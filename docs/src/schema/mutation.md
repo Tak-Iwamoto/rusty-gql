@@ -24,7 +24,7 @@ pub async fn createTodo(ctx: &Context<'_>, input: TodoInput) -> Todo {
 }
 ```
 
-src/graphql/query/mod.rs
+src/graphql/mutation/mod.rs
 
 ```rust
 #![allow(warnings, unused)]
