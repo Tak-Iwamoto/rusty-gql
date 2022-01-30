@@ -2,7 +2,7 @@ use std::{collections::HashMap, io::Error};
 
 use codegen::Scope;
 use futures_util::future::try_join_all;
-use heck::ToSnakeCase;
+use heck::{ToSnakeCase, ToUpperCamelCase};
 use rusty_gql::DirectiveDefinition;
 
 use crate::code_generate::{use_gql_definitions, FileDefinition};
@@ -18,7 +18,7 @@ pub struct DirectiveFile<'a> {
 impl<'a> FileDefinition for DirectiveFile<'a> {
     fn content(&self) -> String {
         let mut scope = Scope::new();
-        let struct_name = &self.def.name;
+        let struct_name = &self.def.name.to_upper_camel_case();
         scope.new_struct(struct_name).vis("pub");
         let new_impl = scope.new_impl(struct_name);
         let new_fn = new_impl.new_fn("new");
@@ -73,9 +73,13 @@ pub async fn create_directive_files(
         }));
         directive_names.push(directive.name.clone());
     }
+    let struct_names = directive_names
+        .iter()
+        .map(|name| name.to_upper_camel_case())
+        .collect::<Vec<_>>();
     create_file(ModFile {
         path: &path_str(vec![base_path, "directive"], false),
-        struct_names: directive_names,
+        struct_names,
     })
     .await?;
 

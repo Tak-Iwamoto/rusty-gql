@@ -27,5 +27,11 @@ type Todo {
   content: String
   done: Boolean!
 }
+
+directive @auth(requires: Role!) on FIELD_DEFINITION | OBJECT
+directive @possibleTypes(
+  abstractType: String
+  concreteTypes: [String!]!
+) on INPUT_FIELD_DEFINITION
 "#
 }

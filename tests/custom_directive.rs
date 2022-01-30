@@ -6,16 +6,16 @@ use rusty_gql::*;
 #[tokio::test]
 pub async fn test_directive() {
     #[derive(Clone, Debug)]
-    struct auth;
+    struct Auth;
 
-    impl auth {
+    impl Auth {
         fn new() -> Box<dyn CustomDirective> {
-            Box::new(auth {})
+            Box::new(Auth {})
         }
     }
 
     #[async_trait::async_trait]
-    impl CustomDirective for auth {
+    impl CustomDirective for Auth {
         async fn resolve_field(
             &self,
             _ctx: &Context<'_>,
@@ -85,7 +85,7 @@ pub async fn test_directive() {
     let contents = schema_content("./tests/schemas/custom_directive.graphql");
 
     let mut custom_directive_maps = HashMap::new();
-    custom_directive_maps.insert("auth", auth::new());
+    custom_directive_maps.insert("auth", Auth::new());
 
     let container = Container::new(
         &vec![contents.as_str()],

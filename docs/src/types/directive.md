@@ -20,10 +20,16 @@ use crate::graphql::*;
 use rusty_gql::*;
 
 #[derive(Clone)]
-struct hidden;
+struct Hidden;
+
+impl Hidden {
+    fn new() -> Box<dyn CustomDirective> {
+        Box::new(Hidden {})
+    }
+}
 
 #[async_trait::async_trait]
-impl CustomDirective for hidden {
+impl CustomDirective for Hidden {
     async fn resolve_field(
         &self,
         _ctx: &Context<'_>,
@@ -45,7 +51,8 @@ type User {
 directive @hidden on FIELD_DEFINITION | OBJECT
 ```
 
-We need to pass a HashMap of directives when Container::new in main.rs.
+Need to pass a HashMap of directives when Container::new in main.rs.
+key is the directive name, value is the directive struct.
 
 main.rs
 
@@ -53,7 +60,7 @@ main.rs
 async fn main() {
     ...
     let mut custom_directive_maps = HashMap::new();
-    custom_directive_maps.insert("hidden", hidden::new());
+    custom_directive_maps.insert("hidden", Hidden::new());
 
     let container = Container::new(
         schema_docs.as_slice(),
