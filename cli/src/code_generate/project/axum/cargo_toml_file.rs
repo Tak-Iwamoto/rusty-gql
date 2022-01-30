@@ -28,8 +28,8 @@ edition = "2021"
 async-trait = "0.1.52"
 axum = {version = "0.4.2", features = ["headers"]}
 hyper = "0.14.16"
-rusty-gql = "0.1.0"
-rusty-gql-axum "0.1.0"
+rusty-gql = "0.1.0-alpha"
+rusty-gql-axum = "0.1.0-alpha"
 tokio = { version = "1.0", features = ["full"] }
 "#
     .replace("APP_NAME", app_name)
