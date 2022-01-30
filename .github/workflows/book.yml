@@ -1,0 +1,36 @@
+name: Book
+
+on:
+  push:
+    branches:
+      - 'main'
+    paths:
+      - 'docs/**'
+
+jobs:
+  deploy_en:
+    name: Deploy book on GitHub pages
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Install mdBook
+        uses: peaceiris/actions-mdbook@v1
+      - name: Render book
+        run: |
+          mdbook build -d gh-pages/master docs/book
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v2.5.1
+        with:
+          emptyCommits: true
+          keepFiles: false
+        env:
+          ACTIONS_DEPLOY_KEY: ${{ secrets.ACTIONS_DEPLOY_KEY }}
+          PUBLISH_BRANCH: gh-pages
+          PUBLISH_DIR: gh-pages
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          keepFiles: true
+          publish_dir: docs/book/gh-pages
