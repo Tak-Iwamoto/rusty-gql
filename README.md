@@ -14,6 +14,6 @@ It is designed to make it easier to create a GraphQL server.
 
 ## Status
 
-rusty-gql is still an experimental project. APIs and the artitecture are subject to change.
+rusty-gql is still an experimental project. APIs and the architecture are subject to change.
 
-It is not yet recommended for use in a production.
+It is not yet recommended for use in production.
