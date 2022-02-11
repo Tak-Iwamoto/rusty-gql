@@ -72,15 +72,14 @@ fn sync_input_file(file_src: &str, input_object_def: &InputObjectType) -> String
             struct_name = quote! {#ident};
             attributes = quote! {#(#attrs)*};
             if struct_ident.eq(&input_object_def.name) {
-                let schema_input_fields = input_object_def
-                    .fields
-                    .iter()
-                    .map(|field| field.name.to_string())
-                    .collect::<Vec<_>>();
                 let mut visited = HashSet::new();
                 for field in &struct_item.fields {
                     let current_field_ident = field.ident.clone().unwrap().to_string();
-                    if schema_input_fields.contains(&current_field_ident) {
+                    if input_object_def
+                        .fields
+                        .iter()
+                        .any(|f| f.name.eq(&current_field_ident))
+                    {
                         fields.push(quote! {#field});
                     }
                     visited.insert(current_field_ident);
