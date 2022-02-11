@@ -25,7 +25,7 @@ impl<'a> InputObjectFile<'a> {
             Ok(mut file) => {
                 let mut current_file_src = String::new();
                 file.read_to_string(&mut current_file_src).await?;
-                let content = sync_input_file(&current_file_src, self.def);
+                let content = sync_file(&current_file_src, self.def);
                 let mut new_file = tokio::fs::File::create(&path).await?;
                 new_file.write(content.as_bytes()).await?;
                 Ok(())
@@ -54,13 +54,13 @@ fn new_file_content(input_object_def: &InputObjectType) -> String {
     format!("{}\n\n{}", use_gql_definitions(), scope.to_string())
 }
 
-fn sync_input_file(file_src: &str, input_object_def: &InputObjectType) -> String {
-    let input_file_syntax = syn::parse_file(file_src).expect("Failed to parse a input file");
+fn sync_file(file_src: &str, input_object_def: &InputObjectType) -> String {
+    let syntax = syn::parse_file(file_src).expect("Failed to parse a input file");
     let mut fields = Vec::new();
     let mut other_items = Vec::new();
     let mut struct_name: TokenStream = Default::default();
     let mut attributes: TokenStream = Default::default();
-    for item in &input_file_syntax.items {
+    for item in &syntax.items {
         if let syn::Item::Struct(struct_item) = item {
             let ident = &struct_item.ident;
             let struct_ident = ident.unraw().to_string();

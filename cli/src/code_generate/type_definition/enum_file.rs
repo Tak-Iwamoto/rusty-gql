@@ -21,7 +21,7 @@ impl<'a> EnumFile<'a> {
             Ok(mut file) => {
                 let mut current_file_src = String::new();
                 file.read_to_string(&mut current_file_src).await?;
-                let content = sync_enum_file(&current_file_src, self.def);
+                let content = sync_file(&current_file_src, self.def);
                 let mut new_file = tokio::fs::File::create(&path).await?;
                 new_file.write(content.as_bytes()).await?;
                 Ok(())
@@ -51,7 +51,7 @@ fn new_file_content(enum_def: &EnumType) -> String {
     format!("{}\n\n{}", use_gql_definitions(), scope.to_string())
 }
 
-fn sync_enum_file(file_src: &str, enum_def: &EnumType) -> String {
+fn sync_file(file_src: &str, enum_def: &EnumType) -> String {
     let syntax = syn::parse_file(file_src).expect("Failed to parse a enum file");
 
     let mut variants = Vec::new();
