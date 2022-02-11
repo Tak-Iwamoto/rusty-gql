@@ -92,11 +92,12 @@ async fn create_type_definition_file(
     match type_def {
         TypeDefinition::Object(def) => {
             let path = path_str(vec![base_path, "resolver", &filename], true);
-            create_file(ObjectFile {
+            ObjectFile {
                 def,
                 path: &path,
                 filename: &filename,
-            })
+            }
+            .create_file()
             .await
         }
         TypeDefinition::Interface(def) => {
