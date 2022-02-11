@@ -4,6 +4,7 @@ mod custom_directive;
 mod error;
 mod executor;
 mod input;
+mod middlewares;
 mod operation;
 mod playground_html;
 mod query_root;
