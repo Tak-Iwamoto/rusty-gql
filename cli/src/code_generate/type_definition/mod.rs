@@ -120,11 +120,12 @@ async fn create_type_definition_file(
         }
         TypeDefinition::Enum(def) => {
             let path = path_str(vec![base_path, "resolver", &filename], true);
-            create_file(EnumFile {
+            EnumFile {
                 def,
                 path: &path,
                 filename: &filename,
-            })
+            }
+            .create_file()
             .await
         }
         TypeDefinition::InputObject(def) => {

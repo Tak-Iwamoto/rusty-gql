@@ -2,11 +2,15 @@ use std::collections::HashSet;
 
 use codegen::Scope;
 use proc_macro2::TokenStream;
+use quote::quote;
 use rusty_gql::InputObjectType;
-use syn::{__private::quote::quote, ext::IdentExt};
+use syn::ext::IdentExt;
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 
-use crate::code_generate::{use_gql_definitions, util::gql_value_ty_to_rust_ty};
+use crate::code_generate::{
+    use_gql_definitions,
+    util::{gql_value_ty_to_rust_ty, is_default_item_use},
+};
 
 pub struct InputObjectFile<'a> {
     pub filename: &'a str,
@@ -19,20 +23,12 @@ impl<'a> InputObjectFile<'a> {
         let path = self.path;
         match tokio::fs::File::open(&path).await {
             Ok(mut file) => {
-                if self.filename == "mod.rs" {
-                    let mut new_file = tokio::fs::File::create(&path).await?;
-                    new_file
-                        .write(new_file_content(self.def).as_bytes())
-                        .await?;
-                    Ok(())
-                } else {
-                    let mut current_file_src = String::new();
-                    file.read_to_string(&mut current_file_src).await?;
-                    let content = sync_input_file(&current_file_src, self.def);
-                    let mut new_file = tokio::fs::File::create(&path).await?;
-                    new_file.write(content.as_bytes()).await?;
-                    Ok(())
-                }
+                let mut current_file_src = String::new();
+                file.read_to_string(&mut current_file_src).await?;
+                let content = sync_input_file(&current_file_src, self.def);
+                let mut new_file = tokio::fs::File::create(&path).await?;
+                new_file.write(content.as_bytes()).await?;
+                Ok(())
             }
             Err(_) => {
                 let mut file = tokio::fs::File::create(&path).await?;
@@ -102,23 +98,10 @@ fn sync_input_file(file_src: &str, input_object_def: &InputObjectType) -> String
             continue;
         }
 
-        if let syn::Item::Use(use_item) = item {
-            if let syn::UseTree::Path(use_path) = &use_item.tree {
-                let ident = use_path.ident.unraw().to_string();
-                if ident.eq("rusty_gql") {
-                    continue;
-                }
-
-                if ident.eq("crate") {
-                    if let syn::UseTree::Path(child_path) = &*use_path.tree {
-                        let ident = child_path.ident.unraw().to_string();
-                        if ident.eq("graphql") {
-                            continue;
-                        }
-                    }
-                }
+        if let syn::Item::Use(item_use) = item {
+            if !is_default_item_use(item_use) {
+                other_items.push(quote! {#item});
             }
-            other_items.push(quote! {#item});
             continue;
         }
 
