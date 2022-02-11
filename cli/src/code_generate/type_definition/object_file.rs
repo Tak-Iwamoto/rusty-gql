@@ -85,6 +85,7 @@ fn new_file_content(object_def: &ObjectType) -> String {
 fn sync_file(file_src: &str, object_def: &ObjectType) -> String {
     let syntax = syn::parse_file(file_src).expect("Failed to parse a input file");
     let mut fields = Vec::new();
+    let mut use_items = Vec::new();
     let mut other_items = Vec::new();
     let mut current_impl_items = Vec::new();
     let mut new_impl_items = Vec::new();
@@ -135,6 +136,7 @@ fn sync_file(file_src: &str, object_def: &ObjectType) -> String {
                 if let syn::ImplItem::Method(item_method) = item {
                     let method_name = item_method.sig.ident.unraw().to_string();
                     let schema_field = get_field_by_name(object_def, &method_name);
+                    println!("name: {},{:?}", &object_def.name, schema_field);
                     if let Some(_field) = schema_field {
                         current_impl_items.push(item);
                     }
@@ -172,7 +174,7 @@ fn sync_file(file_src: &str, object_def: &ObjectType) -> String {
 
         if let syn::Item::Use(item_use) = item {
             if !is_default_item_use(item_use) {
-                other_items.push(quote! {#item});
+                use_items.push(quote! {#item});
             }
             continue;
         }
@@ -184,6 +186,7 @@ fn sync_file(file_src: &str, object_def: &ObjectType) -> String {
         #![allow(warnings, unused)]
         use crate::graphql::*;
         use rusty_gql::*;
+        #(#use_items)*
 
         #struct_attributes
         pub struct #struct_name {

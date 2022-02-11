@@ -55,6 +55,7 @@ fn sync_file(file_src: &str, enum_def: &EnumType) -> String {
     let syntax = syn::parse_file(file_src).expect("Failed to parse a enum file");
 
     let mut variants = Vec::new();
+    let mut use_items = Vec::new();
     let mut other_items = Vec::new();
     let enum_name: TokenStream = enum_def.name.parse().unwrap();
     let mut attributes: TokenStream = Default::default();
@@ -88,7 +89,7 @@ fn sync_file(file_src: &str, enum_def: &EnumType) -> String {
         }
         if let syn::Item::Use(item_use) = item {
             if !is_default_item_use(item_use) {
-                other_items.push(quote! {#item});
+                use_items.push(quote! {#item});
             }
             continue;
         }
@@ -100,6 +101,7 @@ fn sync_file(file_src: &str, enum_def: &EnumType) -> String {
         #![allow(warnings, unused)]
         use crate::graphql::*;
         use rusty_gql::*;
+        #(#use_items)*
 
         #attributes
         pub enum #enum_name {
