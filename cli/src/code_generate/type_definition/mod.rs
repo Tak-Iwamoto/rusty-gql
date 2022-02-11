@@ -129,11 +129,12 @@ async fn create_type_definition_file(
         }
         TypeDefinition::InputObject(def) => {
             let path = path_str(vec![base_path, "input", &filename], true);
-            create_file(InputObjectFile {
+            InputObjectFile {
                 def,
                 path: &path,
                 filename: &filename,
-            })
+            }
+            .create_file()
             .await
         }
         TypeDefinition::Scalar(def) => {

@@ -2,6 +2,7 @@ use anyhow::Result;
 use app::build_app;
 use async_recursion::async_recursion;
 use exit_codes::ExitCode;
+use std::process::Command;
 use std::{path::Path, process};
 
 use crate::code_generate::{create_gql_files, create_project_files};
@@ -49,6 +50,11 @@ async fn run() -> Result<ExitCode> {
     let matches = build_app().get_matches();
     if matches.subcommand_matches("generate").is_some() {
         create_graphql_files(None).await?;
+
+        Command::new("cargo")
+            .arg("fmt")
+            .spawn()
+            .expect("Failed to run cargo fmt.");
         return Ok(ExitCode::Success);
     }
 
