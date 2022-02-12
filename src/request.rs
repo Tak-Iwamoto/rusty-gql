@@ -1,7 +1,9 @@
+use std::collections::HashMap;
+
 use futures_util::{pin_mut, AsyncRead, AsyncReadExt};
 use serde::{Deserialize, Serialize};
 
-use crate::variables::Variables;
+use crate::{variables::Variables, GqlValue};
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
@@ -10,9 +12,10 @@ pub struct Request {
     pub query: String,
     #[serde(default)]
     pub operation_name: Option<String>,
-
     #[serde(default)]
     pub variables: Variables,
+    #[serde(default)]
+    pub extensions: HashMap<String, GqlValue>,
 }
 
 pub async fn receive_http_request(
