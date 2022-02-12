@@ -46,15 +46,18 @@ async fn create_graphql_files(app_name: Option<&str>) -> Result<(), std::io::Err
     create_gql_files(&schema_contents, &gql_files_path).await
 }
 
+fn run_fmt() {
+    Command::new("cargo")
+        .arg("fmt")
+        .spawn()
+        .expect("Failed to run cargo fmt.");
+}
+
 async fn run() -> Result<ExitCode> {
     let matches = build_app().get_matches();
     if matches.subcommand_matches("generate").is_some() {
         create_graphql_files(None).await?;
-
-        Command::new("cargo")
-            .arg("fmt")
-            .spawn()
-            .expect("Failed to run cargo fmt.");
+        run_fmt();
         return Ok(ExitCode::Success);
     }
 
@@ -63,6 +66,7 @@ async fn run() -> Result<ExitCode> {
             create_project_files(app_name).await?;
             create_graphql_files(Some(app_name)).await?;
             println!("Successfully created the rusty-gql project!");
+            run_fmt();
             return Ok(ExitCode::Success);
         }
     }
