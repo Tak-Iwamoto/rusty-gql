@@ -21,7 +21,7 @@ impl<'a> FileDefinition for AxumCargoTomlFile<'a> {
 fn cargo_toml_content(app_name: &str) -> String {
     r#"[package]
 name = "APP_NAME"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 
 [dependencies]
