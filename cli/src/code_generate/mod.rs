@@ -20,6 +20,10 @@ use self::{
 pub use project::create_project_files;
 use tokio::io::AsyncWriteExt;
 
+#[async_trait::async_trait]
+pub(crate) trait CreateFile {
+    async fn create_file(&self) -> Result<(), std::io::Error>;
+}
 pub(crate) trait FileDefinition {
     fn name(&self) -> String;
 

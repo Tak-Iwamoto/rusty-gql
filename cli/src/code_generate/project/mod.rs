@@ -1,5 +1,6 @@
 mod axum;
 mod example_schema_file;
+mod gitignore_file;
 
 use std::io::Error;
 
@@ -8,6 +9,7 @@ use futures_util::future::try_join_all;
 use self::{
     axum::{AxumCargoTomlFile, AxumMainFile},
     example_schema_file::TodoSchemaFile,
+    gitignore_file::GitignoreFile,
 };
 
 use super::create_file;
@@ -20,7 +22,8 @@ pub async fn create_project_files(app_name: &str) -> Result<(), Error> {
     .await?;
     create_main_file(app_name).await?;
     create_cargo_toml(app_name).await?;
-    create_example_gql_schema(app_name).await
+    create_example_gql_schema(app_name).await?;
+    create_gitignore_file(app_name).await
 }
 
 async fn create_main_file(app_name: &str) -> Result<(), Error> {
@@ -33,4 +36,8 @@ async fn create_cargo_toml(app_name: &str) -> Result<(), Error> {
 
 async fn create_example_gql_schema(app_name: &str) -> Result<(), Error> {
     create_file(TodoSchemaFile { app_name }).await
+}
+
+async fn create_gitignore_file(app_name: &str) -> Result<(), Error> {
+    create_file(GitignoreFile { app_name }).await
 }

@@ -7,5 +7,5 @@ The following features will be implemented.
 - Calculate Query complexity
 - Apollo tracing
 - Apollo Federation
-- Apollo Persisted Query
+- Automatic Persisted Query
 - etc.

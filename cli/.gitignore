@@ -1,2 +1,4 @@
 graphql/**
 sample/**
+src/graphql
+/schema

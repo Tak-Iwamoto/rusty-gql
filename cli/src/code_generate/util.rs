@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 use rusty_gql::{GqlValueType, TypeDefinition};
+use syn::{ext::IdentExt, ItemUse};
 
 pub fn get_interface_impl_object_map(
     type_definitions: &HashMap<String, TypeDefinition>,
@@ -68,4 +69,23 @@ pub fn is_introspection_type_names(type_name: &str) -> bool {
         "__TypeKind",
     ]
     .contains(&type_name)
+}
+
+pub fn is_default_item_use(item_use: &ItemUse) -> bool {
+    if let syn::UseTree::Path(use_path) = &item_use.tree {
+        let ident = use_path.ident.unraw().to_string();
+        if ident.eq("rusty_gql") {
+            return true;
+        }
+
+        if ident.eq("crate") {
+            if let syn::UseTree::Path(child_path) = &*use_path.tree {
+                let ident = child_path.ident.unraw().to_string();
+                if ident.eq("graphql") {
+                    return true;
+                }
+            }
+        }
+    }
+    false
 }
