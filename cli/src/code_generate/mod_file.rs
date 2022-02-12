@@ -1,15 +1,14 @@
 use heck::ToSnakeCase;
+use tokio::io::AsyncWriteExt;
 
-use crate::code_generate::FileDefinition;
-
-use super::path_str;
+use super::{path_str, CreateFile};
 
 pub struct ModFile<'a> {
     pub struct_names: Vec<String>,
     pub path: &'a str,
 }
 
-impl<'a> FileDefinition for ModFile<'a> {
+impl<'a> ModFile<'a> {
     fn content(&self) -> String {
         let mut mod_str = String::from("");
         let mut pub_use_str = String::from("");
@@ -25,8 +24,14 @@ impl<'a> FileDefinition for ModFile<'a> {
     fn path(&self) -> String {
         path_str(vec![self.path, "mod"], true)
     }
+}
 
-    fn name(&self) -> String {
-        "mod.rs".to_string()
+#[async_trait::async_trait]
+impl<'a> CreateFile for ModFile<'a> {
+    async fn create_file(&self) -> Result<(), std::io::Error> {
+        let path = self.path();
+        let mut file = tokio::fs::File::create(&path).await?;
+        file.write(self.content().as_bytes()).await?;
+        Ok(())
     }
 }

@@ -16,10 +16,10 @@ use self::{
 };
 
 use super::{
-    create_file,
     mod_file::ModFile,
     path_str,
     util::{is_gql_primitive_ty, is_introspection_type_names},
+    CreateFile,
 };
 
 pub async fn create_type_definition_files(
@@ -62,22 +62,25 @@ pub async fn create_type_definition_files(
         futures.push(task);
     }
 
-    create_file(ModFile {
+    ModFile {
         path: &path_str(vec![base_path, "resolver"], false),
         struct_names: resolver_names,
-    })
+    }
+    .create_file()
     .await?;
 
-    create_file(ModFile {
+    ModFile {
         path: &path_str(vec![base_path, "input"], false),
         struct_names: input_names,
-    })
+    }
+    .create_file()
     .await?;
 
-    create_file(ModFile {
+    ModFile {
         path: &path_str(vec![base_path, "scalar"], false),
         struct_names: scalar_names,
-    })
+    }
+    .create_file()
     .await?;
 
     try_join_all(futures).await
@@ -143,11 +146,12 @@ async fn create_type_definition_file(
         }
         TypeDefinition::Scalar(def) => {
             let path = path_str(vec![base_path, "scalar", &filename], true);
-            create_file(ScalarFile {
+            ScalarFile {
                 def,
                 path: &path,
                 filename: &filename,
-            })
+            }
+            .create_file()
             .await
         }
     }
