@@ -136,7 +136,6 @@ fn sync_file(file_src: &str, object_def: &ObjectType) -> String {
                 if let syn::ImplItem::Method(item_method) = item {
                     let method_name = item_method.sig.ident.unraw().to_string();
                     let schema_field = get_field_by_name(object_def, &method_name);
-                    println!("name: {},{:?}", &object_def.name, schema_field);
                     if let Some(_field) = schema_field {
                         current_impl_items.push(item);
                     }

@@ -102,12 +102,13 @@ async fn create_type_definition_file(
         }
         TypeDefinition::Interface(def) => {
             let path = path_str(vec![base_path, "resolver", &filename], true);
-            create_file(InterfaceFile {
+            InterfaceFile {
                 def,
                 path: &path,
                 filename: &filename,
                 interface_obj_map,
-            })
+            }
+            .create_file()
             .await
         }
         TypeDefinition::Union(def) => {
