@@ -66,7 +66,6 @@ async fn run() -> Result<ExitCode> {
             create_project_files(app_name).await?;
             create_graphql_files(Some(app_name)).await?;
             println!("Successfully created the rusty-gql project!");
-            run_fmt();
             return Ok(ExitCode::Success);
         }
     }
