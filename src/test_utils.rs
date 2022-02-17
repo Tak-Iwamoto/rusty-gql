@@ -13,6 +13,7 @@ pub fn build_test_request(
         query: query.to_string(),
         operation_name,
         variables,
+        extensions: Default::default(),
     }
 }
 
