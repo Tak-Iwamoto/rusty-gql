@@ -11,6 +11,33 @@ fn vec_to_array<T, const N: usize>(v: Vec<T>) -> [T; N] {
         .unwrap_or_else(|v: Vec<T>| panic!("Expected a Vec of length {} but it was {}", N, v.len()))
 }
 
+impl<T: GqlInputType> GqlInputType for Vec<T> {
+    fn from_gql_value(value: Option<GqlValue>) -> Result<Self, String> {
+        match value {
+            Some(value) => match value {
+                GqlValue::List(list) => {
+                    let mut result = Vec::new();
+                    for v in list {
+                        let value = T::from_gql_value(Some(v))?;
+                        result.push(value)
+                    }
+                    Ok(result)
+                }
+                invalid_value => Err(format!(
+                    "Expected type: list, but found {}",
+                    invalid_value.to_string()
+                )),
+            },
+            None => Err("Expected type: list, but not found".to_string()),
+        }
+    }
+
+    fn to_gql_value(&self) -> GqlValue {
+        let values = self.iter().map(|v| v.to_gql_value()).collect();
+        GqlValue::List(values)
+    }
+}
+
 impl<T: GqlInputType, const N: usize> GqlInputType for [T; N] {
     fn from_gql_value(value: Option<GqlValue>) -> Result<Self, String> {
         match value {
